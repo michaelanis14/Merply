@@ -1,0 +1,111 @@
+cbq> SELECT default.Viewgroups[*].Viewgroup[1] AS K  FROM  `default` WHERE META( `default`).id LIKE "ViewStructure::%" AND default.Type ="Entity" ;
+{
+    "requestID": "81e5bcfd-2968-4286-8e15-fec3e42eb958",
+    "signature": {
+        "K": "json"
+    },
+    "results": [
+        {
+            "K": {
+                "Fields": [
+                    {
+                        "Label": "Name1",
+                        "SubFields": [
+                            {
+                                "Select": "Name",
+                                "Source": "Country",
+                                "Type": "Refrence"
+                            },
+                            {
+                                "Type": "Text"
+                            }
+                        ]
+                    }
+                ],
+                "Group": "general",
+                "Style": "vertical"
+            }
+        }
+    ],
+    "status": "success",
+    "metrics": {
+        "elapsedTime": "9.476729ms",
+        "executionTime": "9.431428ms",
+        "resultCount": 1,
+        "resultSize": 636
+    }
+}
+
+cbq> SELECT default.Viewgroups[*].Viewgroup[*] AS K  FROM  `default` WHERE META( `default`).id LIKE "ViewStructure::%" AND default.Type ="Entity" ;
+{
+    "requestID": "f136f90a-91f5-4deb-8ed3-017767f8515b",
+    "signature": {
+        "K": "object"
+    },
+    "results": [
+        {
+            "K": {
+                "Fields": [
+                    [
+                        {
+                            "Label": "Name",
+                            "SubFields": [
+                                {
+                                    "Select": "Name",
+                                    "Source": "Country",
+                                    "Type": "Refrence"
+                                },
+                                {
+                                    "Type": "Text"
+                                }
+                            ]
+                        },
+                        {
+                            "Label": "Address",
+                            "SubFields": [
+                                {
+                                    "Select": "Name",
+                                    "Source": "Country",
+                                    "Type": "Refrence"
+                                },
+                                {
+                                    "Type": "Text"
+                                }
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            "Label": "Name1",
+                            "SubFields": [
+                                {
+                                    "Select": "Name",
+                                    "Source": "Country",
+                                    "Type": "Refrence"
+                                },
+                                {
+                                    "Type": "Text"
+                                }
+                            ]
+                        }
+                    ]
+                ],
+                "Group": [
+                    "general",
+                    "general"
+                ],
+                "Style": [
+                    "vertical",
+                    "vertical"
+                ]
+            }
+        }
+    ],
+    "status": "success",
+    "metrics": {
+        "elapsedTime": "14.424356ms",
+        "executionTime": "14.376506ms",
+        "resultCount": 1,
+        "resultSize": 1972
+    }
+}

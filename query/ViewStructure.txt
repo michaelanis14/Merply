@@ -1,0 +1,85 @@
+{
+  "Title": "New Card1",
+  "Type": "Entity",
+  "Viewgroups": [
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "Label": "Name",
+            "SubFields": [
+              {
+                "Editable": false,
+                "Select": "Name",
+                "Source": "Contact",
+                "Type": "Refrence"
+              },
+              {
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "Label": "Address",
+            "SubFields": [
+              {
+                "Editable": false,
+                "Select": "Name",
+                "Source": "Contact",
+                "Type": "Refrence"
+              },
+              {
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "Label": "\"Home Tel\" :",
+            "SubFields": [
+              {
+                "Default": "No Idea",
+                "Type": "Fixed"
+              }
+            ]
+          }
+        ],
+        "Group": "general",
+        "Style": "horizontail"
+      }
+    },
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "Label": "Name1",
+            "SubFields": [
+              {
+                "Editable": false,
+                "Select": "Name",
+                "Source": "Contact",
+                "Type": "Refrence"
+              },
+              {
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "Label": "\"Homojo1\" :",
+            "SubFields": [
+              {
+                "Editable": false,
+                "Select": "Address",
+                "Source": "Contact",
+                "Type": "Refrence"
+              }
+            ]
+          }
+        ],
+        "Group": "general",
+        "Style": "horizontail"
+      }
+    }
+  ],
+  "document_id": "ViewStructure::1"
+}

@@ -1,0 +1,34 @@
+#ifndef PRSISTANCE_H
+#define PRSISTANCE_H
+
+#define DATABASE "default"
+
+#include "database.h"
+
+#include <QString>
+#include <QStringList>
+
+
+
+
+class Prsistance : public QObject
+{
+	Q_OBJECT
+public:
+	explicit Prsistance(QObject *parent = 0);
+	static bool write(QString table, QList<QString> lines,bool update);
+	static void write(QString table, QString line);
+
+	static QJsonArray table(QString line);
+	static bool init();
+	static QList<QString> ComboxList(QString table, QString select,QString condition = "");
+	static int Count(const QString table);
+	static QList<QJsonDocument> GetALL(const QString entity,const QString condition);
+	static bool Select(const QString query);
+	static QString GetDatabaseName();
+signals:
+
+public slots:
+};
+
+#endif // PRSISTANCE_H

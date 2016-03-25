@@ -1,0 +1,25 @@
+{
+  "Viewgroups": [
+    {
+      "Viewgroup": {
+        "Style": "vertical",
+        "Group": "general",
+        "Fields": [
+          {
+            "Label": "Name",
+            "SubFields": [
+              {
+                "Select": "Name",
+                "Source": "Country",
+                "Type": "Refrence"
+              },
+              {
+                "Type": "M15"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+SELECT SPLIT(META(`default`).id,"ViewStructure::")[1] AS `META(default).id`  FROM  `default` WHERE META( `default`).id LIKE "ViewStructure::%" AND default.Type ="Entity" ;
+
+SELECT default.Viewgroups  FROM  `default` WHERE META( `default`).id LIKE \"ViewStructure::%\" AND default.Type =\"Entity\"
+
+
+SELECT default.Viewgroups[*].Viewgroup.Fields[*].Label  FROM  `default` WHERE META( `default`).id LIKE "ViewStructure::%" AND default.Type ="Entity" ;

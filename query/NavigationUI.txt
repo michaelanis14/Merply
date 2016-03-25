@@ -1,0 +1,54 @@
+{
+  "Title": "Sales",
+  "Items": [
+    {
+      "Title": "Invoice",
+      "Type": "Entity",
+      "View": "Index",
+      "EntityId": "1",
+      "Items": [
+        {
+          "Title": "INV in 1",
+          "Type": "Page",
+          "Sections": [
+            {
+              "Title": "Invoices"
+            }
+          ],
+          "Items": [
+            {
+              "Title": "INv in INV1 ",
+              "Type": "Page",
+              "Sections": [
+                {
+                  "Title": "Invoices",
+                  "Items": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "Title": "INV in 2",
+          "Type": "Page",
+          "Sections": [
+            {
+              "Title": "Invoices",
+              "Items": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Payment",
+      "Type": "Page",
+      "Sections": [
+        {
+          "Title": "Invoices",
+          "Items": []
+        }
+      ]
+    }
+  ]
+}
