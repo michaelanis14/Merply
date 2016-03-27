@@ -51,6 +51,20 @@ void SettingsCtrlsUI::setTitle(QString value)
 	title->setText(value);
 }
 
+void SettingsCtrlsUI::clear()
+{
+	QList<QWidget *> Widgets = this->findChildren<QWidget *>();
+	foreach(QWidget * child, Widgets)
+		{
+		if(child != NULL){
+			layout->removeWidget(child);
+			child->setHidden(true);
+			//child->setParent(0);
+			child->deleteLater();
+			}
+		}
+}
+
 void SettingsCtrlsUI::btn_Clicked()
 {
 	if(sender()->objectName().contains("Delete")){

@@ -304,6 +304,7 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 }
 bool Database::query(QString query)
 {
+	//qDebug() << query;
 	lcb_t instance = Database::InitDatabase();
 	Database::Get()->array = QList<QJsonDocument>();
 	if(instance == NULL){

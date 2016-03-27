@@ -129,7 +129,8 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 	//else
 	//qDebug()<<"SubNav" << item->text(1) << column;
 	subNavigation->resizeColumnToContents(0);
-	NavigationPageEditUI::ShowUI(QJsonObject());
+
+	NavigationPageEditUI::ShowUI(Controller::GetPage(item->text(1).toInt()));
 	if(column == 2)
 		addSubNavChild(item);
 	else if(column == 3){
@@ -202,7 +203,7 @@ void NavigationEditUI::addSubNavChild(QTreeWidgetItem* parent)
 	child->setText(0,"New Button");
 	child->setFlags(child->flags() | Qt::ItemIsEditable);
 	//subNavigation->insertTopLevelItems(0,Controller::getMainNavigation(item->text(0)));
-
+	Controller::AddPage(key,QJsonObject());
 	parent->addChild(child);
 	child->setSelected(true);
 
@@ -244,6 +245,8 @@ void NavigationEditUI::addSubNavChild(QTreeWidgetItem* parent)
 	subNavigation->setSelectionModel(selection);
 
 
+
+
 }
 
 void NavigationEditUI::addSubNavTopItem()
@@ -255,7 +258,7 @@ void NavigationEditUI::addSubNavTopItem()
 	child->setText(0,"New Top Button");
 	child->setFlags(child->flags() | Qt::ItemIsEditable);
 	subNavigation->insertTopLevelItem(subNavigation->topLevelItemCount(),child);
-
+	Controller::AddPage(key,QJsonObject());
 
 	child->setSelected(true);
 
@@ -298,6 +301,8 @@ void NavigationEditUI::addSubNavTopItem()
 	selection->select(select->selectedRows().last(), QItemSelectionModel::Select | QItemSelectionModel::Rows);
 	subNavigation->resizeColumnToContents(select->selectedRows().last().column());
 	subNavigation->setSelectionModel(selection);
+
+
 
 }
 

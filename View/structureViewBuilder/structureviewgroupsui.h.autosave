@@ -36,6 +36,7 @@ private:
 	void addViewgroup();
 protected:
 	SettingsCtrlsUI* sctrlUI;
+	bool links;
 signals:
 	void cancel();
 

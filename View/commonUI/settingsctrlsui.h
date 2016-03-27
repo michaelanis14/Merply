@@ -21,6 +21,7 @@ public:
 	QString getTitle() const;
 	void setTitle(QString value);
 	QHBoxLayout* layout;
+	void clear();
 private:
 
 	QLabel *title;

@@ -171,10 +171,10 @@ QList<QJsonDocument> Controller::getEnities()
 	return Prsistance::GetALL("ViewStructure","default.Type =\"Entity\"");
 }
 
-QList<QString> Controller::getFields(QString Entity)
+QList<QString> Controller::getFields(QString Title)
 {
 	QStringList fieldsName;
-	Database::Get()->query("SELECT array_star(default.Viewgroups[*].Viewgroup).Fields FROM  `default` WHERE META(`default`).id = \"ViewStructure::"+Entity+"\"");
+	Database::Get()->query("SELECT array_star(default.Viewgroups[*].Viewgroup).Fields FROM  `default` WHERE META(`default`).id LIKE 'ViewStructure::%' AND default.Title ='"+Title+"'");
 	foreach(QJsonValue fv,Database::Get()->getDocument().object().value("Fields").toArray()){
 		foreach(QJsonValue fvvapn,fv.toArray()){
 			fieldsName << fvvapn.toObject().value("Label").toString();

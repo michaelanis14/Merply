@@ -37,7 +37,7 @@ signals:
 
 public slots:
 	void updateFields(QString type);
-	void updateSelect(QString entity);
+	void updateSelect(QString title);
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILD_H

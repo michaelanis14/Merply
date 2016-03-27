@@ -1,3 +1,5 @@
+
+
 #include "structurevieweditsubfeild.h"
 #include "structureviewedit.h"
 #include "controller.h"
@@ -63,7 +65,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS)
 
 	if(type.compare("Refrence") == 0){
 		Source = new ERPComboBox(0);
-		Source->addItems(Controller::Get()->getListItems("ViewStructure","SPLIT(META("+Controller::Get()->getDatabaseName()+").id,\"ViewStructure::\")[1] ","default.Type =\"Entity\""));
+		Source->addItems(Controller::Get()->getListItems("ViewStructure","Title","default.Type =\"Entity\""));
 		layout->addRow(new QLabel(tr("Source ")), Source);
 
 		Select = new ERPComboBox(0);
@@ -162,9 +164,9 @@ void StructureVieweditSubFeild::updateFields(QString type)
 	emit changed();
 }
 
-void StructureVieweditSubFeild::updateSelect(QString entity)
+void StructureVieweditSubFeild::updateSelect(QString title)
 {
-	Select->addItems(Controller::Get()->getFields(entity));
+	Select->addItems(Controller::Get()->getFields(title));
 
 }
 

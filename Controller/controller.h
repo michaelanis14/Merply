@@ -50,7 +50,7 @@ public:
 	QString toString(QJsonArray array);
 	bool documentInList(QList<QJsonDocument> all, QString key);
 	QList<QJsonDocument> getEnities();
-	QList<QString> getFields(QString Entity);
+	QList<QString> getFields(QString Title);
 	void updateLayoutViewGroups(QString entityName, QList<StructureViewsEditUI*> sVEUIs);
 	QStringList getLayoutViewGroups(QString entity);
 	bool storeDoc(QString key,QJsonDocument document);

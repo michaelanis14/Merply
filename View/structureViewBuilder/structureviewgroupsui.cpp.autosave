@@ -64,6 +64,7 @@ StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject struct
 	//	this->setLayout(layout);
 	init = true;
 	layout->addStretch(1);
+	this->links = false;
 }
 
 
