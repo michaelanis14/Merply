@@ -30,7 +30,8 @@ SOURCES += View/maindisplay.cpp \
     $$PWD/commonUI/headerlabel.cpp \
     $$PWD/commonUI/NavigationUI/navigationbtn.cpp \
     $$PWD/createeditui.cpp \
-    $$PWD/commonUI/NavigationUI/navigationeditui.cpp
+    $$PWD/commonUI/NavigationUI/navigationeditui.cpp \
+    $$PWD/commonUI/NavigationUI/navigationpageeditui.cpp
 
 HEADERS  += View/maindisplay.h \
     View/commonUI/rangevalidator.h \
@@ -59,7 +60,8 @@ HEADERS  += View/maindisplay.h \
     $$PWD/commonUI/headerlabel.h \
     $$PWD/commonUI/NavigationUI/navigationbtn.h \
     $$PWD/createeditui.h \
-    $$PWD/commonUI/NavigationUI/navigationeditui.h
+    $$PWD/commonUI/NavigationUI/navigationeditui.h \
+    $$PWD/commonUI/NavigationUI/navigationpageeditui.h
 
 #FORMS    += View/mainwindow.ui
 

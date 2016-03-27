@@ -9,6 +9,8 @@
 #include <QAbstractItemView>
 #include <QTreeWidget>
 
+
+#include "navigationpageeditui.h"
 NavigationEditUI::NavigationEditUI(QWidget *parent) : QWidget(parent)
 {
 	this->setContentsMargins(0,0,0,0);
@@ -127,6 +129,7 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 	//else
 	//qDebug()<<"SubNav" << item->text(1) << column;
 	subNavigation->resizeColumnToContents(0);
+	NavigationPageEditUI::ShowUI(QJsonObject());
 	if(column == 2)
 		addSubNavChild(item);
 	else if(column == 3){
