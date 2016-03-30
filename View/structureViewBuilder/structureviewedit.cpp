@@ -126,7 +126,7 @@ QJsonObject StructureViewEdit::save()
 	saveObject.insert("Label",label->text());
 	QJsonArray subFields;
 	foreach(StructureVieweditSubFeild* svsf, sVSFs){
-		subFields << svsf->save();
+        subFields.append(svsf->save());
 		}
 
 	saveObject.insert("SubFields",subFields);

@@ -38,7 +38,7 @@ QJsonArray ViewGroup::save()
 {
 	QJsonArray fields;
 	foreach(FeildUI* feild,feilds)
-		fields << feild->save();
+        fields.append(feild->save());
 	return fields;
 
 }

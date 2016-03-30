@@ -50,7 +50,7 @@ QJsonDocument ViewGroups::save()
 	QJsonObject entity;
 	QJsonArray fields;
 	foreach(ViewGroup* vg,viewgroups){
-		fields << vg->save();
+        fields.append(vg->save());
 		}
 	entity.insert("Fields",fields);
 	//entity.insert("Title",this->structureView.value("Title"))
