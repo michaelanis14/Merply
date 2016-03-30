@@ -14,7 +14,7 @@ class StructureViewEdit : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit StructureViewEdit(QWidget *parent = 0,QJsonValue fieldVS = QJsonValue());
+	explicit StructureViewEdit(QWidget *parent = 0,QJsonValue fieldVS = QJsonValue(),bool links = false);
 	QJsonObject save();
 	void showTypeFields();
 	void hideTypeFields();
@@ -40,6 +40,7 @@ signals:
 protected:
 	//void showEvent(QShowEvent *);
 	void paintEvent(QPaintEvent*event);
+	bool links;
 public slots:
 	void updatePreview(bool oldStrct = false);
 	void controller_Clicked(QString btn);

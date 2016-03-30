@@ -8,7 +8,7 @@ class StructureViewsEditUI : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit StructureViewsEditUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject());
+	explicit StructureViewsEditUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject(),bool links = false);
 	QJsonObject save();
 	QComboBox* group;
 	QLineEdit* groupName;
@@ -36,6 +36,8 @@ private:
 	QStringList styles;
 	void loadStyle();
 	void addStrField(QJsonValue fieldVS);
+protected:
+	bool links;
 signals:
 	void changed();
 	void styleChanged();

@@ -14,7 +14,7 @@ class StructureViewGroupsUI : public MainDisplay
 {
 	Q_OBJECT
 public:
-	explicit StructureViewGroupsUI(QWidget *parent = 0,QJsonObject structureView = QJsonObject());
+	explicit StructureViewGroupsUI(QWidget *parent = 0,QJsonObject structureView = QJsonObject(),bool links = false);
 	static void ShowUI(QJsonObject structureView);
 	void fill(QJsonObject structureView);
 	static StructureViewGroupsUI* GetUI();
@@ -36,6 +36,7 @@ private:
 	void addViewgroup();
 protected:
 	SettingsCtrlsUI* sctrlUI;
+	bool links;
 signals:
 	void cancel();
 

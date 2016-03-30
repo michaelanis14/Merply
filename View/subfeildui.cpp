@@ -61,6 +61,11 @@ SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonObject d
 		layout->addWidget(table);
 		field = table;
 		}
+	else if(type.compare("Link") == 0){
+		QPushButton* btn  = new QPushButton(structureView.value("Title").toString(),this);
+		layout->addWidget(btn);
+		field = btn;
+		}
 
 }
 

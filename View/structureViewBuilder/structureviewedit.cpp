@@ -3,14 +3,14 @@
 #include <QWidget>
 #include <QPushButton>
 
-StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS) : QWidget(parent)
+StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, bool links) : QWidget(parent)
 {
 
 
 
 	this->setContentsMargins(2,2,2,2);
 
-
+	this->links = links;
 	this->structureView = fieldVS.toObject();
 
 	layout = new QHBoxLayout(0);
@@ -42,13 +42,14 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS) : QWid
 	QObject::connect(topCntrlsPreview, SIGNAL(btnClicked(QString)),this, SLOT(controller_Clicked(QString)));
 	widgetsLayout->addWidget(topCntrlsPreview);
 
-	sctrlUI = new SettingsCtrlsUI();
-	sctrlUI->addbtn("Add",":/resources/icons/add.png","add");
-	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(controller_Clicked(QString)));
-	//sctrlUI->setAutoFillBackground(true);
-	layout->addWidget(sctrlUI);
+	//if(!links){
+		sctrlUI = new SettingsCtrlsUI();
+		sctrlUI->addbtn("Add",":/resources/icons/add.png","add");
+		QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(controller_Clicked(QString)));
+		//sctrlUI->setAutoFillBackground(true);
+		layout->addWidget(sctrlUI);
 
-
+		//}
 
 	preview = new QWidget(0);
 	preview->setContentsMargins(0,0,0,0);
@@ -152,15 +153,15 @@ void StructureViewEdit::fill(QJsonObject structureView)
 			foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
 				QString type = fieldVS.toObject().value("Type").toString();
 				StructureVieweditSubFeild * svsf = new StructureVieweditSubFeild(this);
-				svsf->fillTypeFields(type,fieldVS);
+				svsf->fillTypeFields(type,fieldVS,this->links);
 				sVSFs << svsf;
 				QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
-				RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
-				//rmvtbn->hideRemovebtn(true);
-				//QObject::connect(topCntrlsPreview,SIGNAL(removeClicked()),rmvtbn,SLOT(remove()));
 
-				QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
-				typeFieldsLayout->addWidget(rmvtbn,1,Qt::AlignLeft);
+					RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
+					QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
+					typeFieldsLayout->addWidget(rmvtbn,1,Qt::AlignLeft);
+
+				 typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 				//typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 				}
 
@@ -193,7 +194,7 @@ bool StructureViewEdit::setHidden(bool hidden)
 
 	typeFields->setHidden(hidden);
 	label->setHidden(hidden);
-	sctrlUI->setHidden(hidden);
+	if(sctrlUI) sctrlUI->setHidden(hidden);
 
 	preview->setHidden(!hidden);
 	if(hidden){
@@ -257,6 +258,7 @@ void StructureViewEdit::controller_Clicked(QString btn)
 		}
 	else if(btn.contains("Save")){
 		this->structureView = this->save();
+		this->updatePreview(false);
 		setHidden(true);
 		}
 	else if(btn.contains("Add")){
@@ -268,13 +270,18 @@ void StructureViewEdit::controller_Clicked(QString btn)
 void StructureViewEdit::addField()
 {
 	QString type = "Text";
+	if(links)
+		type = "Link";
 	StructureVieweditSubFeild * svsf = new StructureVieweditSubFeild(this);
-	svsf->fillTypeFields(type,QJsonObject());
+	svsf->fillTypeFields(type,QJsonObject(),this->links);
 	sVSFs << svsf;
 	QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
-	RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
-	QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
-	typeFieldsLayout->addWidget(rmvtbn,1,Qt::AlignLeft);
+
+		RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
+		QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
+		typeFieldsLayout->addWidget(rmvtbn,1,Qt::AlignLeft);
+
+	typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 
 	//typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 	this->structureView = this->save();

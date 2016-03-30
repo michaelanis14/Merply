@@ -64,12 +64,12 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 
 
 	pageDetails = new QGroupBox(tr("Page Details"));
-	QFormLayout* pageDetailsLayout = new QFormLayout;
+	QHBoxLayout* pageDetailsLayout = new QHBoxLayout;
 	pageDetails->setLayout(pageDetailsLayout);
-	pageDetailsLayout->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
-	pageDetailsLayout->setLabelAlignment(Qt::AlignLeft);
+	//pageDetailsLayout->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
+	//pageDetailsLayout->setLabelAlignment(Qt::AlignLeft);
 
-	pageDetailsLayout->addRow("Test",new PageStructureViewEditeUI());
+	pageDetailsLayout->addWidget(new PageStructureViewEditeUI());
 
 	layout->addWidget(pageDetails);
 

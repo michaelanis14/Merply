@@ -42,77 +42,111 @@ StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(
 }
 
 
-void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS)
+void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,bool links)
 {
 	//qDebug() << "fffield" << fieldVS;
 	this->filled = true;
 	this->type = type;
+	this->links = links;
 	if(fieldVS.isObject())
 		this->fieldVS = fieldVS;
 
 	ERPComboBox* typeSelect = new ERPComboBox(0);
 	QStringList types;
-	types << "Index"<<"Text"<< "Refrence" << "Fixed" << "Table";
+	if(links)
+		types << "Link";
+	else
+		types << "Index"<<"Text"<< "Refrence" << "Fixed" << "Table";
 	typeSelect->addItems(types);
 	typeSelect->setCurrentIndex(types.indexOf(type));
-	layout->addRow(new QLabel(tr("Data Type")), typeSelect);
+	if(!links)
+		layout->addRow(new QLabel(tr("Data Type")), typeSelect);
+
 
 	QObject::connect(typeSelect,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateFields(QString)));
 
 
 
+	if(links){
+		title = new QLineEdit;
 
+		if(!fieldVS.toObject().value("Title").toString().isEmpty())
+			title->setText(fieldVS.toObject().value("Title").toString());
+		else title->setText(tr("New "));
 
-	if(type.compare("Refrence") == 0){
+		layout->addRow(new QLabel(tr("Title")), title);
+
 		Source = new ERPComboBox(0);
 		Source->addItems(Controller::Get()->getListItems("ViewStructure","Title","default.Type =\"Entity\""));
+		if(!fieldVS.toObject().value("Source").toString().isEmpty())
+			Source->setCurrentText(fieldVS.toObject().value("Source").toString());
 		layout->addRow(new QLabel(tr("Source ")), Source);
 
 		Select = new ERPComboBox(0);
-		//Select->setText(fieldVS.toObject().value("Select").toString());
-		layout->addRow(new QLabel(tr("Select ")), Select);
+		Select->addItems(QStringList() << "Index" <<"New");
+		if(!fieldVS.toObject().value("Select").toString().isEmpty())
+			Select->setCurrentText(fieldVS.toObject().value("Select").toString());
+		layout->addRow(new QLabel(tr("Action ")), Select);
 
-		Editable = new QCheckBox(0);
-		Editable->setChecked(fieldVS.toObject().value("Editable").toString().compare("true") ==0);
-		layout->addRow(new QLabel(tr("Editable ")), Editable);
 
-		QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
+		//QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
 		QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
+		QObject::connect(title,SIGNAL(textChanged(QString)),this,SIGNAL(changed()));
 
-		updateSelect(Source->currentText());
-
+		//this->preview->hide();
 		}
-	else if(type.compare("Text") == 0){
+	else
 
-		defaultValue = new QLineEdit(0);
-		defaultValue->setText(fieldVS.toObject().value("Default").toString());
-		layout->addRow(new QLabel(tr("Default ")), defaultValue);
-		}
-	else if(type.compare("Fixed") == 0){
+		if(type.compare("Refrence") == 0){
+			Source = new ERPComboBox(0);
+			Source->addItems(Controller::Get()->getListItems("ViewStructure","Title","default.Type =\"Entity\""));
+			layout->addRow(new QLabel(tr("Source ")), Source);
 
-		defaultValue = new QLineEdit(0);
-		defaultValue->setText(fieldVS.toObject().value("Default").toString());
-		layout->addRow(new QLabel(tr("Default ")), defaultValue);
-		}
-	else if(type.compare("Index") == 0){
-		Source = new ERPComboBox(0);
-		//Source->setText(fieldVS.toObject().value("Source").toString());
-		layout->addRow(new QLabel(tr("Source ")), Source);
+			Select = new ERPComboBox(0);
+			//Select->setText(fieldVS.toObject().value("Select").toString());
+			layout->addRow(new QLabel(tr("Select ")), Select);
 
-		Select = new ERPComboBox(0);
-		//	Select->setText(fieldVS.toObject().value("Select").toString());
-		layout->addRow(new QLabel(tr("Select ")), Select);
-		}
-	else if(type.compare("Table") == 0){
-		tableEdit = new StructureVieweditSubFeildTable(this,fieldVS.toObject());
-		QObject::connect(tableEdit,SIGNAL(tableChanged()),this,SIGNAL(changed()));
+			Editable = new QCheckBox(0);
+			Editable->setChecked(fieldVS.toObject().value("Editable").toString().compare("true") ==0);
+			layout->addRow(new QLabel(tr("Editable ")), Editable);
 
-		layout->addRow("Tabel",tableEdit);
+			QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
+			QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
+
+			updateSelect(Source->currentText());
+
+			}
+		else if(type.compare("Text") == 0){
+
+			defaultValue = new QLineEdit(0);
+			defaultValue->setText(fieldVS.toObject().value("Default").toString());
+			layout->addRow(new QLabel(tr("Default ")), defaultValue);
+			}
+		else if(type.compare("Fixed") == 0){
+
+			defaultValue = new QLineEdit(0);
+			defaultValue->setText(fieldVS.toObject().value("Default").toString());
+			layout->addRow(new QLabel(tr("Default ")), defaultValue);
+			}
+		else if(type.compare("Index") == 0){
+			Source = new ERPComboBox(0);
+			//Source->setText(fieldVS.toObject().value("Source").toString());
+			layout->addRow(new QLabel(tr("Source ")), Source);
+
+			Select = new ERPComboBox(0);
+			//	Select->setText(fieldVS.toObject().value("Select").toString());
+			layout->addRow(new QLabel(tr("Select ")), Select);
+			}
+		else if(type.compare("Table") == 0){
+			tableEdit = new StructureVieweditSubFeildTable(this,fieldVS.toObject());
+			QObject::connect(tableEdit,SIGNAL(tableChanged()),this,SIGNAL(changed()));
+
+			layout->addRow("Tabel",tableEdit);
 
 
-		}
+			}
 	previewLayout->addWidget(new SubFieldUI(0,this->save()));
-//	qDebug() <<this->save();
+	//	qDebug() <<this->save();
 }
 
 QJsonObject StructureVieweditSubFeild::save()
@@ -120,29 +154,37 @@ QJsonObject StructureVieweditSubFeild::save()
 	QJsonObject saveObject;
 	if(!this->type.isEmpty() && filled)
 		{
+		//qDebug() << this->type << filled << links;
 		saveObject.insert("Type",type);
-		if(type.compare("Refrence") == 0){
+		if(links){
 			saveObject.insert("Select",Select->currentText());
 			saveObject.insert("Source",Source->currentText());
-			saveObject.insert("Editable",Editable->isChecked());
+			saveObject.insert("Title",title->text());
 
 			}
-		else if(type.compare("Text") == 0){
-			if(!defaultValue->text().isEmpty())
-				saveObject.insert("Default",defaultValue->text());
-			}
-		else  if(type.compare("Fixed") == 0){
-			if(!defaultValue->text().isEmpty())
-				saveObject.insert("Default",defaultValue->text());
-			}
-		else  if(type.compare("Index") == 0){
-			saveObject.insert("Select",Select->currentText());
-			saveObject.insert("Source",Source->currentText());
-			}
-		else if(type.compare("Table") == 0){
-			//qDebug() << tableEdit->save();
-			saveObject = tableEdit->save();
-			}
+		else
+			if(type.compare("Refrence") == 0){
+				saveObject.insert("Select",Select->currentText());
+				saveObject.insert("Source",Source->currentText());
+				saveObject.insert("Editable",Editable->isChecked());
+
+				}
+			else if(type.compare("Text") == 0){
+				if(!defaultValue->text().isEmpty())
+					saveObject.insert("Default",defaultValue->text());
+				}
+			else  if(type.compare("Fixed") == 0){
+				if(!defaultValue->text().isEmpty())
+					saveObject.insert("Default",defaultValue->text());
+				}
+			else  if(type.compare("Index") == 0){
+				saveObject.insert("Select",Select->currentText());
+				saveObject.insert("Source",Source->currentText());
+				}
+			else if(type.compare("Table") == 0){
+				//qDebug() << tableEdit->save();
+				saveObject = tableEdit->save();
+				}
 		}
 	return saveObject;
 }
@@ -160,7 +202,7 @@ void StructureVieweditSubFeild::updateFields(QString type)
 			}
 		}
 
-	this->fillTypeFields(type,this->fieldVS);
+	this->fillTypeFields(type,this->fieldVS,this->links);
 	emit changed();
 }
 

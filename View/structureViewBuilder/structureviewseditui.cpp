@@ -3,9 +3,10 @@
 #include "controller.h"
 #include "removebtn.h"
 
-StructureViewsEditUI::StructureViewsEditUI(QWidget *parent,QJsonObject structureView) : QWidget(parent)
+StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structureView, bool links) : QWidget(parent)
 {
 	this->structureView = structureView;
+	this->links = links;
 	this->setContentsMargins(2,2,2,2);
 
 	QVBoxLayout* structureViewGroupsUILayout = new QVBoxLayout(this);
@@ -274,7 +275,7 @@ void StructureViewsEditUI::loadStyle()
 
 void StructureViewsEditUI::addStrField(QJsonValue fieldVS)
 {
-	StructureViewEdit * strcView = new StructureViewEdit(0,fieldVS);
+	StructureViewEdit * strcView = new StructureViewEdit(0,fieldVS,this->links);
 	QObject::connect(strcView,SIGNAL(changed()),this,SIGNAL(changed()));
 	sVSFs << strcView;
 	layout->setStretch(layout->count()-1,0);
