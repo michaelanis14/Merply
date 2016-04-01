@@ -161,7 +161,7 @@ void StructureViewEdit::fill(QJsonObject structureView)
 					QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
 					typeFieldsLayout->addWidget(rmvtbn,1,Qt::AlignLeft);
 
-				 typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
+				 //typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 				//typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 				}
 
@@ -281,7 +281,7 @@ void StructureViewEdit::addField()
 		QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
 		typeFieldsLayout->addWidget(rmvtbn,1,Qt::AlignLeft);
 
-	typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
+	//typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 
 	//typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 	this->structureView = this->save();
