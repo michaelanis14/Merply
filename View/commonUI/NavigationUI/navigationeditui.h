@@ -28,9 +28,10 @@ private:
 	void addSubNavChild(QTreeWidgetItem* parent);
 	void addSubNavTopItem();
 	void addMainNavTopItem(QString title = "", int key = -1);
-	QJsonObject saveSubNavigation(QTreeWidgetItem* item);
 	void fillSubNavigation(int key);
 	int idCount;
+	QJsonObject page;
+	int currentSubNav;
 public slots:
 	void mainNavPressed(QTreeWidgetItem* item, int column);
 	void subNavPressed(QTreeWidgetItem* item, int column);

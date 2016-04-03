@@ -18,11 +18,12 @@ public:
 	static void ShowUI(QJsonObject structureView);
 	void fill(QJsonObject structureView);
 	static StructureViewGroupsUI* GetUI();
+	QJsonObject save();
 private:
 	QVBoxLayout *layout;
-	HeaderLabel* headerlbl;
+
 	QList<StructureViewsEditUI*> sVSFUIs;
-	QJsonObject save();
+
 	bool init;
 	//QWidget* preview;
 	static StructureViewGroupsUI* p_instance;
@@ -37,6 +38,8 @@ private:
 protected:
 	SettingsCtrlsUI* sctrlUI;
 	bool links;
+	HeaderLabel* headerlbl;
+
 signals:
 	void cancel();
 

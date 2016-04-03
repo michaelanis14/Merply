@@ -33,10 +33,12 @@ public:
 	QStringList getNameByGroupName(const QString& groupName);
 
 	void  setShowWarning(bool value);
-	void showWarning(QString warning);
+	bool showWarning(QString warning);
+	static bool ShowQuestion(QString question);
 	void static Log(QStringList log);
 
 	bool deleteDocument(QString id);
+	static bool Compare(QJsonObject first,QJsonObject second);
 
 	QStringList getModelDocumentsNameByType(const QString& modelType);
 
@@ -74,6 +76,7 @@ public:
 	static void ClearMainNavigation();
 
 	static bool SaveNavigation();
+	static QJsonObject SaveSubNavigation(QTreeWidgetItem* item);
 
 	//Model Defines
 	int static GetWindowWidth();

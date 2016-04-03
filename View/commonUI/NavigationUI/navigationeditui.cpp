@@ -64,6 +64,7 @@ NavigationEditUI::NavigationEditUI(QWidget *parent) : QWidget(parent)
 
 	this->editMode = true;
 	this->idCount = 0;
+	this->currentSubNav = -1;
 
 }
 
@@ -105,7 +106,7 @@ QList<QTreeWidgetItem *> NavigationEditUI::loadSubNavigation(QJsonArray subNav)
 		//qDebug() <<"KEY "<< key;
 		QString title = tab.toObject().value("Title").toString();
 		if(key!=0 && !title.isEmpty())
-			Controller::AddPage(key,tab.toObject());
+			Controller::AddPage(key,tab.toObject().value("Page").toObject());
 		QTreeWidgetItem*  item = new QTreeWidgetItem();
 		item->setText(1,QString::number(key));
 		item->setText(0,title);
@@ -128,9 +129,10 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 	//	emit subNavPressed(Controller::getSubNavigation(item->text(column)));
 	//else
 	//qDebug()<<"SubNav" << item->text(1) << column;
+
 	subNavigation->resizeColumnToContents(0);
 
-	NavigationPageEditUI::ShowUI(Controller::GetPage(item->text(1).toInt()));
+
 	if(column == 2)
 		addSubNavChild(item);
 	else if(column == 3){
@@ -145,26 +147,27 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 
 			}
 		}
+	else if(currentSubNav != item->text(1).toInt()){
+
+		qDebug() << page << NavigationPageEditUI::Get()->save();
+	//	qDebug() << Controller::Compare(page,NavigationPageEditUI::Get()->save());
+
+		QJsonObject newPage = NavigationPageEditUI::Get()->save();
+		if(!Controller::Compare(page,newPage)){
+			if(Controller::ShowQuestion(tr("Do you want to save changes ?")))
+				Controller::AddPage(currentSubNav,newPage);
+			}
+		page =  (Controller::GetPage(item->text(1).toInt()));
+		NavigationPageEditUI::ShowUI(page);
+		currentSubNav = item->text(1).toInt();
+		}
 	//save();
 
 
 	//QTreeWidgetItem::
 }
 
-QJsonObject NavigationEditUI::saveSubNavigation(QTreeWidgetItem * item)
-{
 
-	QJsonObject itemTab = QJsonObject();
-	itemTab.insert("Title",item->text(0));
-	itemTab.insert("ID",item->text(1).toInt());
-	if(item->childCount() > 0){
-		QJsonArray items = QJsonArray();
-		for(int i = 0; i < item->childCount();i++)
-			items << saveSubNavigation(item->child(i));
-		itemTab.insert("Items",items);
-		}
-	return itemTab;
-}
 void NavigationEditUI::save()
 {
 
@@ -174,19 +177,6 @@ void NavigationEditUI::save()
 		//subNavigation->clearSelection();
 		subNavigation->setEnabled(false);
 		mainNavigation->setEnabled(false);
-		Controller::ClearSubNavigation();
-		Controller::ClearMainNavigation();
-		Controller::ClearPages();
-
-		QList<QTreeWidgetItem *> items;
-
-		for(int i = 0; i < subNavigation->topLevelItemCount(); i++) {
-			//qDebug() << subNavigation->topLevelItem(i)->text(0);
-			Controller::AddPage(subNavigation->topLevelItem(i)->text(1).toInt(),saveSubNavigation((subNavigation->topLevelItem(i))));
-			items << subNavigation->topLevelItem(i);
-			}
-		Controller::AddMainNavigation(mainNavigation->selectedItems().last()->text(0).toInt(),mainNavigation->selectedItems().last()->text(1));
-		Controller::AddSubNavigation(mainNavigation->selectedItems().last()->text(0).toInt(),items);
 		Controller::SaveNavigation();
 		}
 	subNavigation->setEnabled(true);

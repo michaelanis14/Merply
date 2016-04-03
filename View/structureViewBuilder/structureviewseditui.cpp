@@ -180,6 +180,7 @@ QJsonObject StructureViewsEditUI::save()
 
 void StructureViewsEditUI::loadGroup()
 {
+
 	if(structureView.value("Viewgroup").toObject().value("Style").toString().compare("horizontail") == 0){
 
 
@@ -275,6 +276,7 @@ void StructureViewsEditUI::loadStyle()
 
 void StructureViewsEditUI::addStrField(QJsonValue fieldVS)
 {
+
 	StructureViewEdit * strcView = new StructureViewEdit(0,fieldVS,this->links);
 	QObject::connect(strcView,SIGNAL(changed()),this,SIGNAL(changed()));
 	sVSFs << strcView;

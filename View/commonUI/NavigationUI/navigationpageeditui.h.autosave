@@ -32,6 +32,8 @@ private:
 	PageStructureViewEditeUI* pageEdit;
 	QRadioButton *card ;
 	QRadioButton *page;
+	ERPComboBox* cards;
+	ERPComboBox* view;
 signals:
 
 public slots:

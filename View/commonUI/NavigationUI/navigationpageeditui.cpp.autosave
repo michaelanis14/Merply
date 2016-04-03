@@ -119,7 +119,8 @@ QJsonObject NavigationPageEditUI::save()
 		save = pageEdit->save();
 		}
 	else{
-		save
+		save.insert("Type","Page");
+		save.insert("Type","Page");
 		}
 	save.insert("Type","Page");
 	save.insert("Title",headerlbl->getTitle());

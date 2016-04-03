@@ -306,9 +306,7 @@ bool Controller::SaveNavigation()
 		mainNav.insert("ID",i.key());
 		QJsonArray items;
 		foreach(QTreeWidgetItem * tab,GetSubNavigation(i.key())){
-			//QJsonObject item;
-			//item.insert("Title",tab->text());
-			items.append(GetPage(tab->text(1).toInt()));
+			items.append(SaveSubNavigation(tab));
 			}
 		mainNav.insert("Items",items);
 
@@ -319,7 +317,21 @@ bool Controller::SaveNavigation()
 	return Controller::UpdateDoc(QJsonDocument(mainNav));
 
 }
+QJsonObject Controller::SaveSubNavigation(QTreeWidgetItem * item)
+{
 
+	QJsonObject itemTab = QJsonObject();
+	itemTab.insert("Title",item->text(0));
+	itemTab.insert("ID",item->text(1).toInt());
+	itemTab.insert("Page",GetPage(item->text(1).toInt()));
+	if(item->childCount() > 0){
+		QJsonArray items = QJsonArray();
+		for(int i = 0; i < item->childCount();i++)
+			items << SaveSubNavigation(item->child(i));
+		itemTab.insert("Items",items);
+		}
+	return itemTab;
+}
 
 int Controller::GetWindowWidth()
 {
@@ -364,7 +376,7 @@ void Controller::setShowWarning(bool value)
 
 
 
-void Controller::showWarning(QString warning){
+bool Controller::showWarning(QString warning){
 	//QMessageBox::StandardButton reply;
 	//reply = QMessageBox::question(0, "Test", warning,QMessageBox::Ok|QMessageBox::No);
 	//reply =
@@ -372,7 +384,7 @@ void Controller::showWarning(QString warning){
 	if(Model::Get()->getShowWarning())
 		QMessageBox::critical(0,"Warning",warning,QMessageBox::Ok);
 	else{
-		fprintf (stderr, "%s", warning.toLatin1().constData());
+		//fprintf (stderr, "%s", warning.toLatin1().constData());
 		}
 	/*
 	if (reply == QMessageBox::Ok) {
@@ -382,6 +394,18 @@ void Controller::showWarning(QString warning){
 	  qDebug() << "Yes was *not* clicked";
 	}
 	*/
+}
+
+bool Controller::ShowQuestion(QString question)
+{
+	QMessageBox::StandardButton reply;
+	reply = QMessageBox::question(0, "Test", question,QMessageBox::Ok|QMessageBox::No);
+	if (reply == QMessageBox::Ok) {
+	 return true;
+	 // QApplication::quit();
+	} else {
+	 return false;
+	}
 }
 /*
 void Controller::showWarning(QString warning)
@@ -420,6 +444,20 @@ bool Controller::save(QList<Entity*> entityGroup,bool update){
 bool Controller::deleteDocument(QString id)
 {
 	return Database::Get()->deleteDoc(id);
+}
+
+bool Controller::Compare(QJsonObject first, QJsonObject second)
+{
+	foreach(QString key,first.keys()){
+		if(first[key] != second[key])
+			return false;
+		}
+	foreach(QString key,second.keys()){
+		if(first[key] != second[key])
+			return false;
+		}
+
+	return true;
 }
 
 

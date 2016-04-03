@@ -36,6 +36,7 @@ private:
 	QStringList styles;
 	void loadStyle();
 	void addStrField(QJsonValue fieldVS);
+
 protected:
 	bool links;
 signals:

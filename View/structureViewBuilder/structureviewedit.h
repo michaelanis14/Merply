@@ -35,6 +35,7 @@ private:
 	void clearTypeFields();
 	bool setHidden(bool hidden);
 	SettingsCtrlsUI* topCntrls;
+
 signals:
 	void changed();
 protected:

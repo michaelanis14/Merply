@@ -4,5 +4,5 @@ PageStructureViewEditeUI::PageStructureViewEditeUI(QWidget *) : StructureViewGro
 {
 	this->sctrlUI->clear();
 	sctrlUI->addbtn("Add",":/resources/icons/add.png","add");
-
+	headerlbl->hide();
 }

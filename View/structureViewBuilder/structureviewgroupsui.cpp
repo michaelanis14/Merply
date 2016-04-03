@@ -104,6 +104,7 @@ void StructureViewGroupsUI::ShowUI(QJsonObject structureView) {
 
 void StructureViewGroupsUI::fill(QJsonObject structureView)
 {
+
 	QList<QWidget *> Widgets = viewGroups->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
 		{
@@ -174,6 +175,7 @@ void StructureViewGroupsUI::btn_Clicked(QString btn)
 	else if(btn.contains("Add")){
 
 		addViewgroup();
+
 		}
 	else if(btn.contains("Save")){
 	//	qDebug() << this->save();
@@ -191,6 +193,7 @@ void StructureViewGroupsUI::viewGroupStyleChanged()
 
 void StructureViewGroupsUI::updateLayout()
 {
+
 	fill(this->save());
 }
 
