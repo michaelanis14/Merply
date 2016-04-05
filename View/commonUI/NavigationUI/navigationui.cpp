@@ -98,7 +98,7 @@ QList<QTreeWidgetItem *> navigationUI::loadSubNavigation(QJsonArray subNav)
 		int key = tab.toObject().value("ID").toInt();
 		QString title = tab.toObject().value("Title").toString();
 		if(key!=0 && !title.isEmpty())
-			Controller::AddPage(key,tab.toObject());
+			Controller::AddPage(key,tab.toObject().value("Page").toObject());
 		QTreeWidgetItem*  item = new QTreeWidgetItem();
 		item->setText(1,QString::number(key));
 		item->setText(0,title);
@@ -147,9 +147,8 @@ void navigationUI::mainNavPressed(QTreeWidgetItem* item, int column)
 
 void navigationUI::subNavPressed(QTreeWidgetItem* item, int column)
 {
-
 	if(column == 0)
-		emit subNavPressed(Controller::GetPage(item->text(2).toInt()));
+		emit subNavPressed(Controller::GetPage(item->text(1).toInt()));
 	else qDebug() << item->text(column) << column;
 	//save();
 }

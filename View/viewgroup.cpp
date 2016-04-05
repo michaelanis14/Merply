@@ -26,10 +26,11 @@ ViewGroup::ViewGroup(QWidget *parent, QJsonObject structureView, QJsonObject dat
 				layout->addWidget(feild);
 				feilds << feild;
 
-			//	StructureViewEdit* svE = new StructureViewEdit(0,fieldVS.toObject());
-			//	layout->addWidget(svE);
+				//	StructureViewEdit* svE = new StructureViewEdit(0,fieldVS.toObject());
+				//	layout->addWidget(svE);
 
 				}
+			layout->addStretch();
 		}
 
 }
@@ -38,8 +39,7 @@ QJsonArray ViewGroup::save()
 {
 	QJsonArray fields;
 	foreach(FeildUI* feild,feilds)
-		fields << feild->save();
-        fields.append(feild->save());
+		fields.append(feild->save());
 	return fields;
 
 }

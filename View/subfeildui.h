@@ -25,10 +25,12 @@ public:
 private:
 	QHBoxLayout *layout;
 	QWidget* field;
+	QJsonObject structureView;
 signals:
 
 public slots:
 		void indexedFillEvent(QString completion);
+		void linkPressed();
 };
 
 #endif // SUBFIELDUI_H

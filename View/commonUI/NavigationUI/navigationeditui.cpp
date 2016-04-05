@@ -149,19 +149,14 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 		}
 	else if(currentSubNav != item->text(1).toInt()){
 
-		qDebug() << page << NavigationPageEditUI::Get()->save();
+	//	qDebug() << page << NavigationPageEditUI::Get()->save();
 	//	qDebug() << Controller::Compare(page,NavigationPageEditUI::Get()->save());
-
-		QJsonObject newPage = NavigationPageEditUI::Get()->save();
-		if(!Controller::Compare(page,newPage)){
-			if(Controller::ShowQuestion(tr("Do you want to save changes ?")))
-				Controller::AddPage(currentSubNav,newPage);
-			}
-		page =  (Controller::GetPage(item->text(1).toInt()));
-		NavigationPageEditUI::ShowUI(page);
-		currentSubNav = item->text(1).toInt();
 		}
 	//save();
+	savePage();
+	page =  (Controller::GetPage(item->text(1).toInt()));
+	NavigationPageEditUI::ShowUI(page);
+	currentSubNav = item->text(1).toInt();
 
 
 	//QTreeWidgetItem::
@@ -374,6 +369,17 @@ void NavigationEditUI::fillSubNavigation(int key)
 		}
 }
 
+void NavigationEditUI::savePage()
+{
+
+	QJsonObject newPage = NavigationPageEditUI::Get()->save();
+	if(!Controller::Compare(page,newPage)){
+		if(Controller::ShowQuestion(tr("Do you want to save changes ?")))
+			Controller::AddPage(currentSubNav,newPage);
+		}
+
+}
+
 void NavigationEditUI::paintEvent(QPaintEvent *)
 {
 	QStyleOption opt;
@@ -406,6 +412,7 @@ void NavigationEditUI::btn_Clicked(QString btn)
 		addSubNavTopItem();
 		}
 	else if(btn.contains("Save")){
+		this->savePage();
 		this->save();
 		this->btn_Clicked("Cancel");
 		}

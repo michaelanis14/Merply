@@ -117,11 +117,15 @@ QJsonObject NavigationPageEditUI::save()
 	QJsonObject save;
 	if(page->isChecked()){
 		save = pageEdit->save();
+		save.insert("Type","Page");
+
 		}
 	else{
-		save
+		save.insert("Card",cards->currentText());
+		save.insert("Select",view->currentText());
+		save.insert("Type","Entity");
+
 		}
-	save.insert("Type","Page");
 	save.insert("Title",headerlbl->getTitle());
 	return save;
 }

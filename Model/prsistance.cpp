@@ -163,7 +163,9 @@ QList<QString> Prsistance::ComboxList(QString table, QString select,QString cond
 	QString where;
 	if(!condition.isEmpty())
 		where = QString("AND "+condition);
-	Database::Get()->query("SELECT "+select.trimmed()+" AS `"+select.trimmed()+"`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \""+table+"::%\" "+where);
+	QString query = "SELECT "+select.trimmed()+" AS `"+select.trimmed()+"`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \""+table+"::%\" "+where;
+	//qDebug() << query;
+	Database::Get()->query(query);
 	foreach (const QJsonDocument & value, Database::Get()->getArray()){
 		//qDebug() << select.trimmed() << value.object().keys();
 		QString valueString = value.object().value(select.trimmed()).toString();

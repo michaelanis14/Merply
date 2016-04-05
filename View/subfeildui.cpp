@@ -6,7 +6,7 @@ SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonObject d
 {
 
 	//qDebug() << "wassup" << structureView;
-
+	this->structureView = structureView;
 	layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
@@ -63,6 +63,7 @@ SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonObject d
 		}
 	else if(type.compare("Link") == 0){
 		QPushButton* btn  = new QPushButton(structureView.value("Title").toString(),this);
+		QObject::connect(btn,SIGNAL(pressed()),this,SLOT(linkPressed()));
 		layout->addWidget(btn);
 		field = btn;
 		}
@@ -107,4 +108,9 @@ void SubFieldUI::indexedFillEvent(QString completion)
 {
 	qDebug() << completion;
 
+}
+
+void SubFieldUI::linkPressed()
+{
+	Controller::Get()->linkPressed(this->structureView);
 }

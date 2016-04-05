@@ -29,6 +29,7 @@
 
 #include "structureviewgroupsui.h"
 #include "createeditui.h"
+#include "pageui.h"
 
 
 Controller::Controller(QObject *parent) :
@@ -91,11 +92,19 @@ void Controller::showDisplay()
 }
 void Controller::subNavPressed(QJsonObject view)
 {
+	//qDebug() << view;
 	if(view.value("Type").toString().contains("Entity")){
-		Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
+		//	Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
+		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE "+QString(DATABASE)+".Title = '"+view.value("Card").toString()+"'");
+		//qDebug()<<"Q : " << query;
+		Database::Get()->query(query);
+
 		QJsonDocument d =Database::Get()->getDocument();
-		qDebug() << view.value("EntityId").toString();
+		//qDebug() << view.value("Card").toString() << d;
 		CreateEditUI::ShowUI(d.object(),QJsonObject());
+		}
+	else if(view.value("Type").toString().contains("Page")){
+		PageUI::ShowUI(view);
 		}
 }
 
@@ -219,6 +228,23 @@ bool Controller::UpdateDoc(QJsonDocument document)
 	return Database::Get()->updateDoc(document);
 }
 
+void Controller::linkPressed(QJsonObject link)
+{
+	qDebug() << link;
+
+	if(link.value("Type").toString().contains("Link")){
+		//	Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
+		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE "+QString(DATABASE)+".Title = '"+link.value("Source").toString()+"'");
+		//qDebug()<<"Q : " << query;
+		Database::Get()->query(query);
+
+		QJsonDocument d =Database::Get()->getDocument();
+		//qDebug() << view.value("Card").toString() << d;
+		CreateEditUI::ShowUI(d.object(),QJsonObject());
+		}
+
+}
+
 void Controller::AddSubNavigation(int key, QList<QTreeWidgetItem*> subNav)
 {
 	Model::Get()->addSubNavigation(key,subNav);
@@ -310,7 +336,7 @@ bool Controller::SaveNavigation()
 			}
 		mainNav.insert("Items",items);
 
-	//	qDebug() << mainNav;
+		//	qDebug() << mainNav;
 		//mainNavs.append(QJsonDocument(mainNav));
 		}
 	mainNav.insert("document_id","NavigationUI::1");
@@ -394,6 +420,7 @@ bool Controller::showWarning(QString warning){
 	  qDebug() << "Yes was *not* clicked";
 	}
 	*/
+	return true;
 }
 
 bool Controller::ShowQuestion(QString question)
@@ -401,11 +428,11 @@ bool Controller::ShowQuestion(QString question)
 	QMessageBox::StandardButton reply;
 	reply = QMessageBox::question(0, "Test", question,QMessageBox::Ok|QMessageBox::No);
 	if (reply == QMessageBox::Ok) {
-	 return true;
-	 // QApplication::quit();
-	} else {
-	 return false;
-	}
+		return true;
+		// QApplication::quit();
+		} else {
+		return false;
+		}
 }
 /*
 void Controller::showWarning(QString warning)

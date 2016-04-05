@@ -39,10 +39,13 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 CreateEditUI* CreateEditUI::p_instance = 0;
 void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data) {
 
-	if(p_instance == 0)
+	if(p_instance == 0){
 		p_instance = new CreateEditUI(0,viewStructure, data);
+		}
+	else{
 	p_instance->clear();
 	p_instance->fill(viewStructure, data);
+		}
 	MainForm::Get()->ShowDisplay(p_instance);
 }
 

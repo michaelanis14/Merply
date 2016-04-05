@@ -58,6 +58,9 @@ public:
 	bool storeDoc(QString key,QJsonDocument document);
 	static bool UpdateDoc(QJsonDocument document);
 
+	//
+
+
 	//Model Interface
 		 //Navigation
 	static void AddSubNavigation(int key, QList<QTreeWidgetItem*> subNav);
@@ -96,6 +99,7 @@ private:
 
 public slots:
 	void subNavPressed(QJsonObject view);
+	void linkPressed(QJsonObject link);
 
 };
 

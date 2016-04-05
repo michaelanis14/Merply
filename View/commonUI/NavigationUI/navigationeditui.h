@@ -32,6 +32,7 @@ private:
 	int idCount;
 	QJsonObject page;
 	int currentSubNav;
+	void savePage();
 public slots:
 	void mainNavPressed(QTreeWidgetItem* item, int column);
 	void subNavPressed(QTreeWidgetItem* item, int column);
