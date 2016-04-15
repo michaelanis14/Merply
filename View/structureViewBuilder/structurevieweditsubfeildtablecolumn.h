@@ -26,6 +26,8 @@ signals:
 public slots:
 	void updateFields(QString value);
 	void updateSelect(QString entity);
+
+	void updateSelectData(QList<QString> fields);
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILDTABLECOLUMN_H

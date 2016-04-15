@@ -26,8 +26,10 @@
 #define NAVIGATION_SUB_HEIGHT 100
 
 
-class Model
+class Model:public QObject
 {
+	Q_OBJECT
+
 public:
 	static Model* Get();
 	bool Log(const QStringList& log);
@@ -56,8 +58,6 @@ public:
 
 	QMap<int, QList<QTreeWidgetItem*> > getSubNavigationModel();
 	QMap<int, QString > getMainNavigationModel();
-
-
 
 private:
 	explicit Model();

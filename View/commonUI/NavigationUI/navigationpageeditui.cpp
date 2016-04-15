@@ -50,11 +50,11 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	cardDetailsLayout->setLabelAlignment(Qt::AlignLeft);
 
 	cards = new ERPComboBox(this,false);
-	cards->addItems(Controller::Get()->getListItems("ViewStructure","Title","default.Type =\"Entity\""));
+	cardsItems = Controller::Get()->getListItems("ViewStructure","Title","default.Type =\"Entity\"");
+	cards->addItems(cardsItems);
 	cardDetailsLayout->addRow(tr("Card"),cards);
 
 	view = new ERPComboBox(this,false);
-	QStringList viewList;
 	viewList << "Index" << "New";
 	view->addItems(viewList);
 	cardDetailsLayout->addRow(tr("View"),view);
@@ -98,11 +98,19 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 {
 
 	this->structureView = structureView;
+	if(!structureView.value("Title").toString().isEmpty())
+		this->headerlbl->setTitle(structureView.value("Title").toString());
 	if(structureView.value("Type").toString().compare("Entity") == 0){
+		if(structureView.value("Title").toString().isEmpty())
+			this->headerlbl->setTitle(tr("New Card"));
 		card->setChecked(true);
 		cardToggled(true);
+		cards->setCurrentIndex(cardsItems.indexOf(structureView.value("Card").toString()));
+		view->setCurrentIndex(viewList.indexOf(structureView.value("Select").toString()));
 		}
 	else{
+		if(structureView.value("Title").toString().isEmpty())
+			this->headerlbl->setTitle(tr("New Page"));
 		page->setChecked(true);
 		pageToggled(true);
 		pageEdit->fill(structureView);

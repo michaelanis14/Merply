@@ -119,7 +119,7 @@ bool Database::deleteDoc(QString documentid)
 lcb_t Database::InitDatabase()
 {
 	// initializing
-	Database::Get()->document = QJsonDocument();
+	//Database::Get()->document = QJsonDocument();
 	Database::Get()->array.clear();
 
 	struct lcb_create_st cropts;// = { 0 };
@@ -153,7 +153,7 @@ bool Database::KillDatabase(lcb_t instance)
 
 bool Database::IncrementKey(QString key)
 {
-	Database::Get()->value = QString::number(-1);
+	//Database::Get()->value = QString::number(-1);
 
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){
@@ -189,7 +189,7 @@ bool Database::IncrementKey(QString key)
 int Database::GetKey(QString key)
 {
 	if(getDoc(key))
-		return Database::Get()->value.toInt();
+		//return Database::Get()->value.toInt();
 	return -1;
 }
 void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
@@ -198,30 +198,18 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 	if (err == LCB_SUCCESS) {
 		QJsonParseError parserError;
 		QByteArray byteArray((char*) resp->v.v0.bytes,(int)resp->v.v0.nbytes);
-		Database::Get()->document = QJsonDocument::fromJson(byteArray , &parserError);
-		//qDebug() << resp->v.v0.cas;
-		QJsonObject objectwithCAS = Database::Get()->document.object();
-		objectwithCAS.insert("cas_value",QString::number(resp->v.v0.cas));
+		QJsonDocument documentWithoutCAS =  QJsonDocument::fromJson(byteArray , &parserError);
 
-		QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
-
-		//qDebug() <<"Got Doc"<< resp->v.v0.key << keyByte << QString(keyByte);
-		objectwithCAS.insert("document_id",QString(keyByte));
-		//	qDebug() << objectwithCAS.value("document_id");
-
-
-		Database::Get()->document = QJsonDocument(objectwithCAS);
 		if(parserError.error == QJsonParseError::NoError){
-			//QString strJson(Database::Get()->document.toJson(QJsonDocument::Compact));
-			//qDebug()<<"NoError" << strJson;
+			QJsonObject objectwithCAS = documentWithoutCAS.object();
+			objectwithCAS.insert("cas_value",QString::number(resp->v.v0.cas));
+			QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
+			objectwithCAS.insert("document_id",QString(keyByte));
+			emit (Database::Get()->gotDocument(QJsonDocument(objectwithCAS)));
 			}
 		else{
-			//	qDebug() << parserError.errorString();
-			Database::Get()->value = QString(byteArray);
-			//	qDebug() << Database::Get()->value;
+			emit Database::Get()->gotValue(QString(byteArray));
 			}
-
-		//	qDebug("Received document: %.*s\n", (int)resp->v.v0.nbytes, resp->v.v0.bytes);
 		} else {
 		fprintf(stderr, "Couldn’t retrieve item: %s\n", lcb_strerror(instance, err));
 		}
@@ -260,42 +248,35 @@ bool Database::getDoc(QString key) {
 
 }
 
+//QJsonDocument Database::getDocument() const
+//{
+//	return QJsonDocument();
+//}
 
-QJsonDocument Database::getDocument() const
-{
-	return document;
-}
+
+
 
 void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 
 	if (! (resp->rflags & LCB_RESP_F_FINAL)) {
 		QJsonParseError parserError;
 		QByteArray byteArray(resp->row,resp->nrow);
-
-		Database::Get()->document = QJsonDocument::fromJson(byteArray , &parserError);
-		Database::Get()->document.toJson(QJsonDocument::Compact);
-		//qDebug() <<Database::Get()->document.object();
-		Database::Get()->array << Database::Get()->document;
-		//	QString strJson(Database::Get()->document.toJson(QJsonDocument::Compact));
-		//	QJsonValue v(strJson);
-		//	Database::Get()->array << v;
-		//qDebug() << array;
+		QJsonDocument documentToArray =  QJsonDocument::fromJson(byteArray , &parserError);
 		if(parserError.error == QJsonParseError::NoError){
-			//QString strJson(Database::Get()->document.toJson(QJsonDocument::Compact));
-			//qDebug() <<"No Errors"<< strJson;
-
+			documentToArray.toJson(QJsonDocument::Compact);
+			Database::Get()->array << documentToArray;
 			}
 		else{
-			qDebug() << parserError.errorString();
-			Database::Get()->value = QString(byteArray);
+			qDebug() << parserError.errorString() << "emitting Value Line: DATABASE268";
+			Database::Get()->emit gotValue(QString(byteArray));
 			//	qDebug() << Database::Get()->value;
 			}
 
 		} else {
-		//qDebug() << Database::Get()->array;
+	//	qDebug() << Database::Get()->array;
 
 		//Database::Get()->document = QJsonDocument(Database::Get()->array);
-		Database::Get()->document.toJson(QJsonDocument::Compact);
+		Database::Get()->emit gotDocuments(Database::Get()->array);
 		//qDebug() << Database::Get()->document.array();
 		//.toJson(QJsonDocument::Compact);
 		//	qDebug("Got metadata: %.*s\n", (int)resp->nrow, resp->row);
@@ -320,12 +301,8 @@ bool Database::query(QString query)
 	lcb_N1QLPARAMS *nparams = lcb_n1p_new();
 
 	lcb_n1p_setstmtz(nparams,query.toUtf8().constData());
-	// "SELECT * from default WHERE  \"id = Contact::* \"");
-
 	lcb_n1p_mkcmd(nparams, &cmd);
-
 	cmd.callback = rowCallback;
-
 	lcb_error_t rc = lcb_n1ql_query(instance, NULL, &cmd);
 	if(rc == LCB_SUCCESS){
 		lcb_n1p_free(nparams);
@@ -337,9 +314,9 @@ bool Database::query(QString query)
 
 		}
 	else{
+		qDebug() << "FAIL query" << query;
 		lcb_n1p_free(nparams);
 		lcb_wait(instance);
-		qDebug() << "FAIL query" << query;
 		Database::KillDatabase(instance);
 		return false;
 		}
@@ -355,7 +332,7 @@ QList<QJsonDocument> Database::getArray() const
 
 QString Database::getValue() const
 {
-	return value;
+	return "-1";
 }
 
 QString Database::getLastKeyID() const
@@ -424,10 +401,11 @@ bool Database::storeDoc(QString key,QJsonDocument document) {
 
 
 
-Database::Database()
+Database::Database():
+	QObject()
 {
-	this->document =  QJsonDocument();
-	this->value = QString();
+	//	this->document =  QJsonDocument();
+//	this->value = QString();
 	this->array = QList<QJsonDocument>();
 	//IncrementKey("cont");
 	/*

@@ -28,7 +28,8 @@ private:
 	QGroupBox *cardDetails ;
 	QGroupBox *pageDetails ;
 	QJsonObject structureView;
-
+	QStringList cardsItems;
+	QStringList viewList;
 	PageStructureViewEditeUI* pageEdit;
 	QRadioButton *card ;
 	QRadioButton *page;

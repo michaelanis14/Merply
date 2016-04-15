@@ -26,7 +26,9 @@
 
 
 
-Model::Model(){
+Model::Model():
+	QObject()
+{
 	this->showWarning = true;
 	subNavigation =  QMap<int, QList<QTreeWidgetItem *> >();
 	pages =  QMap<int, QJsonObject >();

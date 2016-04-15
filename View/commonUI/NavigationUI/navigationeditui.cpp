@@ -1,8 +1,6 @@
 #include "navigationeditui.h"
 #include <QDebug>
-#include "navigationui.h"
-#include "navigationbtn.h"
-#include "controller.h"
+
 #include "navigationeditui.h"
 #include "mainform.h"
 #include <QHeaderView>
@@ -15,6 +13,7 @@ NavigationEditUI::NavigationEditUI(QWidget *parent) : QWidget(parent)
 {
 	this->setContentsMargins(0,0,0,0);
 	this->setObjectName("navigationUI");
+	this->oldItemSubNavSelected = new QTreeWidgetItem();
 	this->layout = new QVBoxLayout(this);
 	this->layout->setContentsMargins(0,0,0,0);
 	//this->layout->setAlignment(Qt::AlignLeft);
@@ -22,7 +21,7 @@ NavigationEditUI::NavigationEditUI(QWidget *parent) : QWidget(parent)
 	this->setFixedWidth(Controller::GetNavigationWidth());
 	this->setFixedHeight(Controller::GetWindowHeight());
 
-	SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
+	sctrlUI = new SettingsCtrlsUI();
 	sctrlUI->setFixedHeight(Controller::GetNavigationSettingsBarHeight());
 	sctrlUI->addbtn("Add",":/resources/icons/add.png","add");
 	sctrlUI->addbtn("Save",":/resources/icons/save.png","save");
@@ -77,24 +76,29 @@ NavigationEditUI* NavigationEditUI::Get(){
 }
 
 
-void NavigationEditUI::loadMainNavigation(QList<QJsonDocument> navDocs)
+void NavigationEditUI::loadMainNavigation(QJsonDocument navDoc)
 {
 	mainNavigation->clear();
 	subNavigation->clear();
 	Controller::ClearMainNavigation();
 	Controller::ClearSubNavigation();
 	//qDebug() << navDocs;
-	foreach(QJsonDocument doc,navDocs){
-		QString title = doc.object().value("Title").toString();
-		int key = doc.object().value("ID").toInt();
-		QJsonArray items = doc.object().value("Items").isArray()?doc.object().value("Items").toArray():QJsonArray();
+	foreach(QJsonValue mainNav,navDoc.object().value("MainNavigations").toArray()){
+		QString title = mainNav.toObject().value("Title").toString();
+		int key = mainNav.toObject().value("ID").toInt();
+		QJsonArray items = mainNav.toObject().value("Items").isArray()?mainNav.toObject().value("Items").toArray():QJsonArray();
 		this->addMainNavTopItem( title, key);
 		Controller::AddMainNavigation(key,title);
 		Controller::AddSubNavigation(key,loadSubNavigation(items));
 		}
 	if(mainNavigation->topLevelItemCount() > 0){
+		mainNavigation->clearSelection();
 		mainNavigation->selectionModel()->select(mainNavigation->model()->index(0,0,QModelIndex()),QItemSelectionModel::Select| QItemSelectionModel::Rows);
 		mainNavPressed(mainNavigation->topLevelItem(0),1);
+		}
+	else{
+		subNavigation->setEnabled(false);
+		sctrlUI->setEnabled(false);
 		}
 
 }
@@ -147,19 +151,24 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 
 			}
 		}
-	else if(currentSubNav != item->text(1).toInt()){
+	else if(column == 0 && currentSubNav != item->text(1).toInt() && oldItemSubNavSelected){
+		oldItemSubNavSelected->setSelected(true);
+		QItemSelectionModel *selection = new QItemSelectionModel( subNavigation->model() );
+		QItemSelectionModel *select = subNavigation->selectionModel();
+		selection->select(select->selectedRows().last(), QItemSelectionModel::Select | QItemSelectionModel::Rows);
+		subNavigation->setSelectionModel(selection);
+		savePage();
+		oldItemSubNavSelected->setSelected(false);
 
-	//	qDebug() << page << NavigationPageEditUI::Get()->save();
-	//	qDebug() << Controller::Compare(page,NavigationPageEditUI::Get()->save());
+		oldItemSubNavSelected = item;
+		oldItemSubNavSelected->setSelected(true);
+
+
+		page =  (Controller::GetPage(item->text(1).toInt()));
+		NavigationPageEditUI::ShowUI(page);
+		currentSubNav = item->text(1).toInt();
 		}
-	//save();
-	savePage();
-	page =  (Controller::GetPage(item->text(1).toInt()));
-	NavigationPageEditUI::ShowUI(page);
-	currentSubNav = item->text(1).toInt();
 
-
-	//QTreeWidgetItem::
 }
 
 
@@ -317,11 +326,14 @@ void NavigationEditUI::addMainNavTopItem(QString title,int key)
 
 	Controller::AddMainNavigation(key,title);
 
-	if(mainNavigation->topLevelItemCount()-1 > 0){
+	if(mainNavigation->topLevelItemCount() > 0){
 		mainNavigation->clearSelection();
 		mainNavigation->selectionModel()->select(mainNavigation->model()->index(mainNavigation->topLevelItemCount()-1,0,QModelIndex()),QItemSelectionModel::Select| QItemSelectionModel::Rows);
 		mainNavPressed(mainNavigation->topLevelItem(mainNavigation->topLevelItemCount()-1),1);
+		subNavigation->setEnabled(true);
+		sctrlUI->setEnabled(true);
 		}
+
 }
 
 void NavigationEditUI::fillSubNavigation(int key)
@@ -363,7 +375,12 @@ void NavigationEditUI::fillSubNavigation(int key)
 			++it;
 			}
 		if(subNavigation->topLevelItemCount() > 0){
+			//qDebug() << page << subNavigation->topLevelItem(0)->text(1).toInt();
 			subNavigation->selectionModel()->select(subNavigation->model()->index(0,0,QModelIndex()),QItemSelectionModel::Select| QItemSelectionModel::Rows);
+			page =  (Controller::GetPage(subNavigation->topLevelItem(0)->text(1).toInt()));
+			NavigationPageEditUI::ShowUI(page);
+			currentSubNav = subNavigation->topLevelItem(0)->text(1).toInt();
+
 			subNavPressed(subNavigation->topLevelItem(0),0);
 			}
 		}
@@ -374,9 +391,12 @@ void NavigationEditUI::savePage()
 
 	QJsonObject newPage = NavigationPageEditUI::Get()->save();
 	if(!Controller::Compare(page,newPage)){
+		subNavigation->setEnabled(false);
+
 		if(Controller::ShowQuestion(tr("Do you want to save changes ?")))
 			Controller::AddPage(currentSubNav,newPage);
 		}
+	subNavigation->setEnabled(true);
 
 }
 
@@ -403,9 +423,8 @@ void NavigationEditUI::btn_Clicked(QString btn)
 	if(btn.contains("Cancel")){
 		navigationUI::Get()->setHidden(false);
 		navigationUI::Get()->setParent(MainForm::Get());
-		navigationUI::Get()->loadMainNavigation(Controller::Get()->getAll("NavigationUI",""));
-		NavigationEditUI::Get()->setHidden(true);
-
+		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(btn_ClickedDataReturned(QJsonDocument)));
+		Controller::Get()->getDoc("NavigationUI::1");
 		}
 	else if(btn.contains("Add")){
 
@@ -420,6 +439,13 @@ void NavigationEditUI::btn_Clicked(QString btn)
 		addMainNavTopItem();
 		}
 }
+void NavigationEditUI::btn_ClickedDataReturned(QJsonDocument document)
+{
+	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(btn_ClickedDataReturned(QJsonDocument)));
+	navigationUI::Get()->loadMainNavigation(document);
+	NavigationEditUI::Get()->setHidden(true);
+}
+
 void NavigationEditUI::mainNavPressed(QTreeWidgetItem* item, int column)
 {
 

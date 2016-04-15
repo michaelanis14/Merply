@@ -61,23 +61,23 @@ navigationUI::navigationUI(QWidget *parent) :
 
 }
 
-void navigationUI::loadMainNavigation(QList<QJsonDocument> navDocs)
+void navigationUI::loadMainNavigation(QJsonDocument navDoc)
 {
 	mainNavigation->clear();
 	subNavigation->clear();
 	Controller::ClearMainNavigation();
 	Controller::ClearSubNavigation();
 	Controller::ClearPages();
-	foreach(QJsonDocument doc,navDocs){
-		int key = doc.object().value("ID").toInt();
-		QString title = doc.object().value("Title").toString();
-		QJsonArray items = doc.object().value("Items").isArray()?doc.object().value("Items").toArray():QJsonArray();
+	foreach(QJsonValue mainNav,navDoc.object().value("MainNavigations").toArray()){
+		QString title = mainNav.toObject().value("Title").toString();
+		int key = mainNav.toObject().value("ID").toInt();
+		QJsonArray items = mainNav.toObject().value("Items").isArray()?mainNav.toObject().value("Items").toArray():QJsonArray();
 		//qDebug() << title << items;
 		if(!title.isEmpty() && !items.isEmpty()){
 			QTreeWidgetItem* maintab = new QTreeWidgetItem();
 			maintab->setText(2,QString::number(key));
 			maintab->setText(1,title);
-			mainNavigation->insertTopLevelItem(0,maintab);
+			mainNavigation->insertTopLevelItem(mainNavigation->topLevelItemCount(),maintab);
 			}
 		mainNavigation->resizeColumnToContents(0);
 
@@ -85,6 +85,7 @@ void navigationUI::loadMainNavigation(QList<QJsonDocument> navDocs)
 		Controller::AddSubNavigation(key,loadSubNavigation(items));
 		}
 	if(mainNavigation->topLevelItemCount() > 0){
+		mainNavigation->clearSelection();
 		mainNavigation->selectionModel()->select(mainNavigation->model()->index(0,0,QModelIndex()),QItemSelectionModel::Select| QItemSelectionModel::Rows);
 		mainNavPressed(mainNavigation->topLevelItem(0),0);
 		}
@@ -136,21 +137,24 @@ void navigationUI::paintEvent(QPaintEvent *)
 
 void navigationUI::mainNavPressed(QTreeWidgetItem* item, int column)
 {
-	//qDebug() <<item->text(0)  << column;
-
-	//item->setText(0,"Pressedd");
-	if(column == 0)
-		subNavigation->insertTopLevelItems(0,Controller::GetSubNavigation(item->text(2).toInt()));
-	else qDebug() << item->text(column) << column;
+	subNavigation->clearSelection();
+	int count = subNavigation->topLevelItemCount();
+	for(int i = 0; i < count;i++){
+		subNavigation->takeTopLevelItem(0);
+		}
+	subNavigation->insertTopLevelItems(0,Controller::GetSubNavigation(item->text(2).toInt()));
 	subNavigation->clearFocus();
+
+	if(subNavigation->topLevelItemCount() > 0){
+		//qDebug() << page << subNavigation->topLevelItem(0)->text(1).toInt();
+		subNavigation->selectionModel()->select(subNavigation->model()->index(0,0,QModelIndex()),QItemSelectionModel::Select| QItemSelectionModel::Rows);
+		subNavPressed(subNavigation->topLevelItem(0),0);
+		}
 }
 
 void navigationUI::subNavPressed(QTreeWidgetItem* item, int column)
 {
-	if(column == 0)
-		emit subNavPressed(Controller::GetPage(item->text(1).toInt()));
-	else qDebug() << item->text(column) << column;
-	//save();
+	emit subNavPressed(Controller::GetPage(item->text(1).toInt()));
 }
 
 void navigationUI::btn_Clicked(QString btn)
@@ -159,10 +163,20 @@ void navigationUI::btn_Clicked(QString btn)
 	if(btn.contains("settings")){
 		navigationUI::Get()->setHidden(true);
 		NavigationEditUI::Get()->setParent(MainForm::Get());
-		NavigationEditUI::Get()->loadMainNavigation(Controller::Get()->getAll("NavigationUI",""));
-		NavigationEditUI::Get()->setHidden(false);
-
+		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(btn_ClickedDataReturned(QJsonDocument)));
+		Controller::Get()->getDoc("NavigationUI::1");
 		}
 }
+
+void navigationUI::btn_ClickedDataReturned(QJsonDocument document)
+{
+	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(btn_ClickedDataReturned(QJsonDocument)));
+	NavigationEditUI::Get()->loadMainNavigation(document);
+	NavigationEditUI::Get()->setHidden(false);
+
+}
+
+
+
 
 

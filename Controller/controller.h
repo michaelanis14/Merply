@@ -17,6 +17,10 @@
 #include <QMap>
 #include <QTreeWidgetItem>
 
+#include <QJsonDocument>
+#include <QJsonValue>
+#include <QJsonArray>
+#include <QJsonObject>
 
 class Controller : public QObject
 {
@@ -24,6 +28,9 @@ class Controller : public QObject
 public:
 	//    explicit Controller(QObject * parent = 0);
 	void showDisplay();
+
+
+
 	static Controller* Get();
 
 
@@ -43,7 +50,7 @@ public:
 	QStringList getModelDocumentsNameByType(const QString& modelType);
 
 	int Count(const QString table);
-	bool getDoc(QString key);
+	void getDoc(QString key);
 	QList<QString> getListItems(QString table, QString select,QString condition = "");
 	QString getDatabaseName();
 
@@ -52,7 +59,7 @@ public:
 	QString toString(QJsonArray array);
 	bool documentInList(QList<QJsonDocument> all, QString key);
 	QList<QJsonDocument> getEnities();
-	QList<QString> getFields(QString Title);
+	void getFields(QString Title);
 	void updateLayoutViewGroups(QString entityName, QList<StructureViewsEditUI*> sVEUIs);
 	QStringList getLayoutViewGroups(QString entity);
 	bool storeDoc(QString key,QJsonDocument document);
@@ -100,6 +107,24 @@ private:
 public slots:
 	void subNavPressed(QJsonObject view);
 	void linkPressed(QJsonObject link);
+
+
+	void showDisplayDataReturned(QJsonDocument document);
+	void loadNavigationData(QJsonDocument document);
+	void subNavPressedData(QList<QJsonDocument> documents);
+	void getFieldsData(QJsonDocument document);
+	void linkPressedData(QJsonDocument document);
+	void getDocData(QJsonDocument document);
+
+signals:
+	void getDocDataReturned(QJsonDocument document);
+	void getFieldsData(QList<QString> fields);
+
+	void gotDocument(QJsonDocument docuemnt);
+	void gotDocuments(QList<QJsonDocument> array);
+	void gotValue(QString value);
+	void gotLastKey(QString LastKeyID);
+
 
 };
 

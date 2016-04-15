@@ -17,10 +17,10 @@
 #include <libcouchbase/couchbase.h>
 #include <libcouchbase/n1ql.h>
 
-class Database
+class Database: public QObject
 {
 
-
+	Q_OBJECT
 public:
 	Database();
 
@@ -43,7 +43,7 @@ public:
 							 const lcb_get_resp_t *resp);
 	static bool getDoc(QString key);
 
-	QJsonDocument getDocument() const;
+	//QJsonDocument getDocument() const;
 	static void rowCallback(lcb_t, int, const lcb_RESPN1QL *resp);
 
 	bool query(QString query);
@@ -59,10 +59,16 @@ public:
 
 private:
 	static Database* p_instance;
-	QJsonDocument document;
+	//QJsonDocument document;
 	QList<QJsonDocument> array;
-	QString value;
+	//	QString value;
 	QString LastKeyID;
+
+signals:
+	void gotDocument(QJsonDocument document);
+	void gotDocuments(QList<QJsonDocument> array);
+	void gotValue(QString value);
+	void gotLastKey(QString LastKeyID);
 };
 
 #endif // DATABASE_H

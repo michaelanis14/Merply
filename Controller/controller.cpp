@@ -32,6 +32,8 @@
 #include "pageui.h"
 
 
+
+
 Controller::Controller(QObject *parent) :
 	QObject(parent)
 {
@@ -78,34 +80,61 @@ void Controller::showDisplay()
 
 	//Prsistance::init();
 
+	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
 	Database::Get()->getDoc("ViewStructure::1");
-	QJsonDocument d =Database::Get()->getDocument();
+
+	//QJsonDocument d =Database::Get()->getDocument();
 	//ViewGroups* vgs= new ViewGroups(0,"Contact",d.object(),d.object());
-	StructureViewGroupsUI::ShowUI(d.object());
 	//layout->addWidget(vgs);
 
 	QObject::connect(navigationUI::Get(),SIGNAL(subNavPressed(QJsonObject)),this,SLOT(subNavPressed(QJsonObject)));
 
+	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
+	Database::Get()->getDoc("NavigationUI::1");
 
-	navigationUI::Get()->loadMainNavigation(getAll("NavigationUI",""));
-	//navigationUI::Get()->addTab(StructureViewGroupsUI::GetUI(),"Contact");
 }
+
+void Controller::showDisplayDataReturned(QJsonDocument document)
+{
+	StructureViewGroupsUI::ShowUI(document.object());
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
+}
+
+void Controller::loadNavigationData(QJsonDocument document)
+{
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
+	navigationUI::Get()->loadMainNavigation(document);
+}
+
+
+
+
+
+
 void Controller::subNavPressed(QJsonObject view)
 {
 	//qDebug() << view;
 	if(view.value("Type").toString().contains("Entity")){
+
+		//QObject::connect(Database::Get(),SIGNAL(Database::Get()->gotDocument(QJsonDocument)),this,SLOT(subNavPressed(QJsonObject)));
+
 		//	Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
+		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedData(QList<QJsonDocument>)));
 		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE "+QString(DATABASE)+".Title = '"+view.value("Card").toString()+"'");
 		//qDebug()<<"Q : " << query;
 		Database::Get()->query(query);
-
-		QJsonDocument d =Database::Get()->getDocument();
-		//qDebug() << view.value("Card").toString() << d;
-		CreateEditUI::ShowUI(d.object(),QJsonObject());
 		}
 	else if(view.value("Type").toString().contains("Page")){
 		PageUI::ShowUI(view);
 		}
+}
+void Controller::subNavPressedData(QList<QJsonDocument> documents)
+{
+//	qDebug() << "SubPreseed" << documents;
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedData(QList<QJsonDocument>)));
+	if(documents.count() > 0)
+		CreateEditUI::ShowUI(documents.first().object(),QJsonObject());
+
 }
 
 /**
@@ -127,11 +156,18 @@ int Controller::Count(const QString table)
 	return Prsistance::Count(table);
 }
 
-bool Controller::getDoc(QString key)
+void Controller::getDoc(QString key)
 {
-	return Database::getDoc(key);
-}
+	//QObject::connect(Database::Get(),SIGNAL(Database::Get()->gotDocument(QJsonDocument)),this,SLOT(subNavPressed(QJsonObject)));
 
+	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getDocData(QJsonDocument)));
+	Database::getDoc(key);
+}
+void Controller::getDocData(QJsonDocument document)
+{
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getDocData(QJsonDocument)));
+	emit gotDocument(document);
+}
 QList<QString> Controller::getListItems(QString table, QString select,QString condition)
 {
 	return Prsistance::ComboxList(table,select,condition);
@@ -180,17 +216,28 @@ QList<QJsonDocument> Controller::getEnities()
 	return Prsistance::GetALL("ViewStructure","default.Type =\"Entity\"");
 }
 
-QList<QString> Controller::getFields(QString Title)
+void Controller::getFields(QString Title)
 {
-	QStringList fieldsName;
+	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getFieldsData(QJsonDocument)));
+
 	Database::Get()->query("SELECT array_star(default.Viewgroups[*].Viewgroup).Fields FROM  `default` WHERE META(`default`).id LIKE 'ViewStructure::%' AND default.Title ='"+Title+"'");
-	foreach(QJsonValue fv,Database::Get()->getDocument().object().value("Fields").toArray()){
+
+}
+
+void Controller::getFieldsData(QJsonDocument document)
+{
+	//CreateEditUI::ShowUI(document.object(),QJsonObject());
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getFieldsData(QJsonDocument)));
+	QStringList fieldsName;
+	foreach(QJsonValue fv,document.object().value("Fields").toArray()){
 		foreach(QJsonValue fvvapn,fv.toArray()){
 			fieldsName << fvvapn.toObject().value("Label").toString();
 			}
 		}
-	return fieldsName;
+	emit getFieldsData( fieldsName);
 }
+
+
 
 void Controller::updateLayoutViewGroups(QString entityName,QList<StructureViewsEditUI*> sVEUIs)
 {
@@ -234,16 +281,23 @@ void Controller::linkPressed(QJsonObject link)
 
 	if(link.value("Type").toString().contains("Link")){
 		//	Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
+		QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(linkPressedData(QJsonDocument)));
 		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE "+QString(DATABASE)+".Title = '"+link.value("Source").toString()+"'");
 		//qDebug()<<"Q : " << query;
 		Database::Get()->query(query);
-
-		QJsonDocument d =Database::Get()->getDocument();
 		//qDebug() << view.value("Card").toString() << d;
-		CreateEditUI::ShowUI(d.object(),QJsonObject());
 		}
 
 }
+void Controller::linkPressedData(QJsonDocument document)
+{
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(linkPressedData(QJsonDocument)));
+
+	CreateEditUI::ShowUI(document.object(),QJsonObject());
+}
+
+
+
 
 void Controller::AddSubNavigation(int key, QList<QTreeWidgetItem*> subNav)
 {
@@ -325,9 +379,11 @@ bool Controller::SaveNavigation()
 
 	QMapIterator<int, QString > i(Model::Get()->getMainNavigationModel());
 	//QList<QJsonDocument> mainNavs;
-	QJsonObject mainNav;
+	QJsonObject navigation;
+	QJsonArray mainNavs;
 	while (i.hasNext()) {
 		i.next();
+		QJsonObject mainNav;
 		mainNav.insert("Title",i.value());
 		mainNav.insert("ID",i.key());
 		QJsonArray items;
@@ -335,12 +391,14 @@ bool Controller::SaveNavigation()
 			items.append(SaveSubNavigation(tab));
 			}
 		mainNav.insert("Items",items);
-
 		//	qDebug() << mainNav;
 		//mainNavs.append(QJsonDocument(mainNav));
+		mainNavs << mainNav;
 		}
-	mainNav.insert("document_id","NavigationUI::1");
-	return Controller::UpdateDoc(QJsonDocument(mainNav));
+
+	navigation.insert("MainNavigations",mainNavs);
+	navigation.insert("document_id","NavigationUI::1");
+	return Controller::UpdateDoc(QJsonDocument(navigation));
 
 }
 QJsonObject Controller::SaveSubNavigation(QTreeWidgetItem * item)
@@ -475,6 +533,9 @@ bool Controller::deleteDocument(QString id)
 
 bool Controller::Compare(QJsonObject first, QJsonObject second)
 {
+	//	qDebug() << "COMPAREEEEEEEEEEE";
+	//	qDebug() << first;
+	//	qDebug() << second;
 	foreach(QString key,first.keys()){
 		if(first[key] != second[key])
 			return false;

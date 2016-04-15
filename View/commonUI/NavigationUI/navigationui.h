@@ -36,7 +36,7 @@ class navigationUI : public QWidget
 	Q_OBJECT
 public:
 	static navigationUI* Get();
-	void loadMainNavigation(QList<QJsonDocument> navDocs);
+	void loadMainNavigation(QJsonDocument navDoc);
 	QList<QTreeWidgetItem*> loadSubNavigation(QJsonArray subNav);
 	void save();
 	explicit navigationUI(QWidget *parent = 0);
@@ -55,6 +55,7 @@ public slots:
 	void mainNavPressed(QTreeWidgetItem* item, int column);
 	void subNavPressed(QTreeWidgetItem* item, int column);
 	void btn_Clicked(QString btn);
+	void btn_ClickedDataReturned(QJsonDocument document);
 
 signals:
 	void subNavPressed(QJsonObject view);

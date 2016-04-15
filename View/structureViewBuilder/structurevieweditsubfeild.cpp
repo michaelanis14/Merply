@@ -208,8 +208,17 @@ void StructureVieweditSubFeild::updateFields(QString type)
 
 void StructureVieweditSubFeild::updateSelect(QString title)
 {
-	Select->addItems(Controller::Get()->getFields(title));
+	QObject::connect(Controller::Get(),SIGNAL(getFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+	Controller::Get()->getFields(title);
 
+
+}
+
+void StructureVieweditSubFeild::updateSelectData(QList<QString> fields)
+{
+	QObject::disconnect(Controller::Get(),SIGNAL(getFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+
+	Select->addItems(fields);
 }
 
 void StructureVieweditSubFeild::paintEvent(QPaintEvent * event)

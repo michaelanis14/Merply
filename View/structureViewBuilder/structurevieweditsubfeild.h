@@ -39,6 +39,7 @@ signals:
 public slots:
 	void updateFields(QString type);
 	void updateSelect(QString title);
+	void updateSelectData(QList<QString> fields);
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILD_H
