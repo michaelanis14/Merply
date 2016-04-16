@@ -16,7 +16,7 @@ PermissionsUI::PermissionsUI(QWidget *parent) : QWidget(parent)
 	//pageDetailsLayout->setLabelAlignment(Qt::AlignLeft);
 	//pageEdit = new PageStructureViewEditeUI();
 
-	PermissionFieldUI *pf = new PermissionFieldUI(this,"Read");
+	PermissionFieldUI *pf = new PermissionFieldUI(0,"Read");
 	permissionsBoxLayout->addWidget(pf);
 	layout->addWidget(permissionsBox);
 
