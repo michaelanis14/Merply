@@ -1,7 +1,9 @@
 INCLUDEPATH +=  View/commonUI \
 		View/commonUI/NavigationUI \
 		View/VisualDesign \
-		View/structureViewBuilder
+		View/structureViewBuilder\
+		View/permissionsUI
+
 
 
 SOURCES += View/maindisplay.cpp \
@@ -34,7 +36,8 @@ SOURCES += View/maindisplay.cpp \
     $$PWD/commonUI/NavigationUI/navigationpageeditui.cpp \
     $$PWD/commonUI/NavigationUI/pagestructureviewediteui.cpp \
     $$PWD/pageui.cpp \
-    $$PWD/permissionsUI/permissionsui.cpp
+    $$PWD/permissionsUI/permissionsui.cpp \
+    $$PWD/permissionsUI/permissionfieldui.cpp
 
 HEADERS  += View/maindisplay.h \
     View/commonUI/rangevalidator.h \
@@ -67,7 +70,8 @@ HEADERS  += View/maindisplay.h \
     $$PWD/commonUI/NavigationUI/navigationpageeditui.h \
     $$PWD/commonUI/NavigationUI/pagestructureviewediteui.h \
     $$PWD/pageui.h \
-    $$PWD/permissionsUI/permissionsui.h
+    $$PWD/permissionsUI/permissionsui.h \
+    $$PWD/permissionsUI/permissionfieldui.h
 
 #FORMS    += View/mainwindow.ui
 

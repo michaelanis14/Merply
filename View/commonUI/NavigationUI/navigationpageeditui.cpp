@@ -4,6 +4,7 @@
 #include "controller.h"
 #include "structureviewgroupsui.h"
 
+
 NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent)
 {
 	this->setContentsMargins(0,0,0,0);
@@ -73,7 +74,7 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 
 	layout->addWidget(pageDetails);
 
-
+	layout->addWidget(new PermissionsUI());
 
 
 	cardDetails->setHidden(true);

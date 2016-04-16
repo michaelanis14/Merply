@@ -5,6 +5,9 @@
 #include "mainform.h"
 #include "headerlabel.h"
 #include "pagestructureviewediteui.h"
+
+#include "permissionsui.h"
+
 #include <QGroupBox>
 #include <QRadioButton>
 
@@ -24,7 +27,6 @@ private:
 	QVBoxLayout *layout;
 	HeaderLabel* headerlbl;
 	static NavigationPageEditUI* p_instance;
-	QGroupBox *createFirstExclusiveGroup();
 	QGroupBox *cardDetails ;
 	QGroupBox *pageDetails ;
 	QJsonObject structureView;
@@ -35,6 +37,7 @@ private:
 	QRadioButton *page;
 	ERPComboBox* cards;
 	ERPComboBox* view;
+	PermissionsUI* permissions;
 signals:
 
 public slots:
