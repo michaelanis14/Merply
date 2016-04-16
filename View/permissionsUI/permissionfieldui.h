@@ -18,6 +18,7 @@ private:
 	ERPComboBox* readPermissons;
 	QGroupBox* allowGroupBox;
 	QTreeWidget *allowGroup;
+	QGroupBox* denyGroupBox;
 	QTreeWidget *denyGroup;
 	QFormLayout* layout;
 signals:
@@ -26,6 +27,8 @@ public slots:
 	void showSpcfic(int field);
 	void allowGroupPressed(QTreeWidgetItem* item, int column);
 	void denyGroupPressed(QTreeWidgetItem* item, int column);
+	void addDenied();
+	void addAllowed();
 };
 
 #endif // PERMISSIONFIELDUI_H
