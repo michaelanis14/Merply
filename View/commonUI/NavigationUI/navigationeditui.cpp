@@ -52,13 +52,14 @@ NavigationEditUI::NavigationEditUI(QWidget *parent) : QWidget(parent)
 	mainNavigation = new QTreeWidget();
 	mainNavigation->setColumnCount(3);
 	mainNavigation->setFixedWidth(Controller::GetNavigationWidth());
-
 	mainNavigation->setFixedHeight(Controller::GetNavigationMainHeight());
 	mainNavigation->header()->close();
 	mainNavigation->setEditTriggers(QAbstractItemView::AllEditTriggers);
 	mainNavigation->setDropIndicatorShown(false);
 	QObject::connect(mainNavigation, SIGNAL(itemPressed(QTreeWidgetItem*,int)), this, SLOT(mainNavPressed(QTreeWidgetItem*,int)));
-	mainNavigation->hideColumn(0);
+	QObject::connect(mainNavigation, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(mainNavChanged(QTreeWidgetItem*,int)));
+
+	//mainNavigation->hideColumn(0);
 	this->layout->addWidget(mainNavigation);
 
 	this->editMode = true;
@@ -85,7 +86,8 @@ void NavigationEditUI::loadMainNavigation(QJsonDocument navDoc)
 	//qDebug() << navDocs;
 	foreach(QJsonValue mainNav,navDoc.object().value("MainNavigations").toArray()){
 		QString title = mainNav.toObject().value("Title").toString();
-		int key = mainNav.toObject().value("ID").toInt();
+
+		double key = mainNav.toObject().value("ID").toDouble();
 		QJsonArray items = mainNav.toObject().value("Items").isArray()?mainNav.toObject().value("Items").toArray():QJsonArray();
 		this->addMainNavTopItem( title, key);
 		Controller::AddMainNavigation(key,title);
@@ -106,7 +108,7 @@ QList<QTreeWidgetItem *> NavigationEditUI::loadSubNavigation(QJsonArray subNav)
 {
 	QList<QTreeWidgetItem *> items;
 	foreach(QJsonValue tab,subNav){
-		int key = tab.toObject().value("ID").toInt();
+		double key = tab.toObject().value("ID").toDouble();
 		//qDebug() <<"KEY "<< key;
 		QString title = tab.toObject().value("Title").toString();
 		if(key!=0 && !title.isEmpty())
@@ -142,16 +144,16 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 	else if(column == 3){
 		if(subNavigation->indexOfTopLevelItem(item) != -1){
 			if(subNavigation->takeTopLevelItem(subNavigation->indexOfTopLevelItem(item)))
-				Controller::RemoveSubNavigation(item->text(1).toInt());
+				Controller::RemoveSubNavigation(item->text(1).toDouble());
 
 			}
 		else{
 			item->parent()->removeChild(item);
-			Controller::RemoveSubNavigation(item->text(1).toInt());
+			Controller::RemoveSubNavigation(item->text(1).toDouble());
 
 			}
 		}
-	else if(column == 0 && currentSubNav != item->text(1).toInt() && oldItemSubNavSelected){
+	else if(column == 0 && currentSubNav != item->text(1).toDouble() && oldItemSubNavSelected){
 		oldItemSubNavSelected->setSelected(true);
 		QItemSelectionModel *selection = new QItemSelectionModel( subNavigation->model() );
 		QItemSelectionModel *select = subNavigation->selectionModel();
@@ -164,9 +166,9 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 		oldItemSubNavSelected->setSelected(true);
 
 
-		page =  (Controller::GetPage(item->text(1).toInt()));
+		page =  (Controller::GetPage(item->text(1).toDouble()));
 		NavigationPageEditUI::ShowUI(page);
-		currentSubNav = item->text(1).toInt();
+		currentSubNav = item->text(1).toDouble();
 		}
 
 }
@@ -192,7 +194,7 @@ void NavigationEditUI::addSubNavChild(QTreeWidgetItem* parent)
 {
 	QTreeWidgetItem* child = new QTreeWidgetItem();
 
-	int key = ++idCount;
+	double key = ++idCount;
 	child->setText(1,QString::number(key));
 	child->setText(0,"New Button");
 	child->setFlags(child->flags() | Qt::ItemIsEditable);
@@ -247,7 +249,7 @@ void NavigationEditUI::addSubNavTopItem()
 {
 	QTreeWidgetItem* child = new QTreeWidgetItem();
 
-	int key = ++idCount;
+	double key = ++idCount;
 	child->setText(1,QString::number(key));
 	child->setText(0,"New Top Button");
 	child->setFlags(child->flags() | Qt::ItemIsEditable);
@@ -256,7 +258,7 @@ void NavigationEditUI::addSubNavTopItem()
 
 	child->setSelected(true);
 
-
+	if(key != -14){
 
 	QLabel* add = new QLabel();
 	QPixmap addpix (":/resources/icons/1457665371_plus.png");
@@ -271,6 +273,7 @@ void NavigationEditUI::addSubNavTopItem()
 
 	subNavigation->setItemWidget(child,2,add);
 	subNavigation->setItemWidget(child,3,remove);
+		}
 
 	subNavigation->resizeColumnToContents(0);
 	subNavigation->setColumnWidth(2,30);
@@ -289,9 +292,9 @@ void NavigationEditUI::addSubNavTopItem()
 	//qDebug() << select->hasSelection() ;//check if has selection
 	//qDebug() << select->selectedRows().last() ;// return selected row(s)
 
-	QList<QTreeWidgetItem*> subNav =  Controller::GetSubNavigation(mainNavigation->selectedItems().last()->text(0).toInt());
+	QList<QTreeWidgetItem*> subNav =  Controller::GetSubNavigation(mainNavigation->selectedItems().last()->text(0).toDouble());
 	subNav.append(child);
-	Controller::AddSubNavigation(mainNavigation->selectedItems().last()->text(0).toInt(),subNav);
+	Controller::AddSubNavigation(mainNavigation->selectedItems().last()->text(0).toDouble(),subNav);
 	selection->select(select->selectedRows().last(), QItemSelectionModel::Select | QItemSelectionModel::Rows);
 	subNavigation->resizeColumnToContents(select->selectedRows().last().column());
 	subNavigation->setSelectionModel(selection);
@@ -300,23 +303,25 @@ void NavigationEditUI::addSubNavTopItem()
 
 }
 
-void NavigationEditUI::addMainNavTopItem(QString title,int key)
+void NavigationEditUI::addMainNavTopItem(QString title,double key)
 {
 
 
 	if(title.isEmpty())title = "New";
-	if(key <= 0) key =  ++idCount;
+	if(key == 0 || key == -1) key =  ++idCount;
 	QTreeWidgetItem* maintab = new QTreeWidgetItem();
+	maintab->setFlags(maintab->flags() | Qt::ItemIsEditable);
 	maintab->setText(0,QString::number(key));
 	maintab->setText(1,title);
 	mainNavigation->insertTopLevelItem(mainNavigation->topLevelItemCount(),maintab);
 
-	QLabel* remove = new QLabel();
-	QPixmap removepix(":/resources/icons/1457665374_minus.png");
-	remove->setPixmap(removepix.scaled(20,20,Qt::KeepAspectRatio));
-	remove->setMaximumSize(QSize(25,25));
-	mainNavigation->setItemWidget(maintab,2,remove);
-
+	if(key != -14){
+		QLabel* remove = new QLabel();
+		QPixmap removepix(":/resources/icons/1457665374_minus.png");
+		remove->setPixmap(removepix.scaled(20,20,Qt::KeepAspectRatio));
+		remove->setMaximumSize(QSize(25,25));
+		mainNavigation->setItemWidget(maintab,2,remove);
+		}
 	mainNavigation->setColumnWidth(1,Controller::GetNavigationWidth() - 30);
 	mainNavigation->setColumnWidth(2,30);
 
@@ -336,7 +341,7 @@ void NavigationEditUI::addMainNavTopItem(QString title,int key)
 
 }
 
-void NavigationEditUI::fillSubNavigation(int key)
+void NavigationEditUI::fillSubNavigation(double key)
 {
 	QList<QTreeWidgetItem*> subNavItems = Controller::GetSubNavigation(key);
 	//qDebug() << subNavItems.count() << subNavItems;
@@ -355,31 +360,33 @@ void NavigationEditUI::fillSubNavigation(int key)
 			QPixmap addpix (":/resources/icons/1457665371_plus.png");
 			add->setPixmap(addpix.scaled(20,20,Qt::KeepAspectRatio));
 			add->setMaximumSize(QSize(20,20));
-
-			QLabel* remove = new QLabel();
-			QPixmap removepix(":/resources/icons/1457665374_minus.png");
-			remove->setPixmap(removepix.scaled(20,20,Qt::KeepAspectRatio));
-			remove->setMaximumSize(QSize(20,20));
-
-
 			subNavigation->setItemWidget((*it),2,add);
-			subNavigation->setItemWidget((*it),3,remove);
+			if(key != -14){
+				QLabel* remove = new QLabel();
+				QPixmap removepix(":/resources/icons/1457665374_minus.png");
+				remove->setPixmap(removepix.scaled(20,20,Qt::KeepAspectRatio));
+				remove->setMaximumSize(QSize(20,20));
+				subNavigation->setItemWidget((*it),3,remove);
+				}
+
+
+
 
 			//subNavigation->resizeColumnToContents(0);
 			subNavigation->setColumnWidth(2,30);
 			subNavigation->setColumnWidth(3,30);
 
 
-			if((*it)->text(1).toInt() > idCount)
-				idCount = (*it)->text(1).toInt();
+			if((*it)->text(1).toDouble() > idCount)
+				idCount = (*it)->text(1).toDouble();
 			++it;
 			}
 		if(subNavigation->topLevelItemCount() > 0){
-			//qDebug() << page << subNavigation->topLevelItem(0)->text(1).toInt();
+			//qDebug() << page << subNavigation->topLevelItem(0)->text(1).toDouble();
 			subNavigation->selectionModel()->select(subNavigation->model()->index(0,0,QModelIndex()),QItemSelectionModel::Select| QItemSelectionModel::Rows);
-			page =  (Controller::GetPage(subNavigation->topLevelItem(0)->text(1).toInt()));
+			page =  (Controller::GetPage(subNavigation->topLevelItem(0)->text(1).toDouble()));
 			NavigationPageEditUI::ShowUI(page);
-			currentSubNav = subNavigation->topLevelItem(0)->text(1).toInt();
+			currentSubNav = subNavigation->topLevelItem(0)->text(1).toDouble();
 
 			subNavPressed(subNavigation->topLevelItem(0),0);
 			}
@@ -455,11 +462,30 @@ void NavigationEditUI::mainNavPressed(QTreeWidgetItem* item, int column)
 	//
 	//subNavigation->clear();
 	if(column == 2){
-		qDebug() << "Remove Main Nav"<< item->text(0) << column;
-
+		if(Controller::ShowQuestion(tr("Are you sure you want to remove this main Navigation Tab ?"))){
+			if(Controller::ShowQuestion(tr("This will also remove all linked sub-navigation tabs"))){
+				subNavigation->clear();
+				if(mainNavigation->indexOfTopLevelItem(item) != -1)
+					if(mainNavigation->takeTopLevelItem(mainNavigation->indexOfTopLevelItem(item)))
+						Controller::RemoveMainNavigation(item->text(0).toDouble());
+				}
+			//qDebug() << "Remove Main Nav"<< item->text(0) << column;
+			if(mainNavigation->topLevelItem(0)){
+				fillSubNavigation(mainNavigation->topLevelItem(0)->text(0).toDouble());
+				}
+			else {
+				subNavigation->setEnabled(false);
+				sctrlUI->setEnabled(false);
+				}
+			}
 		}
-	else  fillSubNavigation(item->text(0).toInt());
+	else  fillSubNavigation(item->text(0).toDouble());
 
 
-	subNavigation->clearFocus();
+	//subNavigation->clearFocus();
+}
+
+void NavigationEditUI::mainNavChanged(QTreeWidgetItem* item, int)
+{
+	Controller::AddMainNavigation(item->text(0).toDouble(),item->text(1));
 }

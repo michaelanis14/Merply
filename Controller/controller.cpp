@@ -299,17 +299,17 @@ void Controller::linkPressedData(QJsonDocument document)
 
 
 
-void Controller::AddSubNavigation(int key, QList<QTreeWidgetItem*> subNav)
+void Controller::AddSubNavigation(double key, QList<QTreeWidgetItem*> subNav)
 {
 	Model::Get()->addSubNavigation(key,subNav);
 }
 
-QList<QTreeWidgetItem*> Controller::GetSubNavigation(int key)
+QList<QTreeWidgetItem*> Controller::GetSubNavigation(double key)
 {
 	return Model::Get()->getSubNavigation(key);
 }
 
-bool Controller::RemoveSubNavigation(int key)
+bool Controller::RemoveSubNavigation(double key)
 {
 	return Model::Get()->removeSubNavigation(key);
 }
@@ -319,17 +319,17 @@ void Controller::ClearSubNavigation()
 	Model::Get()->clearSubNavigation();
 }
 
-void Controller::AddPage(int key, QJsonObject page)
+void Controller::AddPage(double key, QJsonObject page)
 {
 	Model::Get()->addPage(key,page);
 }
 
-QJsonObject Controller::GetPage(int key)
+QJsonObject Controller::GetPage(double key)
 {
 	return Model::Get()->getPage(key);
 }
 
-bool Controller::RemovePage(int key)
+bool Controller::RemovePage(double key)
 {
 	return Model::Get()->removePage(key);
 }
@@ -339,17 +339,17 @@ void Controller::ClearPages()
 	Model::Get()->clearPages();
 }
 
-void Controller::AddMainNavigation(int key, QString mainNav)
+void Controller::AddMainNavigation(double key, QString mainNav)
 {
 	Model::Get()->addMainNavigation(key,mainNav);
 }
 
-QString Controller::GetMainNavigation(int key)
+QString Controller::GetMainNavigation(double key)
 {
 	return Model::Get()->getMainNavigation(key);
 }
 
-bool Controller::RemoveMainNavigation(int key)
+bool Controller::RemoveMainNavigation(double key)
 {
 	return Model::Get()->removeMainNavigation(key);
 }
@@ -361,7 +361,7 @@ void Controller::ClearMainNavigation()
 
 
 //Navigation
-//void Controller::addMainNavigation(int key, QList<QTreeWidgetItem *> subNav)
+//void Controller::addMainNavigation(double key, QList<QTreeWidgetItem *> subNav)
 //{
 //	Model::Get()->addMainNavigation(key,subNav);
 //}
@@ -377,7 +377,7 @@ bool Controller::SaveNavigation()
 {
 
 
-	QMapIterator<int, QString > i(Model::Get()->getMainNavigationModel());
+	QMapIterator<double, QString > i(Model::Get()->getMainNavigationModel());
 	//QList<QJsonDocument> mainNavs;
 	QJsonObject navigation;
 	QJsonArray mainNavs;
@@ -387,6 +387,7 @@ bool Controller::SaveNavigation()
 		mainNav.insert("Title",i.value());
 		mainNav.insert("ID",i.key());
 		QJsonArray items;
+		//qDebug() << i.key();
 		foreach(QTreeWidgetItem * tab,GetSubNavigation(i.key())){
 			items.append(SaveSubNavigation(tab));
 			}
@@ -406,8 +407,8 @@ QJsonObject Controller::SaveSubNavigation(QTreeWidgetItem * item)
 
 	QJsonObject itemTab = QJsonObject();
 	itemTab.insert("Title",item->text(0));
-	itemTab.insert("ID",item->text(1).toInt());
-	itemTab.insert("Page",GetPage(item->text(1).toInt()));
+	itemTab.insert("ID",item->text(1).toDouble());
+	itemTab.insert("Page",GetPage(item->text(1).toDouble()));
 	if(item->childCount() > 0){
 		QJsonArray items = QJsonArray();
 		for(int i = 0; i < item->childCount();i++)

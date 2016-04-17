@@ -30,8 +30,8 @@ Model::Model():
 	QObject()
 {
 	this->showWarning = true;
-	subNavigation =  QMap<int, QList<QTreeWidgetItem *> >();
-	pages =  QMap<int, QJsonObject >();
+	subNavigation =  QMap<double, QList<QTreeWidgetItem *> >();
+	pages =  QMap<double, QJsonObject >();
 	Database::Get();
 }
 
@@ -40,7 +40,7 @@ bool Model::getShowWarning() const
 	return showWarning;
 }
 
-void Model::addSubNavigation(int key, QList<QTreeWidgetItem *> subNav)
+void Model::addSubNavigation(double key, QList<QTreeWidgetItem *> subNav)
 {
 	subNavigation.insert(key, subNav);
 }
@@ -55,17 +55,17 @@ void Model::clearPages()
 	pages.clear();
 }
 
-void Model::addMainNavigation(int key, QString mainNav)
+void Model::addMainNavigation(double key, QString mainNav)
 {
 	mainNavigation.insert(key,mainNav);
 }
 
-QString Model::getMainNavigation(int key)
+QString Model::getMainNavigation(double key)
 {
 	return mainNavigation.value(key);
 }
 
-bool Model::removeMainNavigation(int key)
+bool Model::removeMainNavigation(double key)
 {
 	return mainNavigation.remove(key);
 }
@@ -76,34 +76,34 @@ void Model::clearMainNavigation()
 }
 
 
-QList<QTreeWidgetItem *> Model::getSubNavigation(int key)
+QList<QTreeWidgetItem *> Model::getSubNavigation(double key)
 {
 	return subNavigation.value(key);
 }
 
-QMap<int, QList<QTreeWidgetItem*> > Model::getSubNavigationModel()
+QMap<double, QList<QTreeWidgetItem*> > Model::getSubNavigationModel()
 {
 	return subNavigation;
 }
 
-QMap<int, QString> Model::getMainNavigationModel()
+QMap<double, QString> Model::getMainNavigationModel()
 {
 	return mainNavigation;
 }
-bool Model::removeSubNavigation(int key)
+bool Model::removeSubNavigation(double key)
 {
 	return subNavigation.remove(key);
 }
 
-void Model::addPage(int key, QJsonObject page)
+void Model::addPage(double key, QJsonObject page)
 {
 	pages.insert(key, page);
 }
-QJsonObject Model::getPage(int key)
+QJsonObject Model::getPage(double key)
 {
 	return pages.value(key);
 }
-bool Model::removePage(int key)
+bool Model::removePage(double key)
 {
 	return pages.remove(key);
 }

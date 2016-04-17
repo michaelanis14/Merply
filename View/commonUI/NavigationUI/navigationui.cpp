@@ -68,11 +68,13 @@ void navigationUI::loadMainNavigation(QJsonDocument navDoc)
 	Controller::ClearMainNavigation();
 	Controller::ClearSubNavigation();
 	Controller::ClearPages();
+
 	foreach(QJsonValue mainNav,navDoc.object().value("MainNavigations").toArray()){
 		QString title = mainNav.toObject().value("Title").toString();
-		int key = mainNav.toObject().value("ID").toInt();
+		double key = mainNav.toObject().value("ID").toDouble();
+
 		QJsonArray items = mainNav.toObject().value("Items").isArray()?mainNav.toObject().value("Items").toArray():QJsonArray();
-		//qDebug() << title << items;
+
 		if(!title.isEmpty() && !items.isEmpty()){
 			QTreeWidgetItem* maintab = new QTreeWidgetItem();
 			maintab->setText(2,QString::number(key));
@@ -96,7 +98,7 @@ QList<QTreeWidgetItem *> navigationUI::loadSubNavigation(QJsonArray subNav)
 {
 	QList<QTreeWidgetItem *> items;
 	foreach(QJsonValue tab,subNav){
-		int key = tab.toObject().value("ID").toInt();
+		double key = tab.toObject().value("ID").toDouble();
 		QString title = tab.toObject().value("Title").toString();
 		if(key!=0 && !title.isEmpty())
 			Controller::AddPage(key,tab.toObject().value("Page").toObject());
@@ -142,11 +144,11 @@ void navigationUI::mainNavPressed(QTreeWidgetItem* item, int column)
 	for(int i = 0; i < count;i++){
 		subNavigation->takeTopLevelItem(0);
 		}
-	subNavigation->insertTopLevelItems(0,Controller::GetSubNavigation(item->text(2).toInt()));
+	subNavigation->insertTopLevelItems(0,Controller::GetSubNavigation(item->text(2).toDouble()));
 	subNavigation->clearFocus();
 
 	if(subNavigation->topLevelItemCount() > 0){
-		//qDebug() << page << subNavigation->topLevelItem(0)->text(1).toInt();
+		//qDebug() << page << subNavigation->topLevelItem(0)->text(1).toDouble();
 		subNavigation->selectionModel()->select(subNavigation->model()->index(0,0,QModelIndex()),QItemSelectionModel::Select| QItemSelectionModel::Rows);
 		subNavPressed(subNavigation->topLevelItem(0),0);
 		}
@@ -154,7 +156,7 @@ void navigationUI::mainNavPressed(QTreeWidgetItem* item, int column)
 
 void navigationUI::subNavPressed(QTreeWidgetItem* item, int column)
 {
-	emit subNavPressed(Controller::GetPage(item->text(1).toInt()));
+	emit subNavPressed(Controller::GetPage(item->text(1).toDouble()));
 }
 
 void navigationUI::btn_Clicked(QString btn)

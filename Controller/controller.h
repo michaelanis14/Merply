@@ -70,19 +70,19 @@ public:
 
 	//Model Interface
 		 //Navigation
-	static void AddSubNavigation(int key, QList<QTreeWidgetItem*> subNav);
-	static QList<QTreeWidgetItem*> GetSubNavigation(int key);
-	static bool RemoveSubNavigation(int key);
+	static void AddSubNavigation(double key, QList<QTreeWidgetItem*> subNav);
+	static QList<QTreeWidgetItem*> GetSubNavigation(double key);
+	static bool RemoveSubNavigation(double key);
 	static void ClearSubNavigation();
 
-	static void AddPage(int key, QJsonObject page);
-	static QJsonObject GetPage(int key);
-	static bool RemovePage(int key);
+	static void AddPage(double key, QJsonObject page);
+	static QJsonObject GetPage(double key);
+	static bool RemovePage(double key);
 	static void ClearPages();
 
-	static void AddMainNavigation(int key, QString mainNav);
-	static QString GetMainNavigation(int key);
-	static bool RemoveMainNavigation(int key);
+	static void AddMainNavigation(double key, QString mainNav);
+	static QString GetMainNavigation(double key);
+	static bool RemoveMainNavigation(double key);
 	static void ClearMainNavigation();
 
 	static bool SaveNavigation();

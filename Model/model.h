@@ -38,26 +38,26 @@ public:
 	bool getShowWarning() const;
 
 	//Navigation
-	void addSubNavigation(int key, QList<QTreeWidgetItem*> subNav);
-	QList<QTreeWidgetItem*> getSubNavigation(int key);
-	bool removeSubNavigation(int key);
+	void addSubNavigation(double key, QList<QTreeWidgetItem*> subNav);
+	QList<QTreeWidgetItem*> getSubNavigation(double key);
+	bool removeSubNavigation(double key);
 	void clearSubNavigation();
 
-	void addPage(int key, QJsonObject page);
-	QJsonObject getPage(int key);
-	bool removePage(int key);
+	void addPage(double key, QJsonObject page);
+	QJsonObject getPage(double key);
+	bool removePage(double key);
 	void clearPages();
 
-	void addMainNavigation(int key, QString mainNav);
-	QString getMainNavigation(int key);
-	bool removeMainNavigation(int key);
+	void addMainNavigation(double key, QString mainNav);
+	QString getMainNavigation(double key);
+	bool removeMainNavigation(double key);
 	void clearMainNavigation();
 
 
 
 
-	QMap<int, QList<QTreeWidgetItem*> > getSubNavigationModel();
-	QMap<int, QString > getMainNavigationModel();
+	QMap<double, QList<QTreeWidgetItem*> > getSubNavigationModel();
+	QMap<double, QString > getMainNavigationModel();
 
 private:
 	explicit Model();
@@ -65,9 +65,9 @@ private:
 	bool showWarning;
 	bool isNameExistInList(QStringList &list, QString &name) ;
 	static Model* p_instance;
-	QMap<int, QList<QTreeWidgetItem *> > subNavigation;
-	QMap<int, QJsonObject > pages;
-	QMap<int, QString > mainNavigation;
+	QMap<double, QList<QTreeWidgetItem *> > subNavigation;
+	QMap<double, QJsonObject > pages;
+	QMap<double, QString > mainNavigation;
 
 };
 

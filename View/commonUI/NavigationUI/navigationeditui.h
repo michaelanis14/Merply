@@ -29,8 +29,8 @@ private:
 	bool editMode;
 	void addSubNavChild(QTreeWidgetItem* parent);
 	void addSubNavTopItem();
-	void addMainNavTopItem(QString title = "", int key = -1);
-	void fillSubNavigation(int key);
+	void addMainNavTopItem(QString title = "", double key = -1);
+	void fillSubNavigation(double key);
 	int idCount;
 	QJsonObject page;
 	int currentSubNav;
@@ -38,6 +38,7 @@ private:
 	QTreeWidgetItem* oldItemSubNavSelected;
 public slots:
 	void mainNavPressed(QTreeWidgetItem* item, int column);
+	void mainNavChanged(QTreeWidgetItem* item, int);
 	void subNavPressed(QTreeWidgetItem* item, int column);
 	void btn_Clicked(QString btn);
 	void btn_ClickedDataReturned(QJsonDocument document);
