@@ -19,6 +19,7 @@ public:
 	void fill(QJsonObject structureView);
 	static StructureViewGroupsUI* GetUI();
 	QJsonObject save();
+	HeaderLabel* headerlbl;
 private:
 	QVBoxLayout *layout;
 
@@ -38,7 +39,7 @@ private:
 protected:
 	SettingsCtrlsUI* sctrlUI;
 	bool links;
-	HeaderLabel* headerlbl;
+
 
 signals:
 	void cancel();

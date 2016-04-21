@@ -43,6 +43,8 @@ public slots:
 	void btn_Clicked(QString btn);
 	void btn_ClickedDataReturned(QJsonDocument document);
 
+	void editControllerCancelPressed();
+	void editControllerSavePressed();
 signals:
 	void subNavPressed(QJsonObject view);
 };

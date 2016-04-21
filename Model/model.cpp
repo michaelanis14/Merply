@@ -6,10 +6,8 @@
 **************************************************************************/
 
 #include "model.h"
-#include "prsistance.h"
 
 #include "controller.h"
-#include "database.h"
 
 #include <QApplication>
 #include <QDir>
@@ -32,7 +30,7 @@ Model::Model():
 	this->showWarning = true;
 	subNavigation =  QMap<double, QList<QTreeWidgetItem *> >();
 	pages =  QMap<double, QJsonObject >();
-	Database::Get();
+
 }
 
 bool Model::getShowWarning() const

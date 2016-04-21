@@ -149,8 +149,12 @@ void StructureViewGroupsUI::fill(QJsonObject structureView)
 
 					viewGroupsLayout->addWidget(vW);
 					}
-				else HViewGroups.find(group).value()->layout()->addWidget(viewgroupRmv);
+				else {
+					if(HViewGroups.find(group) != HViewGroups.end())
+						if(HViewGroups.find(group).value()->layout())
+					HViewGroups.find(group).value()->layout()->addWidget(viewgroupRmv);
 				}
+					}
 			else 	viewGroupsLayout->addWidget(viewgroupRmv);
 			sVSFUIs  << viewgroup;
 

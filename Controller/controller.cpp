@@ -80,8 +80,8 @@ void Controller::showDisplay()
 
 	//Prsistance::init();
 
-	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
-	Database::Get()->getDoc("ViewStructure::1");
+	//QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
+	//Database::Get()->getDoc("ViewStructure::5");
 
 	//QJsonDocument d =Database::Get()->getDocument();
 	//ViewGroups* vgs= new ViewGroups(0,"Contact",d.object(),d.object());
@@ -96,8 +96,9 @@ void Controller::showDisplay()
 
 void Controller::showDisplayDataReturned(QJsonDocument document)
 {
-	StructureViewGroupsUI::ShowUI(document.object());
+
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
+	//StructureViewGroupsUI::ShowUI(document.object());
 }
 
 void Controller::loadNavigationData(QJsonDocument document)
@@ -168,9 +169,16 @@ void Controller::getDocData(QJsonDocument document)
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getDocData(QJsonDocument)));
 	emit gotDocument(document);
 }
-QList<QString> Controller::getListItems(QString table, QString select,QString condition)
+void Controller::getJsonList(QString table, QString select,QString condition)
 {
-	return Prsistance::ComboxList(table,select,condition);
+	QObject::connect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QList<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
+	Prsistance::GetJsonList(table,select,condition);
+}
+
+void Controller::GetJsonListData(QList<QJsonDocument> items)
+{
+	QObject::disconnect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QList<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
+	emit gotJsonListData(items);
 }
 
 QString Controller::getDatabaseName()

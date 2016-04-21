@@ -16,12 +16,16 @@ SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonObject d
 
 
 	if(type.compare("Refrence") == 0){
-		ERPComboBox* combox = new ERPComboBox(this,false);
-		combox->addItems(Controller::Get()->getListItems(structureView.value("Source").toString(),structureView.value("Select").toString()));
+		combox = new ERPComboBox(this,false);
 		if(structureView.value("Editable").toString().compare("false") == 0)
 			combox->setEditable(false);
 		layout->addWidget(combox);
 		field = combox;
+
+		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+		Controller::Get()->getJsonList(structureView.value("Source").toString(),structureView.value("Select").toString());
+
+
 		}
 	else if(type.compare("Text") == 0){
 
@@ -47,12 +51,15 @@ SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonObject d
 		field = lineEdit;
 		}
 	else if(type.compare("Index") == 0){
-		ERPComboBox* combox = new ERPComboBox(0,true);
-		combox->addItems(Controller::Get()->getListItems(structureView.value("Source").toString(),structureView.value("Source").toString("Select")));
+		combox = new ERPComboBox(0,true);
 		combox->setEditable(true);
 		QObject::connect(combox,SIGNAL(indexedFillEvent(QString)),this,SLOT(indexedFillEvent(QString)));
 		layout->addWidget(combox);
 		field = combox;
+
+		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+		Controller::Get()->getJsonList(structureView.value("Source").toString(),structureView.value("Select").toString());
+
 		}
 	else if(type.compare("Table") == 0){
 		merplyTabelView * table = new merplyTabelView(this,"key");
@@ -79,26 +86,26 @@ QString SubFieldUI::save()
 {
 	QString save;
 
-		if(field->objectName().compare("combobox") == 0  || field->objectName().compare("ERPComboBoxIndexed") == 0 ){
-			//	save += component.name;
-			save +=((QComboBox*)field)->currentText();
-			//save +=" ";
-			}
-		else if(QString(field->metaObject()->className()).compare("QLineEdit") == 0 ){
-			//	save += component.name;
-			save +=((QLineEdit*)field)->text();
-			//	save +=" ";
-			}
-		else if(field->objectName().compare("checkbox") == 0){
-			//	save += component.name;
-			save +=((QCheckBox*)field)->isChecked();
-			//	save +=" ";
-			}
-		else if(field->objectName().compare("merplyTabelView") == 0){
-			//	save += component.name;
-			save +=((merplyTabelView*)field)->save("this->key");
-			//	save +=" ";
-			}
+	if(field->objectName().compare("combobox") == 0  || field->objectName().compare("ERPComboBoxIndexed") == 0 ){
+		//	save += component.name;
+		save +=((QComboBox*)field)->currentText();
+		//save +=" ";
+		}
+	else if(QString(field->metaObject()->className()).compare("QLineEdit") == 0 ){
+		//	save += component.name;
+		save +=((QLineEdit*)field)->text();
+		//	save +=" ";
+		}
+	else if(field->objectName().compare("checkbox") == 0){
+		//	save += component.name;
+		save +=((QCheckBox*)field)->isChecked();
+		//	save +=" ";
+		}
+	else if(field->objectName().compare("merplyTabelView") == 0){
+		//	save += component.name;
+		save +=((merplyTabelView*)field)->save("this->key");
+		//	save +=" ";
+		}
 
 
 	return save.trimmed();
@@ -113,4 +120,11 @@ void SubFieldUI::indexedFillEvent(QString completion)
 void SubFieldUI::linkPressed()
 {
 	Controller::Get()->linkPressed(this->structureView);
+}
+
+void SubFieldUI::refrenceData(QList<QJsonDocument> items)
+{
+	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+	if(combox)
+		combox->addJsonItems(items);
 }

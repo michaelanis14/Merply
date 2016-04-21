@@ -15,7 +15,6 @@ ERPComboBox::ERPComboBox(QWidget *parent, bool indexedFill) :
 	this->setEditable(true);
 	this->setInsertPolicy(QComboBox::NoInsert);
 	this->setAutoCompletion(true);
-	this->items = QList<QString >();
 	this->addedItems = false;
 	this->indexedFill = indexedFill;
 	if(indexedFill)
@@ -24,20 +23,19 @@ ERPComboBox::ERPComboBox(QWidget *parent, bool indexedFill) :
 	this->installEventFilter(this);
 
 }
-void ERPComboBox::addItems(QList<QString> pairList){
-	int c = this->count();
-	for(int i = 0; i < c;i++){
-		QComboBox::removeItem(0);
+void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
+	int i = 0;
+	foreach (const QJsonDocument & value, items){
+		//qDebug() << select.trimmed() << value.object().keys();
+		QString valueString = value.object().value("Value").toString();
+		QString keyString = value.object().value("Key").toString();
+		if(!valueString.isEmpty() && !keyString.isEmpty()){
+			QComboBox::insertItem(i,valueString.trimmed());
+			keys.insert(i,keyString);
+			i++;
+			this->addedItems = true;
+			}
 		}
-
-	this->items = pairList;
-	QList<QString> list;
-	for(int i = 0; i < pairList.length();i++) {
-		this->addedItems = true;
-		QComboBox::insertItem(i,pairList.at(i));
-		list.append(pairList.at(i));
-		}
-
 }
 
 void ERPComboBox::focusOutEvent(QFocusEvent *e)
@@ -78,12 +76,20 @@ void ERPComboBox::focusOutEvent(QFocusEvent *e)
 
 }
 
-int ERPComboBox::getKey(){
-	if(this->addedItems){
-		//	qDebug() << currentIndex()<< items.at(currentIndex()).first << items.at(currentIndex()).second;
-		return items.indexOf(items.at(currentIndex()));
+QString ERPComboBox::getKey(){
+	if(this->addedItems)
+		return keys.at(currentIndex());
+	return "_";
+
+}
+
+QStringList ERPComboBox::getItemsText()
+{
+	QStringList itemsText;
+	for(int i = 0; i < this->count(); i++){
+		itemsText.append(this->itemText(i));
 		}
-	return 0;
+	 return itemsText;
 }
 
 bool ERPComboBox::eventFilter(QObject *obj, QEvent *event)
@@ -91,22 +97,22 @@ bool ERPComboBox::eventFilter(QObject *obj, QEvent *event)
 	if (indexedFill && event->type() == QEvent::KeyRelease)
 		{
 		//QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-	//	qDebug()<<"CO" << this->completer()->currentCompletion();
+		//	qDebug()<<"CO" << this->completer()->currentCompletion();
 		if(oldCompletion.compare(this->completer()->currentCompletion()) != 0){
 			oldCompletion = this->completer()->currentCompletion();
 			emit indexedFillEvent(oldCompletion);
-		//	qDebug() << this->completer()->currentCompletion();
+			//	qDebug() << this->completer()->currentCompletion();
 			}
 
 		}
 	return QObject::eventFilter(obj, event);
 }
 //void ERPComboBox::mousePressEvent(QMouseEvent *event){
-	//QLabel *child=  static_cast<QLabel *>(childAt(event->pos()));
+//QLabel *child=  static_cast<QLabel *>(childAt(event->pos()));
 
-	//	event->accept();
+//	event->accept();
 //	qDebug() <<"M" << indexedFill;
-	//if(!this->indexedFill)
+//if(!this->indexedFill)
 //		QWidget::mousePressEvent(event);
 
 //}

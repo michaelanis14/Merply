@@ -40,6 +40,7 @@ public slots:
 	void updateFields(QString type);
 	void updateSelect(QString title);
 	void updateSelectData(QList<QString> fields);
+	void gotSourceData(QList<QJsonDocument> items);
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILD_H

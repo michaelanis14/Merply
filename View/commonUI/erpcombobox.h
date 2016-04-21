@@ -10,19 +10,24 @@
 #include <QWidget>
 #include <QComboBox>
 #include <QKeyEvent>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 
 class ERPComboBox : public QComboBox
 {
 	Q_OBJECT
 public:
 	explicit ERPComboBox(QWidget *parent = 0 ,bool indexedFill = false);
-	void addItems(QList<QString >);
-	int getKey();
+	void addJsonItems(QList<QJsonDocument> items);
+	QString getKey();
 	bool addedItems;
 	bool indexedFill;
+	QStringList getItemsText();
 private:
-	QList<QString>  items;
+	QList<QString> keys;
 	QString oldCompletion;
+
 signals:
 	void refreshModel();
 	void indexedFillEvent(QString completion);

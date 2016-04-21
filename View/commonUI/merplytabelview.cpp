@@ -107,7 +107,8 @@ bool merplyTabelView::fill(QJsonObject columns, QJsonObject data)
 			//model->setItem(i,0,data);
 			if(clmn.toObject().value("Type").toString().compare("Database") == 0){
 				QList<QString> columnData;
-				columnData << Controller::Get()->getListItems(clmn.toObject().value("Source").toString(),clmn.toObject().value("Select").toString());
+				//TODO :: commented to ease the transition to the new database slots
+	//			columnData << Controller::Get()->getListItems(clmn.toObject().value("Source").toString(),clmn.toObject().value("Select").toString());
 				if(tabel->rowCount()<columnData.count())
 					tabel->setRowCount(columnData.count());
 

@@ -19,7 +19,7 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	layout->addWidget(headerlbl);
 
 	SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
-	sctrlUI->addbtn("Add",":/resources/icons/add.png","add");
+	sctrlUI->addbtn("Adddd",":/resources/icons/add.png","add");
 	sctrlUI->addbtn("Save",":/resources/icons/save.png","save");
 
 	sctrlUI->addbtn("Cancel",":/resources/icons/cancel.png","cancel");
@@ -32,34 +32,45 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 
 
 	QGroupBox *groupBox = new QGroupBox(tr("Select Type"));
+
+	newCard = new QRadioButton(tr("&New Card"));
+	connect(newCard,SIGNAL(toggled(bool)),this,SLOT(newCardToggled(bool)));
 	card = new QRadioButton(tr("&Card Refrence"));
 	connect(card,SIGNAL(toggled(bool)),this,SLOT(cardToggled(bool)));
 	page = new QRadioButton(tr("Custom Page"));
 	connect(page,SIGNAL(toggled(bool)),this,SLOT(pageToggled(bool)));
 
 	QHBoxLayout *hbox = new QHBoxLayout;
+	hbox->addWidget(newCard);
 	hbox->addWidget(card);
 	hbox->addWidget(page);
 	hbox->addStretch(1);
 	groupBox->setLayout(hbox);
 	layout->addWidget(groupBox);
 
+
+	newCardDetails = new QGroupBox(tr("new Card Details"));
+	QHBoxLayout* newCardDetailsLayout = new QHBoxLayout;
+	newCardDetails->setLayout(newCardDetailsLayout);
+	newCardStructure = new StructureViewGroupsUI();
+	newCardStructure->headerlbl->setHidden(true);
+	newCardDetailsLayout->addWidget(newCardStructure);
+	layout->addWidget(newCardDetails);
+
+
 	cardDetails = new QGroupBox(tr("Card Details"));
 	QFormLayout* cardDetailsLayout = new QFormLayout;
 	cardDetails->setLayout(cardDetailsLayout);
 	cardDetailsLayout->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
 	cardDetailsLayout->setLabelAlignment(Qt::AlignLeft);
-
 	cards = new ERPComboBox(this,false);
-	cardsItems = Controller::Get()->getListItems("ViewStructure","Title","default.Type =\"Entity\"");
-	cards->addItems(cardsItems);
 	cardDetailsLayout->addRow(tr("Card"),cards);
-
+	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
+	Controller::Get()->getJsonList("ViewStructure","Title","default.Type =\"Entity\"");
 	view = new ERPComboBox(this,false);
 	viewList << "Index" << "New";
 	view->addItems(viewList);
 	cardDetailsLayout->addRow(tr("View"),view);
-
 	layout->addWidget(cardDetails);
 
 
@@ -67,11 +78,8 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	pageDetails = new QGroupBox(tr("Page Details"));
 	QHBoxLayout* pageDetailsLayout = new QHBoxLayout;
 	pageDetails->setLayout(pageDetailsLayout);
-	//pageDetailsLayout->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
-	//pageDetailsLayout->setLabelAlignment(Qt::AlignLeft);
 	pageEdit = new PageStructureViewEditeUI();
 	pageDetailsLayout->addWidget(pageEdit);
-
 	layout->addWidget(pageDetails);
 
 	layout->addWidget(new PermissionsUI());
@@ -79,7 +87,7 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 
 	cardDetails->setHidden(true);
 	pageDetails->setHidden(true);
-
+	newCardDetails->setHidden(true);
 	layout->addStretch(1);
 }
 
@@ -106,7 +114,7 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 			this->headerlbl->setTitle(tr("New Card"));
 		card->setChecked(true);
 		cardToggled(true);
-		cards->setCurrentIndex(cardsItems.indexOf(structureView.value("Card").toString()));
+		cards->setCurrentIndex(cards->getItemsText().indexOf(structureView.value("Card").toString()));
 		view->setCurrentIndex(viewList.indexOf(structureView.value("Select").toString()));
 		}
 	else{
@@ -161,9 +169,22 @@ void NavigationPageEditUI::btn_Clicked(QString btn)
 	else if(btn.contains("Save")){
 		//	qDebug() << this->save();
 		//Controller::Get()->storeDoc("ViewStructure",QJsonDocument(this->save()));
+		emit editControllerSavePressed();
 		}
 	else if(btn.contains("Cancel")){
+		emit editControllerCancelPressed();
 		//emit cancel();
+		}
+}
+
+void NavigationPageEditUI::newCardToggled(bool state)
+{
+	if(state){
+		newCardDetails->setHidden(false);
+		headerlbl->setHidden(false);
+		}
+	else{
+		newCardDetails->setHidden(true);
 		}
 }
 
@@ -179,6 +200,15 @@ void NavigationPageEditUI::pageToggled(bool state)
 {
 	if(state){
 		pageDetails->setHidden(false);
+		headerlbl->setHidden(false);
 		}
-	else pageDetails->setHidden(true);
+	else{
+		pageDetails->setHidden(true);
+		headerlbl->setHidden(true);
+		}
+}
+
+void NavigationPageEditUI::getCardData(QList<QJsonDocument> items)
+{
+	cards->addJsonItems(items);
 }

@@ -77,10 +77,13 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,b
 		layout->addRow(new QLabel(tr("Title")), title);
 
 		Source = new ERPComboBox(0);
-		Source->addItems(Controller::Get()->getListItems("ViewStructure","Title","default.Type =\"Entity\""));
+
 		if(!fieldVS.toObject().value("Source").toString().isEmpty())
 			Source->setCurrentText(fieldVS.toObject().value("Source").toString());
 		layout->addRow(new QLabel(tr("Source ")), Source);
+		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
+		Controller::Get()->getJsonList("ViewStructure","Title","default.Type =\"Entity\"");
+
 
 		Select = new ERPComboBox(0);
 		Select->addItems(QStringList() << "Index" <<"New");
@@ -99,8 +102,10 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,b
 
 		if(type.compare("Refrence") == 0){
 			Source = new ERPComboBox(0);
-			Source->addItems(Controller::Get()->getListItems("ViewStructure","Title","default.Type =\"Entity\""));
 			layout->addRow(new QLabel(tr("Source ")), Source);
+			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
+			Controller::Get()->getJsonList("ViewStructure","Title","default.Type =\"Entity\"");
+
 
 			Select = new ERPComboBox(0);
 			//Select->setText(fieldVS.toObject().value("Select").toString());
@@ -219,6 +224,13 @@ void StructureVieweditSubFeild::updateSelectData(QList<QString> fields)
 	QObject::disconnect(Controller::Get(),SIGNAL(getFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 
 	Select->addItems(fields);
+}
+
+void StructureVieweditSubFeild::gotSourceData(QList<QJsonDocument> items)
+{
+	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
+
+	Source->addJsonItems(items);
 }
 
 void StructureVieweditSubFeild::paintEvent(QPaintEvent * event)

@@ -25,7 +25,8 @@ NavigationEditUI::NavigationEditUI(QWidget *parent) : QWidget(parent)
 	sctrlUI->setFixedHeight(Controller::GetNavigationSettingsBarHeight());
 	sctrlUI->addbtn("Add",":/resources/icons/add.png","add");
 	sctrlUI->addbtn("Save",":/resources/icons/save.png","save");
-	sctrlUI->addbtn("Cancel",":/resources/icons/cancel.png","cancel");
+	//sctrlUI->layout-
+	//sctrlUI->addbtn("Cancel",":/resources/icons/cancel.png","cancel");
 	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btn_Clicked(QString)));
 	//sctrlUI->setAutoFillBackground(true);
 	layout->addWidget(sctrlUI);
@@ -59,12 +60,15 @@ NavigationEditUI::NavigationEditUI(QWidget *parent) : QWidget(parent)
 	QObject::connect(mainNavigation, SIGNAL(itemPressed(QTreeWidgetItem*,int)), this, SLOT(mainNavPressed(QTreeWidgetItem*,int)));
 	QObject::connect(mainNavigation, SIGNAL(itemChanged(QTreeWidgetItem*,int)), this, SLOT(mainNavChanged(QTreeWidgetItem*,int)));
 
-	//mainNavigation->hideColumn(0);
+	mainNavigation->hideColumn(0);
 	this->layout->addWidget(mainNavigation);
 
 	this->editMode = true;
 	this->idCount = 0;
 	this->currentSubNav = -1;
+
+	QObject::connect(NavigationPageEditUI::Get(), SIGNAL(editControllerCancelPressed()), this, SLOT(editControllerCancelPressed()));
+	QObject::connect(NavigationPageEditUI::Get(), SIGNAL(editControllerSavePressed()), this, SLOT(editControllerSavePressed()));
 
 }
 
@@ -260,19 +264,19 @@ void NavigationEditUI::addSubNavTopItem()
 
 	if(key != -14){
 
-	QLabel* add = new QLabel();
-	QPixmap addpix (":/resources/icons/1457665371_plus.png");
-	add->setPixmap(addpix.scaled(20,20,Qt::KeepAspectRatio));
-	add->setMaximumSize(QSize(20,20));
+		QLabel* add = new QLabel();
+		QPixmap addpix (":/resources/icons/1457665371_plus.png");
+		add->setPixmap(addpix.scaled(20,20,Qt::KeepAspectRatio));
+		add->setMaximumSize(QSize(20,20));
 
-	QLabel* remove = new QLabel();
-	QPixmap removepix(":/resources/icons/1457665374_minus.png");
-	remove->setPixmap(removepix.scaled(20,20,Qt::KeepAspectRatio));
-	remove->setMaximumSize(QSize(20,20));
+		QLabel* remove = new QLabel();
+		QPixmap removepix(":/resources/icons/1457665374_minus.png");
+		remove->setPixmap(removepix.scaled(20,20,Qt::KeepAspectRatio));
+		remove->setMaximumSize(QSize(20,20));
 
 
-	subNavigation->setItemWidget(child,2,add);
-	subNavigation->setItemWidget(child,3,remove);
+		subNavigation->setItemWidget(child,2,add);
+		subNavigation->setItemWidget(child,3,remove);
 		}
 
 	subNavigation->resizeColumnToContents(0);
@@ -428,19 +432,14 @@ void NavigationEditUI::btn_Clicked(QString btn)
 
 	//qDebug() << btn;
 	if(btn.contains("Cancel")){
-		navigationUI::Get()->setHidden(false);
-		navigationUI::Get()->setParent(MainForm::Get());
-		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(btn_ClickedDataReturned(QJsonDocument)));
-		Controller::Get()->getDoc("NavigationUI::1");
+		this->editControllerCancelPressed();
 		}
 	else if(btn.contains("Add")){
 
 		addSubNavTopItem();
 		}
 	else if(btn.contains("Save")){
-		this->savePage();
-		this->save();
-		this->btn_Clicked("Cancel");
+		this->editControllerSavePressed();
 		}
 	else if(btn.contains("Mainadd")){
 		addMainNavTopItem();
@@ -451,6 +450,23 @@ void NavigationEditUI::btn_ClickedDataReturned(QJsonDocument document)
 	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(btn_ClickedDataReturned(QJsonDocument)));
 	navigationUI::Get()->loadMainNavigation(document);
 	NavigationEditUI::Get()->setHidden(true);
+}
+
+void NavigationEditUI::editControllerCancelPressed()
+{
+	navigationUI::Get()->setHidden(false);
+	navigationUI::Get()->setParent(MainForm::Get());
+	QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(btn_ClickedDataReturned(QJsonDocument)));
+	Controller::Get()->getDoc("NavigationUI::1");
+
+}
+
+void NavigationEditUI::editControllerSavePressed()
+{
+	this->savePage();
+	this->save();
+	this->editControllerCancelPressed();
+
 }
 
 void NavigationEditUI::mainNavPressed(QTreeWidgetItem* item, int column)
@@ -489,3 +505,5 @@ void NavigationEditUI::mainNavChanged(QTreeWidgetItem* item, int)
 {
 	Controller::AddMainNavigation(item->text(0).toDouble(),item->text(1));
 }
+
+

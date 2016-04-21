@@ -26,11 +26,14 @@ private:
 	QHBoxLayout *layout;
 	QWidget* field;
 	QJsonObject structureView;
+	ERPComboBox* combox;
 signals:
 
 public slots:
 		void indexedFillEvent(QString completion);
 		void linkPressed();
+
+		void refrenceData(QList<QJsonDocument> items);
 };
 
 #endif // SUBFIELDUI_H

@@ -28,6 +28,8 @@ public slots:
 	void updateSelect(QString entity);
 
 	void updateSelectData(QList<QString> fields);
+
+	void selectData(QList<QJsonDocument> items);
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILDTABLECOLUMN_H

@@ -5,7 +5,15 @@
 
 Prsistance::Prsistance(QObject *parent) : QObject(parent)
 {
+	Database::Get();
+}
+Prsistance* Prsistance::p_instance = 0;
+Prsistance*Prsistance::Get()
+{
+	if (p_instance == 0)
+		p_instance = new Prsistance();
 
+	return p_instance;
 }
 
 
@@ -155,7 +163,7 @@ bool Prsistance::init()
 
 
 
-QList<QString> Prsistance::ComboxList(QString table, QString select,QString condition)
+void Prsistance::GetJsonList(QString table, QString select,QString condition)
 {
 
 	QList<QString> list;
@@ -163,21 +171,17 @@ QList<QString> Prsistance::ComboxList(QString table, QString select,QString cond
 	QString where;
 	if(!condition.isEmpty())
 		where = QString("AND "+condition);
-	QString query = "SELECT "+select.trimmed()+" AS `"+select.trimmed()+"`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \""+table+"::%\" "+where;
+	QString query = "SELECT "+select.trimmed()+" AS `Value`,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \""+table+"::%\" "+where;
 	//qDebug() << query;
+
+	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	Database::Get()->query(query);
-	foreach (const QJsonDocument & value, Database::Get()->getArray()){
-		//qDebug() << select.trimmed() << value.object().keys();
-		QString valueString = value.object().value(select.trimmed()).toString();
-		if(!valueString.isEmpty())
-			list.append( value.object().value(select.trimmed()).toString());
-		}
-	QStringList Stringlist (list);
-	Stringlist.sort();
-
-	return Stringlist;
 }
-
+void Prsistance::GetJsonListData(QList<QJsonDocument> items)
+{
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
+	emit GotJsonSelectList(items);
+}
 int Prsistance::Count(const QString table)
 {
 
@@ -224,3 +228,5 @@ QString Prsistance::GetDatabaseName()
 {
 	return QString(DATABASE);
 }
+
+
