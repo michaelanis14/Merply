@@ -20,6 +20,7 @@ public:
 	static StructureViewGroupsUI* GetUI();
 	QJsonObject save();
 	HeaderLabel* headerlbl;
+	SettingsCtrlsUI* sctrlUI;
 private:
 	QVBoxLayout *layout;
 
@@ -37,7 +38,7 @@ private:
 	QVBoxLayout *viewGroupsLayout;
 	void addViewgroup();
 protected:
-	SettingsCtrlsUI* sctrlUI;
+
 	bool links;
 
 
@@ -49,6 +50,8 @@ public slots:
 	void viewGroupStyleChanged();
 	void updateLayout();
 	void removeViewgroup(QWidget* field);
+	void editControllerCancelPressed();
+	void editControllerSavePressed();
 
 protected:
 	void mousePressEvent(QMouseEvent *event);

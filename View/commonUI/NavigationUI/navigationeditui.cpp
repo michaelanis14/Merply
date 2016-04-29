@@ -24,8 +24,8 @@ NavigationEditUI::NavigationEditUI(QWidget *parent) : QWidget(parent)
 	sctrlUI = new SettingsCtrlsUI();
 	sctrlUI->setFixedHeight(Controller::GetNavigationSettingsBarHeight());
 	sctrlUI->addbtn("Add",":/resources/icons/add.png","add");
-	sctrlUI->addbtn("Save",":/resources/icons/save.png","save");
-	//sctrlUI->layout-
+	//sctrlUI->addbtn("Save",":/resources/icons/save.png","save");
+	//sctrlUI->ctrlBtns->value(1)->setHidden(true);
 	//sctrlUI->addbtn("Cancel",":/resources/icons/cancel.png","cancel");
 	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btn_Clicked(QString)));
 	//sctrlUI->setAutoFillBackground(true);
@@ -69,6 +69,7 @@ NavigationEditUI::NavigationEditUI(QWidget *parent) : QWidget(parent)
 
 	QObject::connect(NavigationPageEditUI::Get(), SIGNAL(editControllerCancelPressed()), this, SLOT(editControllerCancelPressed()));
 	QObject::connect(NavigationPageEditUI::Get(), SIGNAL(editControllerSavePressed()), this, SLOT(editControllerSavePressed()));
+
 
 }
 
@@ -158,6 +159,7 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 			}
 		}
 	else if(column == 0 && currentSubNav != item->text(1).toDouble() && oldItemSubNavSelected){
+		//qDebug() << oldItemSubNavSelected << oldItemSubNavSelected->isSelected() << oldItemSubNavSelected->childCount() << oldItemSubNavSelected->text(1);
 		oldItemSubNavSelected->setSelected(true);
 		QItemSelectionModel *selection = new QItemSelectionModel( subNavigation->model() );
 		QItemSelectionModel *select = subNavigation->selectionModel();
@@ -277,11 +279,16 @@ void NavigationEditUI::addSubNavTopItem()
 
 		subNavigation->setItemWidget(child,2,add);
 		subNavigation->setItemWidget(child,3,remove);
+
+		subNavigation->setColumnWidth(2,30);
+		subNavigation->setColumnWidth(3,30);
+		}
+	else{
+	//	subNavigation->setColumnCount(1);
 		}
 
 	subNavigation->resizeColumnToContents(0);
-	subNavigation->setColumnWidth(2,30);
-	subNavigation->setColumnWidth(3,30);
+
 
 	subNavigation->scrollToItem(child);
 
@@ -325,6 +332,10 @@ void NavigationEditUI::addMainNavTopItem(QString title,double key)
 		remove->setPixmap(removepix.scaled(20,20,Qt::KeepAspectRatio));
 		remove->setMaximumSize(QSize(25,25));
 		mainNavigation->setItemWidget(maintab,2,remove);
+
+		}
+	else{
+		mainNavigation->setColumnCount(2);
 		}
 	mainNavigation->setColumnWidth(1,Controller::GetNavigationWidth() - 30);
 	mainNavigation->setColumnWidth(2,30);
@@ -391,7 +402,7 @@ void NavigationEditUI::fillSubNavigation(double key)
 			page =  (Controller::GetPage(subNavigation->topLevelItem(0)->text(1).toDouble()));
 			NavigationPageEditUI::ShowUI(page);
 			currentSubNav = subNavigation->topLevelItem(0)->text(1).toDouble();
-
+			oldItemSubNavSelected = subNavigation->topLevelItem(0);
 			subNavPressed(subNavigation->topLevelItem(0),0);
 			}
 		}
@@ -399,16 +410,13 @@ void NavigationEditUI::fillSubNavigation(double key)
 
 void NavigationEditUI::savePage()
 {
-
 	QJsonObject newPage = NavigationPageEditUI::Get()->save();
 	if(!Controller::Compare(page,newPage)){
 		subNavigation->setEnabled(false);
-
 		if(Controller::ShowQuestion(tr("Do you want to save changes ?")))
 			Controller::AddPage(currentSubNav,newPage);
 		}
 	subNavigation->setEnabled(true);
-
 }
 
 void NavigationEditUI::paintEvent(QPaintEvent *)
@@ -418,6 +426,7 @@ void NavigationEditUI::paintEvent(QPaintEvent *)
 	QPainter p(this);
 	style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
+
 void NavigationEditUI::btn_Clicked(QString btn)
 {
 	//qDebug() << btn;
@@ -445,6 +454,7 @@ void NavigationEditUI::btn_Clicked(QString btn)
 		addMainNavTopItem();
 		}
 }
+
 void NavigationEditUI::btn_ClickedDataReturned(QJsonDocument document)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(btn_ClickedDataReturned(QJsonDocument)));

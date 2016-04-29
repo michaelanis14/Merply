@@ -183,10 +183,10 @@ void StructureViewGroupsUI::btn_Clicked(QString btn)
 		}
 	else if(btn.contains("Save")){
 	//	qDebug() << this->save();
-		Controller::Get()->storeDoc("ViewStructure",QJsonDocument(this->save()));
+		this->editControllerSavePressed();
 		}
 	else if(btn.contains("Cancel")){
-		emit cancel();
+		this->editControllerCancelPressed();
 		}
 }
 
@@ -206,6 +206,16 @@ void StructureViewGroupsUI::removeViewgroup(QWidget* field)
 
 	sVSFUIs.removeOne((StructureViewsEditUI*) field);
 	updateLayout();
+}
+
+void StructureViewGroupsUI::editControllerCancelPressed()
+{
+	emit cancel();
+}
+
+void StructureViewGroupsUI::editControllerSavePressed()
+{
+	Controller::Get()->storeDoc("ViewStructure",QJsonDocument(this->save()));
 }
 
 void StructureViewGroupsUI::paintEvent(QPaintEvent * event)

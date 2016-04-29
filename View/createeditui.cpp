@@ -1,6 +1,7 @@
 #include "createeditui.h"
 #include "mainform.h"
 #include "hcontrollers.h"
+#include "controller.h"
 
 
 
@@ -51,6 +52,7 @@ void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data) {
 
 void CreateEditUI::fill(QJsonObject viewStructure, QJsonObject data)
 {
+	this->viewStructure = viewStructure;
 	viewGroups = new ViewGroups(0,viewStructure,data) ;
 	createEditWidgetLayout->addWidget(viewGroups);
 	//this->layout->addWidget(createEditWidget);
@@ -85,7 +87,8 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 		//	IndexUI::ShowUI(this->id);
 			}
 		else if(nActon.at(1).compare("Save") == 0){
-			viewGroups->save();
+			QString key = this->viewStructure.value("document_id").toString().replace("ViewStructure::","");
+			Controller::Get()->storeDoc(key,QJsonDocument(viewGroups->save()));
 			//if(){
 		//		IndexUI::ShowUI(this->id);
 				//	IndexUI::ShowUI(this->id);

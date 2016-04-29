@@ -23,13 +23,18 @@ public:
 	void fill(QJsonObject structureView);
 	QJsonObject save();
 	static NavigationPageEditUI* Get();
+
 private:
 	QVBoxLayout *layout;
+	QScrollArea *scrollAreaPageEdit;
 	HeaderLabel* headerlbl;
 	static NavigationPageEditUI* p_instance;
+	QGroupBox *viewBox ;
 	QGroupBox *newCardDetails ;
 	QGroupBox *cardDetails ;
 	QGroupBox *pageDetails ;
+	QGroupBox *preview ;
+	QHBoxLayout* previewLayout;
 	QJsonObject structureView;
 	//QStringList cardsItems;
 	QStringList viewList;
@@ -41,6 +46,8 @@ private:
 	ERPComboBox* cards;
 	ERPComboBox* view;
 	PermissionsUI* permissions;
+
+	void clearPreview();
 signals:
 	void editControllerSavePressed();
 	void editControllerCancelPressed();
@@ -52,6 +59,8 @@ public slots:
 	void cardToggled(bool state);
 	void pageToggled(bool state);
 	void getCardData(QList<QJsonDocument> items);
+	void updatePreview();
+	void loadCard(QJsonDocument document);
 };
 
 #endif // NAVIGATIONPAGEEDITUI_H

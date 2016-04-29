@@ -17,7 +17,7 @@ SettingsCtrlsUI::SettingsCtrlsUI(QWidget *parent) : QWidget(parent)
 	title->move(2,-4);
 	title->setEnabled(false);
 
-
+	ctrlBtns = new QMap<int,QWidget*>();
 
 	//title->setGeometry(5,5,200,200);
 }
@@ -37,6 +37,7 @@ void SettingsCtrlsUI::addbtn(QString name,QString icon,QString action){
 
 
 	QObject::connect(btn, SIGNAL(clicked()),this, SLOT(btn_Clicked()));
+	ctrlBtns->insert(ctrlBtns->count(),btn);
 	layout->addWidget(btn);
 
 }

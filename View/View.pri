@@ -37,7 +37,8 @@ SOURCES += View/maindisplay.cpp \
     $$PWD/commonUI/NavigationUI/pagestructureviewediteui.cpp \
     $$PWD/pageui.cpp \
     $$PWD/permissionsUI/permissionsui.cpp \
-    $$PWD/permissionsUI/permissionfieldui.cpp
+    $$PWD/permissionsUI/permissionfieldui.cpp \
+    $$PWD/commonUI/expandbutton.cpp
 
 HEADERS  += View/maindisplay.h \
     View/commonUI/rangevalidator.h \
@@ -71,7 +72,8 @@ HEADERS  += View/maindisplay.h \
     $$PWD/commonUI/NavigationUI/pagestructureviewediteui.h \
     $$PWD/pageui.h \
     $$PWD/permissionsUI/permissionsui.h \
-    $$PWD/permissionsUI/permissionfieldui.h
+    $$PWD/permissionsUI/permissionfieldui.h \
+    $$PWD/commonUI/expandbutton.h
 
 #FORMS    += View/mainwindow.ui
 

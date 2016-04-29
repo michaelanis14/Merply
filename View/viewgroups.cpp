@@ -35,7 +35,11 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 					HViewGroups.insert(group,vW);
 					layout->addWidget(vW);
 					}
-				else HViewGroups.find(group).value()->layout()->addWidget(viewgroup);
+				else{
+					if(HViewGroups.find(group) != HViewGroups.end())
+						if(HViewGroups.find(group).value()->layout())
+							HViewGroups.find(group).value()->layout()->addWidget(viewgroup);
+					}
 				}
 			else 	layout->addWidget(viewgroup);
 			viewgroups << viewgroup;
@@ -50,11 +54,11 @@ QJsonDocument ViewGroups::save()
 	QJsonObject entity;
 	QJsonArray fields;
 	foreach(ViewGroup* vg,viewgroups){
-        fields.append(vg->save());
+		fields.append(vg->save());
 		}
 	entity.insert("Fields",fields);
 	//entity.insert("Title",this->structureView.value("Title"))
-	qDebug() << entity;
+	//qDebug() << entity;
 	return QJsonDocument(entity);
 }
 void ViewGroups::paintEvent(QPaintEvent *)

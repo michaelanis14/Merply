@@ -12,5 +12,7 @@
         <file>1457665376_tick.png</file>
         <file>1457665374_minus.png</file>
         <file>1457665371_plus.png</file>
+        <file>arrow-up.png</file>
+        <file>arrow-down.png</file>
     </qresource>
 </RCC>

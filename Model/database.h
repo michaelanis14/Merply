@@ -31,7 +31,7 @@ public:
 	static void on_stored_status (lcb_t instance, const void *, lcb_storage_t,
 								  lcb_error_t err, const lcb_store_resp_t *resp);
 	static void on_removed(lcb_t instance, const void *, lcb_error_t err, const lcb_remove_resp_t *resp);
-
+	static void arithmatic_callback(lcb_t instance, const void *, lcb_error_t error, const lcb_arithmetic_resp_t *);
 	bool storeDoc(QString key,QJsonDocument document);
 	bool updateDoc(QJsonDocument document);
 	bool deleteDoc(QString documentid);
@@ -53,16 +53,15 @@ public:
 	QList<QJsonDocument> getArray() const;
 
 	QString getValue() const;
-
+	QString LastKeyID;
 	QString getLastKeyID() const;
-	void setLastKeyID(const QString& value);
 
 private:
 	static Database* p_instance;
 	//QJsonDocument document;
 	QList<QJsonDocument> array;
 	//	QString value;
-	QString LastKeyID;
+
 
 signals:
 	void gotDocument(QJsonDocument document);

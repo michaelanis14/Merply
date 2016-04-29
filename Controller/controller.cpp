@@ -50,6 +50,8 @@ Controller::Controller(QObject *parent) :
 
 
 
+
+
 void Controller::showDisplay()
 {
 
@@ -90,8 +92,10 @@ void Controller::showDisplay()
 	QObject::connect(navigationUI::Get(),SIGNAL(subNavPressed(QJsonObject)),this,SLOT(subNavPressed(QJsonObject)));
 
 	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
+
 	Database::Get()->getDoc("NavigationUI::1");
 
+	login("michael","michael");
 }
 
 void Controller::showDisplayDataReturned(QJsonDocument document)
@@ -121,21 +125,22 @@ void Controller::subNavPressed(QJsonObject view)
 
 		//	Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
 		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedData(QList<QJsonDocument>)));
-		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE "+QString(DATABASE)+".Title = '"+view.value("Card").toString()+"'");
+		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id = '"+view.value("Card").toString()+"'");
 		//qDebug()<<"Q : " << query;
 		Database::Get()->query(query);
 		}
 	else if(view.value("Type").toString().contains("Page")){
 		PageUI::ShowUI(view);
+		qDebug() << view;
+		qDebug() <<hasReadAccess(view);
 		}
 }
 void Controller::subNavPressedData(QList<QJsonDocument> documents)
 {
-//	qDebug() << "SubPreseed" << documents;
+	//	qDebug() << "SubPreseed" << documents;
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedData(QList<QJsonDocument>)));
 	if(documents.count() > 0)
 		CreateEditUI::ShowUI(documents.first().object(),QJsonObject());
-
 }
 
 /**
@@ -177,9 +182,79 @@ void Controller::getJsonList(QString table, QString select,QString condition)
 
 void Controller::GetJsonListData(QList<QJsonDocument> items)
 {
+
 	QObject::disconnect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QList<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	emit gotJsonListData(items);
 }
+
+
+
+void Controller::getLastKey()
+{
+	QObject::connect(Database::Get(),SIGNAL(gotLastKey(QString)),Controller::Get(),SLOT(getLastKeyData(QString)));
+}
+void Controller::getLastKeyData(QString key)
+{
+	QObject::disconnect(Database::Get(),SIGNAL(gotLastKey(QString)),Controller::Get(),SLOT(getLastKeyData(QString)));
+	emit gotLastKey(key);
+}
+void Controller::login(QString username, QString password)
+{
+	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(loginData(QList<QJsonDocument>)));
+	QString query = QString("SELECT (`"+QString(DATABASE)+"`).*  ,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \"Users::%\"  AND Fields[0][1].Username[0] = '"+username+"' AND Fields[0][2].UserPassword[0] = '"+password+"'");
+	//qDebug()<<"Q : " << query;
+	Database::Get()->query(query);
+
+
+}
+
+void Controller::loginData(QList<QJsonDocument> user)
+{
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(loginData(QList<QJsonDocument>)));
+	QJsonObject userObject = user.first().object();
+	if(!userObject.value("document_id").toString().isEmpty()){
+		QString username;
+		QString name;
+		QJsonArray userFields = userObject.value("Fields").toArray();
+		foreach(QJsonValue field,userFields){
+			foreach(QJsonValue subfield,field.toArray()){
+				if(subfield.toObject().value("Name") != QJsonValue::Undefined){
+					name = subfield.toObject().value("Name").toArray().at(0).toString();
+					}
+				else if(subfield.toObject().value("Username") != QJsonValue::Undefined){
+					username = subfield.toObject().value("Username").toArray().at(0).toString();
+					}
+
+				}
+			}
+		Model::Get()->login(userObject.value("document_id").toString(),username,name);
+		}
+	//qDebug() << userFields  << userFields.at(0).toArray().at(0).toObject().value("Name").toString();
+}
+bool Controller::hasReadAccess(QJsonObject permissions)
+{
+
+	permissions = permissions.value("Permissions").toObject().value("Read").toObject();
+	qDebug() << permissions;
+	if(permissions.value("Permissions").toString().toInt() == 111){
+		foreach(QJsonValue deny,permissions.value("Denied").toArray()){
+			if(deny.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0   || deny.toObject().value("Permissions").toString().toInt() == 100)
+				return false;
+			}
+		foreach(QJsonValue allow,permissions.value("Allowed").toArray()){
+			if(allow.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0 || allow.toObject().value("Permissions").toString().toInt() == 100)
+				return true;
+			}
+
+		}
+	else if(permissions.value("Permissions").toString().toInt() == 100)
+		return true;
+	else if(permissions.value("Permissions").toString().toInt() == 101)
+		return false;
+
+	return false;
+}
+
 
 QString Controller::getDatabaseName()
 {
@@ -461,6 +536,12 @@ int Controller::GetNavigationSubHeight()
 	return NAVIGATION_SUB_HEIGHT;
 }
 
+QString Controller::getLastKeyID()
+{
+	return Database::Get()->getLastKeyID();
+}
+
+
 
 void Controller::setShowWarning(bool value)
 {
@@ -556,6 +637,7 @@ bool Controller::Compare(QJsonObject first, QJsonObject second)
 
 	return true;
 }
+
 
 
 

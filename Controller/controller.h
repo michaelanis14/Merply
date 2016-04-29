@@ -52,6 +52,7 @@ public:
 	int Count(const QString table);
 	void getDoc(QString key);
 	void getJsonList(QString table, QString select,QString condition = "");
+	void getLastKey();
 	QString getDatabaseName();
 
 	QList<QString> select(const QString query);
@@ -96,13 +97,15 @@ public:
 	int static GetNavigationSettingsBarHeight();
 	int static GetNavigationMainHeight();
 	int static GetNavigationSubHeight();
+	static QString getLastKeyID();
 
+	void login(QString username,QString password);
 
 private:
 	explicit Controller(QObject * parent = 0);
 	static Controller* p_instance;
 	QMap<QString,QStringList> layoutViewGroups;
-
+	bool hasReadAccess(QJsonObject permissions);
 
 public slots:
 	void subNavPressed(QJsonObject view);
@@ -116,7 +119,8 @@ public slots:
 	void linkPressedData(QJsonDocument document);
 	void getDocData(QJsonDocument document);
 	void GetJsonListData(QList<QJsonDocument> items);
-
+	void getLastKeyData(QString key);
+	void loginData(QList<QJsonDocument> user);
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void getFieldsData(QList<QString> fields);

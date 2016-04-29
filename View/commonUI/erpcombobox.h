@@ -24,8 +24,12 @@ public:
 	bool addedItems;
 	bool indexedFill;
 	QStringList getItemsText();
-private:
 	QList<QString> keys;
+	void removeSelected();
+	void removeList(QStringList list);
+
+private:
+
 	QString oldCompletion;
 
 signals:

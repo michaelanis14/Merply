@@ -11,7 +11,7 @@ class FeildUI : public QWidget
 	Q_OBJECT
 public:
 	explicit FeildUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject());
-	void clear();
+//	void clear();
 	QJsonObject save();
 private:
 	QLabel* btnRemove;

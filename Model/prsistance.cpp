@@ -166,7 +166,6 @@ bool Prsistance::init()
 void Prsistance::GetJsonList(QString table, QString select,QString condition)
 {
 
-	QList<QString> list;
 
 	QString where;
 	if(!condition.isEmpty())

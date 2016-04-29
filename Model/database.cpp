@@ -33,11 +33,22 @@ void Database::on_stored_status (lcb_t instance, const void *, lcb_storage_t ,
 		}
 	else {
 		QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
-		Database::Get()->setLastKeyID(QString(keyByte));
+		Database::Get()->LastKeyID = QString(keyByte);
+		emit Database::Get()->gotLastKey(QString(keyByte));
 		qDebug("Stored Key:  %.*s\n",(int)resp->v.v0.nkey,resp->v.v0.key);
 		}
 }
 
+void  Database::arithmatic_callback(lcb_t instance, const void *,
+									lcb_error_t error,
+									const lcb_arithmetic_resp_t *)
+{
+	if (error == LCB_SUCCESS) {
+		//   qDebug("Stored Key:  %.*s\n",(int)resp->v.v0.nkey,resp->v.v0.key);
+		} else {
+		fprintf(stderr, "Couldn’t schedule operation: %s\n", lcb_strerror(instance, error));
+		}
+}
 
 
 bool Database::updateDoc(QJsonDocument document)
@@ -154,7 +165,7 @@ bool Database::KillDatabase(lcb_t instance)
 bool Database::IncrementKey(QString key)
 {
 	//Database::Get()->value = QString::number(-1);
-
+	Database::Get()->LastKeyID = "-1";
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){
 		qDebug() << "Failed to INIT Database @ Increment";
@@ -172,24 +183,18 @@ bool Database::IncrementKey(QString key)
 	cmdd.v.v0.delta = 1; // Increment by one
 	cmdd.v.v0.initial = 1; // Set to 1 if it does not exist
 	cmdd.v.v0.create = 1; // Create item if it does not exist
-	lcb_error_t err = lcb_arithmetic(instance, NULL, 1, &cmdlistt);
-	if (err == LCB_SUCCESS) {
-		lcb_wait(instance);
-		//qDebug() << "LCB_SUCCESS_Key";
-		//qDebug("Key:  %.*s\n",(int)cmdd.v.v0.nkey,cmdd.v.v0.key);
-		} else {
-		fprintf(stderr, "Couldn’t schedule operation: %s\n", lcb_strerror(instance, err));
-		}
-
-	//lcb_wait(instance); // get_callback is invoked here
+	lcb_arithmetic(instance, NULL, 1, &cmdlistt);
+	lcb_set_arithmetic_callback(instance, arithmatic_callback);
+	lcb_wait(instance); // get_callback is invoked here
 	return Database::KillDatabase(instance);
 
 }
 
 int Database::GetKey(QString key)
 {
+
 	if(getDoc(key))
-		//return Database::Get()->value.toInt();
+		return Database::Get()->LastKeyID.toInt();
 	return -1;
 }
 void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
@@ -209,16 +214,20 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 			}
 		else{
 			emit Database::Get()->gotValue(QString(byteArray));
+			Database::Get()->LastKeyID = QString(byteArray);
 			}
 		} else {
-		fprintf(stderr, "Couldn’t retrieve item: %s\n", lcb_strerror(instance, err));
+		QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
+		qDebug() << QString(keyByte);
+		fprintf(stderr, "Couldn’t retrieve item: %s %s\n", lcb_strerror(instance, err),resp->v.v0.key,(int)resp->v.v0.nkey);
 		}
 }
 
 bool Database::getDoc(QString key) {
 	//Query("SELECT * from default WHERE  \"id = Contact::* \"");
 	//qDebug() << "hello";
-	//qDebug() <<"Key:"<< key;
+	qDebug() <<"Key:"<< key;
+	Database::Get()->LastKeyID = "-1";
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){
 		qDebug() << "Failed to INIT Database @ Query";
@@ -248,13 +257,6 @@ bool Database::getDoc(QString key) {
 
 }
 
-//QJsonDocument Database::getDocument() const
-//{
-//	return QJsonDocument();
-//}
-
-
-
 
 void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 
@@ -273,7 +275,7 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 			}
 
 		} else {
-	//	qDebug() << Database::Get()->array;
+		//	qDebug() << Database::Get()->array;
 
 		//Database::Get()->document = QJsonDocument(Database::Get()->array);
 		Database::Get()->emit gotDocuments(Database::Get()->array);
@@ -340,18 +342,13 @@ QString Database::getLastKeyID() const
 	return LastKeyID;
 }
 
-void Database::setLastKeyID(const QString& value)
-{
-	LastKeyID = value;
-}
-
 
 bool Database::storeDoc(QString key,QJsonDocument document) {
 	Database::IncrementKey(key);
 
 	int keyID = Database::GetKey(key);
 	if(keyID == -1){
-		qDebug() << "Error Key Value is -1, Database StoreDoc Line:373";
+		qDebug() << "Error Key Value is -1, Database StoreDoc Line:354 Key:" <<key;
 		return false;
 		}
 
@@ -405,7 +402,7 @@ Database::Database():
 	QObject()
 {
 	//	this->document =  QJsonDocument();
-//	this->value = QString();
+	//	this->value = QString();
 	this->array = QList<QJsonDocument>();
 	//IncrementKey("cont");
 	/*

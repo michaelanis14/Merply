@@ -35,7 +35,7 @@ MainForm::MainForm(): QWidget()
 #endif
 */
 	//border-right: 1px solid rgb(255, 170, 0);
-	this->setWindowTitle("WorkBench[*]");
+	this->setWindowTitle("Merply[*]");
 	this->setWindowModified(false);
 	this->setStyleSheet(
 				// make background white

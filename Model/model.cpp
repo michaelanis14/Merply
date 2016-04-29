@@ -24,13 +24,12 @@
 
 
 
-Model::Model():
-	QObject()
+Model::Model():QObject()
 {
 	this->showWarning = true;
 	subNavigation =  QMap<double, QList<QTreeWidgetItem *> >();
 	pages =  QMap<double, QJsonObject >();
-
+	loggedUser = 0;
 }
 
 bool Model::getShowWarning() const
@@ -87,6 +86,40 @@ QMap<double, QList<QTreeWidgetItem*> > Model::getSubNavigationModel()
 QMap<double, QString> Model::getMainNavigationModel()
 {
 	return mainNavigation;
+}
+
+void Model::login(QString uid, QString username, QString name)
+{
+	loggedUser = new User(uid,username,name);
+}
+
+void Model::logout()
+{
+	loggedUser = 0;
+}
+
+QString Model::getUserID()
+{
+	if(loggedUser){
+		return loggedUser->getId();
+		}
+	return "";
+}
+
+QString Model::getUserName()
+{
+	if(loggedUser){
+		return loggedUser->getName();
+		}
+	return "";
+}
+
+QString Model::getUserUsername()
+{
+	if(loggedUser){
+		return loggedUser->getUsername();
+		}
+	return "";
 }
 bool Model::removeSubNavigation(double key)
 {

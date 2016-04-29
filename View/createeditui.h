@@ -23,6 +23,7 @@ private:
 	QVBoxLayout *createEditWidgetLayout;
 	QVBoxLayout *layout;
 	ViewGroups * viewGroups;
+	QJsonObject viewStructure;
 signals:
 protected:
 	//void showEvent(QShowEvent *);

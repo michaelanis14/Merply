@@ -9,6 +9,9 @@
 #define MODEL_H
 
 #include "controller.h"
+#include "user.h"
+
+
 #include <QList>
 #include <QStringList>
 #include <QMap>
@@ -59,6 +62,12 @@ public:
 	QMap<double, QList<QTreeWidgetItem*> > getSubNavigationModel();
 	QMap<double, QString > getMainNavigationModel();
 
+	void login(QString uid,QString username,QString name);
+	void logout();
+	QString getUserID();
+	QString getUserName();
+	QString getUserUsername();
+
 private:
 	explicit Model();
 	///Flags///
@@ -68,6 +77,7 @@ private:
 	QMap<double, QList<QTreeWidgetItem *> > subNavigation;
 	QMap<double, QJsonObject > pages;
 	QMap<double, QString > mainNavigation;
+	User* loggedUser;
 
 };
 

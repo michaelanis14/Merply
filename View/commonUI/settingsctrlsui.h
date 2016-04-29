@@ -22,6 +22,7 @@ public:
 	void setTitle(QString value);
 	QHBoxLayout* layout;
 	void clear();
+	QMap<int,QWidget*> *ctrlBtns;
 private:
 
 	QLabel *title;

@@ -36,6 +36,8 @@ void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 			this->addedItems = true;
 			}
 		}
+	if(count() > 0)
+		this->setEnabled(true);
 }
 
 void ERPComboBox::focusOutEvent(QFocusEvent *e)
@@ -77,8 +79,10 @@ void ERPComboBox::focusOutEvent(QFocusEvent *e)
 }
 
 QString ERPComboBox::getKey(){
-	if(this->addedItems)
-		return keys.at(currentIndex());
+
+	if(this->addedItems && currentIndex() != -1)
+		if(keys.count() > currentIndex())
+			return keys.at(currentIndex());
 	return "_";
 
 }
@@ -89,8 +93,30 @@ QStringList ERPComboBox::getItemsText()
 	for(int i = 0; i < this->count(); i++){
 		itemsText.append(this->itemText(i));
 		}
-	 return itemsText;
+	return itemsText;
 }
+
+void ERPComboBox::removeSelected()
+{
+	keys.removeAt(currentIndex());
+	removeItem(currentIndex());
+	if(count() <= 0)
+		this->setEnabled(false);
+}
+
+void ERPComboBox::removeList(QStringList list)
+{
+	QStringList items = getItemsText();
+	foreach(QString item,list){
+		int i = items.indexOf(item);
+		removeItem(i);
+		keys.removeAt(i);
+		}
+	if(count() <= 0)
+		this->setEnabled(false);
+}
+
+
 
 bool ERPComboBox::eventFilter(QObject *obj, QEvent *event)
 {
