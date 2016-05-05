@@ -116,7 +116,8 @@ public slots:
 	void showDisplayDataReturned(QJsonDocument document);
 	void loadNavigationData(QJsonDocument document);
 	void subNavPressedData(QList<QJsonDocument> documents);
-	void getFieldsData(QJsonDocument document);
+	void subNavPressedIndexData(QList<QJsonDocument> documents);
+	void getFieldsData(QList<QJsonDocument> documents);
 	void linkPressedData(QJsonDocument document);
 	void getDocData(QJsonDocument document);
 	void GetJsonListData(QList<QJsonDocument> items);
@@ -124,7 +125,7 @@ public slots:
 	void loginData(QList<QJsonDocument> user);
 signals:
 	void getDocDataReturned(QJsonDocument document);
-	void getFieldsData(QList<QString> fields);
+	void gotFieldsData(QList<QString> fields);
 
 	void gotDocument(QJsonDocument docuemnt);
 	void gotDocuments(QList<QJsonDocument> array);

@@ -213,7 +213,7 @@ void StructureVieweditSubFeild::updateFields(QString type)
 
 void StructureVieweditSubFeild::updateSelect(QString title)
 {
-	QObject::connect(Controller::Get(),SIGNAL(getFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	Controller::Get()->getFields(title);
 
 
@@ -221,15 +221,15 @@ void StructureVieweditSubFeild::updateSelect(QString title)
 
 void StructureVieweditSubFeild::updateSelectData(QList<QString> fields)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(getFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
-
+	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+	Select->clear();
 	Select->addItems(fields);
 }
 
 void StructureVieweditSubFeild::gotSourceData(QList<QJsonDocument> items)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
-
+	Source->clear();
 	Source->addJsonItems(items);
 }
 

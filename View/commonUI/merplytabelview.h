@@ -42,7 +42,7 @@ private:
 	QString propertyName;
 	//QStandardItemModel *model;
 	//QStringList headerLabels;
-
+	QList<QJsonDocument> items;
 signals:
 protected:
 	void mousePressEvent(QMouseEvent *event);
@@ -51,6 +51,8 @@ public slots:
 	void printTabel();
 	void editEntity(const QString&id);
 	void deleteEntity(const QString&id);
+
+	void updateHeaderData(QList<QString> headerItems);
 
 };
 

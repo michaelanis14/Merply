@@ -108,7 +108,7 @@ bool merplyTabelView::fill(QJsonObject columns, QJsonObject data)
 			if(clmn.toObject().value("Type").toString().compare("Database") == 0){
 				QList<QString> columnData;
 				//TODO :: commented to ease the transition to the new database slots
-	//			columnData << Controller::Get()->getListItems(clmn.toObject().value("Source").toString(),clmn.toObject().value("Select").toString());
+				//			columnData << Controller::Get()->getListItems(clmn.toObject().value("Source").toString(),clmn.toObject().value("Select").toString());
 				if(tabel->rowCount()<columnData.count())
 					tabel->setRowCount(columnData.count());
 
@@ -175,73 +175,18 @@ bool merplyTabelView::fill(QJsonObject columns, QJsonObject data)
 bool merplyTabelView::indexTable(const QList<QJsonDocument> items, const bool edit, const bool remove)
 {
 	//model->setHorizontalHeaderItem(i, new QStandardItem(QString(column.namedItem("Title").firstChild().nodeValue())));
+	if(items.count() > 0){
+		this->items = items;
 
-	QStringList headerItems = QStringList();
-			//Controller::Get()->propertyNameList(xmlNode);
-	tabel->setColumnCount(headerItems.count()+1);
-	tabel->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("controls")));
-
-
-
-	//QPushButton *btnRemove = new QPushButton();
-
-	//tabel->setCellWidget(1,1,new QLabel("RR"));
-
-
-	int k = 1;
-	foreach(QString key,headerItems){
-		tabel->setHorizontalHeaderItem(k, new QTableWidgetItem(QString(key)));
-		k++;
-		}
-
-	//tabel->setCellWidget()
-	int i = 0;
-	tabel->setRowCount(items.count());
-
-	foreach(QJsonDocument item,items){
-		int k = 1;
-		foreach(QString key,headerItems){
-			merplyTableControllers* controller = new merplyTableControllers(0,item.object().value("document_id").toString(),edit,remove);
-			if(edit)
-				connect(controller, SIGNAL(editClicked(const QString&)), this, SLOT(editEntity(QString)));
-			if(remove)
-				connect(controller, SIGNAL(deleteClicked(QString)), this, SLOT(deleteEntity(QString)));
-
-			tabel->setCellWidget(i, 0, controller);
-
-			if(item.object().value(key).isArray()){
-				QString valueString = Controller::Get()->toString(item.object().value(key).toArray());
-				//qDebug()  << valueString;
-				//	QStandardItem *value = new QStandardItem(valueString);
-				//	tabel->setItem(i,k,value);
-
-				QLabel *value = new QLabel(valueString);
-				//QLable *value = new QStandardItem(QString(data.value(propertyName).toArray()[i].toArray()[j].toString()));
-				//model->setItem(i,j,value);
-				tabel->setCellWidget(i,k,value);
-				}
-			else{
-				//QStandardItem *value = new QStandardItem();
-				//tabel->setItem(i,k,value);
-				QLabel *value = new QLabel(QString(item.object().value(key).toString()));
-				//QLable *value = new QStandardItem(QString(data.value(propertyName).toArray()[i].toArray()[j].toString()));
-				//model->setItem(i,j,value);
-				////	item->setFlags(Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-				tabel->setCellWidget(i,k,value);
-
-				}
-
-			k++;
+		if(items.first().object().value("document_id") != QJsonValue::Undefined){
+			QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
+			QString documentid = items.first().object().value("document_id").toString().split("::")[0];
+			//qDebug() << documentid;
+			Controller::Get()->getFields(documentid);
+			return true;
 			}
-		i++;
 		}
-	//	this->tabel->setModel(model);
-	this->tabel->resizeColumnsToContents();
-
-	//this->tabel->hideColumn(headerItems.indexOf("document_id"));
-	//this->tabel->hideColumn(headerItems.indexOf("cas"));
-
-	return true;
+	return false;
 }
 
 void merplyTabelView::clear()
@@ -355,13 +300,105 @@ void merplyTabelView::printTabel(){
 
 void merplyTabelView::editEntity(const QString& id)
 {
-	//	qDebug() <<id;
+	qDebug() <<id;
 	//CreateEditUI* create = new CreateEditUI(0,id);
-//	CreateEditUI::ShowUI(id);
+	//	CreateEditUI::ShowUI(id);
 }
 
 void merplyTabelView::deleteEntity(const QString& id)
 {
 	//if(Controller::Get()->deleteDocument(id))
-		//IndexUI::ShowUI(id);
+	//IndexUI::ShowUI(id);
+}
+
+void merplyTabelView::updateHeaderData(QList<QString> headerItems)
+{
+	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
+	tabel->setColumnCount(headerItems.count()+1);
+	tabel->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("controls")));
+	bool edit = true;
+	bool remove = true;
+	int k = 1;
+	foreach(QString key,headerItems){
+		tabel->setHorizontalHeaderItem(k, new QTableWidgetItem(QString(key)));
+		k++;
+		}
+	tabel->setRowCount(items.count());
+	int i = 0;
+	foreach(QJsonDocument item,items){
+		int j = 0;
+		merplyTableControllers* controller = new merplyTableControllers(0,item.object().value("document_id").toString(),edit,remove);
+		if(edit)
+			connect(controller, SIGNAL(editClicked(const QString&)), this, SLOT(editEntity(QString)));
+		if(remove)
+			connect(controller, SIGNAL(deleteClicked(QString)), this, SLOT(deleteEntity(QString)));
+
+		tabel->setCellWidget(i, j, controller);
+
+		foreach(QJsonValue value, item.object().value("Fields").toArray()){
+			foreach(QJsonValue viewGroup, value.toArray()){
+
+				QString valueString = Controller::Get()->toString(viewGroup.toObject().value(headerItems.at(j)).toArray());
+				//qDebug()  << valueString;
+				//QStandardItem *value = new QStandardItem(valueString);
+				//	tabel->setItem(i,k,value);
+				QLabel *value = new QLabel(valueString);
+				//QLable *value = new QStandardItem(QString(data.value(propertyName).toArray()[i].toArray()[j].toString()));
+				//model->setItem(i,j,value);
+				tabel->setCellWidget(i,j+1,value);
+				j++;
+				}
+			}
+		i++;
+		}
+	tabel->resizeColumnsToContents();
+	/*
+
+
+	foreach(QJsonDocument item,items){
+
+		foreach(QString key,headerItems){
+
+			foreach(QJsonValue value, item.object().value("Fields").toArray()){
+
+				foreach(QJsonValue viewGroup, value.toArray()){
+					//qDebug() << viewGroup.toObject().value("key");
+					}
+				}
+
+
+			if(item.object().value(key).isArray()){
+				QString valueString = Controller::Get()->toString(item.object().value(key).toArray());
+				//qDebug()  << valueString;
+					//QStandardItem *value = new QStandardItem(valueString);
+				//	tabel->setItem(i,k,value);
+
+				QLabel *value = new QLabel(valueString);
+				//QLable *value = new QStandardItem(QString(data.value(propertyName).toArray()[i].toArray()[j].toString()));
+				//model->setItem(i,j,value);
+				tabel->setCellWidget(i,k,value);
+				}
+			else{
+				//QStandardItem *value = new QStandardItem();
+				//tabel->setItem(i,k,value);
+				QLabel *value = new QLabel(QString(item.object().value(key).toString()));
+				//QLable *value = new QStandardItem(QString(data.value(propertyName).toArray()[i].toArray()[j].toString()));
+				//model->setItem(i,j,value);
+				////	item->setFlags(Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+				tabel->setCellWidget(i,k,value);
+
+				}
+
+
+			}
+		i++;
+		}
+	//	this->tabel->setModel(model);
+	this->tabel->resizeColumnsToContents();
+
+	//this->tabel->hideColumn(headerItems.indexOf("document_id"));
+	//this->tabel->hideColumn(headerItems.indexOf("cas"));
+
+	//return true;
+	*/
 }
