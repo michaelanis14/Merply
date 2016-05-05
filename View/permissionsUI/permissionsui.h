@@ -15,15 +15,17 @@ class PermissionsUI : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit PermissionsUI(QWidget *parent = 0,QJsonObject saved = QJsonObject());
+	explicit PermissionsUI(QWidget *parent = 0,bool read = false,bool write = false);
 	QGroupBox *permissionsBox ;
 	QVBoxLayout *layout;
 	QJsonObject save();
 	PermissionFieldUI *pfRead;
+	PermissionFieldUI *pfWrite;
 	void load(QJsonObject saved);
 	ExpandButton* btnExpand;
 private:
-
+	bool read;
+	bool write;
 	void updateDescription();
 signals:
 

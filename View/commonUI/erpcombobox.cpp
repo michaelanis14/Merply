@@ -133,6 +133,13 @@ bool ERPComboBox::eventFilter(QObject *obj, QEvent *event)
 		}
 	return QObject::eventFilter(obj, event);
 }
+
+void ERPComboBox::clear()
+{
+	keys.clear();
+	this->addedItems = false;
+	QComboBox::clear();
+}
 //void ERPComboBox::mousePressEvent(QMouseEvent *event){
 //QLabel *child=  static_cast<QLabel *>(childAt(event->pos()));
 

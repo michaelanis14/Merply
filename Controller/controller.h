@@ -106,6 +106,7 @@ private:
 	static Controller* p_instance;
 	QMap<QString,QStringList> layoutViewGroups;
 	bool hasReadAccess(QJsonObject permissions);
+	bool hasWriteAccess(QJsonObject permissions);
 
 public slots:
 	void subNavPressed(QJsonObject view);

@@ -27,7 +27,7 @@ public:
 	QList<QString> keys;
 	void removeSelected();
 	void removeList(QStringList list);
-
+	void clear();
 private:
 
 	QString oldCompletion;
@@ -43,6 +43,7 @@ protected:
 	//void mousePressEvent(QMouseEvent *event);
 	//virtual void  keyPressEvent(QKeyEvent *event);
 	 bool eventFilter(QObject *obj, QEvent *event);
+
 
 
 };

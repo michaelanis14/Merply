@@ -4,7 +4,7 @@
 #include <QHeaderView>
 #include <QLabel>
 
-PermissionFieldUI::PermissionFieldUI(QWidget *parent,QString name, QJsonObject saved) : QWidget(parent)
+PermissionFieldUI::PermissionFieldUI(QWidget *parent, QString name) : QWidget(parent)
 {
 	//qDebug()<<"SAVED" << saved;
 	layout = new QFormLayout;
@@ -19,7 +19,7 @@ PermissionFieldUI::PermissionFieldUI(QWidget *parent,QString name, QJsonObject s
 	readPermissons->addItems(basicPermissons);
 	layout->addRow(tr(name.toStdString().c_str()), readPermissons);
 
-	QList<QJsonDocument> basicPermissonsKeys;
+
 	QJsonObject basicPermissonsItem;
 	QJsonObject basicPermissonsItem2;
 	basicPermissonsItem.insert("Value","Everyone");
@@ -51,7 +51,7 @@ PermissionFieldUI::PermissionFieldUI(QWidget *parent,QString name, QJsonObject s
 	allowGroupBoxLayout->addWidget(allowGroup);
 
 	usersforAllowedList = new ERPComboBox();
-	usersforAllowedList->addJsonItems(basicPermissonsKeys);
+
 	allowGroupBoxLayout->addWidget(usersforAllowedList);
 
 	btnAddAllowed = new QPushButton(tr("Add"));
@@ -78,7 +78,7 @@ PermissionFieldUI::PermissionFieldUI(QWidget *parent,QString name, QJsonObject s
 	denyGroupBoxLayout->addWidget(denyGroup);
 
 	usersforDeniedList = new ERPComboBox();
-	usersforDeniedList->addJsonItems(basicPermissonsKeys);
+
 	denyGroupBoxLayout->addWidget(usersforDeniedList);
 
 	btnAddDeny = new QPushButton(tr("Add"));
@@ -89,10 +89,7 @@ PermissionFieldUI::PermissionFieldUI(QWidget *parent,QString name, QJsonObject s
 	QObject::connect(readPermissons,SIGNAL(currentIndexChanged(int)),this,SLOT(showSpcfic(int)));
 	showSpcfic(0);
 
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(loadUsers(QList<QJsonDocument>)));
-	Controller::Get()->getJsonList("Users","Fields[0][0].Name[0]");
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(loadUsers(QList<QJsonDocument>)));
-	Controller::Get()->getJsonList("Groups","Fields[0][0].Name[0]");
+
 
 }
 
@@ -206,12 +203,28 @@ void PermissionFieldUI::addDenied(QString title, QString key)
 
 }
 
+void PermissionFieldUI::loadUsersGroups()
+{
+	usersforAllowedList->clear();
+	usersforDeniedList->clear();
+
+	usersforAllowedList->addJsonItems(basicPermissonsKeys);
+	usersforDeniedList->addJsonItems(basicPermissonsKeys);
+
+	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(loadUsers(QList<QJsonDocument>)));
+	Controller::Get()->getJsonList("Users","Fields[0][0].Name[0]");
+	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(loadUsers(QList<QJsonDocument>)));
+	Controller::Get()->getJsonList("Groups","Fields[0][0].Name[0]");
+
+}
+
 void PermissionFieldUI::load(QJsonObject saved)
 {
 	allowGroup->clear();
 	denyGroup->clear();
 	btnAddAllowed->setEnabled(true);
 	btnAddDeny->setEnabled(true);
+
 	//qDebug() << saved.value("Permissions").toString().toInt();
 	if(saved.value("Permissions").toString().toInt() == 100)
 		readPermissons->setCurrentIndex(0);
@@ -219,11 +232,13 @@ void PermissionFieldUI::load(QJsonObject saved)
 		readPermissons->setCurrentIndex(1);
 	else if(saved.value("Permissions").toString().toInt() == 111){
 		readPermissons->setCurrentIndex(2);
-
+		loadUsersGroups();
 		foreach(QJsonValue allow,saved.value("Allowed").toArray()){
+			usersforAllowedList->setCurrentIndex(usersforAllowedList->keys.indexOf(allow.toObject().value("Key").toString()));
 			addAllowed(allow.toObject().value("Value").toString(),allow.toObject().value("Key").toString());
 			}
 		foreach(QJsonValue deny,saved.value("Denied").toArray()){
+			usersforDeniedList->setCurrentIndex(usersforDeniedList->keys.indexOf(deny.toObject().value("Key").toString()));
 			addDenied(deny.toObject().value("Value").toString(),deny.toObject().value("Key").toString());
 			}
 
@@ -237,6 +252,7 @@ void PermissionFieldUI::showSpcfic(int field)
 		denyGroupBox->setHidden(false);
 		layout->labelForField(allowGroupBox)->setHidden(false);
 		layout->labelForField(denyGroupBox)->setHidden(false);
+		loadUsersGroups();
 		}
 	else{
 		allowGroupBox->setHidden(true);
@@ -276,7 +292,6 @@ void PermissionFieldUI::allowGroupPressed(QTreeWidgetItem* item, int column)
 
 		}
 }
-
 
 void PermissionFieldUI::denyGroupPressed(QTreeWidgetItem* item, int column)
 {
@@ -320,7 +335,6 @@ void PermissionFieldUI::addDenied()
 		addDenied(title,key);
 		}
 }
-
 
 void PermissionFieldUI::addAllowed()
 {

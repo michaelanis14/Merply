@@ -14,7 +14,7 @@ class PermissionFieldUI : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit PermissionFieldUI(QWidget *parent = 0, QString name = "Field", QJsonObject saved = QJsonObject());
+	explicit PermissionFieldUI(QWidget *parent = 0, QString name = "Field");
 	QJsonObject save();
 	void load(QJsonObject saved);
 private:
@@ -32,6 +32,8 @@ private:
 	QStringList getDenied();
 	void addAllowed(QString title,QString key);
 	void addDenied(QString title,QString key);
+	QList<QJsonDocument> basicPermissonsKeys;
+	void loadUsersGroups();
 
 signals:
 
@@ -43,6 +45,7 @@ public slots:
 	void addAllowed();
 
 	void loadUsers(QList<QJsonDocument> users);
+
 };
 
 #endif // PERMISSIONFIELDUI_H

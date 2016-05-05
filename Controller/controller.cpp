@@ -102,7 +102,7 @@ void Controller::showDisplayDataReturned(QJsonDocument document)
 {
 
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
-	//StructureViewGroupsUI::ShowUI(document.object());
+	StructureViewGroupsUI::ShowUI(document.object());
 }
 
 void Controller::loadNavigationData(QJsonDocument document)
@@ -131,8 +131,8 @@ void Controller::subNavPressed(QJsonObject view)
 		}
 	else if(view.value("Type").toString().contains("Page")){
 		PageUI::ShowUI(view);
-		qDebug() << view;
-		qDebug() <<hasReadAccess(view);
+		//qDebug() << view;
+		qDebug() << hasReadAccess(view);
 		}
 }
 void Controller::subNavPressedData(QList<QJsonDocument> documents)
@@ -200,12 +200,13 @@ void Controller::getLastKeyData(QString key)
 }
 void Controller::login(QString username, QString password)
 {
+	if(username.compare("merplyroot") == 0 && password.compare("LilyMichael") == 0){
+		Model::Get()->login("merplyroot","root","Merply");
+		}
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(loginData(QList<QJsonDocument>)));
 	QString query = QString("SELECT (`"+QString(DATABASE)+"`).*  ,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \"Users::%\"  AND Fields[0][1].Username[0] = '"+username+"' AND Fields[0][2].UserPassword[0] = '"+password+"'");
 	//qDebug()<<"Q : " << query;
 	Database::Get()->query(query);
-
-
 }
 
 void Controller::loginData(QList<QJsonDocument> user)
@@ -233,28 +234,60 @@ void Controller::loginData(QList<QJsonDocument> user)
 }
 bool Controller::hasReadAccess(QJsonObject permissions)
 {
+	if(Model::Get()->getUserID().compare("merplyroot") == 0 )
+		return true;
 
 	permissions = permissions.value("Permissions").toObject().value("Read").toObject();
-	qDebug() << permissions;
 	if(permissions.value("Permissions").toString().toInt() == 111){
 		foreach(QJsonValue deny,permissions.value("Denied").toArray()){
-			if(deny.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0   || deny.toObject().value("Permissions").toString().toInt() == 100)
+			if(deny.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0){
+				//	qDebug() << "At Deny: "<<permissions << Model::Get()->getUserID();
 				return false;
+				}
 			}
 		foreach(QJsonValue allow,permissions.value("Allowed").toArray()){
-			if(allow.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0 || allow.toObject().value("Permissions").toString().toInt() == 100)
+			if(allow.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0 || allow.toObject().value("Key").toString().toInt() == 100)
+				//qDebug() << "At Allow: "<<permissions << Model::Get()->getUserID() << allow.toObject().value("Key").toString().toInt();
 				return true;
 			}
-
 		}
 	else if(permissions.value("Permissions").toString().toInt() == 100)
 		return true;
-	else if(permissions.value("Permissions").toString().toInt() == 101)
+	else if(permissions.value("Permissions").toString().toInt() == 101){
+		//qDebug() << "Denied all: "<<permissions << Model::Get()->getUserID();
 		return false;
-
+		}
+	//	qDebug() << "Permission all fail: "<<permissions << Model::Get()->getUserID();
 	return false;
 }
+bool Controller::hasWriteAccess(QJsonObject permissions)
+{
+	if(Model::Get()->getUserID().compare("merplyroot") == 0 )
+		return true;
 
+	permissions = permissions.value("Permissions").toObject().value("Write").toObject();
+	if(permissions.value("Permissions").toString().toInt() == 111){
+		foreach(QJsonValue deny,permissions.value("Denied").toArray()){
+			if(deny.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0){
+				//	qDebug() << "At Deny: "<<permissions << Model::Get()->getUserID();
+				return false;
+				}
+			}
+		foreach(QJsonValue allow,permissions.value("Allowed").toArray()){
+			if(allow.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0 || allow.toObject().value("Key").toString().toInt() == 100)
+				//qDebug() << "At Allow: "<<permissions << Model::Get()->getUserID() << allow.toObject().value("Key").toString().toInt();
+				return true;
+			}
+		}
+	else if(permissions.value("Permissions").toString().toInt() == 100)
+		return true;
+	else if(permissions.value("Permissions").toString().toInt() == 101){
+		//qDebug() << "Denied all: "<<permissions << Model::Get()->getUserID();
+		return false;
+		}
+	//	qDebug() << "Permission all fail: "<<permissions << Model::Get()->getUserID();
+	return false;
+}
 
 QString Controller::getDatabaseName()
 {

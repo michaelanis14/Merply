@@ -111,7 +111,7 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	pageDetailsLayout->addWidget(pageEdit);
 	layout->addWidget(pageDetails);
 
-	permissions = new PermissionsUI();
+	permissions = new PermissionsUI(this,true,false);
 	layout->addWidget(permissions);
 
 	preview = new QGroupBox(tr("Preview"));
