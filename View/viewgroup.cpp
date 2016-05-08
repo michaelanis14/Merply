@@ -2,11 +2,10 @@
 #include "structureviewedit.h"
 
 
-ViewGroup::ViewGroup(QWidget *parent, QJsonObject structureView, QJsonObject data) : QWidget (parent)
+ViewGroup::ViewGroup(QWidget *parent, QJsonObject structureView, QJsonArray data) : QWidget (parent)
 {
 
 	this->structureView = structureView;
-	this->data = data;
 	layout = new QVBoxLayout(this);
 	layout->setContentsMargins(2,2,2,2);
 	layout->setSpacing(0);
@@ -17,22 +16,25 @@ ViewGroup::ViewGroup(QWidget *parent, QJsonObject structureView, QJsonObject dat
 
 	if(structureView.value("Viewgroup").isObject()){
 		QJsonObject viewgroup = structureView.value("Viewgroup").toObject();
-		if(viewgroup.value("Fields").isArray())
+		if(viewgroup.value("Fields").isArray()){
+
+			int d = 0;
+			//qDebug() << data.at(d);
 			foreach (QJsonValue fieldVS, viewgroup.value("Fields").toArray()) {
 
 
 				//qDebug() << fieldVS.toObject();
-				FeildUI* feild = new FeildUI(0,fieldVS.toObject(),data);
+				FeildUI* feild = new FeildUI(0,fieldVS.toObject(),data.at(d).toObject());
 				layout->addWidget(feild);
 				feilds << feild;
 
 				//	StructureViewEdit* svE = new StructureViewEdit(0,fieldVS.toObject());
 				//	layout->addWidget(svE);
-
+				d++;
 				}
 			layout->addStretch();
 		}
-
+}
 }
 
 QJsonArray ViewGroup::save()

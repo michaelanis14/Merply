@@ -74,14 +74,12 @@ void IndexUI::fill(QList<QJsonDocument> items)
 		}
 
 */
-	qDebug() << items;
+	//qDebug() << items;
 	table->indexTable(items,true,true);
 }
 
 void IndexUI::createNew()
 {
-	if(!this->id.isEmpty()){
-
-		//CreateEditUI::ShowUI(this->id);
-		}
+	if(!table->items.isEmpty())
+	Controller::Get()->showCreateEditeStrUI("ViewStructure::"+table->items.first().object().value("document_id").toString().split("::")[0]);
 }

@@ -24,6 +24,8 @@ private:
 	QVBoxLayout *layout;
 	ViewGroups * viewGroups;
 	QJsonObject viewStructure;
+	QString cas;
+	QJsonObject data;
 signals:
 protected:
 	//void showEvent(QShowEvent *);

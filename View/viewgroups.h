@@ -13,7 +13,7 @@ class ViewGroups : public QWidget
 	Q_OBJECT
 public:
 	explicit ViewGroups(QWidget *parent = 0,QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject());
-	QJsonDocument save();
+	QJsonObject save();
 signals:
 
 private:

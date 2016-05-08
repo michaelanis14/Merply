@@ -2,6 +2,7 @@
 #include "mainform.h"
 #include "hcontrollers.h"
 #include "controller.h"
+#include "indexui.h"
 
 
 
@@ -12,9 +13,9 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 	this->layout = new QVBoxLayout(this);
 	this->layout->setContentsMargins(0,0,0,0);
 	this->layout->setSpacing(0);
-
+	this->data = data;
 	QStringList btnsList;
-	btnsList << "Save->Save";
+	btnsList << "Save->Save"<< "Cancel->Cancel";
 
 	HControllers* contrls = new HControllers(0,btnsList);
 	connect(contrls, SIGNAL(btnClicked(const QString&)), this, SLOT(controller_Clicked(QString)));
@@ -35,6 +36,8 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 
 	fill(viewStructure,data);
 
+
+
 }
 
 CreateEditUI* CreateEditUI::p_instance = 0;
@@ -44,22 +47,30 @@ void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data) {
 		p_instance = new CreateEditUI(0,viewStructure, data);
 		}
 	else{
-	p_instance->clear();
-	p_instance->fill(viewStructure, data);
+		p_instance->clear();
+		p_instance->fill(viewStructure, data);
 		}
 	MainForm::Get()->ShowDisplay(p_instance);
 }
 
 void CreateEditUI::fill(QJsonObject viewStructure, QJsonObject data)
 {
-	this->viewStructure = viewStructure;
-	viewGroups = new ViewGroups(0,viewStructure,data) ;
+	if(!viewStructure.isEmpty()){
+		this->viewStructure = viewStructure;
+		}
+
+	this->data = data;
+
+
+	viewGroups = new ViewGroups(0,this->viewStructure,data) ;
 	createEditWidgetLayout->addWidget(viewGroups);
+	this->cas = data.value("cas_value").toString();
 	//this->layout->addWidget(createEditWidget);
 }
 
 void CreateEditUI::clear()
 {
+	this->cas = "";
 	QList<QWidget *> Widgets = createEditWidget->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
 		{
@@ -84,26 +95,24 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 	if(nActon.count() > 1){
 
 		if(nActon.at(1).compare("cancel") == 0){
-		//	IndexUI::ShowUI(this->id);
+			Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 			}
 		else if(nActon.at(1).compare("Save") == 0){
-			QString key = this->viewStructure.value("document_id").toString().replace("ViewStructure::","");
-			Controller::Get()->storeDoc(key,QJsonDocument(viewGroups->save()));
-			//if(){
-		//		IndexUI::ShowUI(this->id);
-				//	IndexUI::ShowUI(this->id);
-				//	IndexUI::ShowUI(this->id);
-				//	IndexUI::ShowUI(this->id);
-			//	}
-			}
-		/*else
-			if(nActon.at(1).compare("clear") == 0){
-			this->update = false;
-			foreach(Entity * entity,commands){
-				entity->clear();
-				Database::Get()->setLastKeyID("");
+			if(this->cas.isEmpty()){
+				QString key = this->viewStructure.value("document_id").toString().replace("ViewStructure::","");
+				QJsonObject vgsSave = viewGroups->save();
+				vgsSave.insert("cas_value",this->cas);
+				Controller::Get()->storeDoc(key,QJsonDocument(vgsSave));
 				}
+			else{
+				QJsonObject vgsSave = viewGroups->save();
+				vgsSave.insert("cas_value",this->cas);
+				vgsSave.insert("document_id",this->data.value("document_id").toString());
+				Controller::Get()->UpdateDoc(QJsonDocument(vgsSave));
+				}
+
 			}
-*/
 		}
+
+	Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 }

@@ -19,7 +19,7 @@ class SubFieldUI : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit SubFieldUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject());
+	explicit SubFieldUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject(), QJsonValue data = QJsonValue());
 	void clear();
 	QString save();
 private:

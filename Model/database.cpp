@@ -226,7 +226,7 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 bool Database::getDoc(QString key) {
 	//Query("SELECT * from default WHERE  \"id = Contact::* \"");
 	//qDebug() << "hello";
-	qDebug() <<"Key:"<< key;
+	//qDebug() <<"Key:"<< key;
 	Database::Get()->LastKeyID = "-1";
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){

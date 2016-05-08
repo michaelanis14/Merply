@@ -18,16 +18,19 @@ FeildUI::FeildUI(QWidget *parent, QJsonObject structureView, QJsonObject data) :
 		}
 	layout->addWidget(label);
 
-	if(structureView.value("SubFields").isArray())
+	if(structureView.value("SubFields").isArray()){
+		int d = 0;
+		QJsonArray dataSubFields = data.value(structureView.value("Label").toString()).toArray();
 		foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
-			SubFieldUI* subfeild = new SubFieldUI(0,fieldVS.toObject(),data);
+			//qDebug() << dataSubFields.at(d);
+			SubFieldUI* subfeild = new SubFieldUI(0,fieldVS.toObject(),dataSubFields.at(d));
 			layout->addWidget(subfeild);
 			subFields << subfeild;
 
-
+			d++;
 			}
 
-
+		}
 }
 
 QJsonObject FeildUI::save()

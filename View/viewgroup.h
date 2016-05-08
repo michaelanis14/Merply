@@ -9,11 +9,10 @@
 class ViewGroup  : public QWidget
 {
 public:
-	explicit ViewGroup(QWidget *parent = 0,QJsonObject structureView = QJsonObject(),QJsonObject data = QJsonObject());
+	explicit ViewGroup(QWidget *parent = 0,QJsonObject structureView = QJsonObject(),QJsonArray data = QJsonArray());
 	QJsonArray save();
 private:
 	QJsonObject structureView;
-	QJsonObject data;
 	QVBoxLayout * layout;
 	QList<FeildUI*> feilds;
 };

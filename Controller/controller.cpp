@@ -122,13 +122,8 @@ void Controller::subNavPressed(QJsonObject view)
 	//qDebug() << view;
 	if(view.value("Type").toString().contains("Entity")){
 		if(view.value("Select").toString().contains("Index")){
-			QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedIndexData(QList<QJsonDocument>)));
-			QString card = view.value("Card").toString().replace("ViewStructure::","");
-			card.append("::%");
-			QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
-			//qDebug()<<"Q : " << query;
-			Database::Get()->query(query);
-
+			QString card = view.value("Card").toString();
+			queryIndexView(card);
 			}
 		else{
 			//QObject::connect(Database::Get(),SIGNAL(Database::Get()->gotDocument(QJsonDocument)),this,SLOT(subNavPressed(QJsonObject)));
@@ -146,6 +141,16 @@ void Controller::subNavPressed(QJsonObject view)
 		qDebug() << hasReadAccess(view);
 		}
 }
+void Controller::queryIndexView(QString vStrctKey)
+{
+	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedIndexData(QList<QJsonDocument>)));
+	QString card = vStrctKey.replace("ViewStructure::","");
+	card.append("::%");
+	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
+	//qDebug()<<"Q : " << query;
+	Database::Get()->query(query);
+}
+
 void Controller::subNavPressedData(QList<QJsonDocument> documents)
 {
 	//	qDebug() << "SubPreseed" << documents;
@@ -250,6 +255,8 @@ void Controller::loginData(QList<QJsonDocument> user)
 		}
 	//qDebug() << userFields  << userFields.at(0).toArray().at(0).toObject().value("Name").toString();
 }
+
+
 bool Controller::hasReadAccess(QJsonObject permissions)
 {
 	if(Model::Get()->getUserID().compare("merplyroot") == 0 )
@@ -412,6 +419,34 @@ bool Controller::UpdateDoc(QJsonDocument document)
 	return Database::Get()->updateDoc(document);
 }
 
+void Controller::showCreateEditeStrUI(QString str)
+{
+	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUIData(QJsonDocument)));
+	Database::getDoc(str);
+
+}
+void Controller::showCreateEditeStrUIData(QJsonDocument str)
+{
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUIData(QJsonDocument)));
+	CreateEditUI::ShowUI(str.object(),QJsonObject());
+
+}
+
+
+void Controller::showCreateEditeValueUI(QString key)
+{
+	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeValueUIData(QJsonDocument)));
+	Database::getDoc(key);
+}
+
+
+
+
+void Controller::showCreateEditeValueUIData(QJsonDocument value)
+{
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeValueUIData(QJsonDocument)));
+	CreateEditUI::ShowUI(QJsonObject(),value.object());
+}
 void Controller::linkPressed(QJsonObject link)
 {
 	qDebug() << link;

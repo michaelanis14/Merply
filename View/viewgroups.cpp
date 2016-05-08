@@ -17,8 +17,11 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 
 
 	if(structureView.value("Viewgroups").isArray()){
+		int d = 0;
+		QJsonArray dataVGs =data.value("Fields").toArray();
+
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
-			ViewGroup* viewgroup = new ViewGroup(0,item.toObject(),data);
+			ViewGroup* viewgroup = new ViewGroup(0,item.toObject(),dataVGs.at(d).toArray());
 
 			QJsonObject viewGroupObject = item.toObject().value("Viewgroup").toObject();
 			if(viewGroupObject.value("Style").toString().compare("horizontail") == 0){
@@ -44,12 +47,13 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 			else 	layout->addWidget(viewgroup);
 			viewgroups << viewgroup;
 
+			d++;
 			}
 		}
 
 }
 
-QJsonDocument ViewGroups::save()
+QJsonObject ViewGroups::save()
 {
 	QJsonObject entity;
 	QJsonArray fields;
@@ -59,7 +63,7 @@ QJsonDocument ViewGroups::save()
 	entity.insert("Fields",fields);
 	//entity.insert("Title",this->structureView.value("Title"))
 	//qDebug() << entity;
-	return QJsonDocument(entity);
+	return (entity);
 }
 void ViewGroups::paintEvent(QPaintEvent *)
 {

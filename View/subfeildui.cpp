@@ -2,10 +2,11 @@
 #include "controller.h"
 #include "merplytabelview.h"
 
-SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonObject data) : QWidget(parent)
+SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonValue data) : QWidget(parent)
 {
 
 	//qDebug() << "wassup" << structureView;
+//	qDebug() << "data" << data;
 	this->structureView = structureView;
 	layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0,0,0,0);
@@ -34,7 +35,7 @@ SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonObject d
 		if(structureView.value("Default") != QJsonValue::Undefined){
 			lineEdit->setText(structureView.value("Default").toString());
 			}
-
+		lineEdit->setText(data.toString());
 		layout->addWidget(lineEdit);
 		field = lineEdit;
 		}
@@ -64,7 +65,7 @@ SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonObject d
 	else if(type.compare("Table") == 0){
 		merplyTabelView * table = new merplyTabelView(this,"key");
 		//QDomNode columns = nodek.namedItem("Columns");
-		table->fill(structureView,data);
+		table->fill(structureView,data.toObject());
 		layout->addWidget(table);
 		field = table;
 		}

@@ -66,6 +66,9 @@ public:
 	bool storeDoc(QString key,QJsonDocument document);
 	static bool UpdateDoc(QJsonDocument document);
 
+	void showCreateEditeStrUI(QString str);
+	void showCreateEditeValueUI(QString key);
+	void queryIndexView(QString vStrctKey);
 	//
 
 
@@ -123,6 +126,10 @@ public slots:
 	void GetJsonListData(QList<QJsonDocument> items);
 	void getLastKeyData(QString key);
 	void loginData(QList<QJsonDocument> user);
+
+	void showCreateEditeStrUIData(QJsonDocument str);
+	void showCreateEditeValueUIData(QJsonDocument value);
+
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void gotFieldsData(QList<QString> fields);

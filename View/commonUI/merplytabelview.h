@@ -35,6 +35,7 @@ public:
 	bool fill(QJsonObject columns, QJsonObject data);
 	bool indexTable( const QList<QJsonDocument> items, const bool edit, const bool remove);
 	void clear();
+	QList<QJsonDocument> items;
 private:
 	QVBoxLayout* layout;
 	QHBoxLayout* lblLayout;
@@ -42,7 +43,6 @@ private:
 	QString propertyName;
 	//QStandardItemModel *model;
 	//QStringList headerLabels;
-	QList<QJsonDocument> items;
 signals:
 protected:
 	void mousePressEvent(QMouseEvent *event);
