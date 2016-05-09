@@ -25,18 +25,22 @@ navigationUI::navigationUI(QWidget *parent) :
 	this->setFixedWidth(Controller::GetNavigationWidth());
 	this->setFixedHeight(Controller::GetWindowHeight());
 
-	SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
-	sctrlUI->setFixedHeight(Controller::GetNavigationSettingsBarHeight());
-	sctrlUI->addbtn("Settings",":/resources/icons/settings.png","settings");
-	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btn_Clicked(QString)));
-	layout->addWidget(sctrlUI);
-
+	if(Controller::Get()->hasAdminGroupAccess()){
+		SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
+		sctrlUI->setFixedHeight(Controller::GetNavigationSettingsBarHeight());
+		sctrlUI->addbtn("Settings",":/resources/icons/settings.png","settings");
+		QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btn_Clicked(QString)));
+		layout->addWidget(sctrlUI);
+		}
 
 
 	subNavigation = new QTreeWidget();
 	subNavigation->setColumnCount(2);
 	subNavigation->setFixedWidth(Controller::GetNavigationWidth());
-	subNavigation->setFixedHeight(Controller::GetWindowHeight()-(Controller::GetNavigationSettingsBarHeight() +15)-Controller::GetNavigationMainHeight());
+	if(Controller::Get()->hasAdminGroupAccess())
+		subNavigation->setFixedHeight(Controller::GetWindowHeight()-(Controller::GetNavigationSettingsBarHeight() +15)-Controller::GetNavigationMainHeight());
+	else subNavigation->setFixedHeight(Controller::GetWindowHeight()- 5 -Controller::GetNavigationMainHeight());
+
 
 	subNavigation->header()->close();
 	QObject::connect(subNavigation, SIGNAL(itemPressed(QTreeWidgetItem*,int)), this, SLOT(subNavPressed(QTreeWidgetItem*,int)));

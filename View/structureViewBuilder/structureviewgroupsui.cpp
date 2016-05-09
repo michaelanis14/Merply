@@ -34,7 +34,7 @@ StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject struct
 
 	headerlbl = new HeaderLabel();
 	if(!structureView.value("Title").toString().isEmpty())
-	headerlbl->setTitle(structureView.value("Title").toString());
+		headerlbl->setTitle(structureView.value("Title").toString());
 	else headerlbl->setTitle("New Card"+QString::number(Controller::Get()->Count("ViewStructure")));
 	layout->addWidget(headerlbl);
 
@@ -85,7 +85,10 @@ QJsonObject StructureViewGroupsUI::save()
 		ViewGroups << viewGroup;
 		}
 	saveObject.insert("Viewgroups",ViewGroups);
-
+	if(!document_id.isEmpty()){
+		saveObject.insert("cas_value",cas_value);
+		saveObject.insert("document_id",document_id);
+		}
 
 	return saveObject;
 }
@@ -96,14 +99,19 @@ void StructureViewGroupsUI::ShowUI(QJsonObject structureView) {
 
 	if(p_instance == 0)
 		p_instance = new StructureViewGroupsUI(0,structureView);
+	else p_instance->fill(structureView);
+
 	p_instance->setObjectName("StructureViewGroupsUI");
 	//p_instance->clear();
-	//p_instance->fill(id);
+
 	MainForm::Get()->ShowDisplay(p_instance);
 }
 
 void StructureViewGroupsUI::fill(QJsonObject structureView)
 {
+	//	qDebug() << structureView.value("document_id").toString() << structureView.value("document_iddd").toString();
+	this->cas_value = structureView.value("cas_value").toString();
+	this->document_id = structureView.value("document_id").toString();
 
 	QList<QWidget *> Widgets = viewGroups->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
@@ -152,9 +160,9 @@ void StructureViewGroupsUI::fill(QJsonObject structureView)
 				else {
 					if(HViewGroups.find(group) != HViewGroups.end())
 						if(HViewGroups.find(group).value()->layout())
-					HViewGroups.find(group).value()->layout()->addWidget(viewgroupRmv);
-				}
+							HViewGroups.find(group).value()->layout()->addWidget(viewgroupRmv);
 					}
+				}
 			else 	viewGroupsLayout->addWidget(viewgroupRmv);
 			sVSFUIs  << viewgroup;
 
@@ -182,7 +190,7 @@ void StructureViewGroupsUI::btn_Clicked(QString btn)
 
 		}
 	else if(btn.contains("Save")){
-	//	qDebug() << this->save();
+		//	qDebug() << this->save();
 		this->editControllerSavePressed();
 		}
 	else if(btn.contains("Cancel")){
@@ -211,11 +219,18 @@ void StructureViewGroupsUI::removeViewgroup(QWidget* field)
 void StructureViewGroupsUI::editControllerCancelPressed()
 {
 	emit cancel();
+	Controller::Get()->editControllerCancelPressed();
 }
 
 void StructureViewGroupsUI::editControllerSavePressed()
 {
-	Controller::Get()->storeDoc("ViewStructure",QJsonDocument(this->save()));
+	QJsonObject savedObj = this->save();
+	//qDebug() << savedObj;
+	if(savedObj.value("document_id") == QJsonValue::Undefined)
+		Controller::Get()->storeDoc("ViewStructure",QJsonDocument(savedObj));
+	else Controller::Get()->UpdateDoc(QJsonDocument(savedObj));
+
+	Controller::Get()->editControllerCancelPressed();
 }
 
 void StructureViewGroupsUI::paintEvent(QPaintEvent * event)

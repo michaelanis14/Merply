@@ -37,6 +37,8 @@ private:
 	QWidget * viewGroups;
 	QVBoxLayout *viewGroupsLayout;
 	void addViewgroup();
+	QString cas_value;
+	QString document_id;
 protected:
 
 	bool links;

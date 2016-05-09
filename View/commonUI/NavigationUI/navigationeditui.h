@@ -36,12 +36,13 @@ private:
 	int currentSubNav;
 	void savePage();
 	QTreeWidgetItem* oldItemSubNavSelected;
+	bool rootOnly;
 public slots:
 	void mainNavPressed(QTreeWidgetItem* item, int column);
 	void mainNavChanged(QTreeWidgetItem* item, int);
 	void subNavPressed(QTreeWidgetItem* item, int column);
 	void btn_Clicked(QString btn);
-	void btn_ClickedDataReturned(QJsonDocument document);
+//	void btn_ClickedDataReturned(QJsonDocument document);
 
 	void editControllerCancelPressed();
 	void editControllerSavePressed();

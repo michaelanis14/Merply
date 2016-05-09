@@ -1,4 +1,5 @@
 #include "viewgroups.h"
+#include "controller.h"
 
 
 ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject data) : QWidget(parent)
@@ -10,11 +11,12 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 	this->viewgroups =  QList<ViewGroup*>();
 	this->structureView = structureView;
 
-	SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
-	sctrlUI->addbtn("Settings",":/resources/icons/settings.png","settings");
-	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btn_Clicked(QString)));
-	layout->addWidget(sctrlUI);
-
+	if(Controller::Get()->hasAdminGroupAccess()){
+		SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
+		sctrlUI->addbtn("Settings",":/resources/icons/settings.png","settings");
+		QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btn_Clicked(QString)));
+		layout->addWidget(sctrlUI);
+		}
 
 	if(structureView.value("Viewgroups").isArray()){
 		int d = 0;

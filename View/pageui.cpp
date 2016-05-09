@@ -6,6 +6,10 @@ PageUI::PageUI(QWidget *parent, QJsonObject viewStructure) : MainDisplay(parent)
 	this->layout = new QVBoxLayout(this);
 	this->layout->setContentsMargins(0,0,0,0);
 	this->layout->setSpacing(0);
+	this->headerlbl = new HeaderLabel();
+	this->headerlbl->setTitle("Page");
+	layout->addWidget(headerlbl);
+
 	fill(viewStructure);
 }
 
@@ -26,6 +30,7 @@ void PageUI::ShowUI(QJsonObject viewStructure) {
 }
 void PageUI::fill(QJsonObject viewStructure)
 {
+	headerlbl->setTitle(viewStructure.value("Title").toString());
 	viewGroups = new ViewGroups(0,viewStructure,QJsonObject()) ;
 	viewGroups->setHidden(false);
 	layout->addWidget(viewGroups);

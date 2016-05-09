@@ -69,8 +69,8 @@ public:
 	void showCreateEditeStrUI(QString str);
 	void showCreateEditeValueUI(QString key);
 	void queryIndexView(QString vStrctKey);
-	//
 
+	void editControllerCancelPressed();
 
 	//Model Interface
 		 //Navigation
@@ -101,8 +101,12 @@ public:
 	int static GetNavigationMainHeight();
 	int static GetNavigationSubHeight();
 	static QString getLastKeyID();
-
+	//Access Control
 	void login(QString username,QString password);
+	bool hasRootGroupAccess();
+	bool hasAdminGroupAccess();
+	bool hasAccess(QString group);
+
 
 private:
 	explicit Controller(QObject * parent = 0);
@@ -110,11 +114,11 @@ private:
 	QMap<QString,QStringList> layoutViewGroups;
 	bool hasReadAccess(QJsonObject permissions);
 	bool hasWriteAccess(QJsonObject permissions);
-
+	QString indexDocument_id;
 public slots:
 	void subNavPressed(QJsonObject view);
 	void linkPressed(QJsonObject link);
-
+	void editControllerCancelDataPressed(QJsonDocument document);
 
 	void showDisplayDataReturned(QJsonDocument document);
 	void loadNavigationData(QJsonDocument document);

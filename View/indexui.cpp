@@ -29,13 +29,13 @@ IndexUI::IndexUI(QWidget *parent) : MainDisplay(parent)
 
 }
 IndexUI* IndexUI::p_instance = 0;
-void IndexUI::ShowUI(QList<QJsonDocument> documents) {
+void IndexUI::ShowUI(const QString document_id, const QList<QJsonDocument> documents) {
 	//qDebug() << id;
 
 	if(p_instance == 0)
 		p_instance = new IndexUI();
 	p_instance->clear();
-	p_instance->fill(documents);
+	p_instance->fill(document_id,documents);
 	MainForm::Get()->ShowDisplay(p_instance);
 }
 
@@ -44,7 +44,7 @@ void IndexUI::clear()
 	this->table->tabel->clear();
 }
 
-void IndexUI::fill(QList<QJsonDocument> items)
+void IndexUI::fill(const QString document_id,const QList<QJsonDocument> items)
 {
 /*	this->id = id;
 	QStringList idNumber = id.split("::");
@@ -75,11 +75,12 @@ void IndexUI::fill(QList<QJsonDocument> items)
 
 */
 	//qDebug() << items;
-	table->indexTable(items,true,true);
+	this->document_id = document_id;
+	table->indexTable(document_id,items,true,true);
 }
 
 void IndexUI::createNew()
 {
-	if(!table->items.isEmpty())
-	Controller::Get()->showCreateEditeStrUI("ViewStructure::"+table->items.first().object().value("document_id").toString().split("::")[0]);
+
+	Controller::Get()->showCreateEditeStrUI("ViewStructure::"+this->document_id.split("::")[0]);
 }

@@ -24,6 +24,7 @@ private:
 	//QVBoxLayout *createEditWidgetLayout;
 	QVBoxLayout *layout;
 	ViewGroups * viewGroups;
+	HeaderLabel* headerlbl;
 signals:
 
 public slots:

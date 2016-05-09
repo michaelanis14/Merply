@@ -9,6 +9,7 @@
 #include "QPrinter"
 #include "QPrintDialog"
 
+
 #include "controller.h"
 
 #include <QLabel>
@@ -172,21 +173,15 @@ bool merplyTabelView::fill(QJsonObject columns, QJsonObject data)
 
 }
 
-bool merplyTabelView::indexTable(const QList<QJsonDocument> items, const bool edit, const bool remove)
+void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocument> items, const bool edit, const bool remove)
 {
 	//model->setHorizontalHeaderItem(i, new QStandardItem(QString(column.namedItem("Title").firstChild().nodeValue())));
-	if(items.count() > 0){
-		this->items = items;
+	this->items = items;
+	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
+	//QString documentid = items.first().object().value("document_id").toString().split("::")[0];
+	//qDebug() << documentid;
+	Controller::Get()->getFields(document_id);
 
-		if(items.first().object().value("document_id") != QJsonValue::Undefined){
-			QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
-			QString documentid = items.first().object().value("document_id").toString().split("::")[0];
-			//qDebug() << documentid;
-			Controller::Get()->getFields(documentid);
-			return true;
-			}
-		}
-	return false;
 }
 
 void merplyTabelView::clear()
@@ -248,9 +243,10 @@ void merplyTabelView::printTabel(){
 	// data table
 	for (int row = 0; row < rowCount; row++) {
 		out << "<tr>";
-		for (int column = 0; column < columnCount; column++) {
+		for (int column = 1; column < columnCount; column++) {
 			if (!tabel->isColumnHidden(column)) {
-				QString data = tabel->model()->data(tabel->model()->index(row, column)).toString().simplified();
+			//	QString data = tabel->model()->data(tabel->model()->index(row, column)).toString().simplified();
+				QString data = ((QLabel*)tabel->cellWidget(row,column))->text();
 				out << QString("<td bkcolor=0>%1</td>").arg((!data.isEmpty()) ? data : QString("&nbsp;"));
 				}
 			}
@@ -309,8 +305,9 @@ void merplyTabelView::editEntity(const QString& id)
 
 void merplyTabelView::deleteEntity(const QString& id)
 {
-	//if(Controller::Get()->deleteDocument(id))
-	//IndexUI::ShowUI(id);
+	if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?")))
+		if(Controller::Get()->deleteDocument(id))
+			Controller::Get()->queryIndexView("ViewStructure::"+id.split("::")[0]);
 }
 
 void merplyTabelView::updateHeaderData(QList<QString> headerItems)

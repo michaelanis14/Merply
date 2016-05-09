@@ -46,7 +46,7 @@ private:
 	ERPComboBox* cards;
 	ERPComboBox* view;
 	PermissionsUI* permissions;
-
+	QString currentCardKey;
 	void clearPreview();
 signals:
 	void editControllerSavePressed();
@@ -59,7 +59,10 @@ public slots:
 	void cardToggled(bool state);
 	void pageToggled(bool state);
 	void getCardData(QList<QJsonDocument> items);
-	void updatePreview();
+	void updatePagePreview();
+	void deleteCard();
+	void updateNewCardPreview();
+	void updateCardPreview();
 	void loadCard(QJsonDocument document);
 };
 

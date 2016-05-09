@@ -25,6 +25,7 @@ ERPComboBox::ERPComboBox(QWidget *parent, bool indexedFill) :
 }
 void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 	int i = 0;
+
 	foreach (const QJsonDocument & value, items){
 		//qDebug() << select.trimmed() << value.object().keys();
 		QString valueString = value.object().value("Value").toString();

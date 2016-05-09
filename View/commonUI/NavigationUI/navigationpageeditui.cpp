@@ -87,12 +87,21 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 
 
 	cardDetails = new QGroupBox(tr("Card Details"));
-	QFormLayout* cardDetailsLayout = new QFormLayout;
+	QHBoxLayout* cardDetailsLayout = new QHBoxLayout;
+	cardDetailsLayout->setAlignment(Qt::AlignLeft);
+	cardDetailsLayout->setMargin(0);
 	cardDetails->setLayout(cardDetailsLayout);
-	cardDetailsLayout->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
-	cardDetailsLayout->setLabelAlignment(Qt::AlignLeft);
+	QLabel* lblCard = new QLabel(tr("Card"));
+//	cardDetailsLayout->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
+//	cardDetailsLayout->setLabelAlignment(Qt::AlignLeft);
 	cards = new ERPComboBox(this,false);
-	cardDetailsLayout->addRow(tr("Card"),cards);
+	cardDetailsLayout->addWidget(lblCard);
+	cardDetailsLayout->addWidget(cards);
+
+	QPushButton* btnRemoveCard = new QPushButton(tr("Delete Card"));
+	QObject::connect(btnRemoveCard,SIGNAL(clicked(bool)),this,SLOT(deleteCard()));
+
+	cardDetailsLayout->addWidget(btnRemoveCard);
 
 	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
 	Controller::Get()->getJsonList("ViewStructure","Title","default.Type =\"Entity\"");
@@ -125,18 +134,17 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	layout->addStretch(1);
 
 
-	QObject::connect(this, SIGNAL(editControllerCancelPressed()), newCardStructure, SLOT(editControllerCancelPressed()));
-	QObject::connect(this, SIGNAL(editControllerSavePressed()), newCardStructure, SLOT(editControllerSavePressed()));
 
 
-	connect(newCard,SIGNAL(toggled(bool)),this,SLOT(updatePreview()));
-	connect(card,SIGNAL(toggled(bool)),this,SLOT(updatePreview()));
-	connect(page,SIGNAL(toggled(bool)),this,SLOT(updatePreview()));
-	QObject::connect(cards,SIGNAL(currentIndexChanged(int)),this,SLOT(updatePreview()));
+	connect(newCard,SIGNAL(toggled(bool)),this,SLOT(updateNewCardPreview()));
+	connect(card,SIGNAL(toggled(bool)),this,SLOT(updateCardPreview()));
+	connect(page,SIGNAL(toggled(bool)),this,SLOT(updatePagePreview()));
+	//QObject::connect(cards,SIGNAL(currentIndexChanged(int)),this,SLOT(updatePreview()));
 	//connect(newCard,SIGNAL(toggled(bool)),this,SLOT(updatePreview()));
 	//connect(newCard,SIGNAL(toggled(bool)),this,SLOT(updatePreview()));
 
-	QObject::connect(cards,SIGNAL(currentIndexChanged(int)),this,SLOT(updatePreview()));
+	QObject::connect(cards,SIGNAL(currentIndexChanged(int)),this,SLOT(updateCardPreview()));
+
 
 }
 
@@ -156,19 +164,25 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 {
 
 	this->structureView = structureView;
-	cards->clear();
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
-	Controller::Get()->getJsonList("ViewStructure","Title","default.Type =\"Entity\"");
+
+	//QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
+	//Controller::Get()->getJsonList("ViewStructure","Title","default.Type =\"Entity\"");
 
 	//if(!structureView.value("Title").toString().isEmpty())
 	//	this->headerlbl->setTitle(structureView.value("Title").toString());
 	if(structureView.value("Type").toString().compare("Entity") == 0){
 		//if(structureView.value("Title").toString().isEmpty())
 		//	this->headerlbl->setTitle(tr("New Card"));
+
+		cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
+		if(cards->currentIndex() == -1){
+			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
+			Controller::Get()->getJsonList("ViewStructure","Title","default.Type =\"Entity\"");
+			cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
+			}
+		view->setCurrentIndex(viewList.indexOf(structureView.value("Select").toString()));
 		card->setChecked(true);
 		cardToggled(true);
-		cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
-		view->setCurrentIndex(viewList.indexOf(structureView.value("Select").toString()));
 		}
 	else{
 		//if(structureView.value("Title").toString().isEmpty())
@@ -205,6 +219,7 @@ QJsonObject NavigationPageEditUI::save()
 		}
 	save.insert("Title",headerlbl->getTitle());
 	save.insert("Permissions",permissions->save());
+
 	return save;
 }
 
@@ -241,12 +256,18 @@ void NavigationPageEditUI::btn_Clicked(QString btn)
 void NavigationPageEditUI::newCardToggled(bool state)
 {
 	if(state){
+		QObject::connect(this, SIGNAL(editControllerCancelPressed()), newCardStructure, SLOT(editControllerCancelPressed()));
+		QObject::connect(this, SIGNAL(editControllerSavePressed()), newCardStructure, SLOT(editControllerSavePressed()));
+
 		newCardDetails->setHidden(false);
 		headerlbl->setEnabled(true);
 		headerlbl->setTitle("New Card");
 		viewBox->setHidden(false);
 		}
 	else{
+		QObject::disconnect(this, SIGNAL(editControllerCancelPressed()), newCardStructure, SLOT(editControllerCancelPressed()));
+		QObject::disconnect(this, SIGNAL(editControllerSavePressed()), newCardStructure, SLOT(editControllerSavePressed()));
+
 		newCardDetails->setHidden(true);
 		}
 }
@@ -255,7 +276,7 @@ void NavigationPageEditUI::cardToggled(bool state)
 {
 	if(state){
 		this->headerlbl->setTitle(structureView.value("Title").toString());
-		headerlbl->setEnabled(false);
+		headerlbl->setEnabled(true);
 		cardDetails->setHidden(false);
 		viewBox->setHidden(false);
 
@@ -286,10 +307,58 @@ void NavigationPageEditUI::pageToggled(bool state)
 
 void NavigationPageEditUI::getCardData(QList<QJsonDocument> items)
 {
+	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
+
+	qDebug() << "CLEAR";
+	cards->clear();
 	cards->addJsonItems(items);
+}
+
+void NavigationPageEditUI::updatePagePreview()
+{
+	if(page->isChecked()){
+
+	//	qDebug() << "updatePAge";
+		clearPreview();
+		previewLayout->addWidget( new PageUI(0,pageEdit->save()) );
+		}
+}
+
+void NavigationPageEditUI::deleteCard()
+{
+	QString id  = cards->getKey();
+	if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?")))
+		if(Controller::Get()->deleteDocument(id)){
+			cards->removeSelected();
+			}
+			//Controller::Get()->queryIndexView("ViewStructure::"+id.split("::")[0]);
+
+}
+
+void NavigationPageEditUI::updateNewCardPreview()
+{
+	if(newCard->isChecked()){
+		//qDebug() << "newCard";
+		clearPreview();
+		previewLayout->addWidget(new ViewGroups(0,newCardStructure->save()));
+		}
+}
+
+void NavigationPageEditUI::updateCardPreview()
+{
+	if(card->isChecked()){
+		if(currentCardKey.compare(cards->getKey()) != 0){
+			clearPreview();
+			currentCardKey = cards->getKey();
+			QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadCard(QJsonDocument)));
+			Controller::Get()->getDoc(this->currentCardKey);
+			}
+		}
+
 }
 void NavigationPageEditUI::clearPreview()
 {
+	this->currentCardKey = "";
 	QList<QWidget *> Widgets = preview->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
 		{
@@ -301,25 +370,16 @@ void NavigationPageEditUI::clearPreview()
 			}
 		}
 }
-void NavigationPageEditUI::updatePreview()
-{
-	clearPreview();
+//void NavigationPageEditUI::updatePreview()
+//{
+//
 
-	if(newCard->isChecked()){
-		//previewLayout->addWidget(new ViewGroups(0,newCardStructure->save()));
-		}
-	else if(page->isChecked()){
-	//	previewLayout->addWidget( new PageUI(0,pageEdit->save()) );
-		}
-	else if(card->isChecked()){
-		//QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadCard(QJsonDocument)));
-		//Controller::Get()->getDoc(cards->getKey());
-		}
-}
+
+//}
 
 void NavigationPageEditUI::loadCard(QJsonDocument document)
 {
-	//qDebug() << "Reploaded";
-	//QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadCard(QJsonDocument)));
-	//previewLayout->addWidget(new ViewGroups(0,document.object()));
+//	qDebug() << "Reploaded" << preview->isHidden() << document.object();
+	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadCard(QJsonDocument)));
+	previewLayout->addWidget(new ViewGroups(0,document.object()));
 }
