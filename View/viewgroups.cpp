@@ -1,6 +1,8 @@
 #include "viewgroups.h"
 #include "controller.h"
 
+#include "structureviewgroupsui.h"
+
 
 ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject data) : QWidget(parent)
 {
@@ -23,7 +25,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 		QJsonArray dataVGs =data.value("Fields").toArray();
 
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
-			ViewGroup* viewgroup = new ViewGroup(0,item.toObject(),dataVGs.at(d).toArray());
+			ViewGroup* viewgroup = new ViewGroup(0,structureView.value("document_id").toString(),item.toObject(),dataVGs.at(d).toArray());
 
 			QJsonObject viewGroupObject = item.toObject().value("Viewgroup").toObject();
 			if(viewGroupObject.value("Style").toString().compare("horizontail") == 0){

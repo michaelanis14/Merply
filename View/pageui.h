@@ -1,6 +1,8 @@
 #ifndef PAGEUI_H
 #define PAGEUI_H
 
+#include "headerlabel.h"
+
 #include "maindisplay.h"
 #include "viewgroups.h"
 

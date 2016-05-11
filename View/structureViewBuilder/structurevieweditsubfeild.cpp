@@ -157,7 +157,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,b
 			}
 
 
-	previewLayout->addWidget(new SubFieldUI(0,this->save()));
+	previewLayout->addWidget(new SubFieldUI(0,"V",this->save()));
 	//	qDebug() <<this->save();
 }
 

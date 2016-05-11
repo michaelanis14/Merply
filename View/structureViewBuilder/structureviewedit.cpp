@@ -126,7 +126,7 @@ QJsonObject StructureViewEdit::save()
 	saveObject.insert("Label",label->text());
 	QJsonArray subFields;
 	foreach(StructureVieweditSubFeild* svsf, sVSFs){
-        subFields.append(svsf->save());
+		subFields.append(svsf->save());
 		}
 
 	saveObject.insert("SubFields",subFields);
@@ -236,10 +236,10 @@ void StructureViewEdit::updatePreview(bool oldStrct)
 		}
 
 	if(!oldStrct){
-		previewLayout->addWidget(new FeildUI(0,this->save()));
+		previewLayout->addWidget(new FeildUI(0,"this->strID",this->save()));
 		}
 	else if(!this->structureView.isEmpty()){
-		previewLayout->addWidget(new FeildUI(0,this->structureView));
+		previewLayout->addWidget(new FeildUI(0,"this->strID",this->structureView));
 		}
 
 	emit changed();

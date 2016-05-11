@@ -80,7 +80,8 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		QLineEdit* lineEdit = new QLineEdit();
 		lineEdit->setContentsMargins(0,0,0,0);
 		lineEdit->setEnabled(false);
-		qDebug() <<  this->strID;;
+		QStringList id = this->strID.s
+		qDebug() <<  ;;
 		//QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(serialData(QJsonDocument serial)));
 		//Controller::Get()->getDoc(structureView.value("Source").toString(),structureView.value("Select").toString());
 

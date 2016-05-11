@@ -1,13 +1,16 @@
 #ifndef VIEWGROUPS_H
 #define VIEWGROUPS_H
+
 #include "settingsctrlsui.h"
-#include "structureviewgroupsui.h"
+
 #include "viewgroup.h"
+#include "feildui.h"
 
 #include <QObject>
 #include <QWidget>
 #include <QPainter>
 
+class ViewGroup;
 class ViewGroups : public QWidget
 {
 	Q_OBJECT

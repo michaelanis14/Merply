@@ -273,6 +273,7 @@ bool Controller::hasAccess(QString group)
 
 	if(group.compare("3") == 0)
 		return false;
+	return false;
 }
 
 void Controller::loginData(QList<QJsonDocument> user)

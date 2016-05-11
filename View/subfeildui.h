@@ -19,7 +19,7 @@ class SubFieldUI : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit SubFieldUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject(), QJsonValue data = QJsonValue());
+	explicit SubFieldUI(QWidget *parent = 0,QString strID = "", QJsonObject structureView = QJsonObject(), QJsonValue data = QJsonValue());
 	void clear();
 	QString save();
 private:
@@ -27,13 +27,14 @@ private:
 	QWidget* field;
 	QJsonObject structureView;
 	ERPComboBox* combox;
+	QString strID;
 signals:
 
 public slots:
 		void indexedFillEvent(QString completion);
 		void linkPressed();
-
 		void refrenceData(QList<QJsonDocument> items);
+		void serialData(QJsonDocument serial);
 };
 
 #endif // SUBFIELDUI_H

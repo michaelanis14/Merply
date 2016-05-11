@@ -1,4 +1,5 @@
 #include "pageui.h"
+#include "mainform.h"
 
 PageUI::PageUI(QWidget *parent, QJsonObject viewStructure) : MainDisplay(parent)
 {

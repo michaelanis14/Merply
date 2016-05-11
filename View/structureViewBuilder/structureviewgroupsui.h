@@ -2,7 +2,7 @@
 #define STRUCTUREVIEWGROUPSUI_H
 
 #include "maindisplay.h"
-#include "viewgroup.h"
+#include "viewgroups.h"
 #include "structureviewseditui.h"
 #include "mainform.h"
 #include "headerlabel.h"

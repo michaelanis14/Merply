@@ -336,8 +336,9 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 
 		foreach(QJsonValue value, item.object().value("Fields").toArray()){
 			foreach(QJsonValue viewGroup, value.toArray()){
-
-				QString valueString = Controller::Get()->toString(viewGroup.toObject().value(headerItems.at(j)).toArray());
+				QString valueString;
+				if(headerItems.count() -1 > j)
+				valueString = Controller::Get()->toString(viewGroup.toObject().value(headerItems.at(j)).toArray());
 				//qDebug()  << valueString;
 				//QStandardItem *value = new QStandardItem(valueString);
 				//	tabel->setItem(i,k,value);

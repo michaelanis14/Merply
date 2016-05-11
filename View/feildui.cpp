@@ -2,7 +2,7 @@
 
 
 
-FeildUI::FeildUI(QWidget *parent, QJsonObject structureView, QJsonObject data) : QWidget(parent)
+FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJsonObject data) : QWidget(parent)
 {
 
 	//qDebug() << structureView;
@@ -11,6 +11,7 @@ FeildUI::FeildUI(QWidget *parent, QJsonObject structureView, QJsonObject data) :
 	this->layout->setContentsMargins(0,0,0,0);
 	this->setContentsMargins(0,0,0,0);
 	this->layout->setSpacing(0);
+	this->strID = strID;
 
 	if(structureView.value("Label") != QJsonValue::Undefined){
 		label = new QLabel(structureView.value("Label").toString());
@@ -23,7 +24,7 @@ FeildUI::FeildUI(QWidget *parent, QJsonObject structureView, QJsonObject data) :
 		QJsonArray dataSubFields = data.value(structureView.value("Label").toString()).toArray();
 		foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
 			//qDebug() << dataSubFields.at(d);
-			SubFieldUI* subfeild = new SubFieldUI(0,fieldVS.toObject(),dataSubFields.at(d));
+			SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),dataSubFields.at(d));
 			layout->addWidget(subfeild);
 			subFields << subfeild;
 
