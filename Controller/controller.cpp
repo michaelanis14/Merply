@@ -56,7 +56,7 @@ Controller::Controller(QObject *parent) :
 
 void Controller::showDisplay()
 {
-
+	login("merplyroot","LilyMichael");
 	//navigationUI::Get();
 	///Tabs
 	QStringList tabList = QStringList();
@@ -97,7 +97,7 @@ void Controller::showDisplay()
 
 	Database::Get()->getDoc("NavigationUI::1");
 
-	login("michael","michael");
+
 }
 
 void Controller::showDisplayDataReturned(QJsonDocument document)
@@ -215,6 +215,12 @@ void Controller::getJsonList(QString table, QString select,QString condition)
 
 	QObject::connect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QList<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	Prsistance::GetJsonList(table,select,condition);
+}
+void Controller::getJsonEntityFieldsList(QString table, QString select,QString condition)
+{
+
+	QObject::connect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QList<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
+	Prsistance::GetJsonEntityFields(table,select,condition);
 }
 
 void Controller::GetJsonListData(QList<QJsonDocument> items)

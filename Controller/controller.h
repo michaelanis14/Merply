@@ -52,6 +52,7 @@ public:
 	int Count(const QString table);
 	void getDoc(QString key);
 	void getJsonList(QString table, QString select,QString condition = "");
+	void getJsonEntityFieldsList(QString table, QString select,QString condition = "");
 	void getLastKey();
 	QString getDatabaseName();
 
@@ -128,6 +129,8 @@ public slots:
 	void linkPressedData(QJsonDocument document);
 	void getDocData(QJsonDocument document);
 	void GetJsonListData(QList<QJsonDocument> items);
+
+
 	void getLastKeyData(QString key);
 	void loginData(QList<QJsonDocument> user);
 

@@ -23,6 +23,7 @@ public:
 	static QJsonArray table(QString line);
 	static bool init();
 	static void GetJsonList(QString table, QString select,QString condition = "");
+	static void GetJsonEntityFields(QString table, QString select,QString condition = "");
 
 	static int Count(const QString table);
 	static QList<QJsonDocument> GetALL(const QString entity,const QString condition);

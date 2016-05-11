@@ -56,7 +56,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,b
 	if(links)
 		types << "Link";
 	else
-		types << "Index"<<"Text"<< "Refrence" << "Fixed" << "Table";
+		types << "Index"<<"Text"<< "Refrence" << "Fixed" <<"Serial" << "Table";
 	typeSelect->addItems(types);
 	typeSelect->setCurrentIndex(types.indexOf(type));
 	if(!links)
@@ -150,6 +150,13 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,b
 
 
 			}
+		else if(type.compare("Serial") == 0){
+			defaultValue = new QLineEdit(0);
+			defaultValue->setText(fieldVS.toObject().value("startNum").toString());
+			layout->addRow(new QLabel(tr("Start Number")), defaultValue);
+			}
+
+
 	previewLayout->addWidget(new SubFieldUI(0,this->save()));
 	//	qDebug() <<this->save();
 }
@@ -189,6 +196,10 @@ QJsonObject StructureVieweditSubFeild::save()
 			else if(type.compare("Table") == 0){
 				//qDebug() << tableEdit->save();
 				saveObject = tableEdit->save();
+				}
+			else  if(type.compare("Serial") == 0){
+				if(!defaultValue->text().isEmpty())
+					saveObject.insert("startNum",defaultValue->text().toInt());
 				}
 		}
 	return saveObject;

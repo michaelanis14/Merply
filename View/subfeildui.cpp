@@ -6,7 +6,7 @@ SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonValue da
 {
 
 	//qDebug() << "wassup" << structureView;
-//	qDebug() << "data" << data;
+	//	qDebug() << "data" << data;
 	this->structureView = structureView;
 	layout = new QHBoxLayout(this);
 	layout->setContentsMargins(0,0,0,0);
@@ -24,9 +24,9 @@ SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonValue da
 		field = combox;
 
 		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
-		Controller::Get()->getJsonList(structureView.value("Source").toString(),structureView.value("Select").toString());
+		Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString());
 
-
+		//qDebug() << structureView.value("Source").toString() << structureView.value("Select").toString();
 		}
 	else if(type.compare("Text") == 0){
 
@@ -74,6 +74,17 @@ SubFieldUI::SubFieldUI(QWidget *parent, QJsonObject structureView, QJsonValue da
 		QObject::connect(btn,SIGNAL(pressed()),this,SLOT(linkPressed()));
 		layout->addWidget(btn);
 		field = btn;
+		}
+	else if(type.compare("Serial") == 0){
+		QLineEdit* lineEdit = new QLineEdit();
+		lineEdit->setContentsMargins(0,0,0,0);
+		lineEdit->setEnabled(false);
+		if(structureView.value("startNum") != QJsonValue::Undefined){
+			lineEdit->setText(structureView.value("startNum").toString());
+			}
+		//lineEdit->setText(data.toString());
+		layout->addWidget(lineEdit);
+		field = lineEdit;
 		}
 
 }
@@ -128,4 +139,6 @@ void SubFieldUI::refrenceData(QList<QJsonDocument> items)
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
 	if(combox)
 		combox->addJsonItems(items);
+
+	//qDebug() << items;
 }

@@ -308,8 +308,6 @@ void NavigationPageEditUI::pageToggled(bool state)
 void NavigationPageEditUI::getCardData(QList<QJsonDocument> items)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
-
-	qDebug() << "CLEAR";
 	cards->clear();
 	cards->addJsonItems(items);
 }
