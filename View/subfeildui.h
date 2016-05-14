@@ -34,7 +34,7 @@ public slots:
 		void indexedFillEvent(QString completion);
 		void linkPressed();
 		void refrenceData(QList<QJsonDocument> items);
-		void serialData(QJsonDocument serial);
+		void serialData(QString serial);
 };
 
 #endif // SUBFIELDUI_H

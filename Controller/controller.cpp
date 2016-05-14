@@ -230,9 +230,22 @@ void Controller::GetJsonListData(QList<QJsonDocument> items)
 	emit gotJsonListData(items);
 }
 
+
+
 void Controller::getLastKey()
 {
 	QObject::connect(Database::Get(),SIGNAL(gotLastKey(QString)),Controller::Get(),SLOT(getLastKeyData(QString)));
+}
+
+void Controller::getValue(QString key)
+{
+	QObject::connect(Database::Get(),SIGNAL(gotValue(QString)),this,SLOT(getValueData(QString)));
+	Database::getDoc(key);
+}
+void Controller::getValueData(QString value)
+{
+	QObject::disconnect(Database::Get(),SIGNAL(gotValue(QString)),this,SLOT(getValueData(QString)));
+	emit gotValue(value);
 }
 void Controller::getLastKeyData(QString key)
 {

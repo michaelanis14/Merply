@@ -78,18 +78,27 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		}
 	else if(type.compare("Serial") == 0){
 		QLineEdit* lineEdit = new QLineEdit();
+		field = lineEdit;
 		lineEdit->setContentsMargins(0,0,0,0);
 		lineEdit->setEnabled(false);
-		qDebug() <<  this->strID;;
-		//QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(serialData(QJsonDocument serial)));
-		//Controller::Get()->getDoc(structureView.value("Source").toString(),structureView.value("Select").toString());
-
+		QString dataString = data.toString();
+		if(!dataString.isEmpty()){
+			lineEdit->setText(dataString);
+			}
+		else{
 		if(structureView.value("startNum") != QJsonValue::Undefined){
 			lineEdit->setText(QString::number(structureView.value("startNum").toInt()));
 			}
+
+		QStringList id = this->strID.split("ViewStructure::");
+		if(id.count() > 1){
+			QObject::connect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
+			Controller::Get()->getValue(id[1]);
+			}
+			}
 		//lineEdit->setText(data.toString());
 		layout->addWidget(lineEdit);
-		field = lineEdit;
+
 		}
 
 }
@@ -148,7 +157,15 @@ void SubFieldUI::refrenceData(QList<QJsonDocument> items)
 	//qDebug() << items;
 }
 
-void SubFieldUI::serialData(QJsonDocument serial)
+void SubFieldUI::serialData(QString serial)
 {
-	qDebug() << serial;
+	QObject::disconnect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
+	if(structureView.value("startNum") != QJsonValue::Undefined){
+		int i = structureView.value("startNum").toInt();
+		int current = serial.toInt();
+		int serialized = i + current;
+		//qDebug() << serialized << i << current;
+		if(serialized > i)
+			((QLineEdit*)field)->setText(QString::number(serialized));
+		}
 }

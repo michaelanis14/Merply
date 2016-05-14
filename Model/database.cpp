@@ -215,6 +215,7 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 		else{
 			emit Database::Get()->gotValue(QString(byteArray));
 			Database::Get()->LastKeyID = QString(byteArray);
+			//qDebug() <<"Las"<< Database::Get()->LastKeyID;
 			}
 		} else {
 		QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
