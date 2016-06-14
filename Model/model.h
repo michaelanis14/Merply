@@ -46,6 +46,8 @@ public:
 	bool removeSubNavigation(double key);
 	void clearSubNavigation();
 
+
+
 	void addPage(double key, QJsonObject page);
 	QJsonObject getPage(double key);
 	bool removePage(double key);
@@ -67,6 +69,8 @@ public:
 	QString getUserID();
 	QString getUserName();
 	QString getUserUsername();
+
+	QMap<double, QJsonObject> getPages() const;
 
 private:
 	explicit Model();

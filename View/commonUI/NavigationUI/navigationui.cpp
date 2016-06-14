@@ -25,7 +25,7 @@ navigationUI::navigationUI(QWidget *parent) :
 	this->setFixedWidth(Controller::GetNavigationWidth());
 	this->setFixedHeight(Controller::GetWindowHeight());
 
-	if(Controller::Get()->hasAdminGroupAccess()){
+	if(AccessController::Get()->hasAdminGroupAccess()){
 		SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
 		sctrlUI->setFixedHeight(Controller::GetNavigationSettingsBarHeight());
 		sctrlUI->addbtn("Settings",":/resources/icons/settings.png","settings");
@@ -37,7 +37,7 @@ navigationUI::navigationUI(QWidget *parent) :
 	subNavigation = new QTreeWidget();
 	subNavigation->setColumnCount(2);
 	subNavigation->setFixedWidth(Controller::GetNavigationWidth());
-	if(Controller::Get()->hasAdminGroupAccess())
+	if(AccessController::Get()->hasAdminGroupAccess())
 		subNavigation->setFixedHeight(Controller::GetWindowHeight()-(Controller::GetNavigationSettingsBarHeight() +15)-Controller::GetNavigationMainHeight());
 	else subNavigation->setFixedHeight(Controller::GetWindowHeight()- 5 -Controller::GetNavigationMainHeight());
 
@@ -69,9 +69,9 @@ void navigationUI::loadMainNavigation(QJsonDocument navDoc)
 {
 	mainNavigation->clear();
 	subNavigation->clear();
-	Controller::ClearMainNavigation();
-	Controller::ClearSubNavigation();
-	Controller::ClearPages();
+	Controller::Get()->clearMainNavigation();
+	Controller::Get()->clearSubNavigation();
+	Controller::Get()->clearPages();
 
 	foreach(QJsonValue mainNav,navDoc.object().value("MainNavigations").toArray()){
 		QString title = mainNav.toObject().value("Title").toString();
@@ -87,8 +87,8 @@ void navigationUI::loadMainNavigation(QJsonDocument navDoc)
 			}
 		mainNavigation->resizeColumnToContents(0);
 
-		Controller::AddMainNavigation(key,title);
-		Controller::AddSubNavigation(key,loadSubNavigation(items));
+		Controller::Get()->addMainNavigation(key,title);
+		Controller::Get()->addSubNavigation(key,loadSubNavigation(items));
 		}
 	if(mainNavigation->topLevelItemCount() > 0){
 		mainNavigation->clearSelection();
@@ -105,7 +105,7 @@ QList<QTreeWidgetItem *> navigationUI::loadSubNavigation(QJsonArray subNav)
 		double key = tab.toObject().value("ID").toDouble();
 		QString title = tab.toObject().value("Title").toString();
 		if(key!=0 && !title.isEmpty())
-			Controller::AddPage(key,tab.toObject().value("Page").toObject());
+			Controller::Get()->addPage(key,tab.toObject().value("Page").toObject());
 		QTreeWidgetItem*  item = new QTreeWidgetItem();
 		item->setText(1,QString::number(key));
 		item->setText(0,title);
@@ -118,7 +118,7 @@ QList<QTreeWidgetItem *> navigationUI::loadSubNavigation(QJsonArray subNav)
 
 void navigationUI::save()
 {
-	Controller::SaveNavigation();
+	Controller::Get()->saveNavigation();
 }
 
 
@@ -141,6 +141,14 @@ void navigationUI::paintEvent(QPaintEvent *)
 	style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
+void navigationUI::resizeEvent(QResizeEvent* event)
+{
+	if(AccessController::Get()->hasAdminGroupAccess())
+		subNavigation->setFixedHeight(event->size().height()-(Controller::GetNavigationSettingsBarHeight() +15)-Controller::GetNavigationMainHeight());
+	else subNavigation->setFixedHeight(event->size().height()- 5 -Controller::GetNavigationMainHeight());
+	this->QWidget::resizeEvent(event);
+}
+
 void navigationUI::mainNavPressed(QTreeWidgetItem* item, int column)
 {
 	subNavigation->clearSelection();
@@ -148,7 +156,7 @@ void navigationUI::mainNavPressed(QTreeWidgetItem* item, int column)
 	for(int i = 0; i < count;i++){
 		subNavigation->takeTopLevelItem(0);
 		}
-	subNavigation->insertTopLevelItems(0,Controller::GetSubNavigation(item->text(2).toDouble()));
+	subNavigation->insertTopLevelItems(0,Controller::Get()->getSubNavigation(item->text(2).toDouble()));
 	subNavigation->clearFocus();
 
 	if(subNavigation->topLevelItemCount() > 0){
@@ -160,7 +168,7 @@ void navigationUI::mainNavPressed(QTreeWidgetItem* item, int column)
 
 void navigationUI::subNavPressed(QTreeWidgetItem* item, int column)
 {
-	emit subNavPressed(Controller::GetPage(item->text(1).toDouble()));
+	emit subNavPressed(Controller::Get()->getPage(item->text(1).toDouble()));
 }
 
 void navigationUI::btn_Clicked(QString btn)

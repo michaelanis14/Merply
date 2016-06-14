@@ -56,7 +56,7 @@ Controller::Controller(QObject *parent) :
 
 void Controller::showDisplay()
 {
-	login("merplyroot","LilyMichael");
+	AccessController::Get()->login("merplyroot","LilyMichael");
 	//navigationUI::Get();
 	///Tabs
 	QStringList tabList = QStringList();
@@ -116,26 +116,37 @@ void Controller::loadNavigationData(QJsonDocument document)
 void Controller::subNavPressed(QJsonObject view)
 {
 	//qDebug() << view;
-	if(view.value("Type").toString().contains("Entity")){
+	if(AccessController::Get()->hasReadAccess(view))
+	if(view.value("Type").toString().contains("Entity") && !view.value("Card").toString().isEmpty()){
 		if(view.value("Select").toString().contains("Index")){
+
 			QString card = view.value("Card").toString();
 			queryIndexView(card);
+
 			}
 		else{
 			//QObject::connect(Database::Get(),SIGNAL(Database::Get()->gotDocument(QJsonDocument)),this,SLOT(subNavPressed(QJsonObject)));
 
 			//	Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
-			QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedData(QList<QJsonDocument>)));
-			QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id = '"+view.value("Card").toString()+"'");
-			//qDebug()<<"Q : " << query;
-			Database::Get()->query(query);
-			}
+
+				QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedData(QList<QJsonDocument>)));
+				QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id = '"+view.value("Card").toString()+"'");
+				//qDebug()<<"Q : " << query;
+				Database::Get()->query(query);
+				}
 		}
 	else if(view.value("Type").toString().contains("Page")){
-		PageUI::ShowUI(view);
+
+		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedPageData(QList<QJsonDocument>)));
+		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id = '"+view.value("Card").toString()+"'");
+		//qDebug()<<"Q : " << query;
+		Database::Get()->query(query);
+
+
 		//qDebug() << view;
-		qDebug() << hasReadAccess(view);
+		//
 		}
+	else IndexUI::ShowUI("ViewStructure::91",QList<QJsonDocument>());
 }
 
 void Controller::queryIndexView(QString vStrctKey)
@@ -180,6 +191,15 @@ void Controller::subNavPressedIndexData(QList<QJsonDocument> documents)
 		IndexUI::ShowUI(this->indexDocument_id,documents);
 
 	this->indexDocument_id = "";
+}
+
+void Controller::subNavPressedPageData(QList<QJsonDocument> documents)
+{
+//	qDebug() << "pageee" << documents;
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedPageData(QList<QJsonDocument>)));
+	if(documents.count() > 0)
+		PageUI::ShowUI(documents.first().object());
+
 }
 /**
  * @author Michael Bishara
@@ -249,130 +269,9 @@ void Controller::getValueData(QString value)
 }
 void Controller::getLastKeyData(QString key)
 {
+	//qDebug()<<"GOTTTTLASTTTTKEYYY CONTROLLER" << key;
 	QObject::disconnect(Database::Get(),SIGNAL(gotLastKey(QString)),Controller::Get(),SLOT(getLastKeyData(QString)));
-	emit gotLastKey(key);
-}
-void Controller::login(QString username, QString password)
-{
-	if(username.compare("merplyroot") == 0 && password.compare("LilyMichael") == 0){
-		Model::Get()->login("merplyroot","root","Merply");
-		}
-	else{
-		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(loginData(QList<QJsonDocument>)));
-		QString query = QString("SELECT (`"+QString(DATABASE)+"`).*  ,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \"Users::%\"  AND Fields[0][1].Username[0] = '"+username+"' AND Fields[0][2].UserPassword[0] = '"+password+"'");
-		//qDebug()<<"Q : " << query;
-		Database::Get()->query(query);
-		}
-}
-
-bool Controller::hasRootGroupAccess()
-{
-	if(Model::Get()->getUserID().compare("merplyroot") == 0 )
-		return true;
-	return false;
-}
-
-bool Controller::hasAdminGroupAccess()
-{
-	if(hasRootGroupAccess())
-		return true;
-	return false;
-}
-
-bool Controller::hasAccess(QString group)
-{
-	if(Model::Get()->getUserID().compare("merplyroot") == 0 )
-		return true;
-
-	if(group.compare("3") == 0)
-		return false;
-	return false;
-}
-
-void Controller::loginData(QList<QJsonDocument> user)
-{
-	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(loginData(QList<QJsonDocument>)));
-	if(user.isEmpty()){
-		qDebug() << "user login faild : Wrong Password or UserName";
-		}
-	else{
-		QJsonObject userObject = user.first().object();
-		if(!userObject.value("document_id").toString().isEmpty()){
-			QString username;
-			QString name;
-			QJsonArray userFields = userObject.value("Fields").toArray();
-			foreach(QJsonValue field,userFields){
-				foreach(QJsonValue subfield,field.toArray()){
-					if(subfield.toObject().value("Name") != QJsonValue::Undefined){
-						name = subfield.toObject().value("Name").toArray().at(0).toString();
-						}
-					else if(subfield.toObject().value("Username") != QJsonValue::Undefined){
-						username = subfield.toObject().value("Username").toArray().at(0).toString();
-						}
-
-					}
-				}
-			Model::Get()->login(userObject.value("document_id").toString(),username,name);
-			}
-		//qDebug() << userFields  << userFields.at(0).toArray().at(0).toObject().value("Name").toString();
-		}
-}
-
-bool Controller::hasReadAccess(QJsonObject permissions)
-{
-	if(Model::Get()->getUserID().compare("merplyroot") == 0 )
-		return true;
-
-	permissions = permissions.value("Permissions").toObject().value("Read").toObject();
-	if(permissions.value("Permissions").toString().toInt() == 111){
-		foreach(QJsonValue deny,permissions.value("Denied").toArray()){
-			if(deny.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0){
-				//	qDebug() << "At Deny: "<<permissions << Model::Get()->getUserID();
-				return false;
-				}
-			}
-		foreach(QJsonValue allow,permissions.value("Allowed").toArray()){
-			if(allow.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0 || allow.toObject().value("Key").toString().toInt() == 100)
-				//qDebug() << "At Allow: "<<permissions << Model::Get()->getUserID() << allow.toObject().value("Key").toString().toInt();
-				return true;
-			}
-		}
-	else if(permissions.value("Permissions").toString().toInt() == 100)
-		return true;
-	else if(permissions.value("Permissions").toString().toInt() == 101){
-		//qDebug() << "Denied all: "<<permissions << Model::Get()->getUserID();
-		return false;
-		}
-	//	qDebug() << "Permission all fail: "<<permissions << Model::Get()->getUserID();
-	return false;
-}
-bool Controller::hasWriteAccess(QJsonObject permissions)
-{
-	if(Model::Get()->getUserID().compare("merplyroot") == 0 )
-		return true;
-
-	permissions = permissions.value("Permissions").toObject().value("Write").toObject();
-	if(permissions.value("Permissions").toString().toInt() == 111){
-		foreach(QJsonValue deny,permissions.value("Denied").toArray()){
-			if(deny.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0){
-				//	qDebug() << "At Deny: "<<permissions << Model::Get()->getUserID();
-				return false;
-				}
-			}
-		foreach(QJsonValue allow,permissions.value("Allowed").toArray()){
-			if(allow.toObject().value("Key").toString().compare(Model::Get()->getUserID()) == 0 || allow.toObject().value("Key").toString().toInt() == 100)
-				//qDebug() << "At Allow: "<<permissions << Model::Get()->getUserID() << allow.toObject().value("Key").toString().toInt();
-				return true;
-			}
-		}
-	else if(permissions.value("Permissions").toString().toInt() == 100)
-		return true;
-	else if(permissions.value("Permissions").toString().toInt() == 101){
-		//qDebug() << "Denied all: "<<permissions << Model::Get()->getUserID();
-		return false;
-		}
-	//	qDebug() << "Permission all fail: "<<permissions << Model::Get()->getUserID();
-	return false;
+	emit Controller::Get()->gotLastKey(key);
 }
 
 QString Controller::getDatabaseName()
@@ -523,69 +422,69 @@ void Controller::linkPressedData(QJsonDocument document)
 	CreateEditUI::ShowUI(document.object(),QJsonObject());
 }
 
-void Controller::AddSubNavigation(double key, QList<QTreeWidgetItem*> subNav)
+void Controller::addSubNavigation(double key, QList<QTreeWidgetItem*> subNav)
 {
 	Model::Get()->addSubNavigation(key,subNav);
 }
 
-QList<QTreeWidgetItem*> Controller::GetSubNavigation(double key)
+QList<QTreeWidgetItem*> Controller::getSubNavigation(double key)
 {
 	return Model::Get()->getSubNavigation(key);
 }
 
-bool Controller::RemoveSubNavigation(double key)
+bool Controller::removeSubNavigation(double key)
 {
 	return Model::Get()->removeSubNavigation(key);
 }
 
-void Controller::ClearSubNavigation()
+void Controller::clearSubNavigation()
 {
 	Model::Get()->clearSubNavigation();
 }
 
-void Controller::AddPage(double key, QJsonObject page)
+void Controller::addPage(double key, QJsonObject page)
 {
 	Model::Get()->addPage(key,page);
 }
 
-QJsonObject Controller::GetPage(double key)
+QJsonObject Controller::getPage(double key)
 {
 	return Model::Get()->getPage(key);
 }
 
-bool Controller::RemovePage(double key)
+bool Controller::removePage(double key)
 {
 	return Model::Get()->removePage(key);
 }
 
-void Controller::ClearPages()
+void Controller::clearPages()
 {
 	Model::Get()->clearPages();
 }
 
-void Controller::AddMainNavigation(double key, QString mainNav)
+void Controller::addMainNavigation(double key, QString mainNav)
 {
 	Model::Get()->addMainNavigation(key,mainNav);
 }
 
-QString Controller::GetMainNavigation(double key)
+QString Controller::getMainNavigation(double key)
 {
 	return Model::Get()->getMainNavigation(key);
 }
 
-bool Controller::RemoveMainNavigation(double key)
+bool Controller::removeMainNavigation(double key)
 {
 	return Model::Get()->removeMainNavigation(key);
 }
 
-void Controller::ClearMainNavigation()
+void Controller::clearMainNavigation()
 {
 	Model::Get()->clearMainNavigation();
 }
-bool Controller::SaveNavigation()
+bool Controller::saveNavigation()
 {
 
-
+	saveNavigationPages();
 	QMapIterator<double, QString > i(Model::Get()->getMainNavigationModel());
 	//QList<QJsonDocument> mainNavs;
 	QJsonObject navigation;
@@ -597,8 +496,8 @@ bool Controller::SaveNavigation()
 		mainNav.insert("ID",i.key());
 		QJsonArray items;
 		//qDebug() << i.key();
-		foreach(QTreeWidgetItem * tab,GetSubNavigation(i.key())){
-			items.append(SaveSubNavigation(tab));
+		foreach(QTreeWidgetItem * tab,getSubNavigation(i.key())){
+			items.append(saveSubNavigation(tab));
 			}
 		mainNav.insert("Items",items);
 		//	qDebug() << mainNav;
@@ -611,17 +510,46 @@ bool Controller::SaveNavigation()
 	return Controller::UpdateDoc(QJsonDocument(navigation));
 
 }
-QJsonObject Controller::SaveSubNavigation(QTreeWidgetItem * item)
+
+bool Controller::saveNavigationPages()
+{
+//	qDebug() << "SaveN";
+	bool savedPages = true;
+	QMapIterator<double, QJsonObject > i(Model::Get()->getPages());
+	while (i.hasNext()) {
+		i.next();
+		QJsonObject page = i.value();
+		if(page.value("CardData") != QJsonValue::Undefined){
+			QJsonObject cardData = page.value("CardData").toObject();
+			if(page.value("Card") != QJsonValue::Undefined && page.value("Card").toString().compare("-1") != 0){
+				cardData.insert("document_id",page.value("Card").toString());
+				savedPages = savedPages & Controller::UpdateDoc(QJsonDocument(cardData));
+
+				}else{
+				if(page.value("Type").toString().compare("Page")){
+					Controller::Get()->storeDoc("Page",QJsonDocument(cardData));
+					}
+
+				qDebug()<<"withoutID" << page;
+				}
+			page.remove("CardData");
+			addPage(i.key(),page);
+			}
+		}
+	return savedPages;
+}
+QJsonObject Controller::saveSubNavigation(QTreeWidgetItem * item)
 {
 
 	QJsonObject itemTab = QJsonObject();
 	itemTab.insert("Title",item->text(0));
 	itemTab.insert("ID",item->text(1).toDouble());
-	itemTab.insert("Page",GetPage(item->text(1).toDouble()));
+	itemTab.insert("Page",getPage(item->text(1).toDouble()));
+	//qDebug() << item->text(1).toDouble() << getPage(item->text(1).toDouble());
 	if(item->childCount() > 0){
 		QJsonArray items = QJsonArray();
 		for(int i = 0; i < item->childCount();i++)
-			items << SaveSubNavigation(item->child(i));
+			items << saveSubNavigation(item->child(i));
 		itemTab.insert("Items",items);
 		}
 	return itemTab;

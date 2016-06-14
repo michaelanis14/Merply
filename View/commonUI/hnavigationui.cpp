@@ -102,6 +102,11 @@ void HNavigationUI::paintEvent(QPaintEvent *)
 	QPainter p(this);
 	style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
+
+void HNavigationUI::resizeEvent(QResizeEvent* event)
+{
+	this->QWidget::resizeEvent(event);
+}
 void HNavigationUI::tabChanged(HNavigationTab* selectedTab){
 	foreach(HNavigationTab* tab, tabs){
 		if(tab != selectedTab)
@@ -124,6 +129,13 @@ void HNavigationUI::clearTabs()
 		tab->setHidden(true);
 		tab->deleteLater();
 		}
+}
+
+void HNavigationUI::addWidget(QWidget* widget)
+{
+//	this->setFixedWidth(Controller::GetWindowWidth());
+	this->layout->addStretch(1);
+	this->layout->addWidget(widget,0,Qt::AlignRight);
 }
 
 void HNavigationUI::mousePressEvent(QMouseEvent *event){

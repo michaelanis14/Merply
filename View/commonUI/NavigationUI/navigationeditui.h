@@ -34,9 +34,10 @@ private:
 	int idCount;
 	QJsonObject page;
 	int currentSubNav;
-	void savePage();
+	void savePage(bool updateDataBase);
 	QTreeWidgetItem* oldItemSubNavSelected;
 	bool rootOnly;
+	bool updateDataBase;
 public slots:
 	void mainNavPressed(QTreeWidgetItem* item, int column);
 	void mainNavChanged(QTreeWidgetItem* item, int);
@@ -46,6 +47,7 @@ public slots:
 
 	void editControllerCancelPressed();
 	void editControllerSavePressed();
+	void savePageData(QJsonObject savedPage);
 signals:
 	void subNavPressed(QJsonObject view);
 };

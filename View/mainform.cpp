@@ -11,6 +11,9 @@
 #include "model.h"
 #include "controller.h"
 
+
+#include "logintabui.h"
+
 #include <QVBoxLayout>
 #include <QScrollArea>
 #include <QLinearGradient>
@@ -94,6 +97,7 @@ MainForm::MainForm(): QWidget()
 	hnavigation =  HNavigationUI::Get();
 	hnavigation->setParent(this);
 	hnavigation->move(NAVIGATION_WIDTH,0);
+	hnavigation->addWidget(LoginTabUI::Get());
 	currentDisplay = 0;
 }
 
@@ -119,6 +123,8 @@ MainForm *MainForm::Get()
 **/
 
 void MainForm::ShowDisplay(MainDisplay * display) {
+
+	///if(AccessController::hasAccess())
 	if (p_instance != NULL)
 		p_instance->show();
 
@@ -167,11 +173,11 @@ void MainForm::paintEvent(QPaintEvent *)
 }
 
 void MainForm::resizeEvent(QResizeEvent* event) {
-	//qDebug() << event->size().width();
-	navigationUI::Get()->setFixedWidth(event->size().width() - 80);
+
+	navigationUI::Get()->setFixedHeight(event->size().height());
+	HNavigationUI::Get()->setFixedWidth(event->size().width() - Controller::GetNavigationWidth() );
 	if (p_instance->currentDisplay != 0)
 		currentDisplay->scrollAreaFormPanel->setGeometry(0,0,this->width() - NAVIGATION_WIDTH,this->height() - NAVIGATION_HEIGHT);
-
 	this->QWidget::resizeEvent(event);
 
 }

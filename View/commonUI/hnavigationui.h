@@ -42,13 +42,15 @@ public:
 	void setTabs(const QList<HNavigationTab *> &value);
 	void tabChanged(HNavigationTab* selectedTab);
 	void clearTabs();
+	void addWidget(QWidget* widget);
+
+	void resizeEvent(QResizeEvent* event);
 private:
 	explicit HNavigationUI(QWidget *parent = 0);
 	static HNavigationUI* p_instance;
 	QHBoxLayout* layout;
 	QList<HNavigationTab*> tabs;
 	void paintEvent(QPaintEvent *);
-
 
 protected:
 	void mousePressEvent(QMouseEvent *event);

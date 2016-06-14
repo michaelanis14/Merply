@@ -13,7 +13,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 	this->viewgroups =  QList<ViewGroup*>();
 	this->structureView = structureView;
 
-	if(Controller::Get()->hasAdminGroupAccess()){
+	if(AccessController::Get()->hasAdminGroupAccess()){
 		SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
 		sctrlUI->addbtn("Settings",":/resources/icons/settings.png","settings");
 		QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btn_Clicked(QString)));

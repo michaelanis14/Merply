@@ -18,6 +18,7 @@ class PageUI : public MainDisplay
 public:
 	explicit PageUI(QWidget *parent = 0, QJsonObject viewStructure = QJsonObject());
 	static void ShowUI(QJsonObject viewStructure);
+	HeaderLabel* headerlbl;
 private:
 	static PageUI* p_instance;
 	void fill(QJsonObject viewStructure);
@@ -26,7 +27,7 @@ private:
 	//QVBoxLayout *createEditWidgetLayout;
 	QVBoxLayout *layout;
 	ViewGroups * viewGroups;
-	HeaderLabel* headerlbl;
+
 signals:
 
 public slots:

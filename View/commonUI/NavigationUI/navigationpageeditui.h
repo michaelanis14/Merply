@@ -21,7 +21,7 @@ public:
 	explicit NavigationPageEditUI(QWidget *parent = 0);
 	static void ShowUI(QJsonObject structureView);
 	void fill(QJsonObject structureView);
-	QJsonObject save();
+	void save(bool updateDataBase);
 	static NavigationPageEditUI* Get();
 
 private:
@@ -48,9 +48,11 @@ private:
 	PermissionsUI* permissions;
 	QString currentCardKey;
 	void clearPreview();
+	QJsonObject saveObject;
 signals:
 	void editControllerSavePressed();
 	void editControllerCancelPressed();
+	void saved(QJsonObject saved);
 
 
 public slots:
@@ -59,11 +61,13 @@ public slots:
 	void cardToggled(bool state);
 	void pageToggled(bool state);
 	void getCardData(QList<QJsonDocument> items);
+	void getPageData(QJsonDocument page);
 	void updatePagePreview();
 	void deleteCard();
 	void updateNewCardPreview();
 	void updateCardPreview();
 	void loadCard(QJsonDocument document);
+	void gotLastKeyData(QString key);
 };
 
 #endif // NAVIGATIONPAGEEDITUI_H

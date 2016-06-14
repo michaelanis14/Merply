@@ -8,7 +8,7 @@
 #ifndef Controller_H
 #define Controller_H
 
-
+#include "accesscontroller.h"
 
 #include <structureviewseditui.h>
 
@@ -75,24 +75,25 @@ public:
 	void editControllerCancelPressed();
 
 	//Model Interface
-		 //Navigation
-	static void AddSubNavigation(double key, QList<QTreeWidgetItem*> subNav);
-	static QList<QTreeWidgetItem*> GetSubNavigation(double key);
-	static bool RemoveSubNavigation(double key);
-	static void ClearSubNavigation();
+	//Navigation
+	void addSubNavigation(double key, QList<QTreeWidgetItem*> subNav);
+	QList<QTreeWidgetItem*> getSubNavigation(double key);
+	bool removeSubNavigation(double key);
+	void clearSubNavigation();
 
-	static void AddPage(double key, QJsonObject page);
-	static QJsonObject GetPage(double key);
-	static bool RemovePage(double key);
-	static void ClearPages();
+	void addPage(double key, QJsonObject page);
+	QJsonObject getPage(double key);
+	bool removePage(double key);
+	void clearPages();
 
-	static void AddMainNavigation(double key, QString mainNav);
-	static QString GetMainNavigation(double key);
-	static bool RemoveMainNavigation(double key);
-	static void ClearMainNavigation();
+	void addMainNavigation(double key, QString mainNav);
+	QString getMainNavigation(double key);
+	bool removeMainNavigation(double key);
+	void clearMainNavigation();
 
-	static bool SaveNavigation();
-	static QJsonObject SaveSubNavigation(QTreeWidgetItem* item);
+	bool saveNavigation();
+	bool saveNavigationPages();
+	QJsonObject saveSubNavigation(QTreeWidgetItem* item);
 
 	//Model Defines
 	int static GetWindowWidth();
@@ -104,18 +105,13 @@ public:
 	int static GetNavigationSubHeight();
 	static QString getLastKeyID();
 	//Access Control
-	void login(QString username,QString password);
-	bool hasRootGroupAccess();
-	bool hasAdminGroupAccess();
-	bool hasAccess(QString group);
+
 
 
 private:
 	explicit Controller(QObject * parent = 0);
 	static Controller* p_instance;
 	QMap<QString,QStringList> layoutViewGroups;
-	bool hasReadAccess(QJsonObject permissions);
-	bool hasWriteAccess(QJsonObject permissions);
 	QString indexDocument_id;
 public slots:
 	void subNavPressed(QJsonObject view);
@@ -126,6 +122,7 @@ public slots:
 	void loadNavigationData(QJsonDocument document);
 	void subNavPressedData(QList<QJsonDocument> documents);
 	void subNavPressedIndexData(QList<QJsonDocument> documents);
+	void subNavPressedPageData(QList<QJsonDocument> documents);
 	void getFieldsData(QList<QJsonDocument> documents);
 	void linkPressedData(QJsonDocument document);
 	void getDocData(QJsonDocument document);
@@ -133,7 +130,7 @@ public slots:
 	void getValueData(QString value);
 
 	void getLastKeyData(QString key);
-	void loginData(QList<QJsonDocument> user);
+
 
 	void showCreateEditeStrUIData(QJsonDocument str);
 	void showCreateEditeValueUIData(QJsonDocument value);

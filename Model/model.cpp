@@ -165,9 +165,14 @@ bool Model::isNameExistInList(QStringList &list, QString &name) {
 	return false;
 }
 
+QMap<double, QJsonObject> Model::getPages() const
+{
+    return pages;
+}
+
 bool Model::Log(const QStringList& log)
 {
-	QString fileName = "log";
+    QString fileName = "log";
 
 	if(!QFile::exists(fileName)){
 #ifndef Q_OS_WIN32

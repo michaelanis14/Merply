@@ -35,7 +35,7 @@ void Database::on_stored_status (lcb_t instance, const void *, lcb_storage_t ,
 		QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
 		Database::Get()->LastKeyID = QString(keyByte);
 		emit Database::Get()->gotLastKey(QString(keyByte));
-		qDebug("Stored Key:  %.*s\n",(int)resp->v.v0.nkey,resp->v.v0.key);
+		qDebug("Stored Key_on_stored_status:  %.*s\n",(int)resp->v.v0.nkey,resp->v.v0.key);
 		}
 }
 
@@ -44,7 +44,7 @@ void  Database::arithmatic_callback(lcb_t instance, const void *,
 									const lcb_arithmetic_resp_t *)
 {
 	if (error == LCB_SUCCESS) {
-		//   qDebug("Stored Key:  %.*s\n",(int)resp->v.v0.nkey,resp->v.v0.key);
+		  // qDebug("Stored Key_arithmatic_callback:  %.*s\n",(int)resp->v.v0.nkey,resp->v.v0.key);
 		} else {
 		fprintf(stderr, "Couldn’t schedule operation: %s\n", lcb_strerror(instance, error));
 		}
@@ -87,6 +87,7 @@ bool Database::updateDoc(QJsonDocument document)
 		lcb_wait(instance);
 		} else {
 		fprintf(stderr, "Couldn’t schedule operation: %s\n", lcb_strerror(instance, err));
+		qDebug() << "ERRLOG" << document;
 		}
 	lcb_set_store_callback(instance, on_stored_status);
 	lcb_set_get_callback(instance, get_callback);
@@ -215,12 +216,12 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 		else{
 			emit Database::Get()->gotValue(QString(byteArray));
 			Database::Get()->LastKeyID = QString(byteArray);
-			//qDebug() <<"Las"<< Database::Get()->LastKeyID;
+			//qDebug() <<"Last Keyy"<< Database::Get()->LastKeyID;
 			}
 		} else {
 		QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
 		qDebug() << QString(keyByte);
-		fprintf(stderr, "Couldn’t retrieve item: %s %s\n", lcb_strerror(instance, err),resp->v.v0.key,(int)resp->v.v0.nkey);
+		fprintf(stderr, "Couldn’t retrieve item: %s %s %d\n", lcb_strerror(instance, err),resp->v.v0.key,(int)resp->v.v0.nkey);
 		}
 }
 

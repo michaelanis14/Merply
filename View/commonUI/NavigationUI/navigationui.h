@@ -50,6 +50,7 @@ public:
 	QTreeWidget *mainNavigation;
 	void paintEvent(QPaintEvent *);
 	bool editMode;
+	void resizeEvent(QResizeEvent* event);
 
 public slots:
 	void mainNavPressed(QTreeWidgetItem* item, int column);
