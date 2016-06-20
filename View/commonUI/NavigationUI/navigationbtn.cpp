@@ -6,7 +6,7 @@ NavigationBtn::NavigationBtn(QWidget *parent,QString title) : QWidget(parent)
 	this->setObjectName("Tab");
 }
 
-void NavigationBtn::addChild(QString title, QJsonObject view)
+void NavigationBtn::addChild(QString title, QJsonObject )
 {
 	QTreeWidgetItem*  item = new QTreeWidgetItem( QStringList(title));
 

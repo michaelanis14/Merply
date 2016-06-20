@@ -55,7 +55,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	if(!restrictedTypes.isEmpty()){
 		types << restrictedTypes;
 		}else
-		types << "Index"<<"Text"<< "Refrence" <<"Date"<< "Fixed" <<"Serial" << "Table";
+		types << "Index"<<"Text"<<"Array"<< "Refrence" <<"Date"<< "Fixed" <<"Serial" << "Table";
 	typeSelect->addItems(types);
 	typeSelect->setCurrentIndex(types.indexOf(type));
 	//if(restrictedTypes.isEmpty())

@@ -3,14 +3,14 @@
 #include <QWidget>
 #include <QPushButton>
 
-StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, bool links) : QWidget(parent)
+StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStringList restrictedTypes) : QWidget(parent)
 {
 
 
 
 	this->setContentsMargins(2,2,2,2);
 
-	this->links = links;
+	this->restrictedTypes = restrictedTypes;
 	this->structureView = fieldVS.toObject();
 
 	layout = new QHBoxLayout(0);
@@ -153,7 +153,7 @@ void StructureViewEdit::fill(QJsonObject structureView)
 			foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
 				QString type = fieldVS.toObject().value("Type").toString();
 				StructureVieweditSubFeild * svsf = new StructureVieweditSubFeild(this);
-				svsf->fillTypeFields(type,fieldVS,this->links);
+				svsf->fillTypeFields(type,fieldVS,this->restrictedTypes);
 				sVSFs << svsf;
 				QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 
@@ -270,10 +270,10 @@ void StructureViewEdit::controller_Clicked(QString btn)
 void StructureViewEdit::addField()
 {
 	QString type = "Text";
-	if(links)
+	if(restrictedTypes.contains("Links"))
 		type = "Link";
 	StructureVieweditSubFeild * svsf = new StructureVieweditSubFeild(this);
-	svsf->fillTypeFields(type,QJsonObject(),this->links);
+	svsf->fillTypeFields(type,QJsonObject(),this->restrictedTypes);
 	sVSFs << svsf;
 	QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 

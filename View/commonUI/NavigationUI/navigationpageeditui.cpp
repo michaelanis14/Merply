@@ -251,7 +251,7 @@ void NavigationPageEditUI::save(bool updateDataBase)
 		if(updateDataBase){
 			QObject::connect(Controller::Get(),SIGNAL(gotLastKey(QString)),this,SLOT(gotLastKeyData(QString)));
 			Controller::Get()->getLastKey();
-			Controller::Get()->storeDoc("ViewStructure",QJsonDocument(saveObject));
+			Controller::Get()->storeDoc("ViewStructure",QJsonDocument(newCardStructure->save()));
 
 			}
 		//	else

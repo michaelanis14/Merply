@@ -11,7 +11,7 @@ class NavigationBtn : public QWidget
 	Q_OBJECT
 public:
 	explicit NavigationBtn(QWidget *parent = 0,QString title = "");
-	void addChild(QString title,QJsonObject view);
+	void addChild(QString title, QJsonObject);
 private:
 	QTreeWidgetItem* root;
 signals:

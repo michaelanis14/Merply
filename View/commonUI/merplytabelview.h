@@ -33,7 +33,7 @@ public:
 	QTableWidget* tabel;
 	QString save(QString propertyName);
 	bool fill(QJsonObject columns, QJsonObject data);
-	void indexTable(const QString document_id, const QList<QJsonDocument> items, const bool edit, const bool remove);
+	void indexTable(const QString document_id, const QList<QJsonDocument> items, const bool, const bool);
 	void clear();
 	QList<QJsonDocument> items;
 private:

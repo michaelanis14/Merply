@@ -11,11 +11,11 @@
 
 #include <QWidget>
 #include <QLabel>
-#include <QDebug>
-#include <QPaintEvent>
+//#include <QPaintEvent>
 #include <QVBoxLayout>
-#include <QPaintEvent>
-#include <QStyleOption>
+//#include <QPaintEvent>
+//#include <QStyleOption>
+
 
 class timelineUI : public QWidget
 {

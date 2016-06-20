@@ -14,7 +14,7 @@ class StructureViewGroupsUI : public MainDisplay
 {
 	Q_OBJECT
 public:
-	explicit StructureViewGroupsUI(QWidget *parent = 0,QJsonObject structureView = QJsonObject(),bool links = false);
+	explicit StructureViewGroupsUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject(), QStringList restrictedTypes = QStringList());
 	static void ShowUI(QJsonObject structureView);
 	void fill(QJsonObject structureView);
 	static StructureViewGroupsUI* GetUI();
@@ -41,7 +41,7 @@ private:
 	QString document_id;
 protected:
 
-	bool links;
+	QStringList restrictedTypes;
 
 
 signals:

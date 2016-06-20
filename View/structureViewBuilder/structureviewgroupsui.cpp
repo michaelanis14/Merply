@@ -5,11 +5,11 @@
 
 #include<QJsonDocument>
 
-StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject structureView, bool links) : MainDisplay(parent)
+StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject structureView, QStringList restrictedTypes) : MainDisplay(parent)
 {
 
 	this->structureView = structureView;
-	this->links = links;
+	this->restrictedTypes = restrictedTypes;
 	this->setContentsMargins(0,0,0,0);
 	QVBoxLayout* structureViewGroupsUILayout = new QVBoxLayout(this);
 	structureViewGroupsUILayout->setMargin(0);
@@ -128,7 +128,7 @@ void StructureViewGroupsUI::fill(QJsonObject structureView)
 
 	if(structureView.value("Viewgroups").isArray()){
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
-			StructureViewsEditUI* viewgroup = new StructureViewsEditUI(0,item.toObject(),this->links);
+			StructureViewsEditUI* viewgroup = new StructureViewsEditUI(0,item.toObject(),this->restrictedTypes);
 
 			QObject::connect(viewgroup,SIGNAL(updateLayout()),this,SLOT(updateLayout()));
 			QObject::connect(viewgroup, SIGNAL(styleChanged()),this, SLOT(viewGroupStyleChanged()));
@@ -244,7 +244,7 @@ void StructureViewGroupsUI::paintEvent(QPaintEvent * event)
 
 void StructureViewGroupsUI::addViewgroup()
 {
-	StructureViewsEditUI * strcViewUI = new StructureViewsEditUI(0,structureView,this->links);
+	StructureViewsEditUI * strcViewUI = new StructureViewsEditUI(0,structureView,this->restrictedTypes);
 	QObject::connect(strcViewUI,SIGNAL(updateLayout()),this,SLOT(updateLayout()));
 
 	sVSFUIs << strcViewUI;

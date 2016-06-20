@@ -181,7 +181,7 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 	if(!condition.isEmpty())
 		where = QString("AND "+condition);
 	QString query = "SELECT fin."+select.trimmed()+"[0] AS `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f UNNEST f fin WHERE fin."+select+" AND META(d).id LIKE \""+table+"::%\" "+where;
-	//qDebug() << query;
+	qDebug() << query;
 
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	Database::Get()->query(query);

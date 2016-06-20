@@ -173,7 +173,7 @@ bool merplyTabelView::fill(QJsonObject columns, QJsonObject data)
 
 }
 
-void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocument> items, const bool edit, const bool remove)
+void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocument> items, const bool , const bool )
 {
 	//model->setHorizontalHeaderItem(i, new QStandardItem(QString(column.namedItem("Title").firstChild().nodeValue())));
 	this->items = items;

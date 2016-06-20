@@ -12,7 +12,8 @@
 #include "navigationeditui.h"
 #include "mainform.h"
 #include <QHeaderView>
-
+#include <QStyleOption>
+#include <QPalette>
 
 
 navigationUI::navigationUI(QWidget *parent) :
@@ -149,7 +150,7 @@ void navigationUI::resizeEvent(QResizeEvent* event)
 	this->QWidget::resizeEvent(event);
 }
 
-void navigationUI::mainNavPressed(QTreeWidgetItem* item, int column)
+void navigationUI::mainNavPressed(QTreeWidgetItem* item, int )
 {
 	subNavigation->clearSelection();
 	int count = subNavigation->topLevelItemCount();
@@ -166,7 +167,7 @@ void navigationUI::mainNavPressed(QTreeWidgetItem* item, int column)
 		}
 }
 
-void navigationUI::subNavPressed(QTreeWidgetItem* item, int column)
+void navigationUI::subNavPressed(QTreeWidgetItem* item, int )
 {
 	emit subNavPressed(Controller::Get()->getPage(item->text(1).toDouble()));
 }

@@ -3,7 +3,7 @@
 
 
 
-WidgetsStructureViewEditeUI::WidgetsStructureViewEditeUI(QWidget* parent): StructureViewGroupsUI(parent,QJsonObject(),true)
+WidgetsStructureViewEditeUI::WidgetsStructureViewEditeUI(QWidget* parent): StructureViewGroupsUI(parent,QJsonObject(),QStringList() <<"Links")
 {
 
 

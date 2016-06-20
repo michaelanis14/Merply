@@ -10,8 +10,8 @@
 
 
 #include <QWidget>
-#include <QPaintEvent>
-#include <QStyleOption>
+//#include "QPaintEvent"
+//#include <QStyleOption>
 class QScrollArea;
 
 class MainDisplay : public QWidget

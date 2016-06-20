@@ -15,12 +15,11 @@
 #include <QWidget>
 #include <QLabel>
 #include <QButtonGroup>
-#include <QDebug>
-#include <QPaintEvent>
+
+//#include <QPaintEvent>
 #include <QHBoxLayout>
-#include <QPaintEvent>
-#include <QStyleOption>
-#include <QPalette>
+//#include <QPaintEvent>
+
 #include <QTreeWidget>
 
 #include <QJsonDocument>
@@ -53,8 +52,8 @@ public:
 	void resizeEvent(QResizeEvent* event);
 
 public slots:
-	void mainNavPressed(QTreeWidgetItem* item, int column);
-	void subNavPressed(QTreeWidgetItem* item, int column);
+	void mainNavPressed(QTreeWidgetItem* item, int);
+	void subNavPressed(QTreeWidgetItem* item, int);
 	void btn_Clicked(QString btn);
 	void btn_ClickedDataReturned(QJsonDocument document);
 

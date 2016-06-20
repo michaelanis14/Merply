@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QFormLayout>
 #include <QPushButton>
+#include <QLineEdit>
 
 class LoginUI : public MainDisplay
 {

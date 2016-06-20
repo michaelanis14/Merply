@@ -6,6 +6,9 @@
 **************************************************************************/
 
 #include "timelineui.h"
+#include "QDebug"
+#include "QStyleOption"
+#include <QMouseEvent>
 
 timelineUI::timelineUI(QWidget *parent) :
 	QWidget(parent)

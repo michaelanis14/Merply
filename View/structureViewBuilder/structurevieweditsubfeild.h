@@ -9,6 +9,7 @@
 #include <QWidget>
 #include <QCheckBox>
 #include <QFormLayout>
+#include <QDateEdit>
 
 
 class StructureVieweditSubFeild : public QWidget
@@ -16,7 +17,7 @@ class StructureVieweditSubFeild : public QWidget
 	Q_OBJECT
 public:
 	explicit StructureVieweditSubFeild(QWidget *parent = 0);
-	void fillTypeFields(QString type, QJsonValue fieldVS, bool links);
+	void fillTypeFields(QString type, QJsonValue fieldVS, QStringList restrictedTypes);
 	QJsonObject save();
 	QFormLayout *layout;
 private:
@@ -26,12 +27,14 @@ private:
 	QCheckBox* Editable;
 	QLineEdit* defaultValue;
 	QLineEdit* title;
+	QDateEdit *date;
 	QString type;
 	QJsonValue fieldVS;
 	bool filled;
 	QWidget* preview;
 	QHBoxLayout* previewLayout;
-	bool links;
+	QStringList restrictedTypes;
+	QCheckBox* mandatory;
 	void paintEvent(QPaintEvent *event);
 signals:
 	void changed();

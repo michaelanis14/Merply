@@ -300,7 +300,7 @@ bool Database::query(QString query)
 	// Error checking omitted for brevity
 
 	// The command structure
-	lcb_CMDN1QL cmd = { 0 };
+	lcb_CMDN1QL cmd = {0,0,0,0,0,0,0};
 	// Allocate the parameter object
 	lcb_N1QLPARAMS *nparams = lcb_n1p_new();
 

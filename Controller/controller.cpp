@@ -117,35 +117,36 @@ void Controller::subNavPressed(QJsonObject view)
 {
 	//qDebug() << view;
 	if(AccessController::Get()->hasReadAccess(view))
-	if(view.value("Type").toString().contains("Entity") && !view.value("Card").toString().isEmpty()){
-		if(view.value("Select").toString().contains("Index")){
+		if(view.value("Type").toString().contains("Entity") && !view.value("Card").toString().isEmpty()){
+			if(view.value("Select").toString().contains("Index")){
 
-			QString card = view.value("Card").toString();
-			queryIndexView(card);
+				QString card = view.value("Card").toString();
+				queryIndexView(card);
 
-			}
-		else{
-			//QObject::connect(Database::Get(),SIGNAL(Database::Get()->gotDocument(QJsonDocument)),this,SLOT(subNavPressed(QJsonObject)));
+				}
+			else{
+				//QObject::connect(Database::Get(),SIGNAL(Database::Get()->gotDocument(QJsonDocument)),this,SLOT(subNavPressed(QJsonObject)));
 
-			//	Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
+				//	Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
 
 				QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedData(QList<QJsonDocument>)));
 				QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id = '"+view.value("Card").toString()+"'");
 				//qDebug()<<"Q : " << query;
 				Database::Get()->query(query);
 				}
-		}
-	else if(view.value("Type").toString().contains("Page")){
+			}
+		else {if(view.value("Type").toString().contains("Page")){
 
-		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedPageData(QList<QJsonDocument>)));
-		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id = '"+view.value("Card").toString()+"'");
-		//qDebug()<<"Q : " << query;
-		Database::Get()->query(query);
+				QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedPageData(QList<QJsonDocument>)));
+				QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id = '"+view.value("Card").toString()+"'");
+				//qDebug()<<"Q : " << query;
+				Database::Get()->query(query);
 
 
-		//qDebug() << view;
-		//
-		}
+				//qDebug() << view;
+				//
+				}
+			}
 	else IndexUI::ShowUI("ViewStructure::91",QList<QJsonDocument>());
 }
 
@@ -195,7 +196,7 @@ void Controller::subNavPressedIndexData(QList<QJsonDocument> documents)
 
 void Controller::subNavPressedPageData(QList<QJsonDocument> documents)
 {
-//	qDebug() << "pageee" << documents;
+	//	qDebug() << "pageee" << documents;
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedPageData(QList<QJsonDocument>)));
 	if(documents.count() > 0)
 		PageUI::ShowUI(documents.first().object());
@@ -513,7 +514,7 @@ bool Controller::saveNavigation()
 
 bool Controller::saveNavigationPages()
 {
-//	qDebug() << "SaveN";
+	//	qDebug() << "SaveN";
 	bool savedPages = true;
 	QMapIterator<double, QJsonObject > i(Model::Get()->getPages());
 	while (i.hasNext()) {

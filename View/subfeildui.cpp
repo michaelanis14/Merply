@@ -86,20 +86,29 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			lineEdit->setText(dataString);
 			}
 		else{
-		if(structureView.value("startNum") != QJsonValue::Undefined){
-			lineEdit->setText(QString::number(structureView.value("startNum").toInt()));
-			}
+			if(structureView.value("startNum") != QJsonValue::Undefined){
+				lineEdit->setText(QString::number(structureView.value("startNum").toInt()));
+				}
 
-		QStringList id = this->strID.split("ViewStructure::");
-		if(id.count() > 1){
-			QObject::connect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
-			Controller::Get()->getValue(id[1]);
-			}
+			QStringList id = this->strID.split("ViewStructure::");
+			if(id.count() > 1){
+				QObject::connect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
+				Controller::Get()->getValue(id[1]);
+				}
 			}
 		//lineEdit->setText(data.toString());
 		layout->addWidget(lineEdit);
 
 		}
+	else if(type.compare("Date") == 0){
+		QDateEdit *date = new QDateEdit(this);
+		if(data.toString().isEmpty())
+			date->setDate(QDate::currentDate());
+		else date->setDate(QDate::fromString(data.toString(),Qt::DefaultLocaleShortDate));
+		layout->addWidget(date);
+		field = date;
+		}
+
 
 }
 
@@ -132,7 +141,9 @@ QString SubFieldUI::save()
 		save +=((merplyTabelView*)field)->save("this->key");
 		//	save +=" ";
 		}
-
+	else if(QString(field->metaObject()->className()).compare("QDateEdit") == 0){
+		save +=((QDateEdit*)field)->date().toString(Qt::DefaultLocaleShortDate);
+		}
 
 	return save.trimmed();
 }
