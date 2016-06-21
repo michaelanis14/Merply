@@ -58,7 +58,8 @@ void RemoveBtn::removeAll()
 			}
 		}
 
-
+	this->setHidden(true);
+	this->setParent(0);
 }
 
 void RemoveBtn::remove()

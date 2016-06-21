@@ -43,13 +43,13 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 	widgetsLayout->addWidget(topCntrlsPreview);
 
 	//if(!links){
-		sctrlUI = new SettingsCtrlsUI();
-		sctrlUI->addbtn("Add",":/resources/icons/add.png","add");
-		QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(controller_Clicked(QString)));
-		//sctrlUI->setAutoFillBackground(true);
-		layout->addWidget(sctrlUI);
+	sctrlUI = new SettingsCtrlsUI();
+	sctrlUI->addbtn("Add",":/resources/icons/add.png","add");
+	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(controller_Clicked(QString)));
+	//sctrlUI->setAutoFillBackground(true);
+	layout->addWidget(sctrlUI);
 
-		//}
+	//}
 
 	preview = new QWidget(0);
 	preview->setContentsMargins(0,0,0,0);
@@ -83,6 +83,18 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 	//labelWidgetLayout->addWidget(label);
 	layout->addWidget(label,0,Qt::AlignTop);
 
+	arrayWidget = new QWidget(this);
+	arrayWidget->setContentsMargins(2,0,2,0);
+	arrayWidget->setObjectName("arrayWidget");
+	QHBoxLayout* arrayWidgetLayout = new QHBoxLayout(arrayWidget);
+	arrayWidgetLayout->setSpacing(0);
+	arrayWidgetLayout->setMargin(0);
+	layout->addWidget(arrayWidget);
+	QLabel * arraylbl = new QLabel(tr("Array"));
+	arrayWidgetLayout->addWidget(arraylbl,0,Qt::AlignTop);
+	array = new QCheckBox();
+	arrayWidgetLayout->addWidget(array,0,Qt::AlignTop);
+	//arrayWidgetLayout->addStretch(1);
 
 
 	typeFields = new QWidget(this);
@@ -121,14 +133,13 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 
 QJsonObject StructureViewEdit::save()
 {
-
 	QJsonObject saveObject;
 	saveObject.insert("Label",label->text());
+	saveObject.insert("ArrayList",array->isChecked());
 	QJsonArray subFields;
 	foreach(StructureVieweditSubFeild* svsf, sVSFs){
 		subFields.append(svsf->save());
 		}
-
 	saveObject.insert("SubFields",subFields);
 	return saveObject;
 }
@@ -157,11 +168,11 @@ void StructureViewEdit::fill(QJsonObject structureView)
 				sVSFs << svsf;
 				QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 
-					RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
-					QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
-					typeFieldsLayout->addWidget(rmvtbn,1,Qt::AlignLeft);
+				RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
+				QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
+				typeFieldsLayout->addWidget(rmvtbn,1,Qt::AlignLeft);
 
-				 //typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
+				//typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 				//typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 				}
 
@@ -194,6 +205,7 @@ bool StructureViewEdit::setHidden(bool hidden)
 
 	typeFields->setHidden(hidden);
 	label->setHidden(hidden);
+	arrayWidget->setHidden(hidden);
 	if(sctrlUI) sctrlUI->setHidden(hidden);
 
 	preview->setHidden(!hidden);
@@ -277,9 +289,9 @@ void StructureViewEdit::addField()
 	sVSFs << svsf;
 	QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 
-		RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
-		QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
-		typeFieldsLayout->addWidget(rmvtbn,1,Qt::AlignLeft);
+	RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
+	QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
+	typeFieldsLayout->addWidget(rmvtbn,1,Qt::AlignLeft);
 
 	//typeFieldsLayout->addWidget(svsf,1,Qt::AlignLeft);
 

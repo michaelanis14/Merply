@@ -1,6 +1,6 @@
 #include "feildui.h"
-
-
+#include "removebtn.h"
+#include "QPushButton"
 
 FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJsonObject data) : QWidget(parent)
 {
@@ -12,6 +12,7 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 	this->setContentsMargins(0,0,0,0);
 	this->layout->setSpacing(0);
 	this->strID = strID;
+	this->structureView = structureView;
 
 	if(structureView.value("Label") != QJsonValue::Undefined){
 		label = new QLabel(structureView.value("Label").toString());
@@ -19,29 +20,100 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 		}
 	layout->addWidget(label);
 
-	if(structureView.value("SubFields").isArray()){
-		int d = 0;
-		QJsonArray dataSubFields = data.value(structureView.value("Label").toString()).toArray();
-		foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
-			//qDebug() << dataSubFields.at(d);
-			SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),dataSubFields.at(d));
-			layout->addWidget(subfeild);
-			subFields << subfeild;
+	QWidget*fieldsWidget = new QWidget(this);
+	fieldsWidget->setContentsMargins(0,0,0,0);
+	fieldsWidget->setObjectName("fieldsWidget");
+	fieldsWidgetLayout = new QVBoxLayout(fieldsWidget);
+	fieldsWidgetLayout->setSpacing(0);
+	fieldsWidgetLayout->setMargin(0);
+	layout->addWidget(fieldsWidget);
 
-			d++;
+	//QLabel * arraylbl = new QLabel(tr("Array"));
+	//arrayWidgetLayout->addWidget(arraylbl,0,Qt::AlignTop);
+	//array = new QCheckBox();
+	//arrayWidgetLayout->addWidget(array,0,Qt::AlignTop);
+
+	if(structureView.value("SubFields").isArray()){
+		QWidget*subFieldsWidget = new QWidget(this);
+		subFieldsWidget->setContentsMargins(0,0,0,0);
+		subFieldsWidget->setObjectName("subFieldsWidget");
+		QHBoxLayout* subFieldsWidgetLayout = new QHBoxLayout(subFieldsWidget);
+		subFieldsWidgetLayout->setSpacing(0);
+		subFieldsWidgetLayout->setMargin(0);
+		fieldsWidgetLayout->addWidget(subFieldsWidget);
+
+		if(structureView.value("ArrayList") != QJsonValue::Undefined   && structureView.value("ArrayList").toBool()){
+			QJsonArray arrDataSubFields = data.value(structureView.value("Label").toString()).toArray();
+			int counter = 0;
+			foreach (QJsonValue field, arrDataSubFields) {
+				if(counter == 0){
+					int d = 0;
+					QJsonArray dataSubFields = field.toArray();
+					foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
+						SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),dataSubFields.at(d));
+						subFieldsWidgetLayout->addWidget(subfeild);
+						subFields << subfeild;
+						d++;
+						}
+					}
+				else
+					addsubFields(field.toArray());
+				counter++;
+				}
 			}
 
+		else{
+			int d = 0;
+			QJsonArray dataSubFields = data.value(structureView.value("Label").toString()).toArray();
+			foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
+				SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),dataSubFields.at(d));
+				subFieldsWidgetLayout->addWidget(subfeild);
+				subFields << subfeild;
+				d++;
+				}
+			}
+
+		}
+
+	if(structureView.value("ArrayList") != QJsonValue::Undefined   && structureView.value("ArrayList").toBool()){
+		QPushButton* arrybtn = new QPushButton(tr("+"));
+		QObject::connect(arrybtn,SIGNAL(clicked()),this,SLOT(addsubFields()));
+		layout->addWidget(arrybtn);
 		}
 }
 
 QJsonObject FeildUI::save()
 {
 	QJsonObject field;
-	QJsonArray subfieldsValues;
-	foreach(SubFieldUI* subfeild,subFields){
-		subfieldsValues.append(subfeild->save());
+
+	if(structureView.value("ArrayList") != QJsonValue::Undefined   && structureView.value("ArrayList").toBool()){
+		QJsonArray arrySubfieldsValues;
+
+		QJsonArray subfieldsValues;
+		foreach(SubFieldUI* subfeild,subFields){
+			subfieldsValues.append(subfeild->save());
+			}
+		arrySubfieldsValues.append(subfieldsValues);
+
+		foreach(QWidget*w,arrySubFields){
+			QJsonArray subfieldsValues;
+			for (int i = 0; i < w->layout()->count(); i++){
+				QWidget *widget = w->layout()->itemAt(i)->widget();
+				if(widget != NULL){
+					subfieldsValues.append(((SubFieldUI*)widget)->save());
+					}
+				}
+			arrySubfieldsValues.append(subfieldsValues);
+			}
+		field.insert(this->label->text(),arrySubfieldsValues);
 		}
-	field.insert(this->label->text(),subfieldsValues);
+	else{
+		QJsonArray subfieldsValues;
+		foreach(SubFieldUI* subfeild,subFields){
+			subfieldsValues.append(subfeild->save());
+			}
+		field.insert(this->label->text(),subfieldsValues);
+		}
 	return field;
 }
 
@@ -56,6 +128,31 @@ void FeildUI::btnRemovePressed()
 		child->deleteLater();  // TODO : check the stability of the app
 		this->deleteLater();
 		}
+}
+
+void FeildUI::addsubFields(QJsonArray arrDataSubFields)
+{
+	QWidget*subFieldsWidget = new QWidget();
+	subFieldsWidget->setContentsMargins(0,0,0,0);
+	subFieldsWidget->setObjectName("subFieldsWidget");
+	QHBoxLayout* subFieldsWidgetLayout = new QHBoxLayout(subFieldsWidget);
+	subFieldsWidgetLayout->setMargin(0);
+	int d = 0;
+	foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
+		SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),arrDataSubFields.at(d));
+		subFieldsWidgetLayout->addWidget(subfeild);
+		d++;
+		}
+	RemoveBtn* removArrybtn = new RemoveBtn(this,subFieldsWidget);
+	QObject::connect(removArrybtn,SIGNAL(remove(QWidget*)),this,SLOT(removsubFields(QWidget*)));
+	fieldsWidgetLayout->addWidget(removArrybtn);
+	arrySubFields << subFieldsWidget;
+
+}
+
+void FeildUI::removsubFields(QWidget* subField)
+{
+	arrySubFields.removeOne(subField);
 }
 void FeildUI::mousePressEvent(QMouseEvent *event){
 	QLabel *child=  static_cast<QLabel *>(childAt(event->pos()));

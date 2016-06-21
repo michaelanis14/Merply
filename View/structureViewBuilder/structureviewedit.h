@@ -35,7 +35,8 @@ private:
 	void clearTypeFields();
 	bool setHidden(bool hidden);
 	SettingsCtrlsUI* topCntrls;
-
+	QWidget* arrayWidget;
+	QCheckBox* array;
 signals:
 	void changed();
 protected:

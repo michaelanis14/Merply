@@ -134,7 +134,6 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		Source = new ERPComboBox(0);
 		//Source->setText(fieldVS.toObject().value("Source").toString());
 		layout->addRow(new QLabel(tr("Source ")), Source);
-
 		Select = new ERPComboBox(0);
 		//	Select->setText(fieldVS.toObject().value("Select").toString());
 		layout->addRow(new QLabel(tr("Select ")), Select);
@@ -142,10 +141,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	else if(type.compare("Table") == 0){
 		tableEdit = new StructureVieweditSubFeildTable(this,fieldVS.toObject());
 		QObject::connect(tableEdit,SIGNAL(tableChanged()),this,SIGNAL(changed()));
-
 		layout->addRow("Tabel",tableEdit);
-
-
 		}
 	else if(type.compare("Serial") == 0){
 		defaultValue = new QLineEdit(0);

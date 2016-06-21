@@ -134,6 +134,7 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 	loadStyle(); //sets the Style selectbox to trctView
 
 
+
 	SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
 	sctrlUI->addbtn("Add Field",":/resources/icons/add.png","add");
 	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(controller_Clicked(QString)));

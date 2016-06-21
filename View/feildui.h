@@ -19,8 +19,11 @@ private:
 	QLabel* btnRemove;
 	QHBoxLayout * layout;
 	QList<SubFieldUI*> subFields;
+	QList<QWidget* > arrySubFields;
 	QLabel * label;
 	QString strID;
+	QJsonObject structureView;
+	QVBoxLayout* fieldsWidgetLayout;
 signals:
 
 protected:
@@ -28,6 +31,8 @@ protected:
 
 public slots:
 	void btnRemovePressed();
+	void addsubFields(QJsonArray arrDataSubFields = QJsonArray());
+	void removsubFields(QWidget* subField);
 };
 
 #endif // FEILDUI_H
