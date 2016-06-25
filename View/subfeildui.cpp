@@ -9,6 +9,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 	//	qDebug() << "data" << data;
 	this->structureView = structureView;
 	layout = new QHBoxLayout(this);
+	this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
 	layout->setMargin(0);

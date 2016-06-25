@@ -4,7 +4,8 @@
 PageUI::PageUI(QWidget *parent, QJsonObject viewStructure) : MainDisplay(parent)
 {
 	this->setContentsMargins(0,0,0,0);
-	this->layout = new QVBoxLayout(this);
+	this->layout = new QVBoxLayout(formPanel);
+	this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	this->layout->setContentsMargins(0,0,0,0);
 	this->layout->setSpacing(0);
 	this->headerlbl = new HeaderLabel();

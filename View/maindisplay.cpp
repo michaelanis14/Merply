@@ -47,7 +47,7 @@ MainDisplay::MainDisplay(QWidget* parent) :
 //scrollAreaFormPanel->setGeometry(0,0,WINDOW_WIDTH - TIMELINE_WIDTH,WINDOW_HEIGHT - NAVIGATION_HEIGHT);
 
 	//formPanel = new QWidget(scrollAreaFormPanel);
-	formPanel = new QWidget();
+	formPanel = new QWidget(this);
 	//	formPanel->setFixedWidth();
 	formPanel->setContentsMargins(0,0,0,0);
 	formPanel->setObjectName("formPanel");

@@ -35,6 +35,14 @@ private:
 	QHBoxLayout* previewLayout;
 	QStringList restrictedTypes;
 	QCheckBox* mandatory;
+	QWidget*filterWidget;
+	ERPComboBox* filterOn;
+	QFormLayout* filterWidgetLayout;
+
+	QWidget*localFilterWidget;
+	ERPComboBox* localFilter;
+	ERPComboBox* entityFilter;
+	QFormLayout* localFilterWidgetLayout;
 	void paintEvent(QPaintEvent *event);
 signals:
 	void changed();
@@ -44,6 +52,7 @@ public slots:
 	void updateSelect(QString title);
 	void updateSelectData(QList<QString> fields);
 	void gotSourceData(QList<QJsonDocument> items);
+	void filterOnChanged(int index);
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILD_H

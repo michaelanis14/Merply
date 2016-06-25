@@ -18,6 +18,7 @@ private:
 	QVBoxLayout * layout;
 	QList<FeildUI*> feilds;
 	QString strID;
+
 };
 
 #endif // VIEWGROUP_H

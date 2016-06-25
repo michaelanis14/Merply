@@ -11,9 +11,10 @@ StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject struct
 	this->structureView = structureView;
 	this->restrictedTypes = restrictedTypes;
 	this->setContentsMargins(0,0,0,0);
-	QVBoxLayout* structureViewGroupsUILayout = new QVBoxLayout(this);
+	QVBoxLayout* structureViewGroupsUILayout = new QVBoxLayout(formPanel);
 	structureViewGroupsUILayout->setMargin(0);
 	structureViewGroupsUILayout->setSpacing(0);
+
 
 
 	QWidget* sVGUI = new QWidget(this);
@@ -29,7 +30,7 @@ StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject struct
 	layout = new QVBoxLayout(sVGUI);
 	layout->setSpacing(0);
 	layout->setMargin(2);
-
+	layout->setSizeConstraint(QLayout::SetMaximumSize);
 
 
 	headerlbl = new HeaderLabel();
@@ -168,6 +169,7 @@ void StructureViewGroupsUI::fill(QJsonObject structureView)
 
 			}
 		}
+	this->adjustSize();
 }
 
 StructureViewGroupsUI* StructureViewGroupsUI::GetUI()
@@ -231,6 +233,17 @@ void StructureViewGroupsUI::editControllerSavePressed()
 	else Controller::Get()->UpdateDoc(QJsonDocument(savedObj));
 
 	Controller::Get()->editControllerCancelPressed();
+}
+
+void StructureViewGroupsUI::getFeildsNames()
+{
+	QStringList feildNames;
+	foreach(StructureViewsEditUI* vg,sVSFUIs){
+		foreach (StructureViewEdit* feild, vg->sVSFs) {
+			feildNames << feild->label->text();
+			}
+		}
+	emit gotFieldsNames(feildNames);
 }
 
 void StructureViewGroupsUI::paintEvent(QPaintEvent * event)

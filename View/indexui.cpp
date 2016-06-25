@@ -6,7 +6,8 @@
 IndexUI::IndexUI(QWidget *parent) : MainDisplay(parent)
 {
 
-	layout = new QVBoxLayout(this);
+	layout = new QVBoxLayout(formPanel);
+	this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	layout->setContentsMargins(2,2,2,2);
 	layout->setSpacing(0);
 	this->setContentsMargins(2,2,2,2);

@@ -10,7 +10,8 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 {
 
 	this->setContentsMargins(0,0,0,0);
-	this->layout = new QVBoxLayout(this);
+	this->layout = new QVBoxLayout(formPanel);
+	this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	this->layout->setContentsMargins(0,0,0,0);
 	this->layout->setSpacing(0);
 	this->data = data;

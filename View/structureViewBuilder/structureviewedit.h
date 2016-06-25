@@ -19,11 +19,12 @@ public:
 	void showTypeFields();
 	void hideTypeFields();
 	SettingsCtrlsUI* topCntrlsPreview;
+		QLineEdit* label;
 private:
 	QHBoxLayout *layout;
 	//ERPComboBox* typeSelect;
 	QWidget* labelWidget;
-	QLineEdit* label;
+
 	QWidget* typeFields;
 	QHBoxLayout *typeFieldsLayout;
 	QList<StructureVieweditSubFeild *> sVSFs;
@@ -43,6 +44,7 @@ protected:
 	//void showEvent(QShowEvent *);
 	void paintEvent(QPaintEvent*event);
 	QStringList restrictedTypes;
+
 public slots:
 	void updatePreview(bool oldStrct = false);
 	void controller_Clicked(QString btn);

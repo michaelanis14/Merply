@@ -46,7 +46,7 @@ protected:
 
 signals:
 	void cancel();
-
+	void gotFieldsNames(QStringList names);
 public slots:
 	void btn_Clicked(QString btn);
 	void viewGroupStyleChanged();
@@ -54,6 +54,8 @@ public slots:
 	void removeViewgroup(QWidget* field);
 	void editControllerCancelPressed();
 	void editControllerSavePressed();
+	void getFeildsNames();
+
 
 protected:
 	void mousePressEvent(QMouseEvent *event);

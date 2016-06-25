@@ -39,6 +39,43 @@ StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(
 	//this->setStyleSheet();
 	layout->addRow(preview);
 
+
+	filterWidget = new QWidget(0);
+	filterWidget->setContentsMargins(0,0,0,0);
+	filterWidget->setObjectName("filterWidget");
+	filterWidgetLayout = new QFormLayout(filterWidget);
+	filterWidgetLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+	filterWidgetLayout->setLabelAlignment(Qt::AlignLeft);
+	filterWidgetLayout->setSpacing(0);
+	filterWidgetLayout->setMargin(0);
+
+	filterOn = new ERPComboBox(0);
+	filterWidgetLayout->addRow(new QLabel(tr("Filter on    ")), filterOn);
+	QStringList filterItems;
+	filterItems << "local";
+	filterOn->addItems(filterItems);
+	//fieldsWidgetLayout->addWidget(filterWidget);
+	QObject::connect(filterOn,SIGNAL(currentIndexChanged(int)),this,SLOT(filterOnChanged(int)));
+
+
+	localFilterWidget = new QWidget(0);
+	localFilterWidget->setAutoFillBackground(true);
+	localFilterWidget->setContentsMargins(0,0,0,0);
+	localFilterWidget->setObjectName("localFilterWidget");
+	localFilterWidgetLayout = new QFormLayout(localFilterWidget);
+	localFilterWidgetLayout->setAlignment(Qt::AlignLeft);
+	//localFilterWidgetLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+	localFilterWidgetLayout->setLabelAlignment(Qt::AlignLeft);
+	localFilterWidgetLayout->setSpacing(0);
+	localFilterWidgetLayout->setMargin(0);
+
+	localFilter = new ERPComboBox(0);
+	localFilterWidgetLayout->addRow(new QLabel(tr("Local Filter")), localFilter);
+	entityFilter = new ERPComboBox(0);
+	localFilterWidgetLayout->addRow(new QLabel(tr("Entity Filter")), entityFilter);
+	QObject::connect(localFilter,SIGNAL(currentIndexChanged(int)),this,SLOT(filterOnChanged(int)));
+
+	filterWidgetLayout->addRow(localFilterWidget);
 }
 
 
@@ -111,6 +148,11 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		Editable = new QCheckBox(0);
 		Editable->setChecked(fieldVS.toObject().value("Editable").toString().compare("true") ==0);
 		layout->addRow(new QLabel(tr("Editable ")), Editable);
+
+
+		//layout->addWidget(filterWidget);
+		layout->addRow(filterWidget);
+
 
 		QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
 		QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
@@ -245,6 +287,15 @@ void StructureVieweditSubFeild::gotSourceData(QList<QJsonDocument> items)
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
 	Source->clear();
 	Source->addJsonItems(items);
+}
+
+void StructureVieweditSubFeild::filterOnChanged(int index)
+{
+	if(!filterWidget->isHidden()){
+		if(index == 0){
+			localFilterWidget->setHidden(false);
+			}
+		}
 }
 
 void StructureVieweditSubFeild::paintEvent(QPaintEvent * event)

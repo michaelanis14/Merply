@@ -16,9 +16,11 @@ public:
 	QCheckBox* joinCheck;
 	SettingsCtrlsUI* topCntrlsPreview;
 	void loadGroup();
+
+	QList<StructureViewEdit *> sVSFs;
 private:
 	QVBoxLayout *layout;
-	QList<StructureViewEdit *> sVSFs;
+
 	QJsonObject structureView;
 	QWidget* groupSelect;
 	QWidget* joinGroup ;

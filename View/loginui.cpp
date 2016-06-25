@@ -5,7 +5,8 @@
 LoginUI::LoginUI(QWidget *parent) : MainDisplay(parent)
 {
 	//this->setContentsMargins(0,0,0,0);
-	this->layout = new QFormLayout(this);
+	this->layout = new QFormLayout(formPanel);
+	this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	//this->layout->setContentsMargins(0,0,0,0);
 	//layout->setAlignment(Qt::AlignVCenter);
 	layout->setAlignment(Qt::AlignHCenter);

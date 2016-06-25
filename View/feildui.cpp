@@ -16,7 +16,6 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 
 	if(structureView.value("Label") != QJsonValue::Undefined){
 		label = new QLabel(structureView.value("Label").toString());
-		//qDebug() << structureView.value("Label").toString();
 		}
 	layout->addWidget(label);
 
@@ -28,10 +27,6 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 	fieldsWidgetLayout->setMargin(0);
 	layout->addWidget(fieldsWidget);
 
-	//QLabel * arraylbl = new QLabel(tr("Array"));
-	//arrayWidgetLayout->addWidget(arraylbl,0,Qt::AlignTop);
-	//array = new QCheckBox();
-	//arrayWidgetLayout->addWidget(array,0,Qt::AlignTop);
 
 	if(structureView.value("SubFields").isArray()){
 		QWidget*subFieldsWidget = new QWidget(this);
