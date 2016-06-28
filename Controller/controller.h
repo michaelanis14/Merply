@@ -73,7 +73,7 @@ public:
 	void queryIndexView(QString vStrctKey);
 
 	void editControllerCancelPressed();
-
+	SubFieldUI* getFirstSubField(QString feildName);
 	//Model Interface
 	//Navigation
 	void addSubNavigation(double key, QList<QTreeWidgetItem*> subNav);

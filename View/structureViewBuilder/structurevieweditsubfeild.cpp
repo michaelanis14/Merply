@@ -1,5 +1,6 @@
 
 
+#include "structureviewgroupsui.h"
 #include "structurevieweditsubfeild.h"
 #include "structureviewedit.h"
 #include "controller.h"
@@ -40,42 +41,7 @@ StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(
 	layout->addRow(preview);
 
 
-	filterWidget = new QWidget(0);
-	filterWidget->setContentsMargins(0,0,0,0);
-	filterWidget->setObjectName("filterWidget");
-	filterWidgetLayout = new QFormLayout(filterWidget);
-	filterWidgetLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
-	filterWidgetLayout->setLabelAlignment(Qt::AlignLeft);
-	filterWidgetLayout->setSpacing(0);
-	filterWidgetLayout->setMargin(0);
 
-	filterOn = new ERPComboBox(0);
-	filterWidgetLayout->addRow(new QLabel(tr("Filter on    ")), filterOn);
-	QStringList filterItems;
-	filterItems << "local";
-	filterOn->addItems(filterItems);
-	//fieldsWidgetLayout->addWidget(filterWidget);
-	QObject::connect(filterOn,SIGNAL(currentIndexChanged(int)),this,SLOT(filterOnChanged(int)));
-
-
-	localFilterWidget = new QWidget(0);
-	localFilterWidget->setAutoFillBackground(true);
-	localFilterWidget->setContentsMargins(0,0,0,0);
-	localFilterWidget->setObjectName("localFilterWidget");
-	localFilterWidgetLayout = new QFormLayout(localFilterWidget);
-	localFilterWidgetLayout->setAlignment(Qt::AlignLeft);
-	//localFilterWidgetLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
-	localFilterWidgetLayout->setLabelAlignment(Qt::AlignLeft);
-	localFilterWidgetLayout->setSpacing(0);
-	localFilterWidgetLayout->setMargin(0);
-
-	localFilter = new ERPComboBox(0);
-	localFilterWidgetLayout->addRow(new QLabel(tr("Local Filter")), localFilter);
-	entityFilter = new ERPComboBox(0);
-	localFilterWidgetLayout->addRow(new QLabel(tr("Entity Filter")), entityFilter);
-	QObject::connect(localFilter,SIGNAL(currentIndexChanged(int)),this,SLOT(filterOnChanged(int)));
-
-	filterWidgetLayout->addRow(localFilterWidget);
 }
 
 
@@ -150,8 +116,8 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		layout->addRow(new QLabel(tr("Editable ")), Editable);
 
 
-		//layout->addWidget(filterWidget);
-		layout->addRow(filterWidget);
+		initFilterWidget();
+
 
 
 		QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
@@ -193,7 +159,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	else if(type.compare("Date") == 0){
 		date = new QDateEdit(this);
 		date->setDate(QDate::fromString(fieldVS.toObject().value("date").toString(),"dd-MMM-yyyy"));
-		layout->addRow("Date", defaultValue);
+		layout->addRow("Date", date);
 		}
 
 	mandatory = new QCheckBox(this);
@@ -209,7 +175,7 @@ QJsonObject StructureVieweditSubFeild::save()
 		{
 		//qDebug() << this->type << filled << Link;
 		saveObject.insert("Type",type);
-
+		saveObject.insert("Mandatory",mandatory->isChecked());
 		if(type.compare("Link") == 0){
 			saveObject.insert("Select",Select->currentText());
 			saveObject.insert("Source",Source->currentText());
@@ -220,7 +186,11 @@ QJsonObject StructureVieweditSubFeild::save()
 			saveObject.insert("Select",Select->currentText());
 			saveObject.insert("Source",Source->currentText());
 			saveObject.insert("Editable",Editable->isChecked());
-
+			if(filterOn->currentIndex() == 1){
+				saveObject.insert("LocalFilter",true);
+				saveObject.insert("Local",localFilter->currentText());
+				saveObject.insert("Entity",entityFilter->currentText());
+				}
 			}
 		else if(type.compare("Text") == 0){
 			if(!defaultValue->text().isEmpty())
@@ -250,6 +220,48 @@ QJsonObject StructureVieweditSubFeild::save()
 	return saveObject;
 }
 
+void StructureVieweditSubFeild::initFilterWidget()
+{
+	filterWidget = new QWidget(0);
+	filterWidget->setContentsMargins(0,0,0,0);
+	filterWidget->setObjectName("filterWidget");
+	filterWidgetLayout = new QFormLayout(filterWidget);
+	filterWidgetLayout->setFormAlignment(Qt::AlignLeft);
+	filterWidgetLayout->setLabelAlignment(Qt::AlignLeft);
+	filterWidgetLayout->setSpacing(0);
+	filterWidgetLayout->setMargin(0);
+
+	filterOn = new ERPComboBox(filterWidget);
+	filterWidgetLayout->addRow(new QLabel(tr("Filter on    ")), filterOn);
+	QStringList filterItems;
+	filterItems <<tr("none")<< tr("local match") << tr("Other");
+	filterOn->addItems(filterItems);
+	//fieldsWidgetLayout->addWidget(filterWidget);
+	QObject::connect(filterOn,SIGNAL(currentIndexChanged(int)),this,SLOT(filterOnChanged(int)));
+
+
+	localFilterWidget = new QWidget(0);
+	localFilterWidget->setAutoFillBackground(true);
+	localFilterWidget->setContentsMargins(0,0,0,0);
+	localFilterWidget->setObjectName("localFilterWidget");
+	localFilterWidgetLayout = new QFormLayout(localFilterWidget);
+	localFilterWidgetLayout->setAlignment(Qt::AlignLeft);
+	//localFilterWidgetLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+	localFilterWidgetLayout->setLabelAlignment(Qt::AlignLeft);
+	localFilterWidgetLayout->setSpacing(0);
+	localFilterWidgetLayout->setMargin(0);
+
+	localFilter = new ERPComboBox(0);
+	localFilterWidgetLayout->addRow(new QLabel(tr("Local Filter")), localFilter);
+	entityFilter = new ERPComboBox(0);
+	localFilterWidgetLayout->addRow(new QLabel(tr("Entity Filter")), entityFilter);
+	//QObject::connect(localFilter,SIGNAL(currentIndexChanged(int)),this,SLOT(filterOnChanged(int)));
+	localFilterWidget->setHidden(true);
+	filterWidgetLayout->addRow(localFilterWidget);
+
+	layout->addRow(filterWidget);
+}
+
 void StructureVieweditSubFeild::updateFields(QString type)
 {
 	QList<QWidget *> Widgets = this->findChildren<QWidget *>();
@@ -267,10 +279,10 @@ void StructureVieweditSubFeild::updateFields(QString type)
 	emit changed();
 }
 
-void StructureVieweditSubFeild::updateSelect(QString title)
+void StructureVieweditSubFeild::updateSelect(QString)
 {
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
-	Controller::Get()->getFields(title);
+	Controller::Get()->getFields(Source->getKey());
 
 
 }
@@ -291,12 +303,34 @@ void StructureVieweditSubFeild::gotSourceData(QList<QJsonDocument> items)
 
 void StructureVieweditSubFeild::filterOnChanged(int index)
 {
-	if(!filterWidget->isHidden()){
+	if(filterWidget){
 		if(index == 0){
+			localFilterWidget->setHidden(true);
+			}
+		else if(index == 1){
+			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilter(QStringList)));
+			StructureViewGroupsUI::GetUI()->getFeildsNames();
+			entityFilter->addItems(Select->getItemsText());
+			entityFilter->adjustSize();
 			localFilterWidget->setHidden(false);
+			}
+		else if(index == 2){
+			localFilterWidget->setHidden(true);
 			}
 		}
 }
+
+void StructureVieweditSubFeild::fillLocalFilter(QStringList feilds)
+{
+	QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilter(QStringList)));
+
+	if(localFilterWidget){
+		localFilter->clear();
+		localFilter->addItems(feilds);
+		}
+}
+
+
 
 void StructureVieweditSubFeild::paintEvent(QPaintEvent * event)
 {

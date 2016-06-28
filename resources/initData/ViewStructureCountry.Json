@@ -1,0 +1,83 @@
+{
+  "Title": "Country",
+  "Type": "Entity",
+  "Viewgroups": [
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "ArrayList": false,
+            "Label": "Code",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Name",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Currency",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Capital",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Continent",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "ContinentCode",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Languages",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          }
+        ],
+        "Style": "vertical"
+      }
+    }
+  ]
+}

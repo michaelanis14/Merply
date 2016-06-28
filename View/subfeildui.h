@@ -35,6 +35,7 @@ public slots:
 		void linkPressed();
 		void refrenceData(QList<QJsonDocument> items);
 		void serialData(QString serial);
+		void updateFilter(QString filter);
 };
 
 #endif // SUBFIELDUI_H

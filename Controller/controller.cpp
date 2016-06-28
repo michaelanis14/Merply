@@ -82,8 +82,8 @@ void Controller::showDisplay()
 	//	navigationUI::Get()->setCurrentIndex(1);
 	//	navigationUI::Get()->setParent(MainWindow::GetMainDisplay());
 
-	//Prsistance::init();
-
+	//
+	Prsistance::init();
 	//QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
 	//Database::Get()->getDoc("ViewStructure::5");
 
@@ -152,11 +152,12 @@ void Controller::subNavPressed(QJsonObject view)
 
 void Controller::queryIndexView(QString vStrctKey)
 {
+	indexDocument_id = vStrctKey;
 	QString card = vStrctKey.replace("ViewStructure::","");
 	card.append("::%");
 	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
 	//qDebug()<<"Q : " << query;
-	indexDocument_id = vStrctKey;
+
 
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedIndexData(QList<QJsonDocument>)));
 	Database::Get()->query(query);
@@ -168,6 +169,17 @@ void Controller::editControllerCancelPressed()
 	navigationUI::Get()->setParent(MainForm::Get());
 	QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(editControllerCancelDataPressed(QJsonDocument)));
 	Controller::Get()->getDoc("NavigationUI::1");
+}
+
+SubFieldUI*Controller::getFirstSubField(QString feildName)
+{
+	foreach (ViewGroup* vg, ViewGroups::Get()->viewgroups)
+		foreach(FeildUI* feild, vg->feilds){
+			if(feild && feild->label->text().compare(feildName) == 0){
+				return feild->subFields.first();
+				}
+			}
+	return new SubFieldUI();
 }
 
 void Controller::editControllerCancelDataPressed(QJsonDocument document)
@@ -323,7 +335,7 @@ QList<QJsonDocument> Controller::getEnities()
 void Controller::getFields(QString Title)
 {
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getFieldsData(QList<QJsonDocument>)));
-	Database::Get()->query("SELECT array_star(default.Viewgroups[*].Viewgroup).Fields FROM  `default` WHERE META(`default`).id = 'ViewStructure::"+Title+"'");
+	Database::Get()->query("SELECT array_star(default.Viewgroups[*].Viewgroup).Fields FROM  `default` WHERE META(`default`).id = '"+Title+"'");
 }
 
 void Controller::getFieldsData(QList<QJsonDocument> documents)

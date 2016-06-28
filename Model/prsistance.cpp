@@ -1,7 +1,7 @@
 #include "prsistance.h"
 
-
-
+#include<QFile>
+#include<QMessageBox>
 
 Prsistance::Prsistance(QObject *parent) : QObject(parent)
 {
@@ -142,6 +142,8 @@ QJsonArray Prsistance::table(QString line)
 
 bool Prsistance::init()
 {
+	qDebug() <<"Init" << Count("Country");
+	/*
 	if(Count("ContactType") == -1){
 		write("ContactType",QString("Name->Customer"));
 		write("ContactType",QString("Name->Supplier"));
@@ -149,16 +151,98 @@ bool Prsistance::init()
 		write("ContactType",QString("Name->Employee"));
 		write("ContactType",QString("Name->Other"));
 		}
+*/
+	if(Count("Country") <=  0){
+		QString jsonFile = initCountries();
+		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		foreach(QJsonValue country,doc.object().value("countries").toObject().value("country").toArray()){
+			//QJsonObject c;
+			QJsonArray arryObj;
 
-	if(Count("Country") == -1){
-		QList<QString> countries;
-		countries <<"Afghanistan"<<"Albania"<<"Algeria"<<"American Samoa"<<"Andorra"<<"Angola"<<"Anguilla"<<"Antigua"<<"Argentina"<<"Armenia"<<"Aruba"<<"Australia"<<"Austria"<<"Azerbaijan"<<"Bahamas"<<"Bahrain"<<"Bangladesh"<<"Barbados"<<"Belarus"<<"Belgium"<<"Belize"<<"Benin"<<"Bermuda"<<"Bhutan"<<"Bolivia"<<"Bosnia-Herzegovina"<<"Botswana"<<"Bouvet Island"<<"Brazil"<<"Brunei"<<"Bulgaria"<<"Burkina Faso"<<"Burundi"<<"Cambodia"<<"Cameroon"<<"Canada"<<"Cape Verde"<<"Cayman Islands"<<"Central African Republic"<<"Chad"<<"Chile"<<"China"<<"Christmas Island"<<"Cocos Islands"<<"Colombia"<<"Comoros"<<"Congo"<< "Democratic Republic of the (Zaire)"<<"Congo<< Republic of"<<"Cook Islands"<<"Costa Rica"<<"Croatia"<<"Cuba"<<"Cyprus"<<"Czech Republic"<<"Denmark"<<"Djibouti"<<"Dominica"<<"Dominican Republic"<<"Ecuador"<<"Egypt"<<"El Salvador"<<"Equatorial Guinea"<<"Eritrea"<<"Estonia"<<"Ethiopia"<<"Falkland Islands"<<"Faroe Islands"<<"Fiji"<<"Finland"<<"France"<<"French Guiana"<<"Gabon"<<"Gambia"<<"Georgia"<<"Germany"<<"Ghana"<<"Gibraltar"<<"Greece"<<"Greenland"<<"Grenada"<<"Guadeloupe (French)"<<"Guam (USA)"<<"Guatemala"<<"Guinea"<<"Guinea Bissau"<<"Guyana"<<"Haiti"<<"Holy See"<<"Honduras"<<"Hong Kong"<<"Hungary"<<"Iceland"<<"India"<<"Indonesia"<<"Iran"<<"Iraq"<<"Ireland"<<"Israel"<<"Italy"<<"Ivory Coast (Cote D`Ivoire)"<<"Jamaica"<<"Japan"<<"Jordan"<<"Kazakhstan"<<"Kenya"<<"Kiribati"<<"Kuwait"<<"Kyrgyzstan"<<"Laos"<<"Latvia"<<"Lebanon"<<"Lesotho"<<"Liberia"<<"Libya"<<"Liechtenstein"<<"Lithuania"<<"Luxembourg"<<"Macau"<<"Macedonia"<<"Madagascar"<<"Malawi"<<"Malaysia"<<"Maldives"<<"Mali"<<"Malta"<<"Marshall Islands"<<"Martinique (French)"<<"Mauritania"<<"Mauritius"<<"Mayotte"<<"Mexico"<<"Micronesia"<<"Moldova"<<"Monaco"<<"Mongolia"<<"Montenegro"<<"Montserrat"<<"Morocco"<<"Mozambique"<<"Myanmar"<<"Namibia"<<"Nauru"<<"Nepal"<<"Netherlands"<<"Netherlands Antilles"<<"New Caledonia (French)"<<"New Zealand"<<"Nicaragua"<<"Niger"<<"Nigeria"<<"Niue"<<"Norfolk Island"<<"North Korea"<<"Northern Mariana Islands"<<"Norway"<<"Oman"<<"Pakistan"<<"Palau"<<"Palestine"<<"Panama"<<"Papua New Guinea"<<"Paraguay"<<"Peru"<<"Philippines"<<"Pitcairn Island"<<"Poland"<<"Polynesia (French)"<<"Portugal"<<"Puerto Rico"<<"Qatar"<<"Reunion"<<"Romania"<<"Russia"<<"Rwanda"<<"Saint Helena"<<"Saint Kitts and Nevis"<<"Saint Lucia"<<"Saint Pierre and Miquelon"<<"Saint Vincent and Grenadines"<<"Samoa"<<"San Marino"<<"Sao Tome and Principe"<<"Saudi Arabia"<<"Senegal"<<"Serbia"<<"Seychelles"<<"Sierra Leone"<<"Singapore"<<"Slovakia"<<"Slovenia"<<"Solomon Islands"<<"Somalia"<<"South Africa"<<"South Georgia and South Sandwich Islands"<<"South Korea"<<"South Sudan"<<"Spain"<<"Sri Lanka"<<"Sudan"<<"Suriname"<<"Svalbard and Jan Mayen Islands"<<"Swaziland"<<"Sweden"<<"Switzerland"<<"Syria"<<"Taiwan"<<"Tajikistan"<<"Tanzania"<<"Thailand"<<"Timor-Leste (East Timor)"<<"Togo"<<"Tokelau"<<"Tonga"<<"Trinidad and Tobago"<<"Tunisia"<<"Turkey"<<"Turkmenistan"<<"Turks and Caicos Islands"<<"Tuvalu"<<"Uganda"<<"Ukraine"<<"United Arab Emirates"<<"United Kingdom"<<"United States"<<"Uruguay"<<"Uzbekistan"<<"Vanuatu"<<"Venezuela"<<"Vietnam"<<"Virgin Islands"<<"Wallis and Futuna Islands"<<"Yemen"<<"Zambia"<<"Zimbabwe";
-		for(int i = 0;i < countries.count(); i++){
-			write("Country",QString("Name:"+countries.at(i).trimmed()));
+			if(country.toObject().value("countryCode") != QJsonValue::Undefined){
+				QJsonObject c;
+				c.insert("Code",QJsonArray() <<country.toObject().value("countryCode").toString());
+				arryObj << c;
+				}
+			if(country.toObject().value("continentName") != QJsonValue::Undefined){
+				QJsonObject c;
+				c.insert("Name",QJsonArray() <<country.toObject().value("countryName").toString());
+				arryObj << c;
+				}
+			if(country.toObject().value("currencyCode") != QJsonValue::Undefined){
+				QJsonObject c;
+				c.insert("Currency",QJsonArray() <<country.toObject().value("currencyCode").toString());
+				arryObj << c;
+				}
+			if(country.toObject().value("capital") != QJsonValue::Undefined){
+				QJsonObject c;
+				c.insert("Capital",QJsonArray() <<country.toObject().value("capital").toString());
+				arryObj << c;
+				}
+			if(country.toObject().value("continentName") != QJsonValue::Undefined){
+				QJsonObject c;
+				c.insert("Continent",QJsonArray() <<country.toObject().value("continentName").toString());
+				arryObj << c;
+				}
+			if(country.toObject().value("continent") != QJsonValue::Undefined){
+				QJsonObject c;
+				c.insert("ContinentCode",QJsonArray() <<country.toObject().value("continent").toString());
+				arryObj << c;
+				}
+			if(country.toObject().value("languages") != QJsonValue::Undefined){
+				QJsonObject c;
+				c.insert("Languages",QJsonArray() <<country.toObject().value("languages").toString());
+				arryObj << c;
+				}
+			if(!arryObj.isEmpty()){
+				QJsonObject fieldsArry;
+				fieldsArry.insert("Fields",QJsonArray() << arryObj);
+				Database::Get()->storeDoc("Country",QJsonDocument(fieldsArry));
+				}
 			}
 		}
 	//if()
 	return true;
+}
+
+QString Prsistance::initCountries()
+{
+	QString jsonFile;
+	QFile file(":/initData/initData/Countries.Json");
+	if(!file.open(QIODevice::ReadOnly)) {
+		qDebug() <<"error @ persistance 169" << file.errorString();
+		}
+
+	QTextStream in(&file);
+
+	while(!in.atEnd()) {
+		QString line = in.readLine();
+		jsonFile.append(line);
+		}
+
+	file.close();
+
+	return jsonFile;
+}
+
+QString Prsistance::initCities()
+{
+	QString jsonFile;
+	QFile file(":/initData/initData/countriesToCities.json");
+	if(!file.open(QIODevice::ReadOnly)) {
+		qDebug() <<"error @ persistance 233" << file.errorString();
+		}
+
+	QTextStream in(&file);
+
+	while(!in.atEnd()) {
+		QString line = in.readLine();
+		jsonFile.append(line);
+		}
+
+	file.close();
+
+	return jsonFile;
 }
 
 
@@ -201,7 +285,7 @@ int Prsistance::Count(const QString table)
 			return Database::Get()->getArray().first().object().value("count").toInt();
 			}
 		else{
-		//	qDebug() <<"-1";
+			//	qDebug() <<"-1";
 			return -1;
 			}
 		}

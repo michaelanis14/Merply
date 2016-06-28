@@ -24,10 +24,17 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			combox->setEditable(false);
 		layout->addWidget(combox);
 		field = combox;
+		if(structureView.value("LocalFilter") != QJsonValue::Undefined && structureView.value("LocalFilter").toBool()){
+			//View
+			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(structureView.value("Local").toString());
+			if(localFilter->combox)
+			QObject::connect(localFilter->combox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateFilter(QString)));
 
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
-		Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString());
-
+			}
+		else{
+			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+			Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString());
+			}
 		//qDebug() << structureView.value("Source").toString() << structureView.value("Select").toString();
 		}
 	else if(type.compare("Text") == 0){
@@ -180,4 +187,12 @@ void SubFieldUI::serialData(QString serial)
 		if(serialized > i)
 			((QLineEdit*)field)->setText(QString::number(serialized));
 		}
+}
+
+void SubFieldUI::updateFilter(QString filter)
+{
+	qDebug() <<"filter" << filter;
+	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+	Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Entity").toString()+"=="+filter);
+
 }

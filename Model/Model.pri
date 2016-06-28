@@ -4,8 +4,7 @@ HEADERS += \
     Model/model.h \
     $$PWD/database.h \
     $$PWD/prsistance.h \
-    $$PWD/user.h \
-    $$PWD/cities.h
+    $$PWD/user.h
 
 SOURCES += \
     Model/model.cpp \

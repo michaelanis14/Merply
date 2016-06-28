@@ -63,7 +63,7 @@ void CreateEditUI::fill(QJsonObject viewStructure, QJsonObject data)
 	this->data = data;
 
 
-	viewGroups = new ViewGroups(0,this->viewStructure,data) ;
+	viewGroups = ViewGroups::Create(this->viewStructure,data) ;
 	createEditWidgetLayout->addWidget(viewGroups);
 	this->cas = data.value("cas_value").toString();
 	//this->layout->addWidget(createEditWidget);

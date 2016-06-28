@@ -15,4 +15,10 @@
         <file>arrow-up.png</file>
         <file>arrow-down.png</file>
     </qresource>
+    <qresource prefix="/"/>
+    <qresource prefix="/initData">
+        <file>initData/Countries.Json</file>
+        <file>initData/ViewStructureCountry.Json</file>
+        <file>initData/countriesToCities.json</file>
+    </qresource>
 </RCC>

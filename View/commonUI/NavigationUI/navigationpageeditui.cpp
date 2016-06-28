@@ -315,6 +315,8 @@ void NavigationPageEditUI::newCardToggled(bool state)
 		//QObject::connect(this, SIGNAL(editControllerSavePressed()), newCardStructure, SLOT(editControllerSavePressed()));
 
 		newCardDetails->setHidden(false);
+		qDebug() << "newCard" ;
+		newCardDetails->layout()->itemAt(0)->widget()->setHidden(false);
 		headerlbl->setEnabled(true);
 		headerlbl->setTitle("New Card");
 		viewBox->setHidden(false);
@@ -403,7 +405,7 @@ void NavigationPageEditUI::updateNewCardPreview()
 	if(newCard->isChecked()){
 		//qDebug() << "newCard";
 		clearPreview();
-		ViewGroups* vg = new ViewGroups(0,newCardStructure->save());
+		ViewGroups* vg = ViewGroups::Create(newCardStructure->save(),QJsonObject());
 		previewLayout->addWidget(vg);
 		}
 }
@@ -439,7 +441,7 @@ void NavigationPageEditUI::loadCard(QJsonDocument document)
 {
 	//	qDebug() << "Reploaded" << preview->isHidden() << document.object();
 	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadCard(QJsonDocument)));
-	previewLayout->addWidget(new ViewGroups(0,document.object()));
+	previewLayout->addWidget(ViewGroups::Create(document.object(),QJsonObject()));
 }
 
 

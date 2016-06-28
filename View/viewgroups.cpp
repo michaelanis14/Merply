@@ -57,6 +57,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 
 }
 
+
 QJsonObject ViewGroups::save()
 {
 	QJsonObject entity;
@@ -68,6 +69,16 @@ QJsonObject ViewGroups::save()
 	//entity.insert("Title",this->structureView.value("Title"))
 	//qDebug() << entity;
 	return (entity);
+}
+ViewGroups* ViewGroups::p_instance = 0;
+ViewGroups*ViewGroups::Create(QJsonObject structureView, QJsonObject data)
+{
+	return p_instance = new ViewGroups(0,structureView, data);
+}
+
+ViewGroups*ViewGroups::Get()
+{
+	return p_instance;
 }
 void ViewGroups::paintEvent(QPaintEvent *)
 {

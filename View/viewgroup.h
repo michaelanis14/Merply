@@ -13,10 +13,11 @@ public:
 	explicit ViewGroup(QWidget *parent = 0,QString strID = ""
 			,QJsonObject structureView = QJsonObject(),QJsonArray data = QJsonArray());
 	QJsonArray save();
+
+	QList<FeildUI*> feilds;
 private:
 	QJsonObject structureView;
 	QVBoxLayout * layout;
-	QList<FeildUI*> feilds;
 	QString strID;
 
 };

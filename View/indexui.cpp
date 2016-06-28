@@ -83,5 +83,5 @@ void IndexUI::fill(const QString document_id,const QList<QJsonDocument> items)
 void IndexUI::createNew()
 {
 
-	Controller::Get()->showCreateEditeStrUI("ViewStructure::"+this->document_id.split("::")[0]);
+	Controller::Get()->showCreateEditeStrUI(this->document_id);
 }

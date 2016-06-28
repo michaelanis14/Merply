@@ -1,0 +1,33 @@
+{
+  "Title": "City",
+  "Type": "Entity",
+  "Viewgroups": [
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "ArrayList": false,
+            "Label": "Country",
+            "SubFields": [
+              {
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": true,
+            "Label": "Cities",
+            "SubFields": [
+              {
+                "Type": "Text"
+              }
+            ]
+          }
+        ],
+        "Style": "vertical"
+      }
+    }
+  ],
+  "cas_value": "360416375713498112",
+  "document_id": "ViewStructure::Cities"
+}

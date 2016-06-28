@@ -14,13 +14,12 @@ public:
 			, QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject());
 //	void clear();
 	QJsonObject save();
-
+	QLabel * label;
+	QList<SubFieldUI*> subFields;
 private:
 	QLabel* btnRemove;
 	QHBoxLayout * layout;
-	QList<SubFieldUI*> subFields;
 	QList<QWidget* > arrySubFields;
-	QLabel * label;
 	QString strID;
 	QJsonObject structureView;
 	QVBoxLayout* fieldsWidgetLayout;

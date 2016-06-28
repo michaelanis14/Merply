@@ -38,7 +38,11 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 		fieldsWidgetLayout->addWidget(subFieldsWidget);
 
 		if(structureView.value("ArrayList") != QJsonValue::Undefined   && structureView.value("ArrayList").toBool()){
+
 			QJsonArray arrDataSubFields = data.value(structureView.value("Label").toString()).toArray();
+			if(arrDataSubFields.isEmpty())
+				goto emptyData;
+
 			int counter = 0;
 			foreach (QJsonValue field, arrDataSubFields) {
 				if(counter == 0){
@@ -51,13 +55,15 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 						d++;
 						}
 					}
-				else
+				else{
 					addsubFields(field.toArray());
+					}
 				counter++;
 				}
 			}
 
 		else{
+emptyData:
 			int d = 0;
 			QJsonArray dataSubFields = data.value(structureView.value("Label").toString()).toArray();
 			foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
