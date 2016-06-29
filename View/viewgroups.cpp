@@ -73,11 +73,14 @@ QJsonObject ViewGroups::save()
 ViewGroups* ViewGroups::p_instance = 0;
 ViewGroups*ViewGroups::Create(QJsonObject structureView, QJsonObject data)
 {
+	qDebug() << "Create";
 	return p_instance = new ViewGroups(0,structureView, data);
 }
 
 ViewGroups*ViewGroups::Get()
 {
+	if(p_instance == 0)
+		p_instance = new ViewGroups;
 	return p_instance;
 }
 void ViewGroups::paintEvent(QPaintEvent *)

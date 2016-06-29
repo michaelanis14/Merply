@@ -14,13 +14,14 @@ class StructureViewGroupsUI : public MainDisplay
 {
 	Q_OBJECT
 public:
-	explicit StructureViewGroupsUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject(), QStringList restrictedTypes = QStringList());
+	explicit StructureViewGroupsUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject(), QStringList restrictedTypes = QStringList(),bool scroll = false);
 	static void ShowUI(QJsonObject structureView);
 	void fill(QJsonObject structureView);
 	static StructureViewGroupsUI* GetUI();
 	QJsonObject save();
 	HeaderLabel* headerlbl;
 	SettingsCtrlsUI* sctrlUI;
+	QVBoxLayout* structureViewGroupsUILayout;
 private:
 	QVBoxLayout *layout;
 

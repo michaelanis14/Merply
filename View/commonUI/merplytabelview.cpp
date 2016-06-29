@@ -296,7 +296,7 @@ void merplyTabelView::printTabel(){
 
 void merplyTabelView::editEntity(const QString& id)
 {
-	//qDebug() <<id;
+	qDebug() <<"editEntity" <<id;
 	Controller::Get()->showCreateEditeStrUI("ViewStructure::"+id.split("::")[0]);
 	Controller::Get()->showCreateEditeValueUI(id);
 	//CreateEditUI* create = new CreateEditUI(0,id);

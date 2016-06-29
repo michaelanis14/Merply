@@ -164,7 +164,7 @@ bool Prsistance::init()
 				c.insert("Code",QJsonArray() <<country.toObject().value("countryCode").toString());
 				arryObj << c;
 				}
-			if(country.toObject().value("continentName") != QJsonValue::Undefined){
+			if(country.toObject().value("countryName") != QJsonValue::Undefined){
 				QJsonObject c;
 				c.insert("Name",QJsonArray() <<country.toObject().value("countryName").toString());
 				arryObj << c;
@@ -200,6 +200,41 @@ bool Prsistance::init()
 				Database::Get()->storeDoc("Country",QJsonDocument(fieldsArry));
 				}
 			}
+		}
+
+	if(Count("City") <=  2){
+		QString jsonFile = initCities();
+		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+
+
+		QString jsonFileC = initCountries();
+		QJsonDocument docC = QJsonDocument::fromJson(jsonFileC.toUtf8());
+		foreach(QJsonValue country,docC.object().value("countries").toObject().value("country").toArray()){
+			QJsonArray arryObj;
+			if(doc.object().value(country.toObject().value("countryName").toString()) != QJsonValue::Undefined){
+				QJsonObject c;
+				c.insert("Country",QJsonArray() <<country.toObject().value("countryName").toString());
+				arryObj << c;
+				QJsonArray cities;
+				foreach(QJsonValue city,doc.object().value(country.toObject().value("countryName").toString()).toArray()){
+					QJsonArray cityarr;
+					cityarr << QString(QString(city.toString().toLatin1()).toUtf8());
+					cities << cityarr;
+					}
+
+				QJsonObject ci;
+				ci.insert("Cities", cities);
+				arryObj << ci;
+				//qDebug() <<doc.object().value(country.toObject().value("countryName").toString()).toArray();
+				}
+			if(!arryObj.isEmpty()){
+				QJsonObject fieldsArry;
+				fieldsArry.insert("Fields",QJsonArray() << arryObj);
+				Database::Get()->storeDoc("City",QJsonDocument(fieldsArry));
+				}
+			}
+
+
 		}
 	//if()
 	return true;
@@ -242,7 +277,7 @@ QString Prsistance::initCities()
 
 	file.close();
 
-	return jsonFile;
+	return jsonFile.toUtf8();
 }
 
 

@@ -44,7 +44,7 @@ void  Database::arithmatic_callback(lcb_t instance, const void *,
 									const lcb_arithmetic_resp_t *)
 {
 	if (error == LCB_SUCCESS) {
-		  // qDebug("Stored Key_arithmatic_callback:  %.*s\n",(int)resp->v.v0.nkey,resp->v.v0.key);
+		// qDebug("Stored Key_arithmatic_callback:  %.*s\n",(int)resp->v.v0.nkey,resp->v.v0.key);
 		} else {
 		fprintf(stderr, "Couldn’t schedule operation: %s\n", lcb_strerror(instance, error));
 		}
@@ -216,11 +216,12 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 		else{
 			emit Database::Get()->gotValue(QString(byteArray));
 			Database::Get()->LastKeyID = QString(byteArray);
+			qDebug() << "ERR @Database 219" << parserError.errorString() << QString(byteArray);
 			//qDebug() <<"Last Keyy"<< Database::Get()->LastKeyID;
 			}
 		} else {
 		QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
-		qDebug() << QString(keyByte);
+		//qDebug() << QString(keyByte);
 		fprintf(stderr, "Couldn’t retrieve item: %s %s %d\n", lcb_strerror(instance, err),resp->v.v0.key,(int)resp->v.v0.nkey);
 		}
 }

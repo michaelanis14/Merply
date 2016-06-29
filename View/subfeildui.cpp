@@ -14,6 +14,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 	layout->setSpacing(0);
 	layout->setMargin(0);
 	this->strID = strID;
+	this->combox = 0;
 	QString type = structureView.value("Type").toString();
 
 
@@ -27,9 +28,13 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		if(structureView.value("LocalFilter") != QJsonValue::Undefined && structureView.value("LocalFilter").toBool()){
 			//View
 			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(structureView.value("Local").toString());
-			if(localFilter->combox)
+			if(localFilter->combox){
 			QObject::connect(localFilter->combox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateFilter(QString)));
-
+				qDebug() <<"COMBOO"<< localFilter->combox->currentText();
+				}
+			else{
+				qDebug() <<"Not Init";
+				}
 			}
 		else{
 			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));

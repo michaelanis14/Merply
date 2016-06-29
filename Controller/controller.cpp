@@ -173,11 +173,14 @@ void Controller::editControllerCancelPressed()
 
 SubFieldUI*Controller::getFirstSubField(QString feildName)
 {
-	foreach (ViewGroup* vg, ViewGroups::Get()->viewgroups)
-		foreach(FeildUI* feild, vg->feilds){
-			if(feild && feild->label->text().compare(feildName) == 0){
-				return feild->subFields.first();
-				}
+	if(ViewGroups::Get()->viewgroups.count() && !ViewGroups::Get()->viewgroups.isEmpty())
+		foreach (ViewGroup* vg, ViewGroups::Get()->viewgroups){
+			//if(vg->feilds.count() && !vg->feilds.isEmpty())
+				foreach(FeildUI* feild, vg->feilds){
+					if(feild && feild->label->text().compare(feildName) == 0){
+						return feild->subFields.first();
+						}
+					}
 			}
 	return new SubFieldUI();
 }

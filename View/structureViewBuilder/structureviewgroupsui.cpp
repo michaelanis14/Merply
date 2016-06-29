@@ -5,13 +5,16 @@
 
 #include<QJsonDocument>
 
-StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject structureView, QStringList restrictedTypes) : MainDisplay(parent)
+StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject structureView, QStringList restrictedTypes,bool scroll) : MainDisplay(parent)
 {
 
 	this->structureView = structureView;
 	this->restrictedTypes = restrictedTypes;
 	this->setContentsMargins(0,0,0,0);
-	QVBoxLayout* structureViewGroupsUILayout = new QVBoxLayout(formPanel);
+	if(scroll)
+		structureViewGroupsUILayout = new QVBoxLayout(formPanel);
+	else
+		structureViewGroupsUILayout = new QVBoxLayout(this);
 	structureViewGroupsUILayout->setMargin(0);
 	structureViewGroupsUILayout->setSpacing(0);
 
@@ -99,12 +102,11 @@ StructureViewGroupsUI* StructureViewGroupsUI::p_instance = 0;
 void StructureViewGroupsUI::ShowUI(QJsonObject structureView) {
 
 	if(p_instance == 0)
-		p_instance = new StructureViewGroupsUI(0,structureView);
+		p_instance = new StructureViewGroupsUI(0,structureView,QStringList(),true);
 	else p_instance->fill(structureView);
 
 	p_instance->setObjectName("StructureViewGroupsUI");
 	//p_instance->clear();
-
 	MainForm::Get()->ShowDisplay(p_instance);
 }
 

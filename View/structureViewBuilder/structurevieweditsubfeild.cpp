@@ -108,7 +108,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 
 
 		Select = new ERPComboBox(0);
-		//Select->setText(fieldVS.toObject().value("Select").toString());
+		//
 		layout->addRow(new QLabel(tr("Select ")), Select);
 
 		Editable = new QCheckBox(0);
@@ -123,7 +123,25 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
 		QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
 
-		updateSelect(Source->currentText());
+
+		if(fieldVS.toObject().value("Source") != QJsonValue::Undefined){
+			qDebug() << "Source" << fieldVS.toObject().value("Source").toString();
+			Source->setCurrentText(fieldVS.toObject().value("Source").toString());
+			}
+		else {
+			updateSelect(Source->currentText());
+			}
+		if(fieldVS.toObject().value("Select") != QJsonValue::Undefined){
+			qDebug() << "Select" << fieldVS.toObject().value("Select").toString();
+			Select->setCurrentText(fieldVS.toObject().value("Select").toString());
+			}
+		if(fieldVS.toObject().value("LocalFilter") != QJsonValue::Undefined && fieldVS.toObject().value("LocalFilter").toBool()){
+			filterOn->setCurrentIndex(1);
+			filterOnChanged(1);
+			localFilter->setCurrentText(fieldVS.toObject().value("Local").toString());
+			entityFilter->setCurrentText(fieldVS.toObject().value("Entity").toString());
+			}
+
 
 		}
 	else if(type.compare("Text") == 0){
