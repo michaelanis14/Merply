@@ -125,14 +125,14 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 
 
 		if(fieldVS.toObject().value("Source") != QJsonValue::Undefined){
-			qDebug() << "Source" << fieldVS.toObject().value("Source").toString();
+			//qDebug() << "Source" << fieldVS.toObject().value("Source").toString();
 			Source->setCurrentText(fieldVS.toObject().value("Source").toString());
 			}
 		else {
 			updateSelect(Source->currentText());
 			}
 		if(fieldVS.toObject().value("Select") != QJsonValue::Undefined){
-			qDebug() << "Select" << fieldVS.toObject().value("Select").toString();
+			//qDebug() << "Select" << fieldVS.toObject().value("Select").toString();
 			Select->setCurrentText(fieldVS.toObject().value("Select").toString());
 			}
 		if(fieldVS.toObject().value("LocalFilter") != QJsonValue::Undefined && fieldVS.toObject().value("LocalFilter").toBool()){
@@ -181,6 +181,8 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		}
 
 	mandatory = new QCheckBox(this);
+	if(fieldVS.toObject().value("Mandatory").toBool())
+		mandatory->setChecked(true);
 	layout->addRow("Mandatory", mandatory);
 	previewLayout->addWidget(new SubFieldUI(0,"V",this->save()));
 	//	qDebug() <<this->save();

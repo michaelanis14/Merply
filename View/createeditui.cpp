@@ -23,6 +23,15 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 	contrls->setObjectName("ViewGroup");
 	this->layout->addWidget(contrls);
 
+	errorsWidget = new QWidget();
+	errorsWidget->setObjectName("errorsWidget");
+	errorsWidget->setContentsMargins(0,0,0,0);
+	errorsWidgetLayout = new QVBoxLayout(errorsWidget);
+	errorsWidgetLayout->setContentsMargins(0,0,0,0);
+	errorsWidgetLayout->setSpacing(0);
+	this->layout->addWidget(errorsWidget);
+
+
 	createEditWidget = new QWidget();
 	createEditWidget->setContentsMargins(0,0,0,0);
 	createEditWidgetLayout = new QVBoxLayout(createEditWidget);
@@ -83,6 +92,18 @@ void CreateEditUI::clear()
 			}
 		}
 }
+
+void CreateEditUI::clearErrorsWidget()
+{
+	QList<QWidget *> Widgets = errorsWidget->findChildren<QWidget *>();
+	foreach(QWidget * child, Widgets)
+		{
+		errorsWidgetLayout->removeWidget(child);
+		child->setHidden(true);
+		child->setParent(0);
+		child->deleteLater();  // TODO : check the stability of the app
+		}
+}
 void CreateEditUI::paintEvent(QPaintEvent *)
 {
 	QStyleOption opt;
@@ -95,25 +116,39 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 	QStringList nActon = nameAction.split("->");
 	if(nActon.count() > 1){
 
-		if(nActon.at(1).compare("cancel") == 0){
+		if(nActon.at(1).compare("Cancel") == 0){
 			Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 			}
 		else if(nActon.at(1).compare("Save") == 0){
-			if(this->cas.isEmpty()){
-				QString key = this->viewStructure.value("document_id").toString().replace("ViewStructure::","");
-				QJsonObject vgsSave = viewGroups->save();
-				vgsSave.insert("cas_value",this->cas);
-				Controller::Get()->storeDoc(key,QJsonDocument(vgsSave));
+			this->clearErrorsWidget();
+			QString errs = viewGroups->checkMandatory();
+			if(errs.isEmpty()){
+				if(this->cas.isEmpty()){
+
+					QString key = this->viewStructure.value("document_id").toString().replace("ViewStructure::","");
+
+					QJsonObject vgsSave = viewGroups->save();
+					vgsSave.insert("cas_value",this->cas);
+					Controller::Get()->storeDoc(key,QJsonDocument(vgsSave));
+
+					}
+				else{
+					QJsonObject vgsSave = viewGroups->save();
+					vgsSave.insert("cas_value",this->cas);
+					vgsSave.insert("document_id",this->data.value("document_id").toString());
+					Controller::Get()->UpdateDoc(QJsonDocument(vgsSave));
+					}
+
+				Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 				}
 			else{
-				QJsonObject vgsSave = viewGroups->save();
-				vgsSave.insert("cas_value",this->cas);
-				vgsSave.insert("document_id",this->data.value("document_id").toString());
-				Controller::Get()->UpdateDoc(QJsonDocument(vgsSave));
+				foreach(QString err,errs.split(";")){
+					errorsWidgetLayout->addWidget(new QLabel(err +" can not be empty"));
+					}
 				}
-
 			}
+
 		}
 
-	Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
+
 }

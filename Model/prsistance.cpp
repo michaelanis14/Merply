@@ -297,10 +297,18 @@ void Prsistance::GetJsonList(QString table, QString select,QString condition)
 void Prsistance::GetJsonEntityFields(QString table, QString select, QString condition)
 {
 	QString where;
-	if(!condition.isEmpty())
-		where = QString("AND "+condition);
-	QString query = "SELECT fin."+select.trimmed()+"[0] AS `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f UNNEST f fin WHERE fin."+select+" AND META(d).id LIKE \""+table+"::%\" "+where;
-	qDebug() << query;
+	if(!condition.isEmpty()){
+		if(condition.split("=").count() > 1){
+			where = QString("AND ANY item in f SATISFIES item."+condition.split("=")[0]+"[0] = \""+condition.split("=")[1]+"\" END ");
+			}
+		else{
+			where = QString("AND "+condition);
+			}
+		}
+	//QString query = "SELECT fin."+select.trimmed()+"[0] AS `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f UNNEST f fin WHERE fin."+select+" AND META(d).id LIKE \""+table+"::%\" "+where;
+	//QString query = "SELECT fin."+select.trimmed()+"[0] AS `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f UNNEST f fin WHERE fin."+select+" AND META(d).id LIKE \""+table+"::%\" "+where;
+	QString query ="SELECT Array item."+select.trimmed()+" FOR item IN f END As `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f WHERE  META(d).id LIKE \""+table+"::%\" "+where;
+	//qDebug() << query;
 
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	Database::Get()->query(query);

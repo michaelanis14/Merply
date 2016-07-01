@@ -118,6 +118,15 @@ QJsonObject FeildUI::save()
 	return field;
 }
 
+QString FeildUI::checkMandatory()
+{
+	foreach(SubFieldUI* subfeild,subFields){
+		if(!subfeild->checkMandatory())
+		return label->text();
+		}
+	return "";
+}
+
 void FeildUI::btnRemovePressed()
 {
 	QList<QWidget *> Widgets = this->findChildren<QWidget *>();

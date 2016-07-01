@@ -106,7 +106,7 @@ void StructureVieweditSubFeildTableColumn::updateFields(QString value)
 	emit columnChanged();
 }
 
-void StructureVieweditSubFeildTableColumn::updateSelect(QString entity)
+void StructureVieweditSubFeildTableColumn::updateSelect(QString )
 {
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 

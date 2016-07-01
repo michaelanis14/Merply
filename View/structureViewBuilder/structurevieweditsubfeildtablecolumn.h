@@ -25,7 +25,7 @@ signals:
 	void columnChanged();
 public slots:
 	void updateFields(QString value);
-	void updateSelect(QString entity);
+	void updateSelect(QString);
 
 	void updateSelectData(QList<QString> fields);
 

@@ -16,6 +16,7 @@ public:
 	QJsonObject save();
 	QLabel * label;
 	QList<SubFieldUI*> subFields;
+	QString checkMandatory();
 private:
 	QLabel* btnRemove;
 	QHBoxLayout * layout;

@@ -173,18 +173,10 @@ void Controller::editControllerCancelPressed()
 
 SubFieldUI*Controller::getFirstSubField(QString feildName)
 {
-	if(ViewGroups::Get()->viewgroups.count() && !ViewGroups::Get()->viewgroups.isEmpty())
-		foreach (ViewGroup* vg, ViewGroups::Get()->viewgroups){
-			//if(vg->feilds.count() && !vg->feilds.isEmpty())
-				foreach(FeildUI* feild, vg->feilds){
-					if(feild && feild->label->text().compare(feildName) == 0){
-						return feild->subFields.first();
-						}
-					}
-			}
+	if(ViewGroups::Fieldsgroups.find(feildName.trimmed()) != ViewGroups::Fieldsgroups.end() )
+		return ViewGroups::Fieldsgroups.value(feildName.trimmed())->subFields.first();
 	return new SubFieldUI();
 }
-
 void Controller::editControllerCancelDataPressed(QJsonDocument document)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(editControllerCancelDataPressed(QJsonDocument)));

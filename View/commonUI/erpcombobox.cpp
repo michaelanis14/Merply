@@ -8,6 +8,7 @@
 #include "QDebug"
 #include "QCompleter"
 #include <QPair>
+#include <QJsonArray>
 
 ERPComboBox::ERPComboBox(QWidget *parent, bool indexedFill) :
 	QComboBox(parent)
@@ -27,14 +28,30 @@ void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 	int i = 0;
 
 	foreach (const QJsonDocument & value, items){
-		//qDebug() << select.trimmed() << value.object().keys();
-		QString valueString = value.object().value("Value").toString();
+
+		//QString valueString = value.object().value("Value").toString();
 		QString keyString = value.object().value("Key").toString();
-		if(!valueString.isEmpty() && !keyString.isEmpty()){
-			QComboBox::insertItem(i,valueString.trimmed());
-			keys.insert(i,keyString);
-			i++;
-			this->addedItems = true;
+
+		foreach(QJsonValue arrVal,value.object().value("Value").toArray()){
+			//qDebug() << arrVal;
+			foreach(QJsonValue Val,arrVal.toArray()){
+			//	qDebug() << Val << keyString;
+				if(Val.isArray()){
+					foreach(QJsonValue subVal,Val.toArray()){
+						QString valueString = subVal.toString().trimmed();
+						QComboBox::insertItem(i,valueString);
+						keys.insert(i,keyString);
+						i++;
+						}
+					}
+				else{
+					QString valueString = Val.toString().trimmed();
+					QComboBox::insertItem(i,valueString);
+					keys.insert(i,keyString);
+					i++;
+					}
+				this->addedItems = true;
+				}
 			}
 		}
 	if(count() > 0)
@@ -68,7 +85,7 @@ void ERPComboBox::focusOutEvent(QFocusEvent *e)
 			//qDebug() <<this->findText(this->completer()->currentCompletion());
 
 			this->clearEditText();
-			this->setCurrentText(this->itemText(this->findText(this->completer()->currentCompletion())));
+			this->setCurrentIndex((this->findText(this->completer()->currentCompletion())));
 
 			}
 
@@ -141,6 +158,13 @@ void ERPComboBox::clear()
 	this->addedItems = false;
 	QComboBox::clear();
 }
+/*
+void ERPComboBox::setCurrentIndex(int index)
+{
+	QComboBox::setCurrentIndex(index);
+	emit currentIndexChanged(index);
+}
+*/
 //void ERPComboBox::mousePressEvent(QMouseEvent *event){
 //QLabel *child=  static_cast<QLabel *>(childAt(event->pos()));
 

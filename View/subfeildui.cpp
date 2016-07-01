@@ -21,16 +21,18 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 
 	if(type.compare("Refrence") == 0){
 		combox = new ERPComboBox(this,false);
+		//qDebug() << structureView.value("Select");
 		if(structureView.value("Editable").toString().compare("false") == 0)
 			combox->setEditable(false);
 		layout->addWidget(combox);
 		field = combox;
 		if(structureView.value("LocalFilter") != QJsonValue::Undefined && structureView.value("LocalFilter").toBool()){
-			//View
+			//qDebug() << structureView.value("Local").toString();
 			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			if(localFilter->combox){
-			QObject::connect(localFilter->combox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateFilter(QString)));
-				qDebug() <<"COMBOO"<< localFilter->combox->currentText();
+				QObject::connect(localFilter->combox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateFilter(QString)));
+				this->updateFilter(localFilter->combox->currentText());
+				//emit localFilter->combox->currentIndexChanged(localFilter->combox->currentIndex());
 				}
 			else{
 				qDebug() <<"Not Init";
@@ -39,6 +41,11 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		else{
 			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
 			Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString());
+			}
+		QString dataString = data.toString();
+		//qDebug() << data;
+		if(!dataString.isEmpty()){
+			combox->setCurrentIndex(combox->findText(dataString));
 			}
 		//qDebug() << structureView.value("Source").toString() << structureView.value("Select").toString();
 		}
@@ -74,7 +81,10 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 
 		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
 		Controller::Get()->getJsonList(structureView.value("Source").toString(),structureView.value("Select").toString());
-
+		QString dataString = data.toString();
+		if(!dataString.isEmpty()){
+			combox->setCurrentIndex(combox->findText(dataString));
+			}
 		}
 	else if(type.compare("Table") == 0){
 		merplyTabelView * table = new merplyTabelView(this,"key");
@@ -133,14 +143,14 @@ void SubFieldUI::clear()
 QString SubFieldUI::save()
 {
 	QString save;
-
-	if(field->objectName().compare("combobox") == 0  || field->objectName().compare("ERPComboBoxIndexed") == 0 ){
+	if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
 		//	save += component.name;
 		save +=((QComboBox*)field)->currentText();
 		//save +=" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QLineEdit") == 0 ){
 		//	save += component.name;
+
 		save +=((QLineEdit*)field)->text();
 		//	save +=" ";
 		}
@@ -158,7 +168,22 @@ QString SubFieldUI::save()
 		save +=((QDateEdit*)field)->date().toString(Qt::DefaultLocaleShortDate);
 		}
 
-	return save.trimmed();
+return save.trimmed();
+}
+
+bool SubFieldUI::checkMandatory()
+{
+	if(structureView.value("Mandatory").toBool()){
+		if(this->save().isEmpty()){
+			field->setObjectName("error");
+			field->style()->unpolish(field);
+			field->style()->polish(field);
+			field->update();
+			return false;
+			}
+
+		}
+	return true;
 }
 
 void SubFieldUI::indexedFillEvent(QString completion)
@@ -175,9 +200,10 @@ void SubFieldUI::linkPressed()
 void SubFieldUI::refrenceData(QList<QJsonDocument> items)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
-	if(combox)
+	if(combox){
+		combox->clear();
 		combox->addJsonItems(items);
-
+		}
 	//qDebug() << items;
 }
 
@@ -196,8 +222,8 @@ void SubFieldUI::serialData(QString serial)
 
 void SubFieldUI::updateFilter(QString filter)
 {
-	qDebug() <<"filter" << filter;
+	//qDebug() <<"filter" << filter;
 	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
-	Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Entity").toString()+"=="+filter);
+	Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Entity").toString()+"="+filter);
 
 }

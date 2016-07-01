@@ -18,7 +18,9 @@ public:
 		QJsonObject save();
 		static  ViewGroups* Create(QJsonObject structureView, QJsonObject data);
 		static ViewGroups* Get();
-		QList<ViewGroup*> viewgroups;
+		static QList<ViewGroup*> Viewgroups;
+		static QHash<QString,FeildUI*> Fieldsgroups;
+		QString checkMandatory();
 signals:
 
 private:

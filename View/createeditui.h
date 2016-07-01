@@ -21,11 +21,14 @@ private:
 	void clear();
 	QWidget* createEditWidget;
 	QVBoxLayout *createEditWidgetLayout;
+	QWidget* errorsWidget;
+	QVBoxLayout *errorsWidgetLayout;
 	QVBoxLayout *layout;
 	ViewGroups * viewGroups;
 	QJsonObject viewStructure;
 	QString cas;
 	QJsonObject data;
+	void clearErrorsWidget();
 signals:
 protected:
 	//void showEvent(QShowEvent *);

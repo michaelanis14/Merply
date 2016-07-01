@@ -14,28 +14,23 @@ ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, 
 	this->feilds =  QList<FeildUI*>();
 	this->strID = strID;
 
-//	qDebug() << structureView;
+	//	qDebug() << structureView;
 	if(structureView.value("Viewgroup").isObject()){
 		QJsonObject viewgroup = structureView.value("Viewgroup").toObject();
 		if(viewgroup.value("Fields").isArray()){
-
 			int d = 0;
 			//qDebug() << data.at(d);
 			foreach (QJsonValue fieldVS, viewgroup.value("Fields").toArray()) {
-
-
 				//qDebug() << fieldVS.toObject();
 				FeildUI* feild = new FeildUI(0,strID,fieldVS.toObject(),data.at(d).toObject());
-				layout->addWidget(feild);
 				feilds << feild;
-
-				//	StructureViewEdit* svE = new StructureViewEdit(0,fieldVS.toObject());
-				//	layout->addWidget(svE);
+				ViewGroups::Fieldsgroups.insert(fieldVS.toObject().value("Label").toString().trimmed(),feild);
+				layout->addWidget(feild);
 				d++;
 				}
 			layout->addStretch();
+			}
 		}
-}
 }
 
 QJsonArray ViewGroup::save()

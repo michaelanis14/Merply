@@ -1,4 +1,4 @@
-#include "viewgroups.h"
+#include "Viewgroups.h"
 #include "controller.h"
 
 #include "structureviewgroupsui.h"
@@ -10,7 +10,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 	layout = new QVBoxLayout(this);
 	layout->setContentsMargins(2,2,2,2);
 	layout->setSpacing(0);
-	this->viewgroups =  QList<ViewGroup*>();
+	ViewGroups::Viewgroups.clear();
 	this->structureView = structureView;
 
 	if(AccessController::Get()->hasAdminGroupAccess()){
@@ -49,7 +49,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 					}
 				}
 			else 	layout->addWidget(viewgroup);
-			viewgroups << viewgroup;
+			ViewGroups::Viewgroups  << viewgroup;
 
 			d++;
 			}
@@ -62,7 +62,7 @@ QJsonObject ViewGroups::save()
 {
 	QJsonObject entity;
 	QJsonArray fields;
-	foreach(ViewGroup* vg,viewgroups){
+	foreach(ViewGroup* vg,ViewGroups::Viewgroups ){
 		fields.append(vg->save());
 		}
 	entity.insert("Fields",fields);
@@ -70,18 +70,39 @@ QJsonObject ViewGroups::save()
 	//qDebug() << entity;
 	return (entity);
 }
+
+QHash<QString,FeildUI*> ViewGroups::Fieldsgroups = QHash<QString,FeildUI*>();
+QList<ViewGroup*> ViewGroups::Viewgroups =  QList<ViewGroup*>();
 ViewGroups* ViewGroups::p_instance = 0;
 ViewGroups*ViewGroups::Create(QJsonObject structureView, QJsonObject data)
 {
-	qDebug() << "Create";
-	return p_instance = new ViewGroups(0,structureView, data);
+	 p_instance = new ViewGroups(0,structureView, data);
+	return p_instance;
 }
 
-ViewGroups*ViewGroups::Get()
+ViewGroups* ViewGroups::Get()
 {
 	if(p_instance == 0)
 		p_instance = new ViewGroups;
 	return p_instance;
+}
+
+QString ViewGroups::checkMandatory()
+{
+	QString errs;
+	QHash<QString,FeildUI*>::iterator i = ViewGroups::Fieldsgroups.begin();
+	while (i != ViewGroups::Fieldsgroups.end()) {
+		QString err = i.value()->checkMandatory();
+		if(!err.isEmpty()){
+			if(!errs.isEmpty())
+				 errs.append(";");
+			 errs.append(err);
+
+			}
+
+		++i;
+	}
+	return errs;
 }
 void ViewGroups::paintEvent(QPaintEvent *)
 {

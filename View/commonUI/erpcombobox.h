@@ -36,13 +36,15 @@ signals:
 	void refreshModel();
 	void indexedFillEvent(QString completion);
 public slots:
-
+	//void setCurrentIndex(int index);
 protected slots:
 	void focusOutEvent(QFocusEvent *e);
+
 protected:
 	//void mousePressEvent(QMouseEvent *event);
 	//virtual void  keyPressEvent(QKeyEvent *event);
 	 bool eventFilter(QObject *obj, QEvent *event);
+
 
 
 
