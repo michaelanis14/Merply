@@ -60,6 +60,7 @@ void LoginUI::submitUser()
 
 void LoginUI::successLogin()
 {
+	Controller::Get()->initNavigation();
 	navigationUI::Get()->setHidden(false);
 	HNavigationUI::Get()->setHidden(false);
 }

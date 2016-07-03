@@ -59,8 +59,8 @@ MainForm::MainForm(): QWidget()
 				"StructureViewEdit#preview{ border: 11px solid gray;}"
 				"QWidget#ViewGroups{ border: 1px solid gray;}"
 
-				"QWidget#errorsWidget{ background: red; color: red;}"
-				"QWidget#errorsWidget::QLabel{ color: red;}"
+				"QWidget#errorsWidget{ background: red;}"
+				"QWidget#errorsWidget#QLabel{ color: red;}"
 
 				"QWidget#ViewGroup{ border: 2px solid gray;}"
 				"QCheckBox {spacing: 5px;}"

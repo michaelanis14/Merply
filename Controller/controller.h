@@ -76,6 +76,7 @@ public:
 	SubFieldUI* getFirstSubField(QString feildName);
 	//Model Interface
 	//Navigation
+	void initNavigation();
 	void addSubNavigation(double key, QList<QTreeWidgetItem*> subNav);
 	QList<QTreeWidgetItem*> getSubNavigation(double key);
 	bool removeSubNavigation(double key);

@@ -347,7 +347,7 @@ QString Database::getLastKeyID() const
 
 
 bool Database::storeDoc(QString key,QJsonDocument document) {
-	qDebug() <<key << key.split("::").count() << key;
+	//qDebug() <<key << key.split("::").count() << key;
 	if(key.split("::").count() <  2){
 		Database::IncrementKey(key);
 		int keyID = Database::GetKey(key);
@@ -358,7 +358,7 @@ bool Database::storeDoc(QString key,QJsonDocument document) {
 
 		key = QString(key)+QString("::")+ QString::number(keyID);
 		}
-		qDebug ()<<"key" << key;
+		//qDebug ()<<"key" << key;
 	QJsonObject objWithKey = document.object();
 	objWithKey.insert("document_id",key);
 	document = QJsonDocument(objWithKey);

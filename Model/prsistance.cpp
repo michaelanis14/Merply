@@ -142,7 +142,7 @@ QJsonArray Prsistance::table(QString line)
 
 bool Prsistance::init()
 {
-	qDebug() <<"Init" << Count("Country");
+	//qDebug() <<"Init" << Count("Country");
 	/*
 	if(Count("ContactType") == -1){
 		write("ContactType",QString("Name->Customer"));
@@ -205,8 +205,6 @@ bool Prsistance::init()
 	if(Count("City") <=  2){
 		QString jsonFile = initCities();
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-
-
 		QString jsonFileC = initCountries();
 		QJsonDocument docC = QJsonDocument::fromJson(jsonFileC.toUtf8());
 		foreach(QJsonValue country,docC.object().value("countries").toObject().value("country").toArray()){
@@ -234,6 +232,35 @@ bool Prsistance::init()
 				}
 			}
 
+
+		}
+	if(Count("ContactType") <=  1){
+
+
+
+		QJsonArray arryObj;
+
+
+				QJsonArray typesall;
+				QStringList types;
+				types << "Customer" << "Supplier";
+
+				foreach(QString typ,types){
+					QJsonArray typarr;
+					typarr << typ;
+					typesall << typarr;
+					}
+
+				QJsonObject ci;
+				ci.insert("Type", typesall);
+				arryObj << ci;
+				//qDebug() <<doc.object().value(country.toObject().value("countryName").toString()).toArray();
+
+			if(!arryObj.isEmpty()){
+				QJsonObject fieldsArry;
+				fieldsArry.insert("Fields",QJsonArray() << arryObj);
+				Database::Get()->storeDoc("ContactType",QJsonDocument(fieldsArry));
+				}
 
 		}
 	//if()
@@ -287,7 +314,7 @@ void Prsistance::GetJsonList(QString table, QString select,QString condition)
 	QString where;
 	if(!condition.isEmpty())
 		where = QString("AND "+condition);
-	QString query = "SELECT "+select.trimmed()+" AS `Value`,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \""+table+"::%\" "+where;
+	QString query = "SELECT ARRAY_REPEAT(TOARRAY("+select.trimmed()+"),1) AS `Value`,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \""+table+"::%\" "+where;
 	//qDebug() << query;
 
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));

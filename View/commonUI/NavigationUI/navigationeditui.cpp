@@ -400,9 +400,6 @@ void NavigationEditUI::fillSubNavigation(double key)
 				subNavigation->setItemWidget((*it),3,remove);
 
 
-
-
-
 				//subNavigation->resizeColumnToContents(0);
 				subNavigation->setColumnWidth(2,30);
 				subNavigation->setColumnWidth(3,30);

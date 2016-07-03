@@ -103,6 +103,11 @@ QList<QTreeWidgetItem *> navigationUI::loadSubNavigation(QJsonArray subNav)
 {
 	QList<QTreeWidgetItem *> items;
 	foreach(QJsonValue tab,subNav){
+		QJsonObject permission;
+		permission.insert("Permissions",tab.toObject().value("TabPermissions").toObject());
+		if(!AccessController::Get()->hasReadAccess(permission))
+			continue;
+
 		double key = tab.toObject().value("ID").toDouble();
 		QString title = tab.toObject().value("Title").toString();
 		if(key!=0 && !title.isEmpty())

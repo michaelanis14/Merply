@@ -49,6 +49,7 @@ private:
 	QString currentCardKey;
 	void clearPreview();
 	QJsonObject saveObject;
+	PermissionsUI* subtabPermissions;
 signals:
 	void editControllerSavePressed();
 	void editControllerCancelPressed();

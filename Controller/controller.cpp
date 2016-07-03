@@ -93,12 +93,10 @@ void Controller::showDisplay()
 
 	QObject::connect(navigationUI::Get(),SIGNAL(subNavPressed(QJsonObject)),this,SLOT(subNavPressed(QJsonObject)));
 
-	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
 
-	Database::Get()->getDoc("NavigationUI::1");
-
-
+	initNavigation();
 }
+
 
 void Controller::showDisplayDataReturned(QJsonDocument document)
 {
@@ -177,6 +175,14 @@ SubFieldUI*Controller::getFirstSubField(QString feildName)
 		return ViewGroups::Fieldsgroups.value(feildName.trimmed())->subFields.first();
 	return new SubFieldUI();
 }
+
+void Controller::initNavigation()
+{
+	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
+	Database::Get()->getDoc("NavigationUI::1");
+
+}
+
 void Controller::editControllerCancelDataPressed(QJsonDocument document)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(editControllerCancelDataPressed(QJsonDocument)));
@@ -553,6 +559,8 @@ QJsonObject Controller::saveSubNavigation(QTreeWidgetItem * item)
 	itemTab.insert("Title",item->text(0));
 	itemTab.insert("ID",item->text(1).toDouble());
 	itemTab.insert("Page",getPage(item->text(1).toDouble()));
+	itemTab.insert("TabPermissions",getPage(item->text(1).toDouble()).value("TabPermissions"));
+
 	//qDebug() << item->text(1).toDouble() << getPage(item->text(1).toDouble());
 	if(item->childCount() > 0){
 		QJsonArray items = QJsonArray();

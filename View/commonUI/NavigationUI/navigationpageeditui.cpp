@@ -37,8 +37,14 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	sctrlUI->setAutoFillBackground(true);
 	layout->addWidget(sctrlUI);
 
-
-
+	QGroupBox *tabGroupBox = new QGroupBox(tr("Tab Permissions"));
+	subtabPermissions = new PermissionsUI(this,true,false);
+	QHBoxLayout* tabGroupBoxLayout = new QHBoxLayout;
+	tabGroupBoxLayout->setMargin(0);
+	tabGroupBoxLayout->setSpacing(0);
+	tabGroupBoxLayout->addWidget(subtabPermissions);
+	tabGroupBox->setLayout(tabGroupBoxLayout);
+	layout->addWidget(tabGroupBox);
 
 	QGroupBox *groupBox = new QGroupBox(tr("Select Type"));
 
@@ -211,7 +217,7 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 
 		}
 
-
+	subtabPermissions->load(structureView.value("TabPermissions").toObject());
 	permissions->load(structureView.value("Permissions").toObject());
 }
 
@@ -220,6 +226,7 @@ void NavigationPageEditUI::save(bool updateDataBase)
 	this->saveObject = QJsonObject();
 	this->saveObject.insert("Title",headerlbl->getTitle());
 	this->saveObject.insert("Permissions",permissions->save());
+	this->saveObject.insert("TabPermissions",subtabPermissions->save());
 	if(page->isChecked()){
 		saveObject.insert("Type","Page");
 		QJsonObject savedPage = pageEdit->save();
@@ -251,7 +258,8 @@ void NavigationPageEditUI::save(bool updateDataBase)
 		if(updateDataBase){
 			QObject::connect(Controller::Get(),SIGNAL(gotLastKey(QString)),this,SLOT(gotLastKeyData(QString)));
 			Controller::Get()->getLastKey();
-			Controller::Get()->storeDoc("ViewStructure",QJsonDocument(newCardStructure->save()));
+			QJsonObject newsStruct = newCardStructure->save();
+			Controller::Get()->storeDoc("ViewStructure::"+newsStruct.value("Title").toString(),QJsonDocument(newsStruct));
 
 			}
 		//	else
