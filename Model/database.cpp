@@ -53,17 +53,10 @@ void  Database::arithmatic_callback(lcb_t instance, const void *,
 
 bool Database::updateDoc(QJsonDocument document)
 {
-	//Database::IncrementKey(key);
-
-	//	int keyID = Database::GetKey(key);
-	//	if(keyID == -1)
-	//	return false;
-
-	//key = QString(key)+QString("::")+ QString::number(keyID);
-	//qDebug () << key;
-
 	lcb_t instance = Database::InitDatabase();
 
+
+	qDebug() << "UPDATE DOC" << document << document.object().value("document_id").toString().toLatin1();
 	//lcb_set_store_callback(instance, on_stored_status);
 	struct lcb_store_cmd_st cmd;// = { 0 };
 	lcb_store_cmd_t *cmdlist = &cmd;
@@ -81,7 +74,8 @@ bool Database::updateDoc(QJsonDocument document)
 	cmd.v.v0.operation = LCB_REPLACE;
 	//qDebug() <<document.object().value("cas_value").toString().toLongLong();
 	cmd.v.v0.cas =  document.object().value("cas_value").toString().toLongLong();
-
+	lcb_set_store_callback(instance, on_stored_status);
+	lcb_set_get_callback(instance, get_callback);
 	lcb_error_t err = lcb_store(instance, NULL, 1, &cmdlist);
 	if (err == LCB_SUCCESS) {
 		lcb_wait(instance);
@@ -89,8 +83,7 @@ bool Database::updateDoc(QJsonDocument document)
 		fprintf(stderr, "Couldn’t schedule operation: %s\n", lcb_strerror(instance, err));
 		qDebug() << "ERRLOG" << document;
 		}
-	lcb_set_store_callback(instance, on_stored_status);
-	lcb_set_get_callback(instance, get_callback);
+
 
 	return Database::KillDatabase(instance);
 }
@@ -267,6 +260,7 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 		QJsonParseError parserError;
 		QByteArray byteArray(resp->row,resp->nrow);
 		QJsonDocument documentToArray =  QJsonDocument::fromJson(byteArray , &parserError);
+
 		if(parserError.error == QJsonParseError::NoError){
 			documentToArray.toJson(QJsonDocument::Compact);
 			Database::Get()->array << documentToArray;
@@ -347,7 +341,7 @@ QString Database::getLastKeyID() const
 
 
 bool Database::storeDoc(QString key,QJsonDocument document) {
-	qDebug() <<key << key.split("::").count() << key;
+	//qDebug() <<key << key.split("::").count() << key;
 	if(key.split("::").count() <  2){
 		Database::IncrementKey(key);
 		int keyID = Database::GetKey(key);
@@ -358,7 +352,7 @@ bool Database::storeDoc(QString key,QJsonDocument document) {
 
 		key = QString(key)+QString("::")+ QString::number(keyID);
 		}
-		qDebug ()<<"key" << key;
+		//qDebug ()<<"key" << key;
 	QJsonObject objWithKey = document.object();
 	objWithKey.insert("document_id",key);
 	document = QJsonDocument(objWithKey);

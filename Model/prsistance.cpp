@@ -234,7 +234,7 @@ bool Prsistance::init()
 
 
 		}
-	if(Count("ContactType") <=  1){
+	if(Count("ContactType") <  1){
 
 
 

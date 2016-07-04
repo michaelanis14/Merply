@@ -121,9 +121,9 @@ public slots:
 
 	void showDisplayDataReturned(QJsonDocument document);
 	void loadNavigationData(QJsonDocument document);
-	void subNavPressedData(QList<QJsonDocument> documents);
+	void subNavPressedData(QJsonDocument documents);
 	void subNavPressedIndexData(QList<QJsonDocument> documents);
-	void subNavPressedPageData(QList<QJsonDocument> documents);
+	void subNavPressedPageData(QJsonDocument document);
 	void getFieldsData(QList<QJsonDocument> documents);
 	void linkPressedData(QJsonDocument document);
 	void getDocData(QJsonDocument document);

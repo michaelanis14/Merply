@@ -35,7 +35,7 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	Source = new ERPComboBox(0);
 	layout->addRow(new QLabel(tr("Source ")), Source);
 	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(selectData(QList<QJsonDocument>)));
-	Controller::Get()->getJsonList("ViewStructure","SPLIT(META("+Controller::Get()->getDatabaseName()+").id,\"ViewStructure::\")[1] ","default.Type =\"Entity\"");
+	Controller::Get()->getJsonList("ViewStructure","Title","default.Type =\"Entity\"");
 
 	Select = new ERPComboBox(0);
 	//Select->setText(fieldVS.toObject().value("Select").toString());
@@ -109,19 +109,20 @@ void StructureVieweditSubFeildTableColumn::updateFields(QString value)
 void StructureVieweditSubFeildTableColumn::updateSelect(QString )
 {
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
-
 	Controller::Get()->getFields(Source->getKey());
 
 }
 void StructureVieweditSubFeildTableColumn::updateSelectData(QList<QString> fields)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+	Select->clear();
 	Select->addItems(fields);
 }
 
 void StructureVieweditSubFeildTableColumn::selectData(QList<QJsonDocument> items)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(selectData(QList<QJsonDocument>)));
+	Source->clear();
 	Source->addJsonItems(items);
 }
 

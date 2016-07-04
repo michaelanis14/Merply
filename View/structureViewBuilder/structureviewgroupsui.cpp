@@ -112,7 +112,7 @@ void StructureViewGroupsUI::ShowUI(QJsonObject structureView) {
 
 void StructureViewGroupsUI::fill(QJsonObject structureView)
 {
-	//	qDebug() << structureView.value("document_id").toString() << structureView.value("document_iddd").toString();
+	//	qDebug() << structureView.value("document_id").toString() << structureView;
 	this->cas_value = structureView.value("cas_value").toString();
 	this->document_id = structureView.value("document_id").toString();
 
@@ -229,7 +229,7 @@ void StructureViewGroupsUI::editControllerCancelPressed()
 void StructureViewGroupsUI::editControllerSavePressed()
 {
 	QJsonObject savedObj = this->save();
-	//qDebug() << savedObj;
+	//qDebug() <<"SAVE: editControllerSavePressed"<< savedObj;
 	if(savedObj.value("document_id") == QJsonValue::Undefined)
 		Controller::Get()->storeDoc("ViewStructure",QJsonDocument(savedObj));
 	else Controller::Get()->UpdateDoc(QJsonDocument(savedObj));

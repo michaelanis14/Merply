@@ -117,32 +117,19 @@ void Controller::subNavPressed(QJsonObject view)
 	if(AccessController::Get()->hasReadAccess(view))
 		if(view.value("Type").toString().contains("Entity") && !view.value("Card").toString().isEmpty()){
 			if(view.value("Select").toString().contains("Index")){
-
 				QString card = view.value("Card").toString();
 				queryIndexView(card);
 
 				}
 			else{
-				//QObject::connect(Database::Get(),SIGNAL(Database::Get()->gotDocument(QJsonDocument)),this,SLOT(subNavPressed(QJsonObject)));
-
-				//	Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
-
-				QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedData(QList<QJsonDocument>)));
-				QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id = '"+view.value("Card").toString()+"'");
-				//qDebug()<<"Q : " << query;
-				Database::Get()->query(query);
+				QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedData(QJsonDocument)));
+				Database::Get()->getDoc(view.value("Card").toString());
 				}
 			}
 		else {if(view.value("Type").toString().contains("Page")){
 
-				QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedPageData(QList<QJsonDocument>)));
-				QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id = '"+view.value("Card").toString()+"'");
-				//qDebug()<<"Q : " << query;
-				Database::Get()->query(query);
-
-
-				//qDebug() << view;
-				//
+				QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedPageData(QJsonDocument)));
+				Database::getDoc(view.value("Card").toString());
 				}
 			}
 	else IndexUI::ShowUI("ViewStructure::91",QList<QJsonDocument>());
@@ -154,7 +141,7 @@ void Controller::queryIndexView(QString vStrctKey)
 	QString card = vStrctKey.replace("ViewStructure::","");
 	card.append("::%");
 	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
-	//qDebug()<<"Q : " << query;
+	//qDebug()<<"QINDEX : " << query;
 
 
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedIndexData(QList<QJsonDocument>)));
@@ -190,12 +177,11 @@ void Controller::editControllerCancelDataPressed(QJsonDocument document)
 	NavigationEditUI::Get()->setHidden(true);
 }
 
-void Controller::subNavPressedData(QList<QJsonDocument> documents)
+void Controller::subNavPressedData(QJsonDocument documents)
 {
 	//	qDebug() << "SubPreseed" << documents;
-	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedData(QList<QJsonDocument>)));
-	if(documents.count() > 0)
-		CreateEditUI::ShowUI(documents.first().object(),QJsonObject());
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedData(QJsonDocument)));
+	CreateEditUI::ShowUI(documents.object(),QJsonObject());
 }
 
 void Controller::subNavPressedIndexData(QList<QJsonDocument> documents)
@@ -207,13 +193,10 @@ void Controller::subNavPressedIndexData(QList<QJsonDocument> documents)
 	this->indexDocument_id = "";
 }
 
-void Controller::subNavPressedPageData(QList<QJsonDocument> documents)
+void Controller::subNavPressedPageData(QJsonDocument document)
 {
-	//	qDebug() << "pageee" << documents;
-	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedPageData(QList<QJsonDocument>)));
-	if(documents.count() > 0)
-		PageUI::ShowUI(documents.first().object());
-
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedPageData(QJsonDocument)));
+	PageUI::ShowUI(document.object());
 }
 /**
  * @author Michael Bishara
