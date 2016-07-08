@@ -7,6 +7,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 
 	//qDebug() << "wassup" << structureView;
 	//	qDebug() << "data" << data;
+	this->structureView = QJsonObject();
 	this->structureView = structureView;
 	layout = new QHBoxLayout(this);
 	this->layout->setSizeConstraint(QLayout::SetMaximumSize);
@@ -88,7 +89,8 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		}
 	else if(type.compare("Table") == 0){
 		merplyTabelView * table = new merplyTabelView(this,"key");
-		//QDomNode columns = nodek.namedItem("Columns");
+		//qDebug() << data.toObject() << structureView;
+		Controller::Get()->getReportTableData(structureView);
 		table->fill(structureView,data.toObject());
 		layout->addWidget(table);
 		field = table;
@@ -168,12 +170,15 @@ QString SubFieldUI::save()
 		save +=((QDateEdit*)field)->date().toString(Qt::DefaultLocaleShortDate);
 		}
 
-return save.trimmed();
+	return save.trimmed();
 }
 
 bool SubFieldUI::checkMandatory()
 {
-	if(structureView.value("Mandatory").toBool()){
+
+	if(structureView.isEmpty()
+			&& structureView.value("Mandatory") != QJsonValue::Undefined
+			&& structureView.value("Mandatory").toBool()){
 		if(this->save().isEmpty()){
 			field->setObjectName("error");
 			field->style()->unpolish(field);

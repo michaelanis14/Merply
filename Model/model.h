@@ -40,6 +40,9 @@ public:
 	void setShowWarning(bool value);
 	bool getShowWarning() const;
 
+
+
+
 	//Navigation
 	void addSubNavigation(double key, QList<QTreeWidgetItem*> subNav);
 	QList<QTreeWidgetItem*> getSubNavigation(double key);
@@ -72,6 +75,9 @@ public:
 
 	QMap<double, QJsonObject> getPages() const;
 
+	QString getDefaulConnStrg() const;
+	void setDefaulConnStrg(const QString& value);
+
 private:
 	explicit Model();
 	///Flags///
@@ -82,7 +88,8 @@ private:
 	QMap<double, QJsonObject > pages;
 	QMap<double, QString > mainNavigation;
 	User* loggedUser;
-
+	//Defaults
+	QString defaulConnStrg;
 };
 
 #endif // MODEL_H

@@ -152,8 +152,8 @@ bool Prsistance::init()
 		write("ContactType",QString("Name->Other"));
 		}
 */
-	if(Count("Country") <=  0){
-		QString jsonFile = initCountries();
+	if(Count("Country::%\"") <=  0){
+		QString jsonFile = readFile(":/initData/initData/Countries.Json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		foreach(QJsonValue country,doc.object().value("countries").toObject().value("country").toArray()){
 			//QJsonObject c;
@@ -202,10 +202,10 @@ bool Prsistance::init()
 			}
 		}
 
-	if(Count("City") <=  2){
-		QString jsonFile = initCities();
+	if(Count("City::%\"") <=  2){
+		QString jsonFile = readFile(":/initData/initData/countriesToCities.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-		QString jsonFileC = initCountries();
+		QString jsonFileC = readFile(":/initData/initData/Countries.Json");
 		QJsonDocument docC = QJsonDocument::fromJson(jsonFileC.toUtf8());
 		foreach(QJsonValue country,docC.object().value("countries").toObject().value("country").toArray()){
 			QJsonArray arryObj;
@@ -234,7 +234,7 @@ bool Prsistance::init()
 
 
 		}
-	if(Count("ContactType") <  1){
+	if(Count("ContactType::%\"") <  1){
 
 
 
@@ -263,36 +263,23 @@ bool Prsistance::init()
 				}
 
 		}
+	if(Count("ViewStructure::Contact") <=  0){
+		QString jsonFile = readFile(":/initData/initData/contact.json");
+		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		Database::Get()->storeDoc("ViewStructure::Contact",doc);
+		}
+
 	//if()
 	return true;
 }
 
-QString Prsistance::initCountries()
+
+QString Prsistance::readFile(QString path)
 {
 	QString jsonFile;
-	QFile file(":/initData/initData/Countries.Json");
+	QFile file(path);
 	if(!file.open(QIODevice::ReadOnly)) {
-		qDebug() <<"error @ persistance 169" << file.errorString();
-		}
-
-	QTextStream in(&file);
-
-	while(!in.atEnd()) {
-		QString line = in.readLine();
-		jsonFile.append(line);
-		}
-
-	file.close();
-
-	return jsonFile;
-}
-
-QString Prsistance::initCities()
-{
-	QString jsonFile;
-	QFile file(":/initData/initData/countriesToCities.json");
-	if(!file.open(QIODevice::ReadOnly)) {
-		qDebug() <<"error @ persistance 233" << file.errorString();
+		qDebug() << __FILE__ << __LINE__ << file.errorString();
 		}
 
 	QTextStream in(&file);
@@ -335,7 +322,7 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 	//QString query = "SELECT fin."+select.trimmed()+"[0] AS `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f UNNEST f fin WHERE fin."+select+" AND META(d).id LIKE \""+table+"::%\" "+where;
 	//QString query = "SELECT fin."+select.trimmed()+"[0] AS `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f UNNEST f fin WHERE fin."+select+" AND META(d).id LIKE \""+table+"::%\" "+where;
 	QString query ="SELECT Array item."+select.trimmed()+" FOR item IN f END As `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f WHERE  META(d).id LIKE \""+table+"::%\" "+where;
-	//qDebug() << query;
+	qDebug() << query;
 
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	Database::Get()->query(query);
@@ -349,7 +336,7 @@ void Prsistance::GetJsonListData(QList<QJsonDocument> items)
 int Prsistance::Count(const QString table)
 {
 
-	if(Database::Get()->query("SELECT COUNT(*) AS count  FROM  "+QString(DATABASE)+" WHERE META( "+QString(DATABASE)+").id LIKE \""+table+"::%\"")){
+	if(Database::Get()->query("SELECT COUNT(*) AS count  FROM  "+QString(DATABASE)+" WHERE META( "+QString(DATABASE)+").id LIKE \""+table)){
 		//qDebug() << Database::Get()->getArray().first().object().value("count").toInt();
 		if(!Database::Get()->getArray().isEmpty() && Database::Get()->getArray().count() > 0){
 			return Database::Get()->getArray().first().object().value("count").toInt();

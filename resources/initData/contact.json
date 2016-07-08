@@ -1,0 +1,162 @@
+{
+  "Title": "Contact",
+  "Type": "Entity",
+  "Viewgroups": [
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "ArrayList": false,
+            "Label": "Salutation",
+            "SubFields": [
+              {
+                "Mandatory": true,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Firstname\n",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Name",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "c/o",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Birthday",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Date"
+              }
+            ]
+          }
+        ],
+        "Style": "vertical"
+      }
+    },
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "ArrayList": false,
+            "Label": "Contact type",
+            "SubFields": [
+              {
+                "Editable": true,
+                "Mandatory": false,
+                "Select": "Type",
+                "Source": "ContactType",
+                "Type": "Refrence"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Contact class",
+            "SubFields": [
+              {
+                "Editable": false,
+                "Mandatory": false,
+                "Select": "Invoice Number",
+                "Source": "Invoice",
+                "Type": "Refrence"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Contact number",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          }
+        ],
+        "Style": "vertical"
+      }
+    },
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "ArrayList": false,
+            "Label": "Street address\n",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Postal code",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Country",
+            "SubFields": [
+              {
+                "Editable": false,
+                "Mandatory": false,
+                "Select": "Name",
+                "Source": "Country",
+                "Type": "Refrence"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "City",
+            "SubFields": [
+              {
+                "Editable": false,
+                "Entity": "Country",
+                "Local": "Country",
+                "LocalFilter": true,
+                "Mandatory": false,
+                "Select": "Cities",
+                "Source": "City",
+                "Type": "Refrence"
+              }
+            ]
+          }
+        ],
+        "Style": "vertical"
+      }
+    }
+  ]
+}

@@ -37,7 +37,7 @@ public:
 	bool deleteDoc(QString documentid);
 	static bool IncrementKey(QString key);
 	static int GetKey(QString key);
-	static lcb_t InitDatabase();
+	static lcb_t InitDatabase(QString connStr = "");
 	static bool KillDatabase(lcb_t instance);
 	static void got_document(lcb_t instance, const void *, lcb_error_t err,
 							 const lcb_get_resp_t *resp);
@@ -60,6 +60,7 @@ private:
 	static Database* p_instance;
 	//QJsonDocument document;
 	QList<QJsonDocument> array;
+	bool connIssue;
 	//	QString value;
 
 

@@ -39,7 +39,7 @@ StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject struct
 	headerlbl = new HeaderLabel();
 	if(!structureView.value("Title").toString().isEmpty())
 		headerlbl->setTitle(structureView.value("Title").toString());
-	else headerlbl->setTitle("New Card"+QString::number(Controller::Get()->Count("ViewStructure")));
+	else headerlbl->setTitle("New Card");///+QString::number(Controller::Get()->Count("ViewStructure")));
 	layout->addWidget(headerlbl);
 
 

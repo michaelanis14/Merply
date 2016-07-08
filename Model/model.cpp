@@ -30,6 +30,7 @@ Model::Model():QObject()
 	subNavigation =  QMap<double, QList<QTreeWidgetItem *> >();
 	pages =  QMap<double, QJsonObject >();
 	loggedUser = 0;
+	this->defaulConnStrg = "couchbase://localhost/default";
 }
 
 bool Model::getShowWarning() const
@@ -44,7 +45,7 @@ void Model::addSubNavigation(double key, QList<QTreeWidgetItem *> subNav)
 
 void Model::clearSubNavigation()
 {
-	 subNavigation.clear();
+	subNavigation.clear();
 }
 
 void Model::clearPages()
@@ -165,14 +166,24 @@ bool Model::isNameExistInList(QStringList &list, QString &name) {
 	return false;
 }
 
+QString Model::getDefaulConnStrg() const
+{
+	return defaulConnStrg;
+}
+
+void Model::setDefaulConnStrg(const QString& value)
+{
+	defaulConnStrg = value;
+}
+
 QMap<double, QJsonObject> Model::getPages() const
 {
-    return pages;
+	return pages;
 }
 
 bool Model::Log(const QStringList& log)
 {
-    QString fileName = "log";
+	QString fileName = "log";
 
 	if(!QFile::exists(fileName)){
 #ifndef Q_OS_WIN32

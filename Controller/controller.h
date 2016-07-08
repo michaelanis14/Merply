@@ -96,6 +96,9 @@ public:
 	bool saveNavigationPages();
 	QJsonObject saveSubNavigation(QTreeWidgetItem* item);
 
+	//
+	void getReportTableData(QJsonObject strct);
+
 	//Model Defines
 	int static GetWindowWidth();
 	int static GetWindowHeight();

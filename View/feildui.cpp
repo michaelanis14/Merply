@@ -13,6 +13,7 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 	this->layout->setSpacing(0);
 	this->strID = strID;
 	this->structureView = structureView;
+	this->subFields = QList<SubFieldUI*>();
 
 	if(structureView.value("Label") != QJsonValue::Undefined){
 		label = new QLabel(structureView.value("Label").toString());

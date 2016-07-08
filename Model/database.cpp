@@ -1,5 +1,7 @@
 #include "database.h"
 
+#include "model.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <string.h>
@@ -9,6 +11,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QDebug>
+#include <QMessageBox>
 
 
 void Database::storage_callback(lcb_t, const void *, lcb_storage_t,
@@ -101,7 +104,10 @@ void Database::on_removed(lcb_t instance, const void *, lcb_error_t err,
 bool Database::deleteDoc(QString documentid)
 {
 	lcb_t instance = Database::InitDatabase();
-
+	if(instance == NULL){
+		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
+		return false;
+		}
 	lcb_set_remove_callback(instance, on_removed);
 	lcb_remove_cmd_t cmd ;//= { 0 };
 	const lcb_remove_cmd_t *cmdlist = &cmd;
@@ -121,31 +127,64 @@ bool Database::deleteDoc(QString documentid)
 	return true;
 }
 
-lcb_t Database::InitDatabase()
+lcb_t Database::InitDatabase(QString connStr)
 {
 	// initializing
 	//Database::Get()->document = QJsonDocument();
+	if(connStr.isEmpty())
+		connStr = Model::Get()->getDefaulConnStrg();
 	Database::Get()->array.clear();
+	bool retry = true;
 
 	struct lcb_create_st cropts;// = { 0 };
 	cropts.version = 3;
-	cropts.v.v3.connstr = "couchbase://localhost/default";
+	QByteArray bKey = connStr.toLatin1();
+	const char *connstr = bKey.data();
+	cropts.v.v3.connstr = connstr;
 	lcb_error_t err;
 	lcb_t instance;
-	err = lcb_create(&instance, &cropts);
-	if (err != LCB_SUCCESS) {
-		qDebug("Couldn't create instance!\n");
-		return  NULL;
-		}
 
-	// connecting
+	while(retry){
+		err = lcb_create(&instance, &cropts);
+		if (err != LCB_SUCCESS) {
+			qDebug("Couldn't create instance!\n");
+			goto retrymsg;
+			}
 
-	lcb_connect(instance);
-	lcb_wait(instance);
-	if ( (err = lcb_get_bootstrap_status(instance)) != LCB_SUCCESS ) {
-		qDebug("Couldn't bootstrap!\n");
-		return NULL;
+		// connecting
+
+		lcb_connect(instance);
+		lcb_wait(instance);
+		if ( (err = lcb_get_bootstrap_status(instance)) != LCB_SUCCESS ) {
+			qDebug() << __FILE__ << __LINE__ << "Couldn't bootstrap!\n";
+retrymsg:
+			QMessageBox msgBox;
+			msgBox.setText("Error Connection to the Database");
+			msgBox.setInformativeText("Do you want to retry?");
+			msgBox.setStandardButtons(QMessageBox::Retry | QMessageBox::Cancel);
+			msgBox.setDefaultButton(QMessageBox::Retry);
+			int ret = QMessageBox::Cancel;
+			if(!p_instance->connIssue)
+				ret = msgBox.exec();
+			switch (ret) {
+			case QMessageBox::Retry:
+				// Save was clicked
+				p_instance->connIssue = false;
+				break;
+			case QMessageBox::Cancel:
+				retry = false;
+				p_instance->connIssue = true;
+				return NULL;
+				break;
+			default:
+				retry = false;
+				return NULL;
+				break;
+				}
+
+			}
 		}
+	p_instance->connIssue = false;
 	return instance;
 }
 
@@ -162,7 +201,7 @@ bool Database::IncrementKey(QString key)
 	Database::Get()->LastKeyID = "-1";
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){
-		qDebug() << "Failed to INIT Database @ Increment";
+		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
 		return false;
 		}
 
@@ -226,7 +265,7 @@ bool Database::getDoc(QString key) {
 	Database::Get()->LastKeyID = "-1";
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){
-		qDebug() << "Failed to INIT Database @ Query";
+		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
 		return false;
 		}
 	lcb_set_get_callback(instance, got_document);
@@ -288,7 +327,7 @@ bool Database::query(QString query)
 	lcb_t instance = Database::InitDatabase();
 	Database::Get()->array = QList<QJsonDocument>();
 	if(instance == NULL){
-		qDebug() << "Failed to INIT Database @ Query";
+		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
 		return false;
 		}
 
@@ -352,12 +391,15 @@ bool Database::storeDoc(QString key,QJsonDocument document) {
 
 		key = QString(key)+QString("::")+ QString::number(keyID);
 		}
-		//qDebug ()<<"key" << key;
+	//qDebug ()<<"key" << key;
 	QJsonObject objWithKey = document.object();
 	objWithKey.insert("document_id",key);
 	document = QJsonDocument(objWithKey);
 	lcb_t instance = Database::InitDatabase();
-
+	if(instance == NULL){
+		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
+		return false;
+		}
 	//lcb_set_store_callback(instance, on_stored_status);
 	struct lcb_store_cmd_st cmd;// = { 0 };
 	lcb_store_cmd_t *cmdlist = &cmd;
@@ -403,6 +445,7 @@ Database::Database():
 	//	this->document =  QJsonDocument();
 	//	this->value = QString();
 	this->array = QList<QJsonDocument>();
+	this->connIssue = false;
 	//IncrementKey("cont");
 	/*
 	// initializing

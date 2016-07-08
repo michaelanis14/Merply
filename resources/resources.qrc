@@ -20,5 +20,6 @@
         <file>initData/Countries.Json</file>
         <file>initData/ViewStructureCountry.Json</file>
         <file>initData/countriesToCities.json</file>
+        <file>initData/contact.json</file>
     </qresource>
 </RCC>

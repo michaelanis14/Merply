@@ -12,6 +12,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 	layout->setSpacing(0);
 	ViewGroups::Viewgroups.clear();
 	this->structureView = structureView;
+	ViewGroups::Fieldsgroups.clear();
 
 	if(AccessController::Get()->hasAdminGroupAccess()){
 		SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
