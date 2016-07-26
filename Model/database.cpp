@@ -59,7 +59,7 @@ bool Database::updateDoc(QJsonDocument document)
 	lcb_t instance = Database::InitDatabase();
 
 
-	qDebug() << "UPDATE DOC" << document << document.object().value("document_id").toString().toLatin1();
+	//qDebug() << "UPDATE DOC" << document << document.object().value("document_id").toString().toLatin1();
 	//lcb_set_store_callback(instance, on_stored_status);
 	struct lcb_store_cmd_st cmd;// = { 0 };
 	lcb_store_cmd_t *cmdlist = &cmd;
@@ -131,60 +131,27 @@ lcb_t Database::InitDatabase(QString connStr)
 {
 	// initializing
 	//Database::Get()->document = QJsonDocument();
-	if(connStr.isEmpty())
-		connStr = Model::Get()->getDefaulConnStrg();
 	Database::Get()->array.clear();
-	bool retry = true;
 
 	struct lcb_create_st cropts;// = { 0 };
 	cropts.version = 3;
-	QByteArray bKey = connStr.toLatin1();
-	const char *connstr = bKey.data();
-	cropts.v.v3.connstr = connstr;
+	cropts.v.v3.connstr = "couchbase://localhost/default";
 	lcb_error_t err;
 	lcb_t instance;
-
-	while(retry){
-		err = lcb_create(&instance, &cropts);
-		if (err != LCB_SUCCESS) {
-			qDebug("Couldn't create instance!\n");
-			goto retrymsg;
-			}
-
-		// connecting
-
-		lcb_connect(instance);
-		lcb_wait(instance);
-		if ( (err = lcb_get_bootstrap_status(instance)) != LCB_SUCCESS ) {
-			qDebug() << __FILE__ << __LINE__ << "Couldn't bootstrap!\n";
-retrymsg:
-			QMessageBox msgBox;
-			msgBox.setText("Error Connection to the Database");
-			msgBox.setInformativeText("Do you want to retry?");
-			msgBox.setStandardButtons(QMessageBox::Retry | QMessageBox::Cancel);
-			msgBox.setDefaultButton(QMessageBox::Retry);
-			int ret = QMessageBox::Cancel;
-			if(!p_instance->connIssue)
-				ret = msgBox.exec();
-			switch (ret) {
-			case QMessageBox::Retry:
-				// Save was clicked
-				p_instance->connIssue = false;
-				break;
-			case QMessageBox::Cancel:
-				retry = false;
-				p_instance->connIssue = true;
-				return NULL;
-				break;
-			default:
-				retry = false;
-				return NULL;
-				break;
-				}
-
-			}
+	err = lcb_create(&instance, &cropts);
+	if (err != LCB_SUCCESS) {
+		qDebug("Couldn't create instance!\n");
+		return  NULL;
 		}
-	p_instance->connIssue = false;
+
+	// connecting
+
+	lcb_connect(instance);
+	lcb_wait(instance);
+	if ( (err = lcb_get_bootstrap_status(instance)) != LCB_SUCCESS ) {
+		qDebug() << __FILE__ << __LINE__ << "Couldn't bootstrap! " << lcb_strerror(instance, err);
+		return NULL;
+		}
 	return instance;
 }
 

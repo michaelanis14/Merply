@@ -43,10 +43,10 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
 			Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString());
 			}
-		QString dataString = data.toString();
+		QJsonObject dataObj = data.toObject();
 		//qDebug() << data;
-		if(!dataString.isEmpty()){
-			combox->setCurrentIndex(combox->findText(dataString));
+		if(!dataObj.isEmpty()){
+			combox->setCurrentIndex(combox->findText(dataObj.value("Value").toString()));
 			}
 		//qDebug() << structureView.value("Source").toString() << structureView.value("Select").toString();
 		}
@@ -142,35 +142,38 @@ void SubFieldUI::clear()
 
 }
 
-QString SubFieldUI::save()
+QJsonValue SubFieldUI::save()
 {
-	QString save;
+	QJsonValue save;
 	if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
 		//	save += component.name;
-		save +=((QComboBox*)field)->currentText();
+		QJsonObject comboFields;
+		comboFields.insert("Value", ((QComboBox*)field)->currentText());
+		comboFields.insert("Key", ((ERPComboBox*)field)->getKey());
+		save = comboFields;
 		//save +=" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QLineEdit") == 0 ){
 		//	save += component.name;
 
-		save +=((QLineEdit*)field)->text();
-		//	save +=" ";
+		save =((QLineEdit*)field)->text();
+		//	save =" ";
 		}
 	else if(field->objectName().compare("checkbox") == 0){
-		//	save += component.name;
-		save +=((QCheckBox*)field)->isChecked();
-		//	save +=" ";
+		//	save = component.name;
+		save =((QCheckBox*)field)->isChecked();
+		//	save =" ";
 		}
 	else if(field->objectName().compare("merplyTabelView") == 0){
-		//	save += component.name;
-		save +=((merplyTabelView*)field)->save("this->key");
-		//	save +=" ";
+		//	save = component.name;
+		save =((merplyTabelView*)field)->save("this->key");
+		//	save =" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QDateEdit") == 0){
-		save +=((QDateEdit*)field)->date().toString(Qt::DefaultLocaleShortDate);
+		save =((QDateEdit*)field)->date().toString(Qt::DefaultLocaleShortDate);
 		}
 
-	return save.trimmed();
+	return save;
 }
 
 bool SubFieldUI::checkMandatory()
@@ -179,7 +182,7 @@ bool SubFieldUI::checkMandatory()
 	if(structureView.isEmpty()
 			&& structureView.value("Mandatory") != QJsonValue::Undefined
 			&& structureView.value("Mandatory").toBool()){
-		if(this->save().isEmpty()){
+		if(this->save().toString().isEmpty()){
 			field->setObjectName("error");
 			field->style()->unpolish(field);
 			field->style()->polish(field);

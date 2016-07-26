@@ -21,7 +21,7 @@ class SubFieldUI : public QWidget
 public:
 	explicit SubFieldUI(QWidget *parent = 0,QString strID = "", QJsonObject structureView = QJsonObject(), QJsonValue data = QJsonValue());
 	void clear();
-	QString save();
+	QJsonValue save();
 	bool checkMandatory();
 private:
 	QHBoxLayout *layout;

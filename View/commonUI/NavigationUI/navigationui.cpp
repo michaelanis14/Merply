@@ -26,7 +26,9 @@ navigationUI::navigationUI(QWidget *parent) :
 	this->setFixedWidth(Controller::GetNavigationWidth());
 	this->setFixedHeight(Controller::GetWindowHeight());
 
-	if(AccessController::Get()->hasAdminGroupAccess()){
+//	if(AccessController::Get()->hasAdminGroupAccess()){
+	if(true){
+	qDebug() << "admin";
 		SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
 		sctrlUI->setFixedHeight(Controller::GetNavigationSettingsBarHeight());
 		sctrlUI->addbtn("Settings",":/resources/icons/settings.png","settings");
