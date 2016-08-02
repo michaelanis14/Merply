@@ -22,6 +22,7 @@ public:
 	HeaderLabel* headerlbl;
 	SettingsCtrlsUI* sctrlUI;
 	QVBoxLayout* structureViewGroupsUILayout;
+	void getTableFields();
 private:
 	QVBoxLayout *layout;
 

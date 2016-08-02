@@ -97,6 +97,19 @@ QJsonObject StructureViewGroupsUI::save()
 	return saveObject;
 }
 
+void StructureViewGroupsUI::getTableFields()
+{
+		QStringList feildNames;
+		foreach(StructureViewsEditUI* vg,sVSFUIs){
+			foreach (StructureViewEdit* feild, vg->sVSFs) {
+				if(!feild->label->text().trimmed().isEmpty() && feild->getFieldsType().contains("Table"))
+					feildNames << feild->label->text();
+				}
+			}
+		emit gotFieldsNames(feildNames);
+
+}
+
 
 StructureViewGroupsUI* StructureViewGroupsUI::p_instance = 0;
 void StructureViewGroupsUI::ShowUI(QJsonObject structureView) {
@@ -242,11 +255,15 @@ void StructureViewGroupsUI::getFeildsNames()
 	QStringList feildNames;
 	foreach(StructureViewsEditUI* vg,sVSFUIs){
 		foreach (StructureViewEdit* feild, vg->sVSFs) {
-			feildNames << feild->label->text();
+			if(!feild->label->text().trimmed().isEmpty() && !feild->getFieldsType().contains("Table"))
+				feildNames << feild->label->text();
 			}
 		}
 	emit gotFieldsNames(feildNames);
 }
+
+
+
 
 void StructureViewGroupsUI::paintEvent(QPaintEvent * event)
 {

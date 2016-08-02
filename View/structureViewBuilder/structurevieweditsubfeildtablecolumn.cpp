@@ -42,7 +42,7 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	layout->addRow(new QLabel(tr("Select ")), Select);
 
 
-
+	initFilterWidget();
 
 	defaultValue = new QLineEdit(0);
 	defaultValue->setVisible(false);
@@ -126,4 +126,73 @@ void StructureVieweditSubFeildTableColumn::selectData(QList<QJsonDocument> items
 	Source->addJsonItems(items);
 }
 
+void StructureVieweditSubFeildTableColumn::filterOnChanged(int index)
+{
+	if(filterWidget){
+		if(index == 0){
+			localFilterWidget->setHidden(true);
+			}
+		else if(index == 1){
+			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilter(QStringList)));
+			StructureViewGroupsUI::GetUI()->getFeildsNames();
+			entityFilter->addItems(Select->getItemsText());
+			entityFilter->adjustSize();
+			localFilterWidget->setHidden(false);
+			}
+		else if(index == 2){
+			localFilterWidget->setHidden(true);
+			}
+		}
+}
+
+void StructureVieweditSubFeildTableColumn::fillLocalFilter(QStringList feilds)
+{
+	QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilter(QStringList)));
+
+	if(localFilterWidget){
+		localFilter->clear();
+		localFilter->addItems(feilds);
+		}
+}
+void StructureVieweditSubFeildTableColumn::initFilterWidget()
+{
+	filterWidget = new QWidget(0);
+	filterWidget->setContentsMargins(0,0,0,0);
+	filterWidget->setObjectName("filterWidget");
+	filterWidgetLayout = new QFormLayout(filterWidget);
+	filterWidgetLayout->setFormAlignment(Qt::AlignLeft);
+	filterWidgetLayout->setLabelAlignment(Qt::AlignLeft);
+	filterWidgetLayout->setSpacing(0);
+	filterWidgetLayout->setMargin(0);
+
+	filterOn = new ERPComboBox(filterWidget);
+	filterWidgetLayout->addRow(new QLabel(tr("Match on    ")), filterOn);
+	QStringList filterItems;
+	filterItems <<tr("none")<< tr("local match");
+	filterOn->addItems(filterItems);
+	//fieldsWidgetLayout->addWidget(filterWidget);
+	QObject::connect(filterOn,SIGNAL(currentIndexChanged(int)),this,SLOT(filterOnChanged(int)));
+
+
+	localFilterWidget = new QWidget(0);
+	localFilterWidget->setAutoFillBackground(true);
+	localFilterWidget->setContentsMargins(0,0,0,0);
+	localFilterWidget->setObjectName("localFilterWidget");
+	localFilterWidgetLayout = new QFormLayout(localFilterWidget);
+	localFilterWidgetLayout->setAlignment(Qt::AlignLeft);
+	//localFilterWidgetLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
+	localFilterWidgetLayout->setLabelAlignment(Qt::AlignLeft);
+	localFilterWidgetLayout->setSpacing(0);
+	localFilterWidgetLayout->setMargin(0);
+
+	localFilter = new ERPComboBox(0);
+	localFilterWidgetLayout->addRow(new QLabel(tr("Local Filter")), localFilter);
+	entityFilter = new ERPComboBox(0);
+	localFilterWidgetLayout->addRow(new QLabel(tr("Entity Filter")), entityFilter);
+	//QObject::connect(localFilter,SIGNAL(currentIndexChanged(int)),this,SLOT(filterOnChanged(int)));
+	localFilterWidget->setHidden(true);
+	filterWidgetLayout->addRow(localFilterWidget);
+
+	layout->addRow(filterWidget);
+}
 

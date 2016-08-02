@@ -13,7 +13,7 @@ StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(
 
 	this->setContentsMargins(0,0,0,0);
 	this->setObjectName("StructureVieweditSubFeild");
-	this->setStyleSheet("QWidget#StructureVieweditSubFeild{ border: 1px solid gray; border-top : 1px solid blue;}");
+	this->setStyleSheet("QWidget2#StructureVieweditSubFeild{ border: 1px solid gray; border-top : 1px solid blue;}");
 
 	layout = new QFormLayout(this);
 	layout->setContentsMargins(0,0,5,0);
@@ -41,7 +41,7 @@ StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(
 	layout->addRow(preview);
 
 
-
+	typeSelect = new ERPComboBox(0);
 }
 
 
@@ -53,7 +53,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	this->restrictedTypes = restrictedTypes;
 	if(fieldVS.isObject())
 		this->fieldVS = fieldVS;
-	ERPComboBox* typeSelect = new ERPComboBox(0);
+
 	QStringList types;
 	if(!restrictedTypes.isEmpty()){
 		types << restrictedTypes;
@@ -238,6 +238,11 @@ QJsonObject StructureVieweditSubFeild::save()
 			}
 		}
 	return saveObject;
+}
+
+QString StructureVieweditSubFeild::getType()
+{
+	return this->typeSelect->currentText();
 }
 
 void StructureVieweditSubFeild::initFilterWidget()

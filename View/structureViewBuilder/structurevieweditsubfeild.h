@@ -20,6 +20,7 @@ public:
 	void fillTypeFields(QString type, QJsonValue fieldVS, QStringList restrictedTypes);
 	QJsonObject save();
 	QFormLayout *layout;
+	QString getType();
 private:
 	StructureVieweditSubFeildTable* tableEdit;
 	ERPComboBox* Source;
@@ -39,7 +40,7 @@ private:
 	QWidget*filterWidget;
 	ERPComboBox* filterOn;
 	QFormLayout* filterWidgetLayout;
-
+	ERPComboBox* typeSelect;
 	QWidget*localFilterWidget;
 	ERPComboBox* localFilter;
 	ERPComboBox* entityFilter;

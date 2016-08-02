@@ -154,6 +154,15 @@ void StructureViewEdit::hideTypeFields()
 	typeFields->setHidden(true);
 }
 
+QStringList StructureViewEdit::getFieldsType()
+{
+	QStringList types;
+	foreach(StructureVieweditSubFeild* svsf, sVSFs){
+		types.append(svsf->getType());
+		}
+	return types;
+}
+
 void StructureViewEdit::fill(QJsonObject structureView)
 {
 	if(!structureView.isEmpty() ){

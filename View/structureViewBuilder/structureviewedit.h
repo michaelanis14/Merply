@@ -19,7 +19,8 @@ public:
 	void showTypeFields();
 	void hideTypeFields();
 	SettingsCtrlsUI* topCntrlsPreview;
-		QLineEdit* label;
+	QLineEdit* label;
+	QStringList getFieldsType();
 private:
 	QHBoxLayout *layout;
 	//ERPComboBox* typeSelect;
