@@ -203,7 +203,7 @@ QJsonObject StructureVieweditSubFeild::save()
 			}
 
 		else if(type.compare("Refrence") == 0){
-			qDebug() <<"Save Refrence subfield:206"<< Select->getKey() << Source->getKey();
+			//qDebug() <<"Save Refrence subfield:206"<< Select->getKey() << Source->getKey();
 			saveObject.insert("Select",Select->currentText());
 			saveObject.insert("Source",Source->getKey());
 			saveObject.insert("Editable",Editable->isChecked());

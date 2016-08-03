@@ -74,8 +74,6 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 	clmn.insert("Header",header->text());
 	clmn.insert("Type",type->currentText());
 	if(type->currentIndex() == 0){
-		qDebug() <<"Save Refrence subfield:206"<< Select->getKey() << Source->getKey();
-
 		clmn.insert("Source",Source->getKey());
 		clmn.insert("Select",Select->currentText());
 		}
@@ -141,7 +139,7 @@ void StructureVieweditSubFeildTableColumn::filterOnChanged(int index)
 			}
 		else if(index == 1){
 			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilter(QStringList)));
-			StructureViewGroupsUI::GetUI()->getFeildsNames();
+			StructureViewGroupsUI::GetUI()->getTableFields();
 			entityFilter->addItems(Select->getItemsText());
 			entityFilter->adjustSize();
 			localFilterWidget->setHidden(false);
