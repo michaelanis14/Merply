@@ -246,6 +246,11 @@ QString StructureVieweditSubFeild::getType()
 	return this->typeSelect->currentText();
 }
 
+StructureVieweditSubFeildTable* StructureVieweditSubFeild::getTableEdit() const
+{
+	return tableEdit;
+}
+
 void StructureVieweditSubFeild::initFilterWidget()
 {
 	filterWidget = new QWidget(0);

@@ -21,6 +21,7 @@ public:
 	SettingsCtrlsUI* topCntrlsPreview;
 	QLineEdit* label;
 	QStringList getFieldsType();
+	StructureVieweditSubFeild * getTableFeild();
 private:
 	QHBoxLayout *layout;
 	//ERPComboBox* typeSelect;

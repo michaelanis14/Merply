@@ -142,7 +142,7 @@ void Controller::queryIndexView(QString vStrctKey)
 	QString card = vStrctKey.replace("ViewStructure::","");
 	card.append("::%");
 	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
-	qDebug()<<"QINDEX : " << query;
+	//qDebug()<<"QINDEX : " << query;
 
 
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedIndexData(QList<QJsonDocument>)));
@@ -559,7 +559,7 @@ void Controller::getReportTableData(QJsonObject strct)
 {
 	foreach(QJsonValue clmn, strct.value("Columns").toArray()){
 		if(clmn.toObject().value("Type").toString().compare("Database") == 0){
-			qDebug() << clmn.toObject().value("Select").toString() << clmn.toObject().value("Source").toString();
+		//	qDebug() << clmn.toObject().value("Select").toString() << clmn.toObject().value("Source").toString();
 			}
 		}
 }

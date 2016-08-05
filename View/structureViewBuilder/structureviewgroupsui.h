@@ -49,6 +49,7 @@ protected:
 signals:
 	void cancel();
 	void gotFieldsNames(QStringList names);
+	void gotSourcesJson(QList<QJsonDocument> sources);
 public slots:
 	void btn_Clicked(QString btn);
 	void viewGroupStyleChanged();

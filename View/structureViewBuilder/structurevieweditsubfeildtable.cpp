@@ -59,6 +59,17 @@ QJsonObject StructureVieweditSubFeildTable::save()
 	return saveTable;
 }
 
+QList<QJsonDocument> StructureVieweditSubFeildTable::getClmnsSources()
+{
+	QList<QJsonDocument> sourcesList;
+	if(!clmns.isEmpty()){
+		foreach(StructureVieweditSubFeildTableColumn* clmn,clmns){
+			sourcesList.append(clmn->getSource()->getCurrentJsonItem());
+			}
+		}
+	return sourcesList;
+}
+
 void StructureVieweditSubFeildTable::addColumn()
 {
 	StructureVieweditSubFeildTableColumn *clmnWidget = new StructureVieweditSubFeildTableColumn(this,QJsonObject());

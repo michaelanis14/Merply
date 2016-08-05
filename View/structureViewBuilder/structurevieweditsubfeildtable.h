@@ -13,6 +13,7 @@ class StructureVieweditSubFeildTable : public QWidget
 public:
 	explicit StructureVieweditSubFeildTable(QWidget *parent = 0, QJsonObject tblStractureView = QJsonObject());
 	QJsonObject save();
+	QList<QJsonDocument> getClmnsSources();
 private:
 	QHBoxLayout *layout;
 	QHBoxLayout *clmnsLayout;

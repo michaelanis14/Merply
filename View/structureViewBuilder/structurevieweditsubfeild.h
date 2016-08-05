@@ -21,6 +21,8 @@ public:
 	QJsonObject save();
 	QFormLayout *layout;
 	QString getType();
+	StructureVieweditSubFeildTable* getTableEdit() const;
+
 private:
 	StructureVieweditSubFeildTable* tableEdit;
 	ERPComboBox* Source;

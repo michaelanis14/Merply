@@ -26,7 +26,7 @@ ERPComboBox::ERPComboBox(QWidget *parent, bool indexedFill) :
 }
 void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 	int i = 0;
-
+	//qDebug() << items;
 	foreach (const QJsonDocument & value, items){
 
 		//QString valueString = value.object().value("Value").toString();
@@ -157,6 +157,19 @@ void ERPComboBox::clear()
 	keys.clear();
 	this->addedItems = false;
 	QComboBox::clear();
+}
+
+QJsonDocument ERPComboBox::getCurrentJsonItem()
+{
+	QJsonObject obj;
+	QJsonArray v1;
+	QJsonArray v2;
+	v2.append(this->currentText());
+	v1.append(v2);
+	obj.insert("Value",v1);
+	obj.insert("Key",this->getKey());
+
+	return QJsonDocument(obj);
 }
 /*
 void ERPComboBox::setCurrentIndex(int index)

@@ -13,6 +13,8 @@ class StructureVieweditSubFeildTableColumn : public QWidget
 public:
 	explicit StructureVieweditSubFeildTableColumn(QWidget *parent = 0, QJsonObject clmn = QJsonObject());
 	QJsonObject save();
+	ERPComboBox* getSource() const;
+
 private:
 	QFormLayout *layout;
 	ERPComboBox* type;
@@ -40,7 +42,7 @@ public slots:
 	void updateSelectData(QList<QString> fields);
 	void selectData(QList<QJsonDocument> items);
 	void filterOnChanged(int index);
-	void fillLocalFilter(QStringList feilds);
+	void fillLocalFilter(QList<QJsonDocument> feilds);
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILDTABLECOLUMN_H

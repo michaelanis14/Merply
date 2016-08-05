@@ -253,14 +253,16 @@ void StructureViewGroupsUI::getFeildsNames()
 
 void StructureViewGroupsUI::getTableFields()
 {
-	QStringList feildNames;
+	QList<QJsonDocument> sourcesList;
 	foreach(StructureViewsEditUI* vg,sVSFUIs){
 		foreach (StructureViewEdit* feild, vg->sVSFs) {
-			if(!feild->label->text().trimmed().isEmpty() && feild->getFieldsType().contains("Table"))
-				feildNames << feild->label->text();
+			StructureVieweditSubFeild* svsf = feild->getTableFeild();
+			if(svsf->getType().contains("Table")){
+				sourcesList = svsf->getTableEdit()->getClmnsSources();
+				}
 			}
 		}
-	emit gotFieldsNames(feildNames);
+	emit gotSourcesJson(sourcesList);
 }
 
 

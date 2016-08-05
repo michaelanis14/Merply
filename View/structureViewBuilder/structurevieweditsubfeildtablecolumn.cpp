@@ -22,7 +22,7 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	else header->setText("New Header");
 	layout->addRow(new QLabel(tr("Header ")), header);
 
-	qDebug()  << clmn;
+//	qDebug()  << clmn;
 	type = new ERPComboBox(0);
 	QStringList typs;
 	typs << "Database" << "Text";
@@ -74,13 +74,16 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 	clmn.insert("Header",header->text());
 	clmn.insert("Type",type->currentText());
 	if(type->currentIndex() == 0){
-		qDebug() <<"Save Refrence subfield:206"<< Select->getKey() << Source->getKey();
-
 		clmn.insert("Source",Source->getKey());
 		clmn.insert("Select",Select->currentText());
 		}
 	else clmn.insert("Default",defaultValue->text());
 	return clmn;
+}
+
+ERPComboBox* StructureVieweditSubFeildTableColumn::getSource() const
+{
+	return Source;
 }
 
 void StructureVieweditSubFeildTableColumn::updateFields(QString value)
@@ -140,10 +143,11 @@ void StructureVieweditSubFeildTableColumn::filterOnChanged(int index)
 			localFilterWidget->setHidden(true);
 			}
 		else if(index == 1){
-			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilter(QStringList)));
-			StructureViewGroupsUI::GetUI()->getFeildsNames();
-			entityFilter->addItems(Select->getItemsText());
-			entityFilter->adjustSize();
+			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QJsonDocument>)),this,SLOT(fillLocalFilter(QList<QJsonDocument>)));
+			StructureViewGroupsUI::GetUI()->getTableFields();
+
+			//entityFilter->addItems(Select->getItemsText());
+			//entityFilter->adjustSize();
 			localFilterWidget->setHidden(false);
 			}
 		else if(index == 2){
@@ -152,13 +156,13 @@ void StructureVieweditSubFeildTableColumn::filterOnChanged(int index)
 		}
 }
 
-void StructureVieweditSubFeildTableColumn::fillLocalFilter(QStringList feilds)
+void StructureVieweditSubFeildTableColumn::fillLocalFilter(QList<QJsonDocument> feilds)
 {
-	QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilter(QStringList)));
+	QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QJsonDocument>)),this,SLOT(fillLocalFilter(QList<QJsonDocument>)));
 
 	if(localFilterWidget){
 		localFilter->clear();
-		localFilter->addItems(feilds);
+		localFilter->addJsonItems(feilds);
 		}
 }
 void StructureVieweditSubFeildTableColumn::initFilterWidget()
@@ -203,3 +207,5 @@ void StructureVieweditSubFeildTableColumn::initFilterWidget()
 	layout->addRow(filterWidget);
 }
 
+/// When localfilter changes get the new entity fields from the controller and fill entity filter
+/// think about adding 2 more fileds for matching with and also an equational field for total sum for example

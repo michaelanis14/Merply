@@ -28,8 +28,8 @@ public:
 	void removeSelected();
 	void removeList(QStringList list);
 	void clear();
+	QJsonDocument getCurrentJsonItem();
 private:
-
 	QString oldCompletion;
 
 signals:

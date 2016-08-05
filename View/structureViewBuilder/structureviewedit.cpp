@@ -163,6 +163,15 @@ QStringList StructureViewEdit::getFieldsType()
 	return types;
 }
 
+StructureVieweditSubFeild* StructureViewEdit::getTableFeild()
+{
+	foreach(StructureVieweditSubFeild* svsf, sVSFs){
+		if(svsf->getType().compare("Table") == 0)
+			return svsf;
+		}
+	return new StructureVieweditSubFeild();
+}
+
 void StructureViewEdit::fill(QJsonObject structureView)
 {
 	if(!structureView.isEmpty() ){
