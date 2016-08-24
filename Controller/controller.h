@@ -96,6 +96,7 @@ public:
 	bool saveNavigationPages();
 	QJsonObject saveSubNavigation(QTreeWidgetItem* item);
 
+	void getReport(QJsonObject clmns);
 	//
 	void getReportTableData(QJsonObject strct);
 
@@ -133,6 +134,7 @@ public slots:
 	void GetJsonListData(QList<QJsonDocument> items);
 	void getValueData(QString value);
 
+	void getReportData(QList<QJsonDocument> documents);
 	void getLastKeyData(QString key);
 
 
@@ -148,7 +150,6 @@ signals:
 	void gotValue(QString value);
 	void gotLastKey(QString LastKeyID);
 	void gotJsonListData(QList<QJsonDocument> items);
-
 
 };
 

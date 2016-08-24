@@ -84,7 +84,7 @@ bool Database::updateDoc(QJsonDocument document)
 		lcb_wait(instance);
 		} else {
 		fprintf(stderr, "Couldn’t schedule operation: %s\n", lcb_strerror(instance, err));
-		qDebug() << "ERRLOG" << document;
+		qDebug()<< __FILE__ << __LINE__ << "ERRLOG" << document;
 		}
 
 

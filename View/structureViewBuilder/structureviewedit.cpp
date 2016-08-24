@@ -182,8 +182,9 @@ void StructureViewEdit::fill(QJsonObject structureView)
 			foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
 				QString type = fieldVS.toObject().value("Type").toString();
 				StructureVieweditSubFeild * svsf = new StructureVieweditSubFeild(this);
-				svsf->fillTypeFields(type,fieldVS,this->restrictedTypes);
 				sVSFs << svsf;
+				svsf->fillTypeFields(type,fieldVS,this->restrictedTypes);
+
 				QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 
 				RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);

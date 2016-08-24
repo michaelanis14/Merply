@@ -96,6 +96,9 @@ QString merplyTabelView::save(QString propertyName)
 bool merplyTabelView::fill(QJsonObject columns, QJsonObject data)
 {
 
+	Controller::Get()->getReport(columns);
+	model = new MerplyReportTableModel();
+	//tabel->setModel(model);
 
 	if(columns.value("Columns").isArray()){
 		QJsonArray arr = (columns.value("Columns").toArray());
@@ -108,6 +111,7 @@ bool merplyTabelView::fill(QJsonObject columns, QJsonObject data)
 			//model->setItem(i,0,data);
 			if(clmn.toObject().value("Type").toString().compare("Database") == 0){
 				QList<QString> columnData;
+
 				//TODO :: commented to ease the transition to the new database slots
 				//			columnData << Controller::Get()->getListItems(clmn.toObject().value("Source").toString(),clmn.toObject().value("Select").toString());
 				if(tabel->rowCount()<columnData.count())
@@ -143,7 +147,7 @@ bool merplyTabelView::fill(QJsonObject columns, QJsonObject data)
 		//qDebug() <<"AA"<< data.value(propertyName).toArray();
 		if(tabel->rowCount() <  data.value(propertyName).toArray().count())
 			tabel->setRowCount( data.value(propertyName).toArray().count());
-
+		qDebug() << "clmn DATA " <<data.value(propertyName);
 		for(int i = 0; i < data.value(propertyName).toArray().count(); i++){
 
 			//qDebug() <<"I"<< data.value(propertyName).toArray()[i];
@@ -245,7 +249,7 @@ void merplyTabelView::printTabel(){
 		out << "<tr>";
 		for (int column = 1; column < columnCount; column++) {
 			if (!tabel->isColumnHidden(column)) {
-			//	QString data = tabel->model()->data(tabel->model()->index(row, column)).toString().simplified();
+				//	QString data = tabel->model()->data(tabel->model()->index(row, column)).toString().simplified();
 				QString data = ((QLabel*)tabel->cellWidget(row,column))->text();
 				out << QString("<td bkcolor=0>%1</td>").arg((!data.isEmpty()) ? data : QString("&nbsp;"));
 				}
@@ -334,12 +338,12 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 
 		tabel->setCellWidget(i, j, controller);
 
-		qDebug() << item;
+		//qDebug() << item;
 		foreach(QJsonValue value, item.object().value("Fields").toArray()){
 			foreach(QJsonValue viewGroup, value.toArray()){
 				QString valueString;
 				if(headerItems.count() -1 > j)
-				valueString = Controller::Get()->toString(viewGroup.toObject().value(headerItems.at(j)).toArray());
+					valueString = Controller::Get()->toString(viewGroup.toObject().value(headerItems.at(j)).toArray());
 				//qDebug()  << valueString;
 				//QStandardItem *value = new QStandardItem(valueString);
 				//	tabel->setItem(i,k,value);

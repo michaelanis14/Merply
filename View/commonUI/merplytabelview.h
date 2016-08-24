@@ -7,6 +7,10 @@
 #ifndef MERPLYTABELVIEW_H
 #define MERPLYTABELVIEW_H
 
+
+#include "merplyreporttablemodel.h"
+
+
 #include <QtGui>
 #include <QWidget>
 #include <QLabel>
@@ -41,6 +45,7 @@ private:
 	QHBoxLayout* lblLayout;
 	QLabel* print;
 	QString propertyName;
+	MerplyReportTableModel* model;
 	//QStandardItemModel *model;
 	//QStringList headerLabels;
 signals:

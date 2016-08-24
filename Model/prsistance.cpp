@@ -142,7 +142,7 @@ QJsonArray Prsistance::table(QString line)
 
 bool Prsistance::init()
 {
-//	qDebug() <<"Init" << Count("City::%\"");//<< Count("ViewStructure::Contact\"");
+	//	qDebug() <<"Init" << Count("City::%\"");//<< Count("ViewStructure::Contact\"");
 	/*
 	if(Count("ContactType") == -1){
 		write("ContactType",QString("Name->Customer"));
@@ -226,7 +226,7 @@ bool Prsistance::init()
 		//qDebug() << jsonFile << doc;
 		QString jsonFileC = readFile(":/initData/initData/Countries.Json");
 		QJsonDocument docC = QJsonDocument::fromJson(jsonFileC.toUtf8());
-	//	qDebug()  << docC;
+		//	qDebug()  << docC;
 		foreach(QJsonValue country,docC.object().value("countries").toObject().value("country").toArray()){
 			QJsonArray arryObj;
 
@@ -264,26 +264,26 @@ bool Prsistance::init()
 		QJsonArray arryObj;
 
 
-				QJsonArray typesall;
-				QStringList types;
-				types << "Customer" << "Supplier";
+		QJsonArray typesall;
+		QStringList types;
+		types << "Customer" << "Supplier";
 
-				foreach(QString typ,types){
-					QJsonArray typarr;
-					typarr << typ;
-					typesall << typarr;
-					}
+		foreach(QString typ,types){
+			QJsonArray typarr;
+			typarr << typ;
+			typesall << typarr;
+			}
 
-				QJsonObject ci;
-				ci.insert("Type", typesall);
-				arryObj << ci;
-				//qDebug() <<doc.object().value(country.toObject().value("countryName").toString()).toArray();
+		QJsonObject ci;
+		ci.insert("Type", typesall);
+		arryObj << ci;
+		//qDebug() <<doc.object().value(country.toObject().value("countryName").toString()).toArray();
 
-			if(!arryObj.isEmpty()){
-				QJsonObject fieldsArry;
-				fieldsArry.insert("Fields",QJsonArray() << arryObj);
-				Database::Get()->storeDoc("ContactType",QJsonDocument(fieldsArry));
-				}
+		if(!arryObj.isEmpty()){
+			QJsonObject fieldsArry;
+			fieldsArry.insert("Fields",QJsonArray() << arryObj);
+			Database::Get()->storeDoc("ContactType",QJsonDocument(fieldsArry));
+			}
 
 		}
 
@@ -338,10 +338,12 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 			where = QString("AND "+condition);
 			}
 		}
+	QString entities = table.split("::").count() > 1 ?table.split("::")[1]:table;
+
 	//QString query = "SELECT fin."+select.trimmed()+"[0] AS `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f UNNEST f fin WHERE fin."+select+" AND META(d).id LIKE \""+table+"::%\" "+where;
 	//QString query = "SELECT fin."+select.trimmed()+"[0] AS `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f UNNEST f fin WHERE fin."+select+" AND META(d).id LIKE \""+table+"::%\" "+where;
-	QString query ="SELECT Array item."+select.trimmed()+" FOR item IN f END As `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f WHERE  META(d).id LIKE \""+table+"::%\" "+where;
-	qDebug() << query;
+	QString query ="SELECT Array item.`"+select.trimmed()+"` FOR item IN f END As `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f WHERE  META(d).id LIKE '"+entities+"::%' "+where;
+	//qDebug() << query;
 
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	Database::Get()->query(query);

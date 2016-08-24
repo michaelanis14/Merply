@@ -251,14 +251,14 @@ void StructureViewGroupsUI::getFeildsNames()
 	emit gotFieldsNames(feildNames);
 }
 
-void StructureViewGroupsUI::getTableFields()
+void StructureViewGroupsUI::getTableFields(ERPComboBox* excludeSource)
 {
 	QList<QJsonDocument> sourcesList;
 	foreach(StructureViewsEditUI* vg,sVSFUIs){
 		foreach (StructureViewEdit* feild, vg->sVSFs) {
 			StructureVieweditSubFeild* svsf = feild->getTableFeild();
 			if(svsf->getType().contains("Table")){
-				sourcesList = svsf->getTableEdit()->getClmnsSources();
+				sourcesList = svsf->getTableEdit()->getClmnsSources(excludeSource);
 				}
 			}
 		}

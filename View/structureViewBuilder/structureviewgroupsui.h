@@ -22,7 +22,7 @@ public:
 	HeaderLabel* headerlbl;
 	SettingsCtrlsUI* sctrlUI;
 	QVBoxLayout* structureViewGroupsUILayout;
-	void getTableFields();
+	void getTableFields(ERPComboBox* excludeSource);
 private:
 	QVBoxLayout *layout;
 

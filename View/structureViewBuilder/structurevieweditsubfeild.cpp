@@ -165,7 +165,8 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		layout->addRow(new QLabel(tr("Select ")), Select);
 		}
 	else if(type.compare("Table") == 0){
-		tableEdit = new StructureVieweditSubFeildTable(this,fieldVS.toObject());
+		tableEdit = new StructureVieweditSubFeildTable(this);
+		tableEdit->fill(fieldVS.toObject());
 		QObject::connect(tableEdit,SIGNAL(tableChanged()),this,SIGNAL(changed()));
 		layout->addRow("Tabel",tableEdit);
 		}
@@ -243,7 +244,7 @@ QJsonObject StructureVieweditSubFeild::save()
 
 QString StructureVieweditSubFeild::getType()
 {
-	return this->typeSelect->currentText();
+	return this->type;
 }
 
 StructureVieweditSubFeildTable* StructureVieweditSubFeild::getTableEdit() const
@@ -295,6 +296,7 @@ void StructureVieweditSubFeild::initFilterWidget()
 
 void StructureVieweditSubFeild::updateFields(QString type)
 {
+	this->type = type;
 	QList<QWidget *> Widgets = this->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
 		{

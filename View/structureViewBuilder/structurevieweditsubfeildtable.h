@@ -11,9 +11,10 @@ class StructureVieweditSubFeildTable : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit StructureVieweditSubFeildTable(QWidget *parent = 0, QJsonObject tblStractureView = QJsonObject());
+	explicit StructureVieweditSubFeildTable(QWidget *parent = 0);
 	QJsonObject save();
-	QList<QJsonDocument> getClmnsSources();
+	QList<QJsonDocument> getClmnsSources(ERPComboBox* excludeSource);
+	void fill(QJsonObject tblStractureView);
 private:
 	QHBoxLayout *layout;
 	QHBoxLayout *clmnsLayout;

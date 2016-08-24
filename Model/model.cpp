@@ -19,9 +19,6 @@
 
 
 
-//QString Model::xmlDir = QString("%1%2xml%2").arg(QDir::currentPath()).arg(QDir::separator());
-
-
 
 
 Model::Model():QObject()

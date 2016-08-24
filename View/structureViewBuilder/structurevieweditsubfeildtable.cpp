@@ -1,7 +1,7 @@
 #include "structurevieweditsubfeildtable.h"
 #include "QPushButton"
 
-StructureVieweditSubFeildTable::StructureVieweditSubFeildTable(QWidget *parent,QJsonObject tblStractureView) : QWidget(parent)
+StructureVieweditSubFeildTable::StructureVieweditSubFeildTable(QWidget *parent) : QWidget(parent)
 {
 	this->setContentsMargins(0,0,5,0);
 	this->setObjectName("StructureVieweditSubFeildTable");
@@ -20,28 +20,10 @@ StructureVieweditSubFeildTable::StructureVieweditSubFeildTable(QWidget *parent,Q
 	layout->setMargin(0);
 	//layout->addRow();
 
-	StructureVieweditSubFeildTableColumn * clmnWidget;
-	if(!tblStractureView.isEmpty() && tblStractureView.value("Columns").isArray()){
-		foreach(QJsonValue clmn,tblStractureView.value("Columns").toArray()){
-			clmnWidget = new StructureVieweditSubFeildTableColumn(this,clmn.toObject());
-			QObject::connect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
-			clmns << clmnWidget;
-			layout->addWidget(clmnWidget);
-			}
-		}
-	else{
-		clmnWidget = new StructureVieweditSubFeildTableColumn(this,QJsonObject());
-		clmns << clmnWidget;
-		QObject::connect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
-		layout->addWidget(clmnWidget);
 
-		}
 
-	QPushButton* addColumn = new QPushButton("+");
-	QObject::connect(addColumn,SIGNAL(pressed()),this,SLOT(addColumn()));
-	QObject::connect(addColumn,SIGNAL(pressed()),this,SIGNAL(tableChanged()));
 
-	layout->addWidget(addColumn);
+
 
 }
 
@@ -59,15 +41,43 @@ QJsonObject StructureVieweditSubFeildTable::save()
 	return saveTable;
 }
 
-QList<QJsonDocument> StructureVieweditSubFeildTable::getClmnsSources()
+QList<QJsonDocument> StructureVieweditSubFeildTable::getClmnsSources(ERPComboBox* excludeSource)
 {
 	QList<QJsonDocument> sourcesList;
-	if(!clmns.isEmpty()){
+	if(clmns.first() && !clmns.isEmpty()){
 		foreach(StructureVieweditSubFeildTableColumn* clmn,clmns){
-			sourcesList.append(clmn->getSource()->getCurrentJsonItem());
+			if(clmn->getSource() != (excludeSource))
+				sourcesList.append(clmn->getSource()->getCurrentJsonItem());
 			}
 		}
 	return sourcesList;
+}
+
+void StructureVieweditSubFeildTable::fill(QJsonObject tblStractureView)
+{
+	clmns.clear();
+	StructureVieweditSubFeildTableColumn * clmnWidget;
+	if(!tblStractureView.isEmpty() && tblStractureView.value("Columns").isArray()){
+		foreach(QJsonValue clmn,tblStractureView.value("Columns").toArray()){
+			clmnWidget = new StructureVieweditSubFeildTableColumn(this,clmn.toObject());
+			clmnWidget->fill(clmn.toObject());
+			QObject::connect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
+			clmns << clmnWidget;
+			layout->addWidget(clmnWidget);
+			}
+		}
+	else{
+		clmnWidget = new StructureVieweditSubFeildTableColumn(this,QJsonObject());
+		clmns << clmnWidget;
+		QObject::connect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
+		layout->addWidget(clmnWidget);
+
+		}
+	QPushButton* addColumn = new QPushButton("+");
+	QObject::connect(addColumn,SIGNAL(pressed()),this,SLOT(addColumn()));
+	QObject::connect(addColumn,SIGNAL(pressed()),this,SIGNAL(tableChanged()));
+
+	layout->addWidget(addColumn);
 }
 
 void StructureVieweditSubFeildTable::addColumn()
