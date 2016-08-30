@@ -91,7 +91,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		merplyTabelView * table = new merplyTabelView(this,"key");
 		//qDebug() << data.toObject() << structureView;
 		Controller::Get()->getReportTableData(structureView);
-		table->fill(structureView,data.toObject());
+		table->fill(structureView);
 		layout->addWidget(table);
 		field = table;
 		}

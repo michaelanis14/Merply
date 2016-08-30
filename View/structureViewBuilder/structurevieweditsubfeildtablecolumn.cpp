@@ -23,9 +23,10 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	layout->addRow(new QLabel(tr("Header ")), header);
 
 	//	qDebug()  << clmn;
+	typsList << ("Database")<< ("Text")<< ("Equation");
 	type = new ERPComboBox(0);
 	QStringList typs;
-	typs << "Database" << "Text";
+	typs << tr("Database")<< tr("Text")<< tr("Equation");
 	type->addItems(typs);
 	type->setCurrentIndex(typs.indexOf(clmn.value("Type").toString()));
 	layout->addRow(new QLabel(tr("Type ")), type);
@@ -51,9 +52,9 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	layout->addRow(new QLabel(tr("Default ")), defaultValue);
 
 
-	QObject::connect(type,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateFields(QString)));
-	type->setCurrentIndex(1);
-	this->updateFields(type->currentText());
+	QObject::connect(type,SIGNAL(currentIndexChanged(int)),this,SLOT(updateFields(int)));
+	type->setCurrentIndex(0);
+	this->updateFields(0);
 	QObject::connect(header,SIGNAL(textEdited(QString)),this,SIGNAL(columnChanged()));
 
 	QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
@@ -91,7 +92,7 @@ ERPComboBox* StructureVieweditSubFeildTableColumn::getSource() const
 
 void StructureVieweditSubFeildTableColumn::fill(QJsonObject clmn)
 {
-	this->type->setCurrentIndex(type->getItemsText().indexOf(clmn.value("Type").toString().trimmed()));
+	this->type->setCurrentIndex(typsList.indexOf(clmn.value("Type").toString().trimmed()));
 	this->Source->setCurrentIndex(Source->keys.indexOf(clmn.value("Source").toString().trimmed()));
 	updateSelect(Source->currentText());
 	this->Select->setCurrentIndex(Select->getItemsText().indexOf(clmn.value("Select").toString().trimmed()));
@@ -108,9 +109,9 @@ void StructureVieweditSubFeildTableColumn::fill(QJsonObject clmn)
 	//qDebug() << clmn;
 }
 
-void StructureVieweditSubFeildTableColumn::updateFields(QString value)
+void StructureVieweditSubFeildTableColumn::updateFields(int value)
 {
-	if(value.compare("Database") == 0){
+	if(value == 0){
 		defaultValue->setVisible(false);
 		layout->labelForField(defaultValue)->setVisible(false);
 		Source->setVisible(true);
@@ -122,6 +123,9 @@ void StructureVieweditSubFeildTableColumn::updateFields(QString value)
 		layout->labelForField(Select)->setVisible(true);
 		if(!clmn.value("Select").toString().isEmpty())
 			Select->setCurrentText(clmn.value("Select").toString());
+		}
+	else if(value== 2){
+
 		}
 	else{
 		Source->setVisible(false);

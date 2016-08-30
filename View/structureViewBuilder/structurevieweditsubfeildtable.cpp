@@ -1,5 +1,6 @@
 #include "structurevieweditsubfeildtable.h"
 #include "QPushButton"
+#include "removebtn.h"
 
 StructureVieweditSubFeildTable::StructureVieweditSubFeildTable(QWidget *parent) : QWidget(parent)
 {
@@ -63,14 +64,20 @@ void StructureVieweditSubFeildTable::fill(QJsonObject tblStractureView)
 			clmnWidget->fill(clmn.toObject());
 			QObject::connect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
 			clmns << clmnWidget;
-			layout->addWidget(clmnWidget);
+			RemoveBtn* removeClmnBtn = new RemoveBtn(this,clmnWidget);
+			QObject::connect(removeClmnBtn,SIGNAL(remove(QWidget*)),this,SLOT(removColumn(QWidget*)));
+
+			layout->addWidget(removeClmnBtn);
 			}
 		}
 	else{
 		clmnWidget = new StructureVieweditSubFeildTableColumn(this,QJsonObject());
 		clmns << clmnWidget;
 		QObject::connect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
-		layout->addWidget(clmnWidget);
+		RemoveBtn* removeClmnBtn = new RemoveBtn(this,clmnWidget);
+		QObject::connect(removeClmnBtn,SIGNAL(remove(QWidget*)),this,SLOT(removColumn(QWidget*)));
+
+		layout->addWidget(removeClmnBtn);
 
 		}
 	QPushButton* addColumn = new QPushButton("+");
@@ -85,8 +92,15 @@ void StructureVieweditSubFeildTable::addColumn()
 	StructureVieweditSubFeildTableColumn *clmnWidget = new StructureVieweditSubFeildTableColumn(this,QJsonObject());
 	clmns << clmnWidget;
 	QObject::connect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
-	layout->addWidget(clmnWidget);
+	RemoveBtn* removeClmnBtn = new RemoveBtn(this,clmnWidget);
+	QObject::connect(removeClmnBtn,SIGNAL(remove(QWidget*)),this,SLOT(removColumn(QWidget*)));
+	layout->addWidget(removeClmnBtn);
 
+}
+
+void StructureVieweditSubFeildTable::removColumn(QWidget* clmn)
+{
+	clmns.removeOne((StructureVieweditSubFeildTableColumn*)clmn);
 }
 
 

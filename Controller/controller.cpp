@@ -588,6 +588,7 @@ void Controller::getReport(QJsonObject clmns)
 				query += "SELECT ";
 				query += "(Array item.`"+selectStr+"`[0] FOR item IN "+uniqueRef+"f END)[0] AS `"+clmnObj.value("Header").toString()+"`";
 				query += " , META("+uniqueRef+"d).id AS `"+source+"Key`";
+
 				orderby += "`"+source+"Key`";
 				//	qDebug() << clmnObj.value("LocalFilter").toString() << clmnObj.value("LocalFilter").toString().split("::").count() <<clmnObj.value("Source").toString() <<clmnObj.value("Source").toString().split("::").count();
 				if(clmnObj.value("LocalFilter") != QJsonValue::Undefined
@@ -602,6 +603,7 @@ void Controller::getReport(QJsonObject clmns)
 
 
 					query += " , META("+uniqueRef+"a).id AS `"+localFilter+"Key`";
+					query += " , META("+uniqueRef+"d).id AS `Join"+localFilter+"Key`";
 					query += "FROM ";
 					query += QString(DATABASE) +" "+uniqueRef+"d UNNEST "+uniqueRef+"d.Fields "+uniqueRef+"f UNNEST (Array item.`"+entityFilter+"`[0] FOR item IN "+uniqueRef+"f END)[0] "+uniqueRef+"fk  INNER JOIN "+QString(DATABASE) +"  "+uniqueRef+"a ON KEYS "+uniqueRef+"fk.`Key`";
 					query += "UNNEST "+uniqueRef+"a  af UNNEST af.Fields "+uniqueRef+"aff UNNEST (Array item.Name[0] FOR item IN "+uniqueRef+"aff END) "+uniqueRef+"afs "; //UNNEST (Array item.Salutation[0] FOR item IN "+uniqueRef+"ff END) IC2fkrk";
@@ -678,7 +680,9 @@ void Controller::getReport(QJsonObject clmns)
 
 void Controller::getReportData(QList<QJsonDocument> documents)
 {
-	qDebug() << documents;
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)));
+	emit gotReportData(documents);
+
 }
 
 

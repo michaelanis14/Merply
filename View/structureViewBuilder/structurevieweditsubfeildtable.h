@@ -27,6 +27,7 @@ signals:
 
 public slots:
 	void addColumn();
+	void removColumn(QWidget* clmn);
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILDTABLE_H

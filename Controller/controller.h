@@ -144,7 +144,7 @@ public slots:
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void gotFieldsData(QList<QString> fields);
-
+	void gotReportData(QList<QJsonDocument> documents);
 	void gotDocument(QJsonDocument docuemnt);
 	void gotDocuments(QList<QJsonDocument> array);
 	void gotValue(QString value);

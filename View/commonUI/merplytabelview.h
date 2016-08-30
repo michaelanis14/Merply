@@ -36,7 +36,7 @@ public:
 	merplyTabelView(QWidget *parent = 0, QString propertyName ="");
 	QTableWidget* tabel;
 	QString save(QString propertyName);
-	bool fill(QJsonObject columns, QJsonObject data);
+	bool fill(QJsonObject columns);
 	void indexTable(const QString document_id, const QList<QJsonDocument> items, const bool, const bool);
 	void clear();
 	QList<QJsonDocument> items;
@@ -56,7 +56,7 @@ public slots:
 	void printTabel();
 	void editEntity(const QString&id);
 	void deleteEntity(const QString&id);
-
+	void gotReportData(QList<QJsonDocument> documents);
 	void updateHeaderData(QList<QString> headerItems);
 
 };

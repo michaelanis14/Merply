@@ -33,13 +33,13 @@ private:
 	ERPComboBox* localFilter;
 	ERPComboBox* entityFilter;
 	QFormLayout* localFilterWidgetLayout;
-
+	QStringList typsList;
 
 
 signals:
 	void columnChanged();
 public slots:
-	void updateFields(QString value);
+	void updateFields(int value);
 	void updateSelect(QString);
 	void updateSelectData(QList<QString> fields);
 	void selectData(QList<QJsonDocument> items);

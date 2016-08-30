@@ -93,13 +93,19 @@ QString merplyTabelView::save(QString propertyName)
 	return list;
 }
 
-bool merplyTabelView::fill(QJsonObject columns, QJsonObject data)
+bool merplyTabelView::fill(QJsonObject columns)
 {
 
-	Controller::Get()->getReport(columns);
-	model = new MerplyReportTableModel();
-	//tabel->setModel(model);
 
+	tabel->setHidden(true);
+	QTableView* view = new QTableView;
+	model = new MerplyReportTableModel(columns);
+	QObject::connect(Controller::Get(),SIGNAL(gotReportData(QList<QJsonDocument>)),this,SLOT(gotReportData(QList<QJsonDocument>)));
+	Controller::Get()->getReport(columns);
+	view->setModel(model);
+	layout->addWidget(view);
+
+	/*
 	if(columns.value("Columns").isArray()){
 		QJsonArray arr = (columns.value("Columns").toArray());
 		tabel->setColumnCount(arr.count());
@@ -174,6 +180,7 @@ bool merplyTabelView::fill(QJsonObject columns, QJsonObject data)
 	//this->tabel->setC(model);
 
 	return true;
+	*/
 
 }
 
@@ -312,6 +319,13 @@ void merplyTabelView::deleteEntity(const QString& id)
 	if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?")))
 		if(Controller::Get()->deleteDocument(id))
 			Controller::Get()->queryIndexView("ViewStructure::"+id.split("::")[0]);
+}
+
+void merplyTabelView::gotReportData(QList<QJsonDocument> documents)
+{
+	QObject::disconnect(Controller::Get(),SIGNAL(gotReportData(QList<QJsonDocument>)),this,SLOT(gotReportData(QList<QJsonDocument>)));
+
+	model->fill(documents);
 }
 
 void merplyTabelView::updateHeaderData(QList<QString> headerItems)
