@@ -7,7 +7,11 @@ merplyTableControllers::merplyTableControllers(QWidget *parent,QString id, const
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setAlignment(Qt::AlignCenter);
 
-
+	btn_print = new QPushButton();
+	btn_print->setObjectName("Print");
+	btn_print->setText("Print");
+	QObject::connect(btn_print, SIGNAL(clicked()),this, SLOT(btn_printClicked()));
+	layout->addWidget(btn_print);
 	if(edit){
 		btn_edit = new QPushButton();
 		btn_edit->setObjectName("Edit");
@@ -35,4 +39,9 @@ void merplyTableControllers::btn_deleteClicked()
 {
 	emit deleteClicked(id);
 	//	qDebug() <<"Delete" << id;
+}
+void merplyTableControllers::btn_printClicked()
+{
+	emit printClicked(id);
+//	qDebug() <<"Print" << id;
 }

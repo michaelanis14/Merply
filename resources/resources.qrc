@@ -15,7 +15,9 @@
         <file>arrow-up.png</file>
         <file>arrow-down.png</file>
     </qresource>
-    <qresource prefix="/"/>
+    <qresource prefix="/">
+        <file>example4.xml</file>
+    </qresource>
     <qresource prefix="/initData">
         <file>initData/Countries.Json</file>
         <file>initData/ViewStructureCountry.Json</file>

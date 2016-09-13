@@ -42,7 +42,8 @@ SOURCES += View/maindisplay.cpp \
     $$PWD/indexui.cpp \
     $$PWD/loginui.cpp \
     $$PWD/commonUI/logintabui.cpp \
-    $$PWD/commonUI/NavigationUI/widgetsstructureviewediteui.cpp
+    $$PWD/commonUI/NavigationUI/widgetsstructureviewediteui.cpp \
+    $$PWD/structureViewBuilder/strctvieweditsubftblclmneq.cpp
 
 HEADERS  += View/maindisplay.h \
     View/commonUI/rangevalidator.h \
@@ -81,7 +82,8 @@ HEADERS  += View/maindisplay.h \
     $$PWD/indexui.h \
     $$PWD/loginui.h \
     $$PWD/commonUI/logintabui.h \
-    $$PWD/commonUI/NavigationUI/widgetsstructureviewediteui.h
+    $$PWD/commonUI/NavigationUI/widgetsstructureviewediteui.h \
+    $$PWD/structureViewBuilder/strctvieweditsubftblclmneq.h
 
 #FORMS    += View/mainwindow.ui
 

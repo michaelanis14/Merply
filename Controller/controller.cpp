@@ -561,11 +561,6 @@ QJsonObject Controller::saveSubNavigation(QTreeWidgetItem * item)
 
 void Controller::getReport(QJsonObject clmns)
 {
-	//QStringList select;
-	//QStringList from;
-	//QStringList where;
-	//QStringList orderby;
-
 
 	//qDebug() << clmns;
 	if(clmns.value("Columns").isArray()){
@@ -583,7 +578,10 @@ void Controller::getReport(QJsonObject clmns)
 				QString selectStr = clmnObj.value("Select").toString();
 				QString uniqueRef = QString(source.at(0)).append(QString(selectStr.at(0))).append(QString::number(i)) ;
 
-
+				if(i > 0 && i < clmns.value("Columns").toArray().count() - 1){
+					query+= " UNION ALL ";
+					orderby += ",";
+					}
 
 				query += "SELECT ";
 				query += "(Array item.`"+selectStr+"`[0] FOR item IN "+uniqueRef+"f END)[0] AS `"+clmnObj.value("Header").toString()+"`";
@@ -625,11 +623,8 @@ void Controller::getReport(QJsonObject clmns)
 					//	qDebug() <<"clmnObj.value().toString()";
 					}
 
+				//qDebug() << i << (clmns.value("Columns").toArray().count() - 1) << query;
 
-				if(i < clmns.value("Columns").toArray().count() - 1){
-					query+= " UNION ALL ";
-					orderby += ",";
-					}
 				}
 			i++;
 			}

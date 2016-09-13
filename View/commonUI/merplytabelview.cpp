@@ -9,7 +9,6 @@
 #include "QPrinter"
 #include "QPrintDialog"
 
-
 #include "controller.h"
 
 #include <QLabel>
@@ -61,7 +60,18 @@ merplyTabelView::merplyTabelView(QWidget *parent,QString propertyName) :
 	layout->addItem(lblLayout);
 	layout->addWidget(tabel);
 
+
+
+	tableView= new QTableView;
+	layout->addWidget(tableView);
+	tableView->setHidden(true);
 	this->setAutoFillBackground(true);
+
+	report = new QtRPT(this);
+
+
+
+
 }
 
 QString merplyTabelView::save(QString propertyName)
@@ -96,15 +106,18 @@ QString merplyTabelView::save(QString propertyName)
 bool merplyTabelView::fill(QJsonObject columns)
 {
 
-
 	tabel->setHidden(true);
-	QTableView* view = new QTableView;
+	tableView->setHidden(false);
 	model = new MerplyReportTableModel(columns);
+	QObject::connect(this,SIGNAL(updateModel(QList<QJsonDocument>)),model,SLOT(fill(QList<QJsonDocument>)));
+
+	tableView->setModel(model);
+
+
 	QObject::connect(Controller::Get(),SIGNAL(gotReportData(QList<QJsonDocument>)),this,SLOT(gotReportData(QList<QJsonDocument>)));
 	Controller::Get()->getReport(columns);
-	view->setModel(model);
-	layout->addWidget(view);
 
+	return true;
 	/*
 	if(columns.value("Columns").isArray()){
 		QJsonArray arr = (columns.value("Columns").toArray());
@@ -224,6 +237,17 @@ void merplyTabelView::mousePressEvent(QMouseEvent *event){
 void merplyTabelView::printTabel(){
 	//tabel->hideColumn(0); // don't show the ID
 
+
+
+	QString fileName = ":/example4.xml";
+
+	report->loadReport(fileName);
+	report->recordCount << this->model->rowCount();
+	QObject::connect(report, SIGNAL(setValue(const int, const QString, QVariant&, const int)),
+					 this->model, SLOT(setValue(const int, const QString, QVariant&, const int)));
+	report->printExec();
+
+	/*
 	if(tabel->model()->headerData(tabel->model()->columnCount()-2, Qt::Horizontal).toString().contains("Created"))
 		tabel->hideColumn(tabel->model()->columnCount()-2); // don't show Created On
 
@@ -276,12 +300,12 @@ void merplyTabelView::printTabel(){
 	//document->setPageSize(QSizeF(printer.pageRect().size()));
 	//printer.setOutputFormat(QPrinter::NativeFormat);
 
-	/*
+
 	QPrintDialog *dialog = new QPrintDialog(&printer, NULL);
 	if (dialog->exec() == QDialog::Accepted) {
 		document->print(&printer);
 		}
-*/
+
 	QString filename = QFileDialog::getSaveFileName(0, QString("Save file"),QString(),QString(),0,0);
 
 	QPdfWriter writer(filename);
@@ -301,8 +325,29 @@ void merplyTabelView::printTabel(){
 		tabel->showColumn(tabel->model()->columnCount()-1); // don't show Edited On
 
 
-	delete document;
+	delete document;*/
 
+}
+
+void merplyTabelView::printEntity(const QString& id)
+{
+	QObject::disconnect(report);
+	QObject::disconnect(report, SIGNAL(setValue(const int, const QString, QVariant&, const int)),
+					 this, SLOT(setValue(const int, const QString, QVariant&, const int)));
+
+
+	qDebug() <<"print" <<id << indexedTable.value(id);
+	currenctPrintID = id;
+	QString fileName = ":/example4.xml";
+
+	report->loadReport(fileName);
+	report->recordCount << tabel->rowCount();
+	if(this->model)
+		QObject::disconnect(report, SIGNAL(setValue(const int, const QString, QVariant&, const int)),
+							this->model, SLOT(setValue(const int, const QString, QVariant&, const int)));
+	QObject::connect(report, SIGNAL(setValue(const int, const QString, QVariant&, const int)),
+					 this, SLOT(setValue(const int, const QString, QVariant&, const int)));
+	report->printExec();
 }
 
 void merplyTabelView::editEntity(const QString& id)
@@ -324,13 +369,14 @@ void merplyTabelView::deleteEntity(const QString& id)
 void merplyTabelView::gotReportData(QList<QJsonDocument> documents)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotReportData(QList<QJsonDocument>)),this,SLOT(gotReportData(QList<QJsonDocument>)));
-
-	model->fill(documents);
+	emit updateModel(documents);
+	//model->fill(documents);
 }
 
 void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
+	indexedTable.clear();
 	tabel->setColumnCount(headerItems.count()+1);
 	tabel->setHorizontalHeaderItem(0, new QTableWidgetItem(QString("controls")));
 	bool edit = true;
@@ -345,6 +391,7 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 	foreach(QJsonDocument item,items){
 		int j = 0;
 		merplyTableControllers* controller = new merplyTableControllers(0,item.object().value("document_id").toString(),edit,remove);
+		connect(controller, SIGNAL(printClicked(QString)), this, SLOT(printEntity(QString)));
 		if(edit)
 			connect(controller, SIGNAL(editClicked(const QString&)), this, SLOT(editEntity(QString)));
 		if(remove)
@@ -353,12 +400,13 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 		tabel->setCellWidget(i, j, controller);
 
 		//qDebug() << item;
+		QJsonObject simplifiedItem = QJsonObject();
 		foreach(QJsonValue value, item.object().value("Fields").toArray()){
 			foreach(QJsonValue viewGroup, value.toArray()){
 				QString valueString;
 				if(headerItems.count() -1 > j)
 					valueString = Controller::Get()->toString(viewGroup.toObject().value(headerItems.at(j)).toArray());
-				//qDebug()  << valueString;
+				simplifiedItem.insert(headerItems.at(j), valueString);
 				//QStandardItem *value = new QStandardItem(valueString);
 				//	tabel->setItem(i,k,value);
 				QLabel *value = new QLabel(valueString);
@@ -368,8 +416,10 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 				j++;
 				}
 			}
+		indexedTable.insert(item.object().value("document_id").toString(),simplifiedItem);
 		i++;
 		}
+	//qDebug() <<indexedTable;
 	tabel->resizeColumnsToContents();
 	/*
 
@@ -420,4 +470,13 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 
 	//return true;
 	*/
+}
+
+void merplyTabelView::setValue(const int , const QString paramName, QVariant& paramValue, const int )
+{
+	qDebug() << paramName;
+	QJsonValue value = indexedTable.value(currenctPrintID).value(paramName);
+	if(value != QJsonValue::Undefined)
+		paramValue = value.toVariant();
+	else return;
 }

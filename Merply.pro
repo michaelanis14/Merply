@@ -20,8 +20,7 @@ SOURCES += main.cpp
 include(View/View.pri)
 include(Model/Model.pri)
 include(Controller/Controller.pri)
-
-
+include(QtRPT/QtRpt.pri)
 
 #win32: LIBS += -L$$PWD/lib/TurboActivate/win32/ \
 #    -lTurboActivate

@@ -12,15 +12,18 @@ class merplyTableControllers : public QWidget
 public:
 	explicit merplyTableControllers(QWidget *parent = 0,QString id ="", const bool edit = false, const bool remove = false);
 private:
+	QPushButton* btn_print;
 	QPushButton* btn_edit;
 	QPushButton* btn_delete;
 	QHBoxLayout* layout;
 	QString id;
 
 signals:
+	void printClicked(const QString&);
 	void editClicked(const QString&);
 	void deleteClicked(const QString&);
 public slots:
+	void btn_printClicked();
 	void btn_editClicked();
 	void btn_deleteClicked();
 };

@@ -2,6 +2,7 @@
 #include "structureviewedit.h"
 #include "structureviewgroupsui.h"
 #include "controller.h"
+#include "removebtn.h"
 
 StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidget *parent,QJsonObject clmn) : QWidget(parent)
 {
@@ -45,9 +46,10 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 
 
 	initFilterWidget();
+	initEquationWidget();
 
 	defaultValue = new QLineEdit(0);
-	defaultValue->setVisible(false);
+	defaultValue->setHidden(true);
 	defaultValue->setText(clmn.value("Default").toString());
 	layout->addRow(new QLabel(tr("Default ")), defaultValue);
 
@@ -79,7 +81,13 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 			clmn.insert("LocalSource",true);
 			}
 		}
-
+	else if(type->currentIndex() == 2){
+		QJsonArray equationTerms;
+		foreach(StructureVieweditSubFeildTableColumnEquation* eqTerm,equationElements){
+			equationTerms << eqTerm->save();
+			}
+		clmn.insert("EquationTerms",equationTerms);
+		}
 	else clmn.insert("Default",defaultValue->text());
 
 	return clmn;
@@ -93,50 +101,74 @@ ERPComboBox* StructureVieweditSubFeildTableColumn::getSource() const
 void StructureVieweditSubFeildTableColumn::fill(QJsonObject clmn)
 {
 	this->type->setCurrentIndex(typsList.indexOf(clmn.value("Type").toString().trimmed()));
-	this->Source->setCurrentIndex(Source->keys.indexOf(clmn.value("Source").toString().trimmed()));
-	updateSelect(Source->currentText());
-	this->Select->setCurrentIndex(Select->getItemsText().indexOf(clmn.value("Select").toString().trimmed()));
-
-	if(clmn.value("LocalFilter") != QJsonValue::Undefined){
-		filterOn->setCurrentIndex(1);
-		localFilter->setCurrentIndex(localFilter->keys.indexOf(clmn.value("LocalFilter").toString()));
-		//localFilterChanged(0);
-		entityFilter->setCurrentText(clmn.value("EntityFilter").toString());
+	if(this->type->currentIndex() == 2){
+		QJsonArray equationTerms =  clmn.value("EquationTerms").toArray();
+		foreach(QJsonValue equationTerm,equationTerms){
+			addEquationWidget(equationTerm.toObject());
+			}
 		}
-	else if(clmn.value("LocalSource") != QJsonValue::Undefined){
-		filterOn->setCurrentIndex(2);
+	else{
+		this->Source->setCurrentIndex(Source->keys.indexOf(clmn.value("Source").toString().trimmed()));
+		updateSelect(Source->currentText());
+		this->Select->setCurrentIndex(Select->getItemsText().indexOf(clmn.value("Select").toString().trimmed()));
+
+		if(clmn.value("LocalFilter") != QJsonValue::Undefined){
+			filterOn->setCurrentIndex(1);
+			localFilter->setCurrentIndex(localFilter->keys.indexOf(clmn.value("LocalFilter").toString()));
+			//localFilterChanged(0);
+			entityFilter->setCurrentText(clmn.value("EntityFilter").toString());
+			}
+		else if(clmn.value("LocalSource") != QJsonValue::Undefined){
+			filterOn->setCurrentIndex(2);
+			}
 		}
 	//qDebug() << clmn;
 }
 
 void StructureVieweditSubFeildTableColumn::updateFields(int value)
 {
+
 	if(value == 0){
-		defaultValue->setVisible(false);
-		layout->labelForField(defaultValue)->setVisible(false);
-		Source->setVisible(true);
-		layout->labelForField(Source)->setVisible(true);
+		equationWidget->setHidden(true);
+
+		defaultValue->setHidden(true);
+
+		layout->labelForField(defaultValue)->setHidden(true);
+		Source->setHidden(false);
+		layout->labelForField(Source)->setHidden(false);
 		if(!clmn.value("Source").toString().isEmpty())
 			Source->setCurrentText(clmn.value("Source").toString());
 
-		Select->setVisible(true);
-		layout->labelForField(Select)->setVisible(true);
+		Select->setHidden(false);
+		layout->labelForField(Select)->setHidden(false);
 		if(!clmn.value("Select").toString().isEmpty())
 			Select->setCurrentText(clmn.value("Select").toString());
 		}
 	else if(value== 2){
 
+		defaultValue->setHidden(true);
+		layout->labelForField(defaultValue)->setHidden(true);
+
+		Source->setHidden(true);
+		layout->labelForField(Source)->setHidden(true);
+		Select->setHidden(true);
+		layout->labelForField(Select)->setHidden(true);
+
+		filterWidget->setHidden(true);
+
+		equationWidget->setHidden(false);
 		}
 	else{
-		Source->setVisible(false);
-		layout->labelForField(Source)->setVisible(false);
-		Select->setVisible(false);
-		layout->labelForField(Select)->setVisible(false);
-		defaultValue->setVisible(true);
-		layout->labelForField(defaultValue)->setVisible(true);
+		Source->setHidden(true);
+		layout->labelForField(Source)->setHidden(true);
+		Select->setHidden(true);
+		layout->labelForField(Select)->setHidden(true);
+		defaultValue->setHidden(false);
+		layout->labelForField(defaultValue)->setHidden(false);
 		if(!clmn.value("Default").toString().isEmpty())
 			defaultValue->setText(clmn.value("Default").toString());
-
+		filterWidget->setHidden(true);
+		equationWidget->setHidden(true);
 		}
 
 	emit columnChanged();
@@ -236,6 +268,43 @@ void StructureVieweditSubFeildTableColumn::initFilterWidget()
 	filterWidgetLayout->addRow(localFilterWidget);
 
 	layout->addRow(filterWidget);
+}
+
+void StructureVieweditSubFeildTableColumn::initEquationWidget()
+{
+	equationWidget = new QWidget;
+	equationWidget->setContentsMargins(0,0,0,0);
+	equationWidget->setAutoFillBackground(true);
+	equationWidget->setObjectName("equationWidget");
+	equationWidgetLayout = new QFormLayout(equationWidget);
+	equationWidget->setLayout(equationWidgetLayout);
+	equationWidgetLayout->setFormAlignment(Qt::AlignLeft);
+	equationWidgetLayout->setLabelAlignment(Qt::AlignLeft);
+	equationWidgetLayout->setSpacing(0);
+	equationWidgetLayout->setMargin(0);
+
+	QPushButton* addEqElement = new QPushButton("add Element");
+	equationWidgetLayout->addRow(addEqElement);
+	QObject::connect(addEqElement,SIGNAL(pressed()),this,SLOT(addEquationWidget()));
+	layout->addRow(equationWidget);
+}
+
+void StructureVieweditSubFeildTableColumn::addEquationWidget(QJsonObject data)
+{
+	StructureVieweditSubFeildTableColumnEquation* eqElemnet = new StructureVieweditSubFeildTableColumnEquation(0,equationElements.count() > 0 ?true:false);
+	if(!data.isEmpty()){
+		qDebug() << "Fill addEquationWidget"<< data;
+		eqElemnet->fill(data);
+		}
+	equationElements << eqElemnet;
+	RemoveBtn* removeEqElement = new RemoveBtn(this,eqElemnet);
+	QObject::connect(removeEqElement,SIGNAL(remove(QWidget*)),this,SLOT(removeEqElement(QWidget*)));
+	equationWidgetLayout->addWidget(removeEqElement);
+}
+
+void StructureVieweditSubFeildTableColumn::removeEqElement(QWidget* eqElement)
+{
+	equationElements.removeOne((StructureVieweditSubFeildTableColumnEquation*)eqElement);
 }
 void StructureVieweditSubFeildTableColumn::localFilterChanged(int)
 {

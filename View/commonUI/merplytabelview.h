@@ -10,6 +10,7 @@
 
 #include "merplyreporttablemodel.h"
 
+#include "qtrpt.h"
 
 #include <QtGui>
 #include <QWidget>
@@ -45,19 +46,26 @@ private:
 	QHBoxLayout* lblLayout;
 	QLabel* print;
 	QString propertyName;
+	QTableView* tableView;
 	MerplyReportTableModel* model;
+	QHash<QString,QJsonObject>indexedTable;
+	QString currenctPrintID;
+	QtRPT *report;
 	//QStandardItemModel *model;
 	//QStringList headerLabels;
 signals:
+	void updateModel(QList<QJsonDocument> documents);
 protected:
 	void mousePressEvent(QMouseEvent *event);
 
 public slots:
 	void printTabel();
+	void printEntity(const QString&id);
 	void editEntity(const QString&id);
 	void deleteEntity(const QString&id);
 	void gotReportData(QList<QJsonDocument> documents);
 	void updateHeaderData(QList<QString> headerItems);
+	void setValue(const int, const QString paramName, QVariant &paramValue, const int);
 
 };
 

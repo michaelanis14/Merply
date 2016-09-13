@@ -131,6 +131,7 @@ lcb_t Database::InitDatabase(QString connStr)
 {
 	// initializing
 	//Database::Get()->document = QJsonDocument();
+	connStr = "";
 	Database::Get()->array.clear();
 
 	struct lcb_create_st cropts;// = { 0 };

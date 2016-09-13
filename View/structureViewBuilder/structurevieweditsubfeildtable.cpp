@@ -47,8 +47,12 @@ QList<QJsonDocument> StructureVieweditSubFeildTable::getClmnsSources(ERPComboBox
 	QList<QJsonDocument> sourcesList;
 	if(clmns.first() && !clmns.isEmpty()){
 		foreach(StructureVieweditSubFeildTableColumn* clmn,clmns){
-			if(clmn->getSource() != (excludeSource))
-				sourcesList.append(clmn->getSource()->getCurrentJsonItem());
+			if(clmn->getSource() != (excludeSource)){
+				QJsonDocument doc = clmn->getSource()->getCurrentJsonItem();
+				QJsonObject objWHeader= doc.object();
+				objWHeader.insert("clmnHeader",clmn->header->text());
+				sourcesList.append(QJsonDocument(objWHeader));
+				}
 			}
 		}
 	return sourcesList;
