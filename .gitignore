@@ -14,3 +14,7 @@ Merply.pro.user
 *.user
 
 *.user
+
+*.o
+
+*.stash

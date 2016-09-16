@@ -1,0 +1,83 @@
+{
+  "Title": "AirportsCode",
+  "Type": "Entity",
+  "Viewgroups": [
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "ArrayList": false,
+            "Label": "Airport",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Country",
+            "SubFields": [
+              {
+                "Editable": false,
+                "Mandatory": false,
+                "Select": "Country",
+                "Source": "ViewStructure::Airline Codes",
+                "Type": "Refrence"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "City",
+            "SubFields": [
+              {
+                "Editable": false,
+                "Entity": "Cities",
+                "Local": "",
+                "LocalFilter": true,
+                "Mandatory": false,
+                "Select": "Cities",
+                "Source": "ViewStructure::Airline Codes",
+                "Type": "Refrence"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "IATA",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "ICAO",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "FAA",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          }
+        ],
+        "Style": "vertical"
+      }
+    }
+  ],
+  "document_id": "ViewStructure::AirportsCode"
+}

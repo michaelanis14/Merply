@@ -18,7 +18,11 @@ TEMPLATE = app
 
 include(../CommonFiles/CommonFiles_QtRptDesigner.pri)
 include(../QtRPT/QtRPT.pri)
-include(SQLDiagram/SQLDiagram.pri)
+#include(SQLDiagram/SQLDiagram.pri)
+unix: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.5.4/lib/ -lcouchbase
+
+INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.5.4/include
+DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.5.4/include
 
 DESTDIR = $${DEST_DIRECTORY}
 
@@ -33,11 +37,11 @@ SOURCES += main.cpp\
     RepScrollArea.cpp \
     SettingDlg.cpp \
     overlay.cpp \
-    SqlDesigner.cpp \
     TContainerLine.cpp \
     TContainerField.cpp \
     UndoCommands.cpp \
-    XmlViewModel.cpp
+    XmlViewModel.cpp \
+    ../Model/database.cpp
 
 HEADERS  += mainwindow.h \
     PageSettingDlg.h \
@@ -49,11 +53,11 @@ HEADERS  += mainwindow.h \
     RepScrollArea.h \
     SettingDlg.h \
     overlay.h \
-    SqlDesigner.h \
     TContainerLine.h \
     TContainerField.h \
     UndoCommands.h \
-    XmlViewModel.h
+    XmlViewModel.h \
+    ../Model/database.h
 
 FORMS    += mainwindow.ui \
     PageSettingDlg.ui \
@@ -61,8 +65,7 @@ FORMS    += mainwindow.ui \
     EditFldDlg.ui \
     FldPropertyDlg.ui \
     RepScrollArea.ui \
-    SettingDlg.ui \
-    SqlDesigner.ui
+    SettingDlg.ui
 
 RESOURCES += \
     images.qrc
@@ -105,6 +108,9 @@ unix {
 CONFIG += c++11
 CONFIG += app_bundle
 CONFIG -= debug_and_release debug_and_release_target
+
+
+
 
 # Automatically build required translation files (*.qm)
 all.depends = locale

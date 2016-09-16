@@ -1,0 +1,67 @@
+{
+  "Title": "Airlines Code",
+  "Type": "Entity",
+  "Viewgroups": [
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "ArrayList": false,
+            "Label": "Prefix",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "ICAO",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "IATA",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Name",
+            "SubFields": [
+              {
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "Country",
+            "SubFields": [
+              {
+                "Editable": false,
+                "Mandatory": false,
+                "Select": "Country",
+                "Source": "ViewStructure::City",
+                "Type": "Refrence"
+              }
+            ]
+          }
+        ],
+        "Style": "vertical"
+      }
+    }
+  ],
+  "document_id": "ViewStructure::AirlinesCode"
+}

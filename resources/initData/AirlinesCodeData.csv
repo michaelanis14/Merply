@@ -1,0 +1,779 @@
+Prefix,ICAO,IATA,Airline Name,Country
+1,AAL,AA,American Airlines Cargo,United States
+2,CRG,2G,Cargoitalia,Italy
+4,BPA,BV,Blue Panorama Airlines,Italy
+5,COA,CO,Continental Airlines,United States
+6,DAL,DL,Delta Air Lines,United States
+9,GMG,Z5,GMG Airlines,Bangladesh
+10,IRP,2F,Payam Air,Iran
+11,MSI,M9,Motor Sich JSC Airlines,Ukraine
+13,GBK,GY,Gabon Airlines,Gabon
+14,ACA,AC,Air Canada,Canada
+16,UAL,UA,United Airlines Cargo,United States
+17,LMP,U3,Air Plus Argentina,Argentina
+18,CDN,CP,Canadian Airlines International,Canada
+19,PAS,6D,Pelita Air Service,Indonesia
+20,GEC,LH,Lufthansa Cargo,Germany
+21,KRP,V3,Carpatair,Romania
+22,LDE,5U,Lineas Aereas Del Estado,Argentina
+23,FDX,FX,FedEx Express,United States
+24,EAE,EA,European Air Express,Germany
+26,SOV,6W,Saravia,Russia
+27,ASA,AS,Alaska Airlines,United States
+29,VTS,3K,Everts Air Cargo,United States
+30,TGA,YT,Air Togo,Togo
+31,PRF,PW,Precision Air,Tanzania
+32,HCY,ZU,Helios Airways,United Kingdom
+33,TLR,7Q,Air Libya,Libya
+34,GNR,GC,Gambia International Airlines,Gambia
+35,ARE,4C,Aires Colombia (Aerovias de Integracion),Colombia
+36,TWN,EC,Avialeasing,Uzbekistan
+37,USA,US,US Airways,United States
+38,TDM,TQ,Tandem Aero,Moldova
+40,HFY,5K,Hi Fly,Portugal
+41,JST,JQ,Jetstar,Australia
+42,VRG,RG,VARIG Brazilian Airlines,Brazil
+43,HDA,KA,Dragonair,Hong Kong
+44,ARG,AR,Aerolineas Argentinas,Argentina
+45,LAN,LA,LAN Airlines,Chile
+46,MGE,,Asia Pacific Airlines,United States
+47,TAP,TP,TAP-Air Portugal,Portugal
+48,CYP,CY,Cyprus Airways,Cyprus
+49,BWG,QW,Blue Wings,Germany
+50,OAL,OA,Olympic Airways,Greece
+51,LLB,LB,Lloyd Aereo Boliviano (LAB),Bolivia
+52,RPA,RW,Republic Airlines,United States
+53,EIN,EI,Aer Lingus Cargo,Ireland
+55,AZA,AZ,Alitalia,Italy
+56,YVK,YK,Cyprus Turkish Airlines,North Cyprus
+57,AFR,AF,Air France,France
+58,IAC,IC,Indian Airlines,India
+60,FWQ,YC,Flight West Airlines,Australia
+61,SEY,HM,Air Seychelles,Seychelles
+62,SKA,,Skyjet Brasil,Brazil
+63,ACI,SB,Air Caledonie International,New Caledonia
+64,CSA,OK,Czech Airlines,Czech Republic
+65,SVA,SV,Saudi Airlines Cargo,Saudi Arabia
+67,AEY,I9,Air Italy,Italy
+68,LAM,TM,LAM-Linhas Aereas de Mozambique,Mozambique
+69,LPR,MJ,LAPA Lineas Aereas Privadas Argentinas,Argentina
+70,SYR,RB,Syrianair,Syria
+71,ETH,ET,Ethiopian Airlines,Ethiopia
+72,GFA,GF,Gulf Air,Bahrain
+73,IAW,IA,Iraqi Airways,Iraq
+74,KLM,KL,KLM Cargo,Netherlands
+75,IBE,IB,Iberia,Spain
+76,MEA,ME,Middle East Airlines,Lebanon
+77,MSR,MS,Egyptair,Egypt
+78,SER,JR,Aero California,Mexico
+79,PAL,PR,Philippine Airlines,Philippines
+80,LOT,LO,LOT Polish Airlines,Poland
+81,QFA,QF,Qantas Airways Ltd,Australia
+82,BEL,SN,Brussels Airlines,Belgium
+83,SAA,SA,South African Airways Cargo,South Africa
+83,EXY,XZ,South African Express Airways,South Africa
+86,ANZ,NZ,Air New Zealand,New Zealand
+87,MXU,,Maximus Air Cargo,Abu Dhabi
+88,ARD,2B,ATA Aerocondor Transportes Aéreos,Portugal
+89,CQH,9S,Spring Airlines,China PRC
+90,KFR,IT,Kingfisher Airlines,India
+91,FCA,DP,First Choice Airways,United Kingdom
+92,RKA,RK,Air Afrique,Ivory Coast
+93,KNI,KD,KD Avia,Russia
+94,CGK,C4,Click Airways,Sharjah
+95,CHP,6A,AVIACSA- Consorcio Aviaxsa SA de CV,Mexico
+96,IRA,IR,Iran Air,Iran
+97,KLN,K8,Kalingrad Air Enterprise,Russia
+98,AIC,AI,Air India,India
+99,HAS,HX,Hamburg Airlines,Germany
+100,JQA,JQ,Trans Jamaican Airlines,Jamaica
+101,DLA,EN,Air Dolomiti SPA,Italy
+104,EWG,EW,Eurowings,Germany
+105,FIN,AY,Finnair Cargo,Finland
+106,BWA,BW,Caribbean Airlines,Trinidad & Tobago
+107,CRF,OR,Crimea Air,Ukraine
+108,ICE,FI,Icelandair Cargo,Iceland
+109,MLI,L9,Air Mali S.A.,Mali
+110,AYC,AO,Aviaco,Spain
+111,BHS,UP,Bahamasair,Bahamas
+112,CKK,CK,China Cargo Airlines,China PRC
+113,DOA,DO,Dominicana de Aviacion,Dominican Republic
+113,KIL,GW,Kuban Airlines,Russia
+114,ELY,LY,El Al Israel Airlines,Israel
+115,JAT,JU,Jat Airways,Serbia
+116,BHT,C6,Bright Air,Netherlands
+117,SAS,SK,SAS-Scandinavian Airlines System,Denmark
+118,DTA,DT,TAAG Angola Airlines,Angola
+119,ALM,LM,ALM Airline,Cura‡ao
+120,KOR,JS,Air Koryo,North Korea
+121,ADE,ZY,Ada Air,Albania
+122,LOG,LC,Loganair,United Kingdom
+123,RON,ON,Our Airline,Nauru
+124,DAH,AH,Air Algerie,Algeria
+125,BAW,BA,British Airways,United Kingdom
+126,GIA,GA,Garuda Indonesia,Indonesia
+127,PRL,J5,Aviaprima Sochi Airlines,Russia
+128,AVE,VE,Avensa,Venezuela
+129,MPH,MP,Martinair,Netherlands
+130,UKA,UK,KLCuk,United Kingdom
+131,JAL,JL,Japan Airlines,Japan
+132,MXA,MX,Mexicana de Aviación,Mexico
+133,LRC,LR,TACA/LACSA-Lineas Aéreas Costarricenses,Costa Rica
+134,AVA,AV,Avianca,Colombia
+135,VTA,VT,Air Tahiti,French Polynesia
+136,CUB,CU,Cubana,Cuba
+137,AES,VX,ACES-Aerolineas Central de Colombia,Colombia
+137,HFL,,Hanseflug,Germany
+139,AMX,AM,Aeromexico,Mexico
+140,LIA,LI,LIAT (1974),Antigua & Barbuda
+141,RSN,ZC,Royal Swazi National Airways,Swaziland
+142,BLF,KF,Blue1,Finland
+143,AUT,AU,Austral Lineas Aereas,Argentina
+144,RTM,7T,Trans Am,Ecuador
+145,LCO,UC,LAN Cargo,Chile
+146,CCM,XK,CCM Airlines,France
+147,RAM,AT,Royal Air Maroc,Morocco
+148,LAA,LN,Libyan Airlines,Libya
+149,LGL,LG,Luxair,Luxembourg
+150,TUI,UG,Tuninter,Tunisia
+151,JAV,R5,Jordan Aviation,Jordan
+152,LAV,VH,Aeropostal Alas de Venezuela,Venezuela
+154,CNO,SK,SAS Norge,Norway
+155,DHX,ES,DHL/SNAS,Bahrain
+156,SET,EH,SAETA-Soc.Ecuatoriana de Transp.Aereos,Ecuador
+157,QTR,QR,Qatar Airways Cargo,Qatar
+158,AKC,ZU,ARCA Aerovias Colombianas,Colombia
+160,CPA,CX,Cathay Pacific Airways,Hong Kong
+161,CAW,MN,Kulula.com,South Africa
+162,PAO,PH,Polynesian Airlines,Samoa
+164,CRN,7L,Aero Caribbean,Cuba
+165,ADR,JP,Adria Airways,Slovenia
+167,AML,QM,Air Malawi,Malawi
+168,AZW,UM,Air Zimbabwe,Zimbabwe
+169,HHN,HR,Hahn Air,Germany
+170,TNA,GE,Transasia Airways,Taiwan ROC
+171,GBL,GT,GB Airways,United Kingdom
+172,CLX,CV,Cargolux Airlines,Luxembourg
+173,HAL,HA,Hawaiian Airlines,United States
+174,MRT,MR,Air Mauritanie,Mauritania
+175,CSQ,II,IBC Airways Inc,United States
+176,UAE,EK,Emirates SkyCargo,Dubai
+180,KAL,KE,Korean Air,South Korea
+181,UDN,Z6,Dniproavia,Ukraine
+182,MAH,MA,Malev Hungarian Airlines,Hungary
+183,VLO,LC,VarigLog,Brazil
+185,AGN,GN,Air Gabon,Gabon
+186,NMB,SW,Air Namibia,Namibia
+187,UCR,DW,ACR Aero-Charter Airlines,Ukraine
+188,AAQ,3J,Air Alliance Inc,Canada
+189,JAE,JI,Jade Cargo International,China PRC
+190,TPC,TY,Air Caledonie,France
+191,ISS,IG,Meridiana,
+192,SLM,PY,Surinam Airways,Surinam
+193,SOL,IE,Solomon Airlines,Solomon Is
+194,SNB,NB,Sterling,Denmark
+195,SDM,FV,Rossiya Airlines,Russia
+196,LAZ,LZ,Balkan Bulgarian Airlines,Bulgaria
+197,ATC,TC,Air Tanzania,Tanzania
+198,AHG,G3,Aerochago Airlines,Dominican Republic
+199,TAR,TU,Tunisair,Tunisia
+200,SUD,SD,Sudan Airways,Sudan
+201,AJM,JM,Air Jamaica,Jamaica
+202,TAI,TA,TACA International Airlines/Groupo TACA,El Salvador
+203,CPI,5J,Cebu Pacific Air,Philippines
+204,TVR,T6,Tavrey Airlines,Ukraine
+205,ANA,NH,All Nippon Airways,Japan
+206,KAV,7F,Air Kufra,Libya
+207,AZR,QC,Air Zaire,Congo DR
+209,UBA,8M,Myanmar Airways International,Myanmar
+210,PLI,PL,Aeroperu,Peru
+211,GAP,2P,Air Philippines,Philippines
+212,AEU,5W,Astraeus,United Kingdom
+212,LCI,LF,Lufthansa Cargo India,India
+213,DSL,D8,Diamond Sakha Airlines,Russia
+214,PIA,PK,Pakistan International Airlines,Pakistan
+215,ESL,P7,Russian Sky Airlines,Russia
+216,PMK,3D,Palair Macedonia,Macedonia
+217,THA,TG,Thai Airways,Thailand
+218,AVN,NF,Air Vanuatu,Vanuatu
+219,CRQ,YN,Air Creebec,Canada
+220,DLH,LH,Lufthansa,Germany
+221,TXC,AL,Transaviaexport Airlines,Belarus
+224,RYR,FR,Ryanair,Ireland
+225,JND,K5,Air East Africa,Kenya
+226,VBW,2J,Air Burkina,Burkina Faso
+227,TWE,TQ,Transwede Airways AB,Sweden
+228,GNC,LQ,Air Guinea Cargo,Equatorial Guinea
+229,KAC,KU,Kuwait Airways,Kuwait
+230,CMP,CM,COPA Airlines,Panama
+231,LDA,NG,Lauda Air,Austria
+232,MAS,MH,MASKargo,Malaysia
+234,JAS,JD,Japan Air System,Japan
+235,THY,TK,Turkish Airlines,Turkey
+236,BMA,BD,bmi Cargo,United Kingdom
+238,AIZ,IZ,Arkia-Israeli Airlines,Israel
+239,MAU,MK,Air Mauritius,Mauritius
+240,GUG,GU,TACA/Aviateca,Guatemala
+242,SWD,A4,Southern Winds,Argentina
+244,THT,TN,Air Tahiti Nui,French Polynesia
+245,FAB,7F,First Air,Canada
+246,VAT,OT,Avant Airlines,Chile
+246,TIS,UZ,Tesis Aviation Enterprise,Russia
+247,,LF,Linjeflyg,Sweden
+247,EZX,Z7,Zimbabwe Express Airlines,Zimbabwe
+248,RIG,GV,Riga Airlines,Latvia
+249,BBR,S3,SBA Airlines,Venezuela
+250,UZB,HY,Uzbekistan Airways,Uzbekistan
+251,RUS,C9,Cirrus Airlines,Germany
+252,SUF,PI,Sunflower Airlines,Fiji
+253,OAA,VQ,Impulse Airlines,Australia
+254,TCI,QW,Turks Air,Turks & Caicos Is
+255,AFG,FG,Ariana Afghan Airlines,Afghanistan
+257,AUA,OS,Austrian Cargo,Austria
+258,MDG,MD,Air Madagascar,Madagascar
+260,FJI,FJ,Air Pacific,Fiji
+262,SVR,U6,Ural Airlines,Russia
+263,VLE,VA,Volare Airlines,Italy
+264,NES,JH,Nordeste-Linhas Aereas Regionais,Brazil
+266,TFL,OR,Arkefly,Netherlands
+266,LTU,LT,LTU International Airways,Germany
+267,BEE,BE,FlyBE,United Kingdom
+268,AAY,G4,Allegiant Air,United States
+269,TAE,EQ,TAME-Linea Aerea del Ecuador,Ecuador
+270,TMA,TL,Trans Mediterranean Airways,Lebanon
+271,SAH,W7,Sayakhat Air Company,Kazakhstan
+272,CKS,K4,Kalitta Air,United States
+273,SHK,7Q,Shorouk Air,Egypt
+275,ASU,5L,Aerosur,Bolivia
+276,SCW,TF,Malmö Aviation,Sweden
+277,VLK,XF,Vladivostok Air,Russia
+278,STU,FS,STAF Airlines,Argentina
+279,ITF,IT,Air Inter,France
+281,ROT,RO,TAROM-Romanian Air Transport,Romania
+282,ISV,WC,Islena Airlines,Honduras
+283,MLV,RM,Air Moldova International,Moldova
+284,TCG,T2,Thai Air Cargo,Thailand
+285,RNA,RA,Nepal Airlines,Nepal
+286,PUA,PU,PLUNA,Uruguay
+287,ANT,4N,Air North,Canada
+288,AHK,LD,Air Hong Kong,Hong Kong
+289,MGL,OM,MIAT-Mongolian Airlines,Mongolia
+290,BBD,BF,Bluebird Cargo,Iceland
+291,ORB,R2,Orenair,Russia
+292,AFM,ZL,Affretair,Zimbabwe
+293,RSL,SL,Rio-Sul Servicos Aereos Regionais SA,Brazil
+295,WIA,WM,Windward Island Airways,Cura‡ao
+296,LLR,CD,Air India Regional,India
+297,CAL,CI,China Airlines,Taiwan ROC
+298,UTA,UT,UTair Aviation,Russia
+300,,,GlobalApexAir,United Kingdom
+301,GAK,5S,Global Aviation and Services,Libya
+302,SKW,OO,SkyWest Airlines,United States
+303,AWI,ZW,Air Wisconsin Airlines,United States
+305,TOW,FF,Tower Air,United States
+306,KAP,9K,Cape Air,United States
+307,CWC,WE,Centurion Air Cargo,United States
+311,VGD,,Vanguard Airlines,United States
+312,JOL,IP,Atyrau Airways,Kazakhstan
+316,AUL,5N,Aeroflot-Nord,Russia
+317,AFJ,3A,Alliance Airlines,United States
+318,ABD,CC,Air Atlanta Icelandic,Iceland
+319,EXV,8D,Expo Aviation,Sri Lanka
+321,,QP,Starlight Airlines,Dubai
+324,CDG,SC,Shandong Airlines,China PRC
+325,PLR,J3,Northwestern Air Lease,Canada
+328,NAX,DY,Norwegian Air Shuttle,Norway
+329,PEM,PD,Pemair,Canada
+330,FWL,RF,Florida West International Airways,United States
+331,RZO,S4,SATA International,Azores
+332,TRS,FL,AirTran,United States
+333,GOE,GO,GO,United Kingdom
+334,SAM,MM,Sociedad Aeronautica de Medellin (SAM),Colombia
+336,AAG,7M,Air Atlantique,United Kingdom
+337,SCX,SY,Sun Country Airlines,United States
+338,RVV,RV,Reeve Aleutian Airways,United States
+339,PEN,KS,Penair,United States
+340,FBF,FB,Fine Air Services,United States
+341,EEA,EU,Ecuatoriana Airlines,Ecuador
+342,POT,YQ,Polet Cargo Airlines,Cyprus
+343,VSP,VP,VASP,Brazil
+344,LYC,L2,Lynden Air Cargo,United States
+345,NAC,NC,Northern Air Cargo,United States
+346,VAP,9R,Phuket Airlines,Thailand
+348,GJB,TY,Trans Air Link,United States
+350,MVR,6M,Maverick Airways,United States
+352,MPD,A7,Air Comet,Spain
+353,JTA,NU,Japan TransOcean Air,Japan
+354,KHO,KO,Khors Aircompany,Ukraine
+355,ESF,E7,Estafeta Carga Aerea,Mexico
+356,MUI,P6,Trans Air,United States
+357,GAA,HL,Business Express (Delta Connection),United States
+358,GCO,GR,Gemini Air Cargo,United States
+359,URN,3T,Turan Air,Azerbaijan
+362,FJE,Y7,Silverjet Cargo/Flyjet,United Kingdom
+363,CHQ,US,Chautauqua Airlines,United States
+366,AMT,TZ,ATA Airlines,United States
+367,MAK,IN,Macedonian Airlines-MAT,Macedonia
+369,GTI,5Y,Atlas Air,United States
+372,LDI,L4,Lauda Air Italy,Italy
+373,CTT,DG,Custom Air Transport,United States
+374,MCK,CC,MacAir Airlines,Australia
+375,SWI,SM,Sunworld International Airlines,United States
+376,BET,,BETA Cargo - Brasilian Express Transportes Aéreos,Brazil
+378,CAY,KX,Cayman Airways,Cayman Is
+379,LBY,LZ,Belle Air,Albania
+381,VES,VI,Vieques Air Link,Puerto Rico
+383,RNL,QL,Aero Lanka,Sri Lanka
+384,ROA,QQ,Reno Air,United States
+385,LKR,6F,Laker Airways,United States
+386,AAI,AX,Air Aurora,United States
+386,MXJ,MY,Maxjet Airways,United States
+388,PXA,KW,Pan American World Airways,United States
+390,AEE,A3,Aegean Airlines,Greece
+391,MBN,Q3,Zambian Airways,Zambia
+394,DJA,HO,Antinea Airlines,United Kingdom
+399,KKB,WV,Air South Airlines,United States
+400,PNW,PF,Palestinian Airlines,Palestine
+401,AWE,HP,America West Airlines,United States
+403,PAC,PO,Polar Air Cargo,United States
+405,SCH,AW,Schreiner Airways,Netherlands
+406,UPS,5X,UPS Airlines,United States
+407,SNG,V7,Air Senegal International,Senegal
+408,LCG,6V,Lignes Aeriennes Congolaises - LAC,Congo DR
+409,MGX,YM,Montenegro Airlines,Serbia
+410,AZS,ZR,Aviacon Zitotrans,Russia
+412,VDA,VI,Volga-Dnepr Airlines,Russia
+414,LOF,AX,Trans States Airlines,United States
+416,NCR,N8,National Airlines,United States
+417,BRC,E6,Bringer Air Cargo,Brazil
+420,IKA,GI,Itek Air,Kyrgyzstan
+421,SBI,S7,S7 Airlines,Russia
+423,BCS,QY,European Air Transport,Belgium
+424,SCI,C7,Special Cargo Airlines,Russia
+425,MTW,YD,Mauritania Airways,Mauritania
+426,CJC,9L,Colgan Air,United States
+427,FWI,TX,Air Caraibes,Guadaloupe
+428,MVL,H5,Magadan Airlines,Russia
+429,RDN,D7,Dinar Lineas Aereas,Argentina
+430,FLG,9E,Pinnacle Airlines,United States
+435,,3X,Premier Trans Aire,United States
+436,LAJ,KJ,British Mediterranean Airways,United Kingdom
+438,SHY,,Sky Airlines,Turkey
+439,AAF,ZI,Aigle Azur Transport Aériens,France
+442,FIF,OF,Air Finland,Finland
+444,KZU,GO,ULS Airlines Cargo,Turkey
+445,NZM,NM,Mount Cook,New Zealand
+449,GFT,3M,Gulfstream International Airlines,United States
+450,RLC,,Avial Air Company,Russia
+452,KZK,9Y,Air Kazakhstan,Kazakhstan
+453,MEP,YX,Midwest Airlines,United States
+454,GIP,2U,Air Guinee Express,Guinea
+455,NAO,XG,North American Airlines,United States
+457,CXT,DQ,Coastal Air Transport,Virgin Is (USA)
+459,RWD,WB,Rwandair Express,Rwanda
+462,LNE,XL,LAN Ecuador,Ecuador
+463,AZQ,ZP,Silk Way Airlines,Azerbaijan
+464,CFS,EM,Empire Airlines,United States
+465,KZR,KC,Air Astana,Kazakhstan
+465,KZR,,Air Astana,Kazakhstan
+466,AFX,5Z,Airfreight Express,United Kingdom
+467,EZE,T3,Eastern Airways,United Kingdom
+468,WOA,WO,World Airways,United States
+469,DSM,4M,LAN Argentina,Argentina
+470,SGK,K9,Skyward Aviation,Canada
+471,AMW,ZV,Air Midwest,United States
+473,XLF,SE,XL Airways France,France
+474,IBB,NT,Binter Canarias,Canary Is
+475,ECA,UI,Eurocypria Airlines,Cyprus
+477,BTA,XE,ExpressJet,United States
+478,MRK,BF,Markair,United States
+479,CSZ,ZH,Shenzhen Airlines,China PRC
+480,BLR,DH,Atlantic Coast Airlines (United Express),United States
+481,QXE,QX,Horizon Air,United States
+483,BKL,X3,Baikal,Russia
+484,ABQ,ED,Airblue,Pakistan
+485,ACP,8V,Astral Aviation,Kenya
+487,NKS,NK,Spirit Airlines,United States
+488,WDY,C8,Chicago Express Airlines,United States
+489,CJT,W8,Cargojet Airways,Canada
+494,EIA,EZ,Evergreen International Airlines,United States
+495,HAR,,Harbour Airlines,United States
+497,DMO,E3,Domodedovo Airlines,Russia
+499,KJC,7B,KrasAir,Russia
+500,GEO,DA,Air Georgia,Georgia
+501,AKT,V2,Karat,Russia
+502,TJK,7J,Tajikair,Tajikistan
+503,LRS,RZ,SANSA Servicios Aereos Nacionales,Costa Rica
+504,JEV,N7,Lagun Air,Spain
+509,RZL,Z9,Aero Zambia,South Africa
+510,LAB,JF,Lab Flying Service,United States
+511,LLM,YL,Yamal Airlines,Russia
+512,RJA,RJ,Royal Jordanian,Jordan
+513,CDO,7G,Cargo d´Or,United Kingdom
+513,MKA,7G,MK Airlines,United Kingdom
+515,DTH,SF,Tassili Airlines,Algeria
+516,LTN,,Aerolineas Latinas (Aerolatin),Venezuela
+517,FTA,2F,Frontier Flying Service,United States
+518,MPE,5T,Canadian North,Canada
+519,MLA,Q5,40 Mile Air,United States
+520,ELK,S8,ELK-Estonian Aviation Company,Estonia
+524,XME,XM,Australian Air Express,Australia
+525,UIA,B7,UNI Air,Taiwan ROC
+526,SWA,WN,Southwest Airlines,United States
+527,LPV,A6,Air Alps,Austria
+528,EAV,ZN,Eagle Airlines,Austria
+529,CIU,A2,Cielos Airlines,Peru
+530,TPU,T0,TACA Peru,Peru
+532,RSO,E4,Aero Asia International,Pakistan
+533,ASH,YV,Mesa Airlines,United States
+534,RMV,WQ,Romavia,Romania
+536,STY,Z2,Styrian Airlines,Austria
+537,IRM,W5,Mahan Air,Iran
+538,KIA,KP,Kiwi International Airlines,United States
+539,TSE,TH,Transmile Air Services,Malaysia
+540,PSD,TO,President Airlines,Cambodia
+541,BML,5Z,Bismillah Airlines,Bangladesh
+542,TUA,T5,Turkmenistan Airlines,Turkmenistan
+543,LEI,,Leisure International Airways,United Kingdom
+544,LPE,LP,Lan Peru,Peru
+545,,X8,Icaro,Ecuador
+546,AAW,8U,Afriqiyah Airways,Libya
+548,MOD,M9,ModiLuft,India
+549,TUS,M3,ABSA Cargo Airline,Brazil
+550,PIC,BL,Jetstar Pacific Airlines,Vietnam
+551,SFB,CT,Air Sofia,Bulgaria
+553,FCX,FC,Falcon Express Cargo Airline,Dubai
+555,AFL,SU,Aeroflot-Russian Airlines,Russia
+556,TRQ,6N,Trans Travel Airlines,Netherlands
+557,KRS,6K,Korsar Airlines,Russia
+559,DCE,K8,Dutch Caribbean Airlines,Cura‡ao
+560,KHB,H8,Dalavia,Russia
+562,ASZ,OB,Astrakhan Airlines,Russia
+564,SXS,XQ,SunExpress,Turkey
+566,AUI,PS,Ukraine International Airlines,Ukraine
+567,NTW,CE,Nationwide Air,South Africa
+568,ANV,LW,Pacific Wings,United States
+569,LBH,7Z,Laker Bahamas,United States
+572,MLD,9U,Air Moldova,Moldova
+573,GJS,G7,GoJet Airlines,United States
+574,AJK,4W,Allied Air,Nigeria
+575,COY,7C,Coyne Airways,United Kingdom
+578,OEA,OX,Orient Thai Airlines,Thailand
+580,ABW,RU,AirBridgeCargo Airlines,Russia
+582,MES,XJ,Mesaba Aviation,United States
+584,OAU,,Oriol Avia Soviet Austrian,Russia
+587,SEE,,Shaheen Air Cargo,Pakistan
+589,JAI,9W,Jet Airways,India
+591,EWW,EB,Emery Worldwide,United States
+592,CYH,3Q,Yunnan Airlines,China PRC
+593,GNT,II,Business Air,United Kingdom
+594,RWG,RX,Redwing Airways,United States
+595,NTS,,Cirrusair,United States
+596,CMI,CS,Continental Micronesia,Guam
+597,SIH,SI,Skynet Airlines,Ireland
+598,SHU,HZ,SAT Airlines,Russia
+600,CBB,BB,Cargo B,Belgium
+601,CVC,J7,Centre-Avia Airlines,Russia
+602,SCB,2E,Sky Cabs,Sri Lanka
+603,ALK,UL,SriLankan Airlines,Sri Lanka
+605,,,Jamaica Air Freighters,Jamaica
+606,MTQ,NN,Air Martinique,Martinique
+606,TGZ,A9,Georgian Airways,Georgia
+607,ETD,EY,Etihad Crystal Cargo,Abu Dhabi
+609,TRL,T4,TransEast Airlines,Latvia
+610,KKK,KK,Atlasjet,Turkey
+612,CYM,,Compass Airlines,Australia
+613,JBA,JB,Helijet Airways,Canada
+614,AUB,IQ,Augsburg Airways,Germany
+614,IRT,IQ,Interot Airways,Germany
+616,AGJ,JG,Air Greece-Aerodromis,Greece
+617,HLF,HF,TUIfly,Germany
+618,SQC,SQ,Singapore Airlines Cargo,Singapore
+620,BDA,BZ,Blue Dart Aviation,India
+621,MNA,MZ,Merpati Nusantara,Indonesia
+622,CAV,MO,Calm Air International ltd,Canada
+623,LZB,FB,Bulgaria Air,Bulgaria
+624,PGT,H9,Pegasus,Turkey
+625,ILN,D6,Interair South Africa,South Africa
+627,LAO,QV,Lao Airlines,Laos
+628,BRU,B2,Belavia,Belarus
+629,SLK,MI,SilkAir,Singapore
+630,VKG,DK,Thomas Cook Airlines Scandinavia,Denmark
+631,GRL,GL,Air Greenland,Greenland
+632,BLS,JV,Bearskin Airlines,United States
+633,AEF,YP,Aero Lloyd,Germany
+634,GLR,9M,Central Mountain Air,Canada
+635,IYE,IY,Yemenia Airways,Yemen
+636,BOT,BP,Air Botswana,Botswana
+637,ERT,B8,Eritrean Airlines,Eritrea
+639,LBC,LV,Albanian Airlines,Albania
+640,SFR,FA,Safair,South Africa
+642,SLI,5D,AeroMéxico Connect,Mexico
+643,AMC,KM,Air Malta,Malta
+644,SLR,Q7,Sobelair,Belgium
+646,MIN,IW,AOM-Minerve,France
+647,CIM,QI,Cimber Sterling,Denmark
+648,AIN,,African International Airways,South Africa
+649,TSC,TS,Air Transat,Canada
+651,CXJ,XO,Xinjiang Airlines,China PRC
+652,ICB,HH,Islandsflug,Iceland
+654,ODS,5K,State Air Company Odessa Airlines,Ukraine
+656,ANG,PX,Air Niugini,Papua New Guinea
+657,BTI,BT,Air Baltic,Latvia
+657,BRY,BC,Brymon Airways,United Kingdom
+658,MMX,M8,AirMax Cargo,Peru
+659,LIT,FU,Air Littoral,France
+660,ITM,K9,Itapemirim Transportes Aereos,Brazil
+661,,6G,Gabon Airlines Cargo,Gabon
+663,,EO,Demavia Airlines,Belgium
+665,VEX,TV,Virgin Express,Belgium
+666,BOU,BO,Bouraq Airlines,Indonesia
+667,AEL,PE,Air Europe,Italy
+668,NWT,NV,NWT Air,Canada
+669,RNV,U8,Armavia,Armenia
+670,TSO,UN,Transaero Airlines,Russia
+671,HLS,9F,Haiti Air Freight International,Haiti
+672,RBA,BI,Royal Brunei Airlines,Brunei
+673,UGA,QU,Uganda Airlines,Uganda
+674,OZW,XR,Skywest Airlines,Australia
+675,AMU,NX,Air Macau,Macau
+676,AFB,WK,American Falcon,Argentina
+677,FAJ,PC,Air Fiji,Fiji
+679,ACY,F5,Archana Airways,India
+680,JKK,JK,Spanair,Spain
+681,HEJ,T4,Hellas Jet,Greece
+683,CLH,CL,Lufthansa CityLine,Germany
+684,GEG,6R,Georgian Airlines,Georgia
+685,PGA,NI,Portugália Airlines,Portugal
+686,AZM,,Aero Cozumel,Mexico
+687,AAH,KH,Aloha Air Cargo,United States
+688,JAA,EG,Japan Asia Airways,Japan
+689,BCY,WX,Cityjet,Ireland
+690,SLA,LJ,Sierra National Airlines,Sierra Leone
+691,TYM,7M,Tyumen Airlines,Russia
+692,LAP,PZ,TAM Mercosur,Paraguay
+693,JEC,JX,Jett8 Airlines Cargo,Singapore
+694,ANE,YW,Air Nostrum LAMSA,Spain
+696,EVA,BR,EVA Air,Taiwan ROC
+698,AZX,7L,AB Airlines Cargo,United Kingdom
+699,VIM,VL,Air VIA Bulgarian Airways,Bulgaria
+700,ICL,5C,CAL Cargo Airlines,Israel
+701,WIF,WF,Wideroe Cargo,Norway
+702,MSK,VB,Maersk Air (UK),United Kingdom
+704,OLT,OL,OLT- Ostfriesische Lufttransport GmbH,Germany
+706,KQA,KQ,Kenya Airways,Kenya
+707,ASM,S6,Air St Martin,Guadaloupe
+708,JAZ,JO,JAL Ways,Japan
+709,AKK,6L,Aklak Inc,Canada
+712,JLH,,Jet Link,Netherlands
+713,URA,U3,Uralinteravia,Russia
+715,TUN,VK,Air Tungaru,Kiribati
+716,MNB,MB,MNG Airlines,Turkey
+717,OCA,R7,ASERCA Airlines,Venezuela
+719,BGL,A8,Benin Golf Air,Benin
+720,ORX,,Orex Airlines,Turkey
+721,LAI,QL,Lesotho Airways,Lesotho
+722,LER,KZ,Linea Aerea,Venezuela
+723,CBE,QA,MexicanaClick,Mexico
+724,SWR,LX,Swiss WorldCargo,Switzerland
+725,ADM,YU,Aerolineas Dominicanas,Dominican Republic
+726,FST,UD,Fast Air Carrier,Chile
+727,FTI,FT,Fly FTI,United Kingdom
+727,MYT,VZ,MyTravel,United Kingdom
+729,TPA,QT,Tampa Cargo,Colombia
+730,ACX,6U,ACG - Air Cargo Germany,Germany
+731,CXA,MF,Xiamen Airlines,China PRC
+732,UZS,C7,Samarkand Airways,Uzbekistan
+733,DNV,D9,Donavia,Russia
+734,TYR,VO,Tyrolean Airways/Austrian Arrows,Austria
+736,KZA,K4,Kazakhstan Airlines (Kazair),Kazakhstan
+737,SAT,SP,SATA - Air Açores,Azores
+738,HVN,VN,Vietnam Airlines,Vietnam
+739,SAN,WB,SAN Servicios Aereos Nacionales,Ecuador
+740,SAI,NL,Shaheen Air International,Pakistan
+741,NEC,3Z,Necon Air,Nepal
+742,ROI,9V,Avior Airlines,Venezuela
+743,AXX,M4,Avioimpex,Macedonia
+745,BER,AB,Air Berlin,Germany
+746,,2A,AECA-Aeroservicios Ecuatorianos CA,Ecuador
+748,HMS,DU,Hemus Air,Bulgaria
+749,LNK,4Z,Airlink,South Africa
+750,BZH,DB,Brit Air,France
+751,SYZ,,Southend Cargo Airlines,Zimbabwe
+752,SKX,JZ,Skyways Express,Sweden
+753,OMS,N3,Omskavia,Russia
+754,TOM,BY,Thomson Airways,United Kingdom
+756,TAY,3V,TNT Airways,Belgium
+757,SMJ,Z3,Avient Aviation,United Kingdom
+758,KGA,K2,Kyrgyzstan Airlines,Kyrgyzstan
+759,FCN,IH,Falcon Air,Sweden
+760,REU,UU,Air Austral,Reunion
+762,BWL,VF,British World Airlines,United Kingdom
+765,RCN,,Imperial Cargo Airlines,Nigeria
+766,TRJ,E9,AJT Air International,Russia
+767,FLI,RC,Atlantic Airways,Faroe Is
+768,ANK,EL,Air Nippon,Japan
+769,AAV,AK,Astro Air,Philippines
+771,AHY,J2,Azerbaijan Airlines,Azerbaijan
+774,CSH,FM,Shanghai Airlines,China PRC
+777,FSW,,Faso Airways,Burkina Faso
+778,MRS,CW,Air Marshall Islands,Marshall Is
+779,GCP,6P,DAC Air SA,Romania
+780,IRK,Y9,Kish Air,Iran
+781,CES,MU,China Eastern Airlines,China PRC
+782,CBF,CJ,China Northern Airlines,China PRC
+783,CNW,WH,China Northwest Airlines,China PRC
+784,CSN,CZ,China Southern Airlines,China PRC
+785,CXN,SZ,China Southwest Airlines,China PRC
+786,VGN,VK,Air Nigeria,Nigeria
+787,DRK,KB,Druk Air,Bhutan
+789,ELG,E8,ALPI Eagles,Italy
+790,,1A,Leader Jet,United States
+791,CFJ,IV,Fujian Airlines,China PRC
+795,VOZ,DJ,Virgin Blue,Australia
+796,MUK,ZR,Muk Air,Denmark
+798,KHA,KR,Kitty Hawk Aircargo,United States
+800,GSC,GD,Grandstar Cargo,China PRC
+801,BVT,J8,Berjaya Air,Malaysia
+802,AEK,ML,Aero Costa Rica,Peru
+803,MDA,AE,Mandarin Airlines,Taiwan ROC
+804,EWA,EW,East-West Airlines,Australia
+806,RSI,YI,Air Sunshine,United States
+807,AXM,AK,AirAsia,Malaysia
+808,ERH,7H,Era Aviation (Alaska Airlines Commuter),United States
+809,CRW,2R,Regal (Crownair),United States
+810,AJT,M6,Amerijet,United States
+811,ANE,8A,Americana,Peru
+813,ATN,8C,Air Transport International,United States
+815,IRC,EP,Iran Aseman Airlines,Iran
+818,ISR,6H,Israir,Israel
+819,DVU,NQ,Orbi Georgian Airlines,Georgia
+821,SSR,SG,Sempati Air,Indonesia
+824,AXL,XT,KLM Exel,Netherlands
+825,SHQ,F4,Shanghai Airlines Cargo,China PRC
+826,TCO,,AeroTrans Colombiana De Carga,Colombia
+827,MHS,,Air Memphis,Egypt
+828,UKM,UF,UM Air,Ukraine
+829,BKP,PG,Bangkok Airways,Thailand
+831,CTN,OU,Croatia Airlines,Croatia
+832,ABX,GB,ABX Air,United States
+834,WLG,G6,Air Volga,Russia
+836,EUL,RN,Euralair International,France
+837,KMP,E2,Kampuchea Airlines,Cambodia
+837,PTB,Y8,Passaredo Transportes Aeros,Brazil
+838,TEJ,GD,TAESA - Transportes Aereos Ejecutivos,Mexico
+839,TLA,T7,Transaer,Ireland
+842,SIB,5M,Sibavia,Russia
+843,KLA,TT,Air Lithuania,Lithuania
+844,CFE,FD,Cityflyer,United Kingdom
+845,RPB,P5,AeroRepublica,Colombia
+846,GLA,ZK,Great Lakes Aviation Ltd,United States
+848,HER,UD,Hex´Air,France
+850,FYH,W3,Flyhy Cargo Airlines,Thailand
+851,CRK,N8,Hong Kong Airlines Ltd,Hong Kong
+854,GTV,KG,Aerogaviota,Cuba
+856,APC,LQ,Airpac Airlines,United States
+858,WTA,FK,Africa West,Togo
+859,SBY,FC,TAL Thuringia Airlines,Germany
+860,MDV,2M,Moldavian Airlines,Moldova
+862,ASQ,EV,Atlantic Southeast Airlines,United States
+865,MAA,MY,Mas Air,Mexico
+867,ADH,AP,Air One,Italy
+868,VAS,V8,ATRAN Cargo Airlines,Russia
+870,AEW,VV,AeroSvit Airlines,Ukraine
+871,YZR,Y8,Yangtze River Express Airlines,China PRC
+873,TNO,6R,Aerounion,Mexico
+875,AIE,3H,Air Inuit,Canada
+876,CSC,3U,Sichuan Airlines,China PRC
+879,CPN,RV,Caspian Air Lines,Iran
+880,CHH,HU,Hainan Airlines,China PRC
+881,CFG,DE,Condor,Germany
+882,FNA,NY,Air Iceland,Iceland
+884,SSV,5G,Skyservice,Canada
+885,TCX,MT,Thomas Cook Airlines,United Kingdom
+886,COM,OH,Comair - Delta Connection,United States
+887,TLE,SH,Air Toulouse International,France
+888,MDL,MI,Mandala Airlines,Indonesia
+891,UKR,6U,Air Ukraine,Ukraine
+895,HSA,S9,East African Safari Air,Kenya
+896,BHO,B4,Bhoja Airlines,Pakistan
+897,UDC,7D,Donbassaero,Ukraine
+898,DER,DF,Deer Jet,China PRC
+899,RXA,ZL,Regional Express Airlines,Australia
+900,AMI,L6,Air Maldives,Maldives
+901,BOL,B1,Transportes Aereos Bolivianos,Bolivia
+902,GRO,LL,Lineas Aereas Allegro,Mexico
+903,ASD,4D,Air Sinai,Egypt
+904,RML,MV,Armenian International Airways,Armenia
+905,PCO,8P,Pacific Coastal Airlines Limited,Canada
+907,ARR,QN,Air Armenia,Armenia
+908,VAL,4V,Voyageur Airways,Canada
+909,ABS,9T,Transwest Air,Canada
+910,OAS,WY,Oman Air,Oman
+912,ABR,AG,Air Contractors,Ireland
+913,STW,Z3,Star Airways,Turkey
+915,RTL,WE,Rheintalflug Seewald,Austria
+916,MNX,BA,British Airways CitiExpress,United Kingdom
+917,APY,7P,APA International Air,United States
+918,CLT,XC,Air Caribbean,Cura‡ao
+919,TCF,S5,Shuttle America,United States
+921,SLL,6Q,Slovak Airlines,Slovakia
+922,PVV,PC,Continental Airways,Russia
+923,CRL,SS,Corsair,France
+924,AUR,GR,Aurigny Air Services,Guernsey
+925,VDT,PF,Vayudoot,India
+926,ROM,BQ,Aeromar,United States
+927,LAL,WJ,Air Labrador,Canada
+928,SSN,BV,Sun Air,South Africa
+929,ACQ,N6,Aero Continente,Peru
+930,NIS,6Y,TACA/Nicaraguense de Aviación,Nicaragua
+931,MOS,MO,MISR Overseas Airways,United Kingdom
+932,VIR,VS,Virgin Atlantic Cargo,United Kingdom
+933,NCA,KZ,Nippon Cargo Airlines,Japan
+934,EFR,,Elf Air Co,Russia
+935,ANO,TL,Airnorth Regional,Australia
+936,TAT,IJ,TAT European Airlines,France
+937,AGU,OG,Air Guadaloupe,Guadaloupe
+938,JEM,G3,Emerald Airways,United Kingdom
+939,SBZ,ZM,Scibe Airlift,Congo DR
+940,BTC,V9,Bashkir Airlines,Russia
+941,NZA,ZQ,Ansett New Zealand,New Zealand
+942,TAO,VW,Transportes Aeromar SA de CV,Mexico
+943,VUN,VU,Air Ivoire,Ivory Coast
+945,UDD,5D,Donbass Airlines,Ukraine
+947,JOS,L3,DHL de Guatemala,Guatemala
+951,BLX,6B,TUIfly Nordic,Sweden
+952,RSE,,SNAS Worldwide Express,Saudi Arabia
+955,PNV,6Z,Panavia Cargo Airlines,Panama
+956,RME,R3,Armenian Airlines,Armenia
+957,TAM,JJ,TAM Linhas Aereas,Brazil
+958,INC,7I,Insel Air,Cura‡ao
+959,LHS,LE,Laparkan Airways,United States
+960,ELL,OV,Estonian Air,Estonia
+965,RVL,DO,Air Vallee,Italy
+966,AUY,,Aerolineas Uruguayas,Uruguay
+967,SPR,PB,Provincial Airlines,Canada
+971,HRH,WR,Royal Tongan Airlines,Tonga
+972,FRS,IX,Flandre Air,France
+974,MON,ZB,Monarch Airlines,United Kingdom
+976,MPX,QO,Aeromexpress Cargo,Mexico
+978,VLM,VG,VLM Airlines,Belgium
+979,TRA,HV,Transavia Airlines,Netherlands
+980,EQL,KY,Air Sao Tome e Principe,Sao Tome & Principe
+982,RGI,YS,Regional,France
+983,ARN,QK,Air Nova/Air Canada Regional Airlines,Canada
+985,SVV,VC,Servivensa-Empresa Servicios Avensa,Venezuela
+986,FOS,VY,Formosa Airlines,Taiwan ROC
+987,PFC,P4,Pacific International Airlines,Panama
+988,AAR,OZ,Asiana Airlines,South Korea
+989,GWL,IJ,Great Wall Airlines,China PRC
+990,HIL,HS,Highland Air,Sweden
+991,DAO,D3,Daallo Airlines,Djibouti
+992,DAE,D5,DHL Aero Expreso,Panama
+993,,BH,Hawkair,Canada
+994,BUC,,Bulgarian Air Charter,Bulgaria
+995,BON,JA,B&H Airlines,Bosnia-Herzegovina
+996,AEA,UX,Air Europa,Spain
+997,BBC,BG,Biman Bangladesh Airlines,Bangladesh
+998,ERV,,Yerevan Avia,Armenia
+999,CCA,CA,Air China,China PRC
