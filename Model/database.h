@@ -46,7 +46,7 @@ public:
 	//QJsonDocument getDocument() const;
 	static void rowCallback(lcb_t, int, const lcb_RESPN1QL *resp);
 
-	bool query(QString query);
+
 
 
 
@@ -63,7 +63,8 @@ private:
 	bool connIssue;
 	//	QString value;
 
-
+public slots :
+	void query(QString query);
 signals:
 	void gotDocument(QJsonDocument document);
 	void gotDocuments(QList<QJsonDocument> array);

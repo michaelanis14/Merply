@@ -12,6 +12,8 @@
 
 #include "qtrpt.h"
 
+#include "hcontrollers.h"
+
 #include <QtGui>
 #include <QWidget>
 #include <QLabel>
@@ -35,11 +37,8 @@ class merplyTabelView : public QWidget
 
 public:
 	merplyTabelView(QWidget *parent = 0, QString propertyName ="");
-	QTableWidget* tabel;
-	QString save(QString propertyName);
 	bool fill(QJsonObject columns);
 	void indexTable(const QString document_id, const QList<QJsonDocument> items, const bool, const bool);
-	void clear();
 	QList<QJsonDocument> items;
 private:
 	QVBoxLayout* layout;
@@ -48,25 +47,24 @@ private:
 	QString propertyName;
 	QTableView* tableView;
 	MerplyReportTableModel* model;
-	QHash<QString,QJsonObject>indexedTable;
+	HControllers* controllers ;
 	QString currenctPrintID;
 	QtRPT *report;
 	//QStandardItemModel *model;
 	//QStringList headerLabels;
 signals:
 	void updateModel(QList<QJsonDocument> documents);
-protected:
-	void mousePressEvent(QMouseEvent *event);
+
 
 public slots:
 	void printTabel();
 	void printEntity(const QString&id);
-	void editEntity(const QString&id);
-	void deleteEntity(const QString&id);
 	void gotReportData(QList<QJsonDocument> documents);
 	void updateHeaderData(QList<QString> headerItems);
 	void setValue(const int, const QString paramName, QVariant &paramValue, const int);
-
+	void modelFinished();
+	void controller_Clicked(QString nameAction);
+	void selectionChanged(const QItemSelection &, const QItemSelection &);
 };
 
 #endif // merplyTabelView_H

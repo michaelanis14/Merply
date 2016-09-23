@@ -142,7 +142,7 @@ QJsonArray Prsistance::table(QString line)
 
 bool Prsistance::init()
 {
-	//	qDebug() <<"Init" << Count("City::%\"");//<< Count("ViewStructure::Contact\"");
+		qDebug() <<"Init" ;//<< Count("City::%\"");//<< Count("ViewStructure::Contact\"");
 	/*
 	if(Count("ContactType") == -1){
 		write("ContactType",QString("Name->Customer"));
@@ -168,8 +168,111 @@ bool Prsistance::init()
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		Database::Get()->storeDoc("ViewStructure::City",doc);
 		}
+	if(Count("ViewStructure::AirlinesCode\"") ==  0){
+		QString jsonFile = readFile(":/initData/initData/AirlinesCode.json");
+		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		Database::Get()->storeDoc("ViewStructure::AirlinesCode",doc);
+		}
+	if(Count("ViewStructure::AirportsCode\"") ==  0){
+		QString jsonFile = readFile(":/initData/initData/AirportsCode.json");
+		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		Database::Get()->storeDoc("ViewStructure::AirportsCode",doc);
+		}
+	if(Count("AirlinesCode::%\"") ==  0){
+		QStringList fileData = readCSVFile(":/initData/initData/AirlinesCodeData.csv");
+		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+	//	qDebug() << fileData;
+		for(int i = 0; i < fileData.count();i++){
+			QStringList data = fileData.at(i).split(",");
+			//qDebug() << data << data.count();
+			QJsonArray arryObj;
+			if(0 < data.count() && !data.at(0).isEmpty()){
+				QJsonObject c;
+				c.insert("Prefix",QJsonArray() <<data.at(0));
+				arryObj << c;
+				}
+			if(1 < data.count() && !data.at(1).isEmpty()){
+				QJsonObject c;
+				c.insert("ICAO",QJsonArray() <<data.at(1));
+				arryObj << c;
+				}
+			if(2 <= data.count() && !data.at(2).isEmpty()){
+				QJsonObject c;
+				c.insert("IATA",QJsonArray() <<data.at(2));
+				arryObj << c;
+				}
+			if(3 < data.count() && !data.at(3).isEmpty()){
+				QJsonObject c;
+				c.insert("Name",QJsonArray() <<data.at(3));
+				arryObj << c;
+				}
+			if(4 < data.count() && !data.at(4).isEmpty()){
+				QJsonObject c;
+				QJsonObject country;
+				country.insert("Value",data.at(4));
+				c.insert("Country",QJsonArray() <<country);
+				arryObj << c;
+				}
+			if(!arryObj.isEmpty()){
+				QJsonObject fieldsArry;
+				fieldsArry.insert("Fields",QJsonArray() << arryObj);
+				//qDebug() << fieldsArry;
+				Database::Get()->storeDoc("AirlinesCode",QJsonDocument(fieldsArry));
+				}
+			}
 
+		}
+	if(Count("AirportsCode::%\"") ==  0){
+		QStringList fileData = readCSVFile(":/initData/initData/AirportsCodeData.csv");
+		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+	//	qDebug() << fileData;
+		for(int i = 0; i < fileData.count();i++){
+			QStringList data = fileData.at(i).split(",");
+			//qDebug() << data << data.count();
+			QJsonArray arryObj;
+			if(0 < data.count() && !data.at(0).isEmpty()){
+				QJsonObject c;
+				c.insert("Airport",QJsonArray() <<data.at(0));
+				arryObj << c;
+				}
+			if(1 < data.count() && !data.at(1).isEmpty()){
+				QJsonObject c;
+				QJsonObject city;
+				city.insert("Value",data.at(1));
+				c.insert("City",QJsonArray() << city);
+				arryObj << c;
+				}
+			if(2 < data.count() && !data.at(2).isEmpty()){
+				QJsonObject c;
+				QJsonObject country;
+				country.insert("Value",data.at(2));
+				c.insert("Country",QJsonArray() <<country);
+				arryObj << c;
+				}
+			if(3 <= data.count() && !data.at(3).isEmpty()){
+				QJsonObject c;
+				c.insert("IATA",QJsonArray() <<data.at(3));
+				arryObj << c;
+				}
+			if(4 < data.count() && !data.at(4).isEmpty()){
+				QJsonObject c;
+				c.insert("ICAO",QJsonArray() <<data.at(4));
+				arryObj << c;
+				}
+			if(5 < data.count() && !data.at(5).isEmpty()){
+				QJsonObject c;
+				c.insert("FAA",QJsonArray() <<data.at(5));
+				arryObj << c;
+				}
+			if(!arryObj.isEmpty()){
+				QJsonObject fieldsArry;
+				fieldsArry.insert("Fields",QJsonArray() << arryObj);
+				//qDebug() << fieldsArry;
+				Database::Get()->storeDoc("AirportsCode",QJsonDocument(fieldsArry));
+				}
+			}
 
+		}
 	if(Count("Country::%\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/Countries.Json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
@@ -313,7 +416,27 @@ QString Prsistance::readFile(QString path)
 	return jsonFile.toUtf8();
 }
 
+QStringList Prsistance::readCSVFile(QString path)
+{
+	qDebug() << path;
+	QStringList lines;
 
+	QFile file(path);
+	if(!file.open(QIODevice::ReadOnly)) {
+		qDebug() << __FILE__ << __LINE__ << file.errorString();
+		}
+
+	QTextStream in(&file);
+
+	while(!in.atEnd()) {
+		QString line = in.readLine();
+		lines.append(line.toUtf8());
+		}
+
+	file.close();
+
+	return lines;
+}
 
 void Prsistance::GetJsonList(QString table, QString select,QString condition)
 {
@@ -357,7 +480,7 @@ void Prsistance::GetJsonListData(QList<QJsonDocument> items)
 int Prsistance::Count(const QString table)
 {
 
-	if(Database::Get()->query("SELECT COUNT(*) AS count  FROM  "+QString(DATABASE)+" WHERE META( "+QString(DATABASE)+").id LIKE \""+table)){
+	Database::Get()->query("SELECT COUNT(*) AS count  FROM  "+QString(DATABASE)+" WHERE META( "+QString(DATABASE)+").id LIKE \""+table);
 
 		if(!Database::Get()->getArray().isEmpty() && Database::Get()->getArray().count() > 0){
 			return Database::Get()->getArray().first().object().value("count").toInt();
@@ -366,7 +489,7 @@ int Prsistance::Count(const QString table)
 			//	qDebug() <<"-1";
 			return 0;
 			}
-		}
+
 	return -1;
 }
 
@@ -377,21 +500,21 @@ QList<QJsonDocument> Prsistance::GetALL(const QString entity, const QString cond
 		where = QString("AND "+condition);
 	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE '"+entity+"::%' "+where);
 	//	qDebug() << query <<"===";
-	if(Database::Get()->query(query))
+	Database::Get()->query(query);
 		//qDebug() << Database::Get()->getArray().first().object().value("count").toInt();
 		return Database::Get()->getArray();
-	return QList<QJsonDocument>();
+	//return QList<QJsonDocument>();
 }
 
 
 
 bool Prsistance::Select(const QString query)
 {
-	QStringList tableColumn =  query.split(".");
-	if(tableColumn.count() > 0){
-		if(Database::Get()->query("S"))
-			return true;
-		}
+	//QStringList tableColumn =  query.split(".");
+	//if(tableColumn.count() > 0){
+	//	if(Database::Get()->query("S"))
+	//		return true;
+	//	}
 
 	return false;
 }

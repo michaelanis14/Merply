@@ -5,7 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string.h>
-
+#include <QThread>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -289,14 +289,14 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 		}
 
 }
-bool Database::query(QString query)
+void Database::query(QString query)
 {
-	//qDebug() << query;
+	//qDebug()<<"Query:: " << query;
 	lcb_t instance = Database::InitDatabase();
 	Database::Get()->array = QList<QJsonDocument>();
 	if(instance == NULL){
 		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
-		return false;
+		return;
 		}
 
 	// Error checking omitted for brevity
@@ -316,7 +316,7 @@ bool Database::query(QString query)
 
 		//qDebug() << "sucess q" << query;
 		Database::KillDatabase(instance);
-		return true;
+		return ;
 
 		}
 	else{
@@ -324,9 +324,10 @@ bool Database::query(QString query)
 		lcb_n1p_free(nparams);
 		lcb_wait(instance);
 		Database::KillDatabase(instance);
-		return false;
+		//return false;
 		}
 	// We can release the params object now..
+
 
 }
 
@@ -479,8 +480,11 @@ Database::Database():
 Database* Database::p_instance = 0;
 Database* Database::Get()
 {
-	if (p_instance == 0)
+	if (p_instance == 0){
+		QThread* thread = new QThread;
 		p_instance = new Database();
-
+		p_instance->moveToThread(thread);
+		thread->start();
+}
 	return p_instance;
 }

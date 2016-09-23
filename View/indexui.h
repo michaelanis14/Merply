@@ -25,7 +25,6 @@ public:
 	static void ShowUI(const QString document_id,const QList<QJsonDocument> documents);
 private:
 	QVBoxLayout * layout;
-	void clear();
 	void fill(const QString document_id,const QList<QJsonDocument> items);
 	static IndexUI* p_instance;
 	merplyTabelView * table ;

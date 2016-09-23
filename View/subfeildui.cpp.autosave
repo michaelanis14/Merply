@@ -31,7 +31,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 
 
 		if(structureView.value("LocalFilter") != QJsonValue::Undefined && structureView.value("LocalFilter").toBool()){
-			qDebug() << "local Field"<< structureView.value("Local").toString();
+			//qDebug() << "local Field"<< structureView.value("Local").toString();
 			//qDebug() << Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			if(localFilter->combox){
@@ -44,7 +44,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 				}
 			}
 		else{
-			qDebug() << "NOT LOACL FILTER";
+			//qDebug() << "NOT LOACL FILTER";
 			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
 			Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString());
 			}

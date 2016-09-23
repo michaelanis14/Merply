@@ -23,6 +23,8 @@ public:
 	static QJsonArray table(QString line);
 	static bool init();
 	static QString readFile(QString path);
+	static QStringList readCSVFile(QString path);
+
 	static void GetJsonList(QString table, QString select,QString condition = "");
 	static void GetJsonEntityFields(QString table, QString select,QString condition = "");
 

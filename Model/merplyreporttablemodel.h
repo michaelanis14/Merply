@@ -29,8 +29,8 @@ public:
 	int columnCount(const QModelIndex& parent = QModelIndex()) const;
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-
-
+	QList<QJsonDocument> items;
+	QString getRowKey(int row);
 private:
 	int rowsCount;
 	int colmnsCount;
@@ -44,10 +44,12 @@ private:
 	QStringList clmnsHeader;
 signals:
 	void equationColumnsSignal();
+	void done();
 public slots:
 	void fillEquationColumns();
 	  void setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage);
 	void fill(QList<QJsonDocument> documents);
+	void fillIndexTabel(QList<QJsonDocument> items);
 };
 
 #endif // MERPLYREPORTTABLEMODEL_H

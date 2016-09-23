@@ -150,6 +150,7 @@ signals:
 	void gotValue(QString value);
 	void gotLastKey(QString LastKeyID);
 	void gotJsonListData(QList<QJsonDocument> items);
+	void queryDatabase(QString q);
 
 };
 

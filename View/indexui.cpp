@@ -35,15 +35,10 @@ void IndexUI::ShowUI(const QString document_id, const QList<QJsonDocument> docum
 
 	if(p_instance == 0)
 		p_instance = new IndexUI();
-	p_instance->clear();
 	p_instance->fill(document_id,documents);
 	MainForm::Get()->ShowDisplay(p_instance);
 }
 
-void IndexUI::clear()
-{
-	this->table->tabel->clear();
-}
 
 void IndexUI::fill(const QString document_id,const QList<QJsonDocument> items)
 {

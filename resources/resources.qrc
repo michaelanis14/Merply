@@ -24,5 +24,9 @@
         <file>initData/countriesToCities.json</file>
         <file>initData/contact.json</file>
         <file>initData/City.json</file>
+        <file>initData/AirportsCode.json</file>
+        <file>initData/AirlinesCode.json</file>
+        <file>initData/AirportsCodeData.csv</file>
+        <file>initData/AirlinesCodeData.csv</file>
     </qresource>
 </RCC>

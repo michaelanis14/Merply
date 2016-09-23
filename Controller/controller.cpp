@@ -45,7 +45,9 @@ Controller::Controller(QObject *parent) :
 	//	connect(timelineUI::Get(), SIGNAL(btnLoadPressed()), this, SLOT(onBtnLoadClicked()));
 	//	connect(timelineUI::Get(), SIGNAL(btnRunPressed()), this, SLOT(onBtnRunClicked()));
 
+	//Worker* worker = new Worker();
 
+	QObject::connect(this,SIGNAL(queryDatabase(QString)),Database::Get(),SLOT(query(QString)),Qt::QueuedConnection);
 
 }
 
@@ -367,8 +369,8 @@ void Controller::updateLayoutViewGroups(QString entityName,QList<StructureViewsE
 QStringList Controller::getLayoutViewGroups(QString entity)
 {
 	return layoutViewGroups.value(entity);
-}
 
+}
 bool Controller::storeDoc(QString key, QJsonDocument document)
 {
 	return Database::Get()->storeDoc(key,document);
@@ -578,16 +580,16 @@ void Controller::getReport(QJsonObject clmns)
 				QString selectStr = clmnObj.value("Select").toString();
 				QString uniqueRef = QString(source.at(0)).append(QString(selectStr.at(0))).append(QString::number(i)) ;
 
-				if(i > 0 && i < clmns.value("Columns").toArray().count() - 1){
+				if(i > 0 && i < clmns.value("Columns").toArray().count()){
 					query+= " UNION ALL ";
 					orderby += ",";
 					}
 
 				query += "SELECT ";
 				query += "(Array item.`"+selectStr+"`[0] FOR item IN "+uniqueRef+"f END)[0] AS `"+clmnObj.value("Header").toString()+"`";
-				query += " , META("+uniqueRef+"d).id AS `"+source+"Key`";
+				query += " , META("+uniqueRef+"d).id AS `"+source+QString::number(i)+"Key`";
 
-				orderby += "`"+source+"Key`";
+				orderby += "`"+source+QString::number(i)+"Key`";
 				//	qDebug() << clmnObj.value("LocalFilter").toString() << clmnObj.value("LocalFilter").toString().split("::").count() <<clmnObj.value("Source").toString() <<clmnObj.value("Source").toString().split("::").count();
 				if(clmnObj.value("LocalFilter") != QJsonValue::Undefined
 						&&	clmnObj.value("Source").toString().split("::").count() > 1
@@ -600,8 +602,8 @@ void Controller::getReport(QJsonObject clmns)
 
 
 
-					query += " , META("+uniqueRef+"a).id AS `"+localFilter+"Key`";
-					query += " , META("+uniqueRef+"d).id AS `Join"+localFilter+"Key`";
+					query += " , META("+uniqueRef+"a).id AS `"+localFilter+QString::number(i)+"Key`";
+					query += " , META("+uniqueRef+"d).id AS `Join"+localFilter+QString::number(i)+"Key`";
 					query += "FROM ";
 					query += QString(DATABASE) +" "+uniqueRef+"d UNNEST "+uniqueRef+"d.Fields "+uniqueRef+"f UNNEST (Array item.`"+entityFilter+"`[0] FOR item IN "+uniqueRef+"f END)[0] "+uniqueRef+"fk  INNER JOIN "+QString(DATABASE) +"  "+uniqueRef+"a ON KEYS "+uniqueRef+"fk.`Key`";
 					query += "UNNEST "+uniqueRef+"a  af UNNEST af.Fields "+uniqueRef+"aff UNNEST (Array item.Name[0] FOR item IN "+uniqueRef+"aff END) "+uniqueRef+"afs "; //UNNEST (Array item.Salutation[0] FOR item IN "+uniqueRef+"ff END) IC2fkrk";
@@ -629,7 +631,7 @@ void Controller::getReport(QJsonObject clmns)
 			i++;
 			}
 		query+= orderby;
-		//qDebug() << query;
+	//	qDebug() << query;
 		/*
 		QString query;
 		query += "SELECT ";
@@ -663,9 +665,11 @@ void Controller::getReport(QJsonObject clmns)
 
 		qDebug() << query;
 		*/
-
-		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)));
-		Database::Get()->query(query);
+		//qDebug() << "Before Query";
+		qRegisterMetaType<QList<QJsonDocument> >("MyStruct");
+		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)),Qt::QueuedConnection);
+		//Database::Get()->query(query);
+		emit queryDatabase(query);
 
 		}
 
@@ -675,6 +679,7 @@ void Controller::getReport(QJsonObject clmns)
 
 void Controller::getReportData(QList<QJsonDocument> documents)
 {
+	//qDebug() << "GotReport Data" ;
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)));
 	emit gotReportData(documents);
 

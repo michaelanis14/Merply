@@ -1,5 +1,5 @@
 #include "merplyreporttablemodel.h"
-
+#include "controller.h"
 
 MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTableModel()
 {
@@ -10,16 +10,21 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 	//colmnsCount = 1;
 	if(strct.value("Columns").isArray()){
 		this->clmns = (strct.value("Columns").toArray());
-		colmnsCount = this->clmns.count();
+
 		foreach(QJsonValue clmn,strct.value("Columns").toArray()){
 			clmnsHeader << clmn.toObject().value("Header").toString();
 			if(clmn.toObject().value("Type").toString().compare("Equation") == 0)
 				equationColumns.insert(clmn.toObject().value("Header").toString(),clmn.toObject().value("EquationTerms").toArray());
 			}
 		}
+	else{
+		clmnsHeader = strct.value("clmnsHeader").toVariant().toStringList();
+		//qDebug() << clmnsHeader;
+		}
+	colmnsCount = clmnsHeader.count();
 	QObject::connect(this,SIGNAL(equationColumnsSignal()),this,SLOT(fillEquationColumns()));
 
-	qDebug() << this->strct;
+	//	qDebug() << this->strct;
 }
 
 int MerplyReportTableModel::rowCount(const QModelIndex& parent) const
@@ -53,16 +58,17 @@ QVariant MerplyReportTableModel::data(const QModelIndex& index, int role) const
 	if (!index.isValid() || role != Qt::DisplayRole)
 		return QVariant();
 
-	// Return the data to which index points.
 	return cells[index.row() * colmnsCount + index.column()].getData();
+}
+
+QString MerplyReportTableModel::getRowKey(int row)
+{
+	return cells[row * this->colmnsCount].getId();
 }
 
 void MerplyReportTableModel::fill(QList<QJsonDocument> documents)
 {
-	//qDebug() << clmnsHeader;
 	rowsCount = 0;
-	//this->rowsCount = ;
-
 	cells = new TableCell[colmnsCount * documents.count()];
 	foreach(QJsonDocument doc, documents){
 		int row = -1;
@@ -138,11 +144,39 @@ void MerplyReportTableModel::fill(QList<QJsonDocument> documents)
 
 	if(this->equationColumns.count() > 0)
 		emit equationColumnsSignal();
+	else emit done();
 	//qDebug()<<"TableModel Fill" << documents;
+
+
+}
+
+void MerplyReportTableModel::fillIndexTabel( QList<QJsonDocument> items)
+{
+
+	int i = 0;
+	cells = new TableCell[colmnsCount * items.count()];
+	foreach(QJsonDocument item,items){
+		QString  key = item.object().value("document_id").toString();
+		int j = 0;
+		foreach(QJsonValue value, item.object().value("Fields").toArray()){
+			foreach(QJsonValue viewGroup, value.toArray()){
+				QString valueString;
+				if(clmnsHeader.count()  > j)
+					valueString = Controller::Get()->toString(viewGroup.toObject().value(clmnsHeader.at(j)).toArray());
+				TableCell cell(key,valueString);
+				cells[i * this->colmnsCount + j] = cell;
+				j++;
+				}
+			}
+		i++;
+		}
+	rowsCount = i;
+	emit done();
 }
 
 void MerplyReportTableModel::fillEquationColumns()
 {
+	//qDebug() << "fillEquationColumns";
 	QHashIterator<QString, QJsonArray> i(equationColumns);
 	while (i.hasNext()) {
 		i.next();
@@ -203,6 +237,7 @@ void MerplyReportTableModel::fillEquationColumns()
 			}
 		}
 
+	emit done();
 }
 
 void MerplyReportTableModel::setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage)
@@ -210,7 +245,7 @@ void MerplyReportTableModel::setValue(const int recNo, const QString paramName, 
 	int  columnIndex = clmnsHeader.indexOf(paramName);
 	if(columnIndex != -1){
 		paramValue = cells[recNo * this->colmnsCount + columnIndex].getData();
-	//	qDebug() << paramValue << paramName;
+		//	qDebug() << paramValue << paramName;
 		}
 	else return;
 
