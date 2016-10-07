@@ -6,8 +6,8 @@
 
 #include <QObject>
 #include <QWidget>
-
-class ViewGroup  : public QWidget
+#include <QGroupBox>
+class ViewGroup  : public QGroupBox
 {
 public:
 	explicit ViewGroup(QWidget *parent = 0,QString strID = ""

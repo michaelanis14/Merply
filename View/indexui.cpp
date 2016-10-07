@@ -18,7 +18,7 @@ IndexUI::IndexUI(QWidget *parent) : MainDisplay(parent)
 	connect(btnCreatNew, SIGNAL(pressed()), this, SLOT(createNew()));
 	layout->addWidget(btnCreatNew);
 
-	table = new merplyTabelView(this);
+	table = new merplyTabelView(this,false,true);
 
 	//QDomNode columns = nodek.namedItem("Columns");
 
@@ -72,7 +72,7 @@ void IndexUI::fill(const QString document_id,const QList<QJsonDocument> items)
 */
 	//qDebug() << items;
 	this->document_id = document_id;
-	table->indexTable(document_id,items,true,true);
+	table->indexTable(document_id,items);
 }
 
 void IndexUI::createNew()

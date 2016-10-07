@@ -68,6 +68,7 @@ QJsonObject StructureVieweditSubFeildTableColumnEquation::save()
 
 void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 {
+	//qDebug() << data;
 	//if(data.value("SecondColmn") != QJsonValue::Undefined){
 	if(firstOperand)
 		firstOperation->setCurrentIndex(data.value("FirstOperation").toInt());
@@ -77,6 +78,7 @@ void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 		operation->setCurrentIndex(data.value("Operation").toInt());
 	if(data.value("SecondColmn") != QJsonValue::Undefined){
 		secondTerm->setCurrentIndex(0);
+		//qDebug() << data.value("SecondColmn").toInt();
 		columnTwo->setCurrentIndex(data.value("SecondColmn").toInt());
 		}
 	else {
@@ -88,6 +90,8 @@ void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 
 void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QJsonDocument> list)
 {
+	int oldClmnOneIndex = columnOne->currentIndex();
+	int oldClmnTwoIndex = columnTwo->currentIndex();
 	columnOne->clear();
 	columnTwo->clear();
 	int i = 0;
@@ -97,6 +101,8 @@ void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QJsonDocum
 		columnTwo->addItem(item);
 		i++;
 		}
+	columnOne->setCurrentIndex(oldClmnOneIndex);
+	columnTwo->setCurrentIndex(oldClmnTwoIndex);
 }
 
 void StructureVieweditSubFeildTableColumnEquation::updateColmnTwo(int index)

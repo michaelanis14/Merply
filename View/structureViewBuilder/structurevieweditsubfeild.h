@@ -10,6 +10,7 @@
 #include <QCheckBox>
 #include <QFormLayout>
 #include <QDateEdit>
+#include <QTextEdit>
 
 
 class StructureVieweditSubFeild : public QWidget
@@ -27,8 +28,12 @@ private:
 	StructureVieweditSubFeildTable* tableEdit;
 	ERPComboBox* Source;
 	ERPComboBox* Select;
+	QTextEdit* condition;
 	QCheckBox* Editable;
 	QLineEdit* defaultValue;
+	QLineEdit* charCount;
+	ERPComboBox* inputDataType;
+
 	QLineEdit* title;
 	QDateEdit *date;
 	QString type;
@@ -47,6 +52,7 @@ private:
 	ERPComboBox* localFilter;
 	ERPComboBox* entityFilter;
 	QFormLayout* localFilterWidgetLayout;
+	QTextEdit* textEdit;
 	void paintEvent(QPaintEvent *event);
 signals:
 	void changed();

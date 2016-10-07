@@ -293,7 +293,7 @@ void StructureVieweditSubFeildTableColumn::addEquationWidget(QJsonObject data)
 {
 	StructureVieweditSubFeildTableColumnEquation* eqElemnet = new StructureVieweditSubFeildTableColumnEquation(0,equationElements.count() > 0 ?true:false);
 	if(!data.isEmpty()){
-		qDebug() << "Fill addEquationWidget"<< data;
+	//	qDebug() << "Fill addEquationWidget"<< data;
 		eqElemnet->fill(data);
 		}
 	equationElements << eqElemnet;

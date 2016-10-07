@@ -16,12 +16,11 @@
 
 //Q_IMPORT_PLUGIN(PrinterSupportPlugin)
 
-merplyTabelView::merplyTabelView(QWidget *parent,QString propertyName) :
+merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 	QWidget(parent)
 {
 	this->setObjectName("merplyTabelView");
 	this->setContentsMargins(0,0,0,0);
-	this->propertyName = propertyName;
 	//	this->model = new QStandardItemModel(this);
 
 	this->setFixedHeight(600);
@@ -50,18 +49,28 @@ merplyTabelView::merplyTabelView(QWidget *parent,QString propertyName) :
 	lblLayout->setContentsMargins(0,2,0,0);
 
 	QStringList btnsList;
-	btnsList << "Print->Print"<< "Edit->Edit"<< "Delete->Delete";
+	if(add){
+		btnsList << "Add->Add" << "Remove->Remove";
+
+
+		}
+	if(edit){
+		btnsList << "Print->Print"<< "Edit->Edit"<< "Delete->Delete";
+		}
 
 
 	controllers = new HControllers(0,btnsList);
-	connect(controllers, SIGNAL(btnClicked(const QString&)), this, SLOT(controller_Clicked(QString)));
 	controllers->setObjectName("controllers");
-	controllers->setEnabled(false);
+
 
 	layout->addWidget(controllers);
 	tableView= new QTableView;
 	tableView->setContentsMargins(0,0,0,0);
+	if(edit){
+		controllers->setEnabled(false);
+		}
 
+	connect(controllers, SIGNAL(btnClicked(const QString&)), this, SLOT(controller_Clicked(QString)));
 	tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	tableView->setSelectionMode(QAbstractItemView::SingleSelection);
 
@@ -79,9 +88,26 @@ merplyTabelView::merplyTabelView(QWidget *parent,QString propertyName) :
 void merplyTabelView::controller_Clicked(QString nameAction)
 {
 	if(tableView){
+		QStringList nActon = nameAction.split("->");
+
+		if(nActon.count() > 1){
+			if(nActon.at(1).compare("Add") == 0){
+
+				 model->insertRow(model->rowCount(QModelIndex()));
+				//model->rowsInserted(QModelIndex(),);
+				return;
+				}
+			else if(nActon.at(1).compare("Remove") == 0){
+				QModelIndexList indexes  = tableView->selectionModel()->selectedRows();
+				int countRow = indexes.count();
+				for( int i = countRow; i > 0; i--)
+					   model->removeRow( indexes.at(i-1).row(), QModelIndex());
+				// model->removeRows( tableView->selectedIndexes().first().row(), tableView->selectedIndexes().count());
+				}
+			}
 		QItemSelectionModel *select = tableView->selectionModel();
 		if(select && select->hasSelection()){
-			QStringList nActon = nameAction.split("->");
+
 			if(nActon.count() > 1){
 				QString id = 	model->getRowKey(select->currentIndex().row());
 				if(nActon.at(1).compare("Print") == 0){
@@ -106,6 +132,7 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 void merplyTabelView::selectionChanged(const QItemSelection& , const QItemSelection& )
 {
 	controllers->setEnabled(true);
+	//qDebug() << "SELECTIONN";
 }
 
 
@@ -121,23 +148,38 @@ bool merplyTabelView::fill(QJsonObject columns)
 	return true;
 }
 
-void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocument> items, const bool , const bool )
+bool merplyTabelView::fillText(QJsonObject data)
+{
+	QJsonArray dataArray = data.value("merplyTabel").toArray();
+	model->fillText(dataArray);
+	return true;
+}
+
+void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocument> items)
 {
 	this->items = items;
 	controllers->setEnabled(false);
-//	if(model){
-//		if(model->rowCount( )== items.count()
+	//	if(model){
+	//		if(model->rowCount( )== items.count()
 	//			&& items.first().object().value("document_id").toString().compare(model->getRowKey(0)) == 0){
 	//	//	//qDebug() << "Lazyyy" ;
-		//	return;
-		//		}
-		//}
-		//qDebug() << "Not Lazy"  ;
-		QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
-		Controller::Get()->getFields(document_id);
+	//	return;
+	//		}
+	//}
+	//qDebug() << "Not Lazy"  ;
+	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
+	Controller::Get()->getFields(document_id);
 
 
 
+}
+
+QJsonObject merplyTabelView::save()
+{
+	QJsonObject table;
+	table.insert("merplyTabel",this->model->getJsonData());
+	//qDebug() << this->model->getJsonData();
+	return table;
 }
 
 void merplyTabelView::printTabel(){
@@ -260,6 +302,7 @@ void merplyTabelView::gotReportData(QList<QJsonDocument> documents)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotReportData(QList<QJsonDocument>)),this,SLOT(gotReportData(QList<QJsonDocument>)));
 	emit updateModel(documents);
+
 }
 
 void merplyTabelView::updateHeaderData(QList<QString> headerItems)
@@ -275,7 +318,7 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 
 void merplyTabelView::setValue(const int , const QString paramName, QVariant& paramValue, const int )
 {
-	qDebug() << paramName;
+	qDebug() <<"setValue TabelView"<< paramName;
 	QJsonValue value;// = indexedTable.value(currenctPrintID).value(paramName);
 	if(value != QJsonValue::Undefined)
 		paramValue = value.toVariant();
@@ -286,9 +329,11 @@ void merplyTabelView::modelFinished()
 {
 	//qDebug() << "ModelDone";
 	tableView->setModel(model);
+
 	QObject::connect(
 				tableView->selectionModel(),
 				SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),this,
 				SLOT(selectionChanged(const QItemSelection &, const QItemSelection &))
 				);
 }
+

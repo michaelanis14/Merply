@@ -132,8 +132,10 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 
 
 	loadStyle(); //sets the Style selectbox to trctView
-
-
+	QLabel *titlelbl = new QLabel(tr("Group Name"));
+	layout->addWidget(titlelbl);
+	titleData = new QLineEdit();
+	layout->addWidget(titleData);
 
 	SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
 	sctrlUI->addbtn("Add Field",":/resources/icons/add.png","add");
@@ -144,6 +146,7 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 
 	if(structureView.value("Viewgroup").isObject()){
 		QJsonObject viewgroup = structureView.value("Viewgroup").toObject();
+		titleData->setText(viewgroup.value("GroupTitle").toString());
 		if(viewgroup.value("Fields").isArray())
 			foreach (QJsonValue fieldVS, viewgroup.value("Fields").toArray()) {
 				addStrField(fieldVS);
@@ -159,7 +162,7 @@ QJsonObject StructureViewsEditUI::save()
 	QJsonObject saveObject;
 	//if(!init)
 	//	return saveObject;
-
+	saveObject.insert("GroupTitle",titleData->text());
 	saveObject.insert("Style",Style->currentText());
 	if(this->Style->currentText().compare("horizontail") == 0){
 		if(this->joinCheck->isChecked()){

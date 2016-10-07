@@ -22,7 +22,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 
 	if(type.compare("Refrence") == 0){
 		combox = new ERPComboBox(this,false);
-		qDebug()<<"SELECT" << structureView.value("Select");
+		//qDebug()<<"SELECT" << structureView.value("Select");
 		if(structureView.value("Editable").toString().compare("false") == 0)
 			combox->setEditable(false);
 
@@ -31,7 +31,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 
 
 		if(structureView.value("LocalFilter") != QJsonValue::Undefined && structureView.value("LocalFilter").toBool()){
-			qDebug() << "local Field"<< structureView.value("Local").toString();
+			//qDebug() << "local Field"<< structureView.value("Local").toString();
 			//qDebug() << Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			if(localFilter->combox){
@@ -44,9 +44,9 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 				}
 			}
 		else{
-			qDebug() << "NOT LOACL FILTER";
+			//qDebug() << "NOT LOACL FILTER";
 			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
-			Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString());
+			Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Condition").toString());
 			}
 		QJsonObject dataObj = data.toObject();
 		//qDebug() << data;
@@ -58,6 +58,23 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 	else if(type.compare("Text") == 0){
 
 		QLineEdit* lineEdit = new QLineEdit();
+		lineEdit->setContentsMargins(0,0,0,0);
+		if(structureView.value("Default") != QJsonValue::Undefined){
+			lineEdit->setText(structureView.value("Default").toString());
+			}
+		lineEdit->setText(data.toString());
+		if(structureView.value("CharCount") != QJsonValue::Undefined && structureView.value("CharCount").toInt() > 0)
+			lineEdit->setMaxLength(structureView.value("CharCount").toInt());
+		if(structureView.value("InputDataType").toString().compare("IntToMillion") == 0)
+			lineEdit->setValidator( new QIntValidator(0, 1000000, this) );
+		else if(structureView.value("InputDataType").toString().compare("DoubleToMillion")== 0)
+			lineEdit->setValidator( new QDoubleValidator(0, 1000000,2, this) );
+		layout->addWidget(lineEdit);
+		field = lineEdit;
+		}
+	else if(type.compare("TextArea") == 0){
+
+		QTextEdit* lineEdit = new QTextEdit();
 		lineEdit->setContentsMargins(0,0,0,0);
 		if(structureView.value("Default") != QJsonValue::Undefined){
 			lineEdit->setText(structureView.value("Default").toString());
@@ -93,10 +110,13 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			}
 		}
 	else if(type.compare("Table") == 0){
-		merplyTabelView * table = new merplyTabelView(this,"key");
+		merplyTabelView * table = new merplyTabelView(this,true,false);
 		//qDebug() << data.toObject() << structureView;
-		Controller::Get()->getReportTableData(structureView);
+		//Controller::Get()->getReportTableData(structureView);
 		table->fill(structureView);
+		QJsonObject dataObj = data.toObject();
+		if(!dataObj.isEmpty())
+			table->fillText(dataObj);
 		layout->addWidget(table);
 		field = table;
 		}
@@ -164,14 +184,19 @@ QJsonValue SubFieldUI::save()
 		save =((QLineEdit*)field)->text();
 		//	save =" ";
 		}
+	else if(QString(field->metaObject()->className()).compare("QTextEdit") == 0 ){
+		save =((QTextEdit*)field)->toPlainText();
+		}
 	else if(field->objectName().compare("checkbox") == 0){
 		//	save = component.name;
 		save =((QCheckBox*)field)->isChecked();
 		//	save =" ";
 		}
-	else if(field->objectName().compare("merplyTabelView") == 0){
+	else if(QString(field->metaObject()->className()).compare("merplyTabelView") == 0){
 		//	save = component.name;
-//		save =((merplyTabelView*)field)->save("this->key");
+		//		save =((merplyTabelView*)field)->save("this->key");
+
+		save = ((merplyTabelView*)field)->save();
 		//	save =" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QDateEdit") == 0){

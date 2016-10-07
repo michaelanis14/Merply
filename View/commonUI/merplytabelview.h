@@ -36,15 +36,16 @@ class merplyTabelView : public QWidget
 	Q_OBJECT
 
 public:
-	merplyTabelView(QWidget *parent = 0, QString propertyName ="");
+	merplyTabelView(QWidget *parent = 0,bool add = false,bool edit = false);
 	bool fill(QJsonObject columns);
-	void indexTable(const QString document_id, const QList<QJsonDocument> items, const bool, const bool);
+	bool fillText(QJsonObject data);
+	void indexTable(const QString document_id, const QList<QJsonDocument> items);
 	QList<QJsonDocument> items;
+	QJsonObject save();
 private:
 	QVBoxLayout* layout;
 	QHBoxLayout* lblLayout;
 	QLabel* print;
-	QString propertyName;
 	QTableView* tableView;
 	MerplyReportTableModel* model;
 	HControllers* controllers ;

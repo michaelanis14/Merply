@@ -12,9 +12,14 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 		this->clmns = (strct.value("Columns").toArray());
 
 		foreach(QJsonValue clmn,strct.value("Columns").toArray()){
+
 			clmnsHeader << clmn.toObject().value("Header").toString();
-			if(clmn.toObject().value("Type").toString().compare("Equation") == 0)
+			if(clmn.toObject().value("Type").toString().compare("Text") == 0)
+				Textclmns.insert(clmn.toObject().value("Header").toString(),QJsonObject());
+			if(clmn.toObject().value("Type").toString().compare("Equation") == 0){
+
 				equationColumns.insert(clmn.toObject().value("Header").toString(),clmn.toObject().value("EquationTerms").toArray());
+				}
 			}
 		}
 	else{
@@ -61,15 +66,86 @@ QVariant MerplyReportTableModel::data(const QModelIndex& index, int role) const
 	return cells[index.row() * colmnsCount + index.column()].getData();
 }
 
+bool MerplyReportTableModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+	if (index.isValid() && role == Qt::EditRole) {
+
+		cells[index.row() * colmnsCount + index.column()].setData(value.toString());
+		if(equationColumns.count() > 0 )
+			fillEquationColumns();
+		emit dataChanged(index, index);
+		return true;
+		}
+	return false;
+}
+
+bool MerplyReportTableModel::insertRows(int row, int count, const QModelIndex& parent)
+{
+	bool state = false;
+	beginInsertRows(parent, row, row+count-1);
+	rowsCount = row +count;
+	cells.resize(colmnsCount * rowsCount);
+	cells[row * this->colmnsCount + 1].setData("dd");
+
+	state = true;
+	endInsertRows();
+
+	return state;
+}
+
+
+bool MerplyReportTableModel::removeRows(int row, int count, const QModelIndex& parent)
+{
+	bool state = false;
+	beginRemoveRows(parent, row, row+count-1);
+
+	qDebug() << cells.count() << row << row * this->colmnsCount;
+	for(int j = 0; j< colmnsCount; j++){
+		cells.removeAt(row * this->colmnsCount );
+		}
+	qDebug() << cells.count();
+	//cells.resize(colmnsCount * rowsCount);
+	//cells[row * this->colmnsCount + 1].setData("dd");
+	rowsCount = rowsCount -count;
+	state = true;
+	endRemoveRows();
+	return state;
+}
+
+Qt::ItemFlags MerplyReportTableModel::flags(const QModelIndex& index) const
+{
+	if(index.isValid())
+		if(!equationColumns.contains(clmnsHeader.at(index.column())) && Textclmns.contains(clmnsHeader.at(index.column())))
+			return QAbstractTableModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsEnabled |Qt::ItemIsSelectable;
+
+	return QAbstractTableModel::flags(index) & ~Qt::ItemIsEditable ;
+}
+
 QString MerplyReportTableModel::getRowKey(int row)
 {
 	return cells[row * this->colmnsCount].getId();
 }
 
+QJsonArray MerplyReportTableModel::getJsonData()
+{
+	QJsonArray tabel;
+	for(int i = 0;i < rowsCount; i++){
+		QJsonObject row;
+		for(int j = 0; j< colmnsCount; j++){
+			QString data = cells[i * this->colmnsCount + j].getData();
+			if(!data.isEmpty())
+				row.insert(clmnsHeader.at(j),data);
+			}
+		if(!row.isEmpty())
+			tabel.append(row);
+		}
+	return tabel;
+}
+
 void MerplyReportTableModel::fill(QList<QJsonDocument> documents)
 {
 	rowsCount = 0;
-	cells = new TableCell[colmnsCount * documents.count()];
+	cells =  QVector<TableCell>(colmnsCount * documents.count());
 	foreach(QJsonDocument doc, documents){
 		int row = -1;
 		QString dataKey;
@@ -150,11 +226,29 @@ void MerplyReportTableModel::fill(QList<QJsonDocument> documents)
 
 }
 
+void MerplyReportTableModel::fillText(QJsonArray data)
+{
+
+	cells =  QVector<TableCell>(colmnsCount * data.count());
+	rowsCount = data.count();
+	for(int i = 0; i < data.count(); i++){
+		QJsonObject row =  data.at(i).toObject();
+		for(int j = 0; j <clmnsHeader.count(); j++){
+			QString value = row.value(clmnsHeader.at(j)).toString();
+			if(!value.isEmpty()){
+				cells[i * this->colmnsCount + j].setData(value);
+				}
+			}
+
+		}
+	emit equationColumnsSignal();
+}
+
 void MerplyReportTableModel::fillIndexTabel( QList<QJsonDocument> items)
 {
 
 	int i = 0;
-	cells = new TableCell[colmnsCount * items.count()];
+	cells = QVector<TableCell>(colmnsCount * items.count());
 	foreach(QJsonDocument item,items){
 		QString  key = item.object().value("document_id").toString();
 		int j = 0;
@@ -187,11 +281,13 @@ void MerplyReportTableModel::fillEquationColumns()
 				bool ok = false;
 				double firstTerm = 0;
 				double secondTerm = 0;
-				if(eq.toObject().value("FirstColumn").toInt() > 0)
-					firstTerm = cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData().toDouble(&ok);
-				if(eq.toObject().value("SecondColmn") != QJsonValue::Undefined){
-					if(eq.toObject().value("SecondColmn").toInt() > 0)
-						secondTerm = cells[j * this->colmnsCount + eq.toObject().value("SecondColmn").toInt()].getData().toDouble(&ok);
+				//qDebug() << eq.toObject();
+				if(eq.toObject().value("FirstColumn").toInt() >= 0){
+					//qDebug() << eq.toObject().value("FirstColumn").toInt() << j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt() << cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData();
+					firstTerm = cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData().trimmed().toDouble(&ok);
+				}if(eq.toObject().value("SecondColmn") != QJsonValue::Undefined){
+					if(eq.toObject().value("SecondColmn").toInt() >= 0)
+						secondTerm = cells[j * this->colmnsCount + eq.toObject().value("SecondColmn").toInt()].getData().trimmed().toDouble(&ok);
 					}
 				else if(eq.toObject().value("Number") != QJsonValue::Undefined){
 					secondTerm = eq.toObject().value("Number").toString().toDouble();
@@ -233,7 +329,8 @@ void MerplyReportTableModel::fillEquationColumns()
 			//cout << i.key() << ": " << i.value() << endl;
 			//qDebug() << total;
 			TableCell cell("",QString::number(total));
-			cells[j * this->colmnsCount + clmnsHeader.indexOf(i.key())] =cell;
+			if(clmnsHeader.indexOf(i.key()) != -1)
+				cells[j * this->colmnsCount + clmnsHeader.indexOf(i.key())] =cell;
 			}
 		}
 
@@ -245,7 +342,7 @@ void MerplyReportTableModel::setValue(const int recNo, const QString paramName, 
 	int  columnIndex = clmnsHeader.indexOf(paramName);
 	if(columnIndex != -1){
 		paramValue = cells[recNo * this->colmnsCount + columnIndex].getData();
-		//	qDebug() << paramValue << paramName;
+		qDebug() << paramValue << paramName << reportPage;
 		}
 	else return;
 
@@ -275,6 +372,7 @@ QString TableCell::getData() const
 void TableCell::setData(const QString& value)
 {
 	data = value;
+
 }
 
 

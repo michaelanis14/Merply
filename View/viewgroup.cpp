@@ -2,21 +2,24 @@
 #include "structureviewedit.h"
 
 
-ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, QJsonArray data) : QWidget (parent)
+ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, QJsonArray data) : QGroupBox (parent)
 {
 
 	this->structureView = structureView;
 	layout = new QVBoxLayout(this);
-	layout->setContentsMargins(2,2,2,2);
-	layout->setSpacing(0);
-	this->setContentsMargins(2,2,2,2);
-	this->setObjectName("ViewGroup");
+	//layout->setContentsMargins(2,2,2,2);
+	//layout->setSpacing(0);
+	//this->setContentsMargins(2,2,2,2);
+	//this->setObjectName("ViewGroup");
 	this->feilds =  QList<FeildUI*>();
 	this->strID = strID;
-
-	//	qDebug() << structureView;
+	//qDebug() << structureView.value("Viewgroup").toObject().value("GroupTitle").toString();
+		//qDebug() << structureView;
 	if(structureView.value("Viewgroup").isObject()){
+
 		QJsonObject viewgroup = structureView.value("Viewgroup").toObject();
+		this->setTitle(viewgroup.value("GroupTitle").toString());
+
 		if(viewgroup.value("Fields").isArray()){
 			int d = 0;
 			//qDebug() << data.at(d);

@@ -58,7 +58,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	if(!restrictedTypes.isEmpty()){
 		types << restrictedTypes;
 		}else
-		types << "Index"<<"Text"<< "Refrence" <<"Date"<< "Fixed" <<"Serial" << "Table";
+		types << "Index"<<"Text"<< "Refrence" <<"Date"<< "Fixed" <<"Serial" << "Table" <<"TextArea";
 	typeSelect->addItems(types);
 	typeSelect->setCurrentIndex(types.indexOf(type));
 	//if(restrictedTypes.isEmpty())
@@ -106,10 +106,12 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
 		Controller::Get()->getJsonList("ViewStructure","Title","default.Type =\"Entity\"");
 
-
 		Select = new ERPComboBox(0);
-		//
 		layout->addRow(new QLabel(tr("Select ")), Select);
+
+		condition = new QTextEdit;
+		condition->setText(fieldVS.toObject().value("Condition").toString());
+		layout->addRow(new QLabel(tr("Condition ")), condition);
 
 		Editable = new QCheckBox(0);
 		Editable->setChecked(fieldVS.toObject().value("Editable").toString().compare("true") ==0);
@@ -126,7 +128,8 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 
 		if(fieldVS.toObject().value("Source") != QJsonValue::Undefined){
 			//qDebug() << "Source" << fieldVS.toObject().value("Source").toString();
-			Source->setCurrentText(fieldVS.toObject().value("Source").toString());
+			QString source = fieldVS.toObject().value("Source").toString().split("::").count() > 1 ?fieldVS.toObject().value("Source").toString().split("::")[1]:fieldVS.toObject().value("Source").toString();
+			Source->setCurrentText(source);
 			}
 		else {
 			updateSelect(Source->currentText());
@@ -149,6 +152,28 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		defaultValue = new QLineEdit(0);
 		defaultValue->setText(fieldVS.toObject().value("Default").toString());
 		layout->addRow(new QLabel(tr("Default ")), defaultValue);
+
+		QStringList inputDTList;
+		inputDTList <<"IntToMillion"<<"DoubleToMillion";
+		inputDataType = new ERPComboBox(0);
+		inputDataType->addItems(inputDTList);
+		if(fieldVS.toObject().value("InputDataType") != QJsonValue::Undefined)
+			inputDataType->setCurrentText(fieldVS.toObject().value("InputDataType").toString());
+		layout->addRow(new QLabel(tr("Input Type ")), inputDataType);
+
+		charCount = new QLineEdit(0);
+		if(fieldVS.toObject().value("CharCount") != QJsonValue::Undefined)
+			charCount->setText(fieldVS.toObject().value("CharCount").toString());
+		else charCount->setText("-1");
+
+		layout->addRow(new QLabel(tr("Count Limit ")), charCount);
+
+		}
+	else if(type.compare("TextArea") == 0){
+
+		textEdit = new QTextEdit;
+		textEdit->setText(fieldVS.toObject().value("Default").toString());
+		layout->addRow(new QLabel(tr("Default ")), textEdit);
 		}
 	else if(type.compare("Fixed") == 0){
 
@@ -166,8 +191,9 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		}
 	else if(type.compare("Table") == 0){
 		tableEdit = new StructureVieweditSubFeildTable(this);
+		//qDebug() << "TABEL STCT"<< fieldVS.toObject();
 		tableEdit->fill(fieldVS.toObject());
-		QObject::connect(tableEdit,SIGNAL(tableChanged()),this,SIGNAL(changed()));
+		//	QObject::connect(tableEdit,SIGNAL(tableChanged()),this,SIGNAL(changed()));
 		layout->addRow("Tabel",tableEdit);
 		}
 	else if(type.compare("Serial") == 0){
@@ -204,9 +230,10 @@ QJsonObject StructureVieweditSubFeild::save()
 			}
 
 		else if(type.compare("Refrence") == 0){
-			qDebug() <<"Save Refrence subfield:206"<< Select->getKey() << Source->getKey();
+			//qDebug() <<"Save Refrence subfield:213"<< Select->getKey() << Source->getKey();
 			saveObject.insert("Select",Select->currentText());
 			saveObject.insert("Source",Source->getKey());
+			saveObject.insert("Condition",condition->toPlainText());
 			saveObject.insert("Editable",Editable->isChecked());
 			if(filterOn->currentIndex() == 1){
 				saveObject.insert("LocalFilter",true);
@@ -217,6 +244,12 @@ QJsonObject StructureVieweditSubFeild::save()
 		else if(type.compare("Text") == 0){
 			if(!defaultValue->text().isEmpty())
 				saveObject.insert("Default",defaultValue->text());
+			saveObject.insert("InputDataType",inputDataType->currentText());
+			saveObject.insert("CharCount",charCount->text());
+			}
+		else if(type.compare("TextArea") == 0){
+			if(!textEdit->toPlainText().isEmpty())
+				saveObject.insert("Default",textEdit->toPlainText());
 			}
 		else  if(type.compare("Fixed") == 0){
 			if(!defaultValue->text().isEmpty())

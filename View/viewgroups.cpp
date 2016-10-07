@@ -9,7 +9,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 	this->setObjectName("ViewGroups");
 	layout = new QVBoxLayout(this);
 	layout->setContentsMargins(2,2,2,2);
-	layout->setSpacing(0);
+	//layout->setSpacing(0);
 	ViewGroups::Viewgroups.clear();
 	this->structureView = structureView;
 	ViewGroups::Fieldsgroups.clear();

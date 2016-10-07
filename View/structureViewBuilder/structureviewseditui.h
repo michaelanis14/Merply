@@ -31,6 +31,7 @@ private:
 	QWidget* layoutPreview;
 	QHBoxLayout* layoutPreviewLayout;
 	SettingsCtrlsUI* topCntrls;
+	QLineEdit *titleData;
 
 	bool hidePreview(bool hide);
 	void updateLayoutPreview();
