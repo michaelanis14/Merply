@@ -9,6 +9,7 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	this->setContentsMargins(0,0,5,0);
 	this->setObjectName("StructureVieweditSubFeildTableColumn");
 	this->clmn = clmn;
+	this->filledLocalSourcefilter = true;
 	layout = new QFormLayout(this);
 	layout->setContentsMargins(0,0,5,0);
 	layout->setSpacing(1);
@@ -53,14 +54,16 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	defaultValue->setText(clmn.value("Default").toString());
 	layout->addRow(new QLabel(tr("Default ")), defaultValue);
 
+	totalRow = new QCheckBox;
+	layout->addRow(new QLabel(tr("TotalRow ")), totalRow);
 
 	QObject::connect(type,SIGNAL(currentIndexChanged(int)),this,SLOT(updateFields(int)));
 	type->setCurrentIndex(0);
 	this->updateFields(0);
-	QObject::connect(header,SIGNAL(textEdited(QString)),this,SIGNAL(columnChanged()));
+	//QObject::connect(header,SIGNAL(textEdited(QString)),this,SIGNAL(columnChanged()));
 
 	QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
-	QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(columnChanged()));
+	//QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(columnChanged()));
 
 
 }
@@ -70,6 +73,8 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 	QJsonObject clmn;
 	clmn.insert("Header",header->text());
 	clmn.insert("Type",type->currentText());
+	if(totalRow->isChecked())
+		clmn.insert("TotalRow",totalRow->isChecked());
 	if(type->currentIndex() == 0){
 		clmn.insert("Source",Source->getKey());
 		clmn.insert("Select",Select->currentText());
@@ -78,7 +83,12 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 			clmn.insert("EntityFilter",entityFilter->currentText());
 			}
 		else if(filterOn->currentIndex() ==2){
+
 			clmn.insert("LocalSource",true);
+			clmn.insert("SourceLocalFilter",localFilter->currentText());
+			clmn.insert("SourceEntityFilter",entityFilter->currentText());
+			//qDebug() <<"Saveeee :"<< clmn;
+
 			}
 		}
 	else if(type->currentIndex() == 2){
@@ -90,6 +100,7 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 		}
 	else clmn.insert("Default",defaultValue->text());
 
+
 	return clmn;
 }
 
@@ -100,7 +111,12 @@ ERPComboBox* StructureVieweditSubFeildTableColumn::getSource() const
 
 void StructureVieweditSubFeildTableColumn::fill(QJsonObject clmn)
 {
+	//qDebug() <<"clmnnnn"<< clmn;
 	this->type->setCurrentIndex(typsList.indexOf(clmn.value("Type").toString().trimmed()));
+	this->clmn = clmn;
+	//qDebug() <<"clmnnnn"<< this->clmn;
+	if(clmn.value("TotalRow") != QJsonValue::Undefined)
+		this->totalRow->setChecked(true);
 	if(this->type->currentIndex() == 2){
 		QJsonArray equationTerms =  clmn.value("EquationTerms").toArray();
 		foreach(QJsonValue equationTerm,equationTerms){
@@ -119,7 +135,9 @@ void StructureVieweditSubFeildTableColumn::fill(QJsonObject clmn)
 			entityFilter->setCurrentText(clmn.value("EntityFilter").toString());
 			}
 		else if(clmn.value("LocalSource") != QJsonValue::Undefined){
+			this->filledLocalSourcefilter = false;
 			filterOn->setCurrentIndex(2);
+
 			}
 		}
 	//qDebug() << clmn;
@@ -143,6 +161,7 @@ void StructureVieweditSubFeildTableColumn::updateFields(int value)
 		layout->labelForField(Select)->setHidden(false);
 		if(!clmn.value("Select").toString().isEmpty())
 			Select->setCurrentText(clmn.value("Select").toString());
+		filterWidget->setHidden(false);
 		}
 	else if(value== 2){
 
@@ -171,7 +190,7 @@ void StructureVieweditSubFeildTableColumn::updateFields(int value)
 		equationWidget->setHidden(true);
 		}
 
-	emit columnChanged();
+	//emit columnChanged();
 }
 
 void StructureVieweditSubFeildTableColumn::updateSelect(QString )
@@ -201,7 +220,7 @@ void StructureVieweditSubFeildTableColumn::filterOnChanged(int index)
 			}
 		else if(index == 1){
 
-			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QJsonDocument>)),this,SLOT(fillLocalFilter(QList<QJsonDocument>)));
+			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QList<QJsonDocument> >)),this,SLOT(fillLocalFilter(QList<QList<QJsonDocument> >)));
 			StructureViewGroupsUI::GetUI()->getTableFields(Source);
 
 			//entityFilter->addItems(Select->getItemsText());
@@ -209,20 +228,49 @@ void StructureVieweditSubFeildTableColumn::filterOnChanged(int index)
 
 			}
 		else if(index == 2){
-			localFilterWidget->setHidden(true);
+			entityFilter->addItems(Select->getItemsText());
+			entityFilter->adjustSize();
+			//qDebug() <<"clmnnnnF"<< clmn;
+			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilterLocalSource(QStringList)));
+			StructureViewGroupsUI::GetUI()->getFeildsNames();
+
+			//localFilterWidget->setHidden(true);
 			}
 		}
 }
 
-void StructureVieweditSubFeildTableColumn::fillLocalFilter(QList<QJsonDocument> feilds)
+void StructureVieweditSubFeildTableColumn::fillLocalFilter(QList<QList<QJsonDocument> > feilds)
 {
-
 	QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QJsonDocument>)),this,SLOT(fillLocalFilter(QList<QJsonDocument>)));
+
+	//QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QJsonDocument>)),this,SLOT(fillLocalFilter(QList<QJsonDocument>)));
 	if(localFilterWidget){
 		localFilter->clear();
-		localFilter->addJsonItems(feilds);
+		foreach(QList<QJsonDocument> table,feilds){
+			localFilter->addJsonItems(table);
+			}
 		localFilterChanged(0);
 		localFilterWidget->setHidden(false);
+		}
+}
+
+void StructureVieweditSubFeildTableColumn::fillLocalFilterLocalSource(QStringList fields)
+{
+	//qDebug() <<"fillLocalFilterLocalSource"<< clmn << filledLocalSourcefilter;
+	QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilterLocalSource(QStringList)));
+	if(localFilterWidget){
+		localFilter->clear();
+		localFilter->addItems(fields);
+		localFilterWidget->setHidden(false);
+		}
+	if(!filledLocalSourcefilter){
+		//	qDebug() <<"signal to fill local source:"<< this->clmn;
+		localFilter->setCurrentIndex(localFilter->getItemsText().indexOf(this->clmn.value("SourceLocalFilter").toString()));
+		localFilter->setCurrentText(this->clmn.value("SourceLocalFilter").toString());
+		localFilter->adjustSize();
+		entityFilter->setCurrentIndex(entityFilter->getItemsText().indexOf(this->clmn.value("SourceEntityFilter").toString()));
+		entityFilter->setCurrentText(this->clmn.value("SourceEntityFilter").toString());
+		this->filledLocalSourcefilter = true;
 		}
 }
 
@@ -293,7 +341,7 @@ void StructureVieweditSubFeildTableColumn::addEquationWidget(QJsonObject data)
 {
 	StructureVieweditSubFeildTableColumnEquation* eqElemnet = new StructureVieweditSubFeildTableColumnEquation(0,equationElements.count() > 0 ?true:false);
 	if(!data.isEmpty()){
-	//	qDebug() << "Fill addEquationWidget"<< data;
+		//	qDebug() << "Fill addEquationWidget"<< data;
 		eqElemnet->fill(data);
 		}
 	equationElements << eqElemnet;

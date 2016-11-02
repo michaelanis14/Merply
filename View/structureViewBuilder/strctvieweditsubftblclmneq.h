@@ -23,17 +23,24 @@ private:
 	QFormLayout *equationElementLayout;
 	ERPComboBox* firstOperation;
 	ERPComboBox* columnOne;
+	ERPComboBox* conditionOnOne;
+	ERPComboBox* conditionColumnOne;
 	ERPComboBox* operation;
 	ERPComboBox* secondTerm;
 	ERPComboBox* columnTwo;
+	ERPComboBox* conditionOnTwo;
+	ERPComboBox* conditionColumnTwo;
 	QLineEdit* numbers;
 	bool firstOperand;
 	QStringList ops ;
+	QStringList conditions ;
 signals:
 
 public slots:
-	void gotclmnsData(QList<QJsonDocument> list);
+	void gotclmnsData(QList<QList<QJsonDocument> > list);
 	void updateColmnTwo(int index);
+	void updateConditionColmnOne(int index);
+	void updateConditionColmnTwo(int index);
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILDTABLECOLUMNEQUATION_H

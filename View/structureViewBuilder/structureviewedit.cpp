@@ -66,7 +66,7 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 
 
 	label = new QLineEdit();
-
+	hideLabel = new QCheckBox(tr("Hide Label"));
 	QObject::connect(label,SIGNAL(textEdited(QString)),this,SLOT(updatePreview()));
 	label->setText(tr("New Field"));
 	//labelWidget = new QWidget();
@@ -82,6 +82,7 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 	//labelWidgetLayout->setAlignment(Qt::AlignLeft);
 	//labelWidgetLayout->addWidget(label);
 	layout->addWidget(label,0,Qt::AlignTop);
+	layout->addWidget(hideLabel,0,Qt::AlignTop);
 
 	arrayWidget = new QWidget(this);
 	arrayWidget->setContentsMargins(2,0,2,0);
@@ -134,7 +135,11 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 QJsonObject StructureViewEdit::save()
 {
 	QJsonObject saveObject;
-	saveObject.insert("Label",label->text());
+	saveObject.insert("Label",label->text().trimmed());
+	if(label->text().trimmed().isEmpty())
+		label->setText("F"+QString::number(rand()));
+	if(hideLabel->isChecked())
+		saveObject.insert("LabelHidden",true);
 	saveObject.insert("ArrayList",array->isChecked());
 	QJsonArray subFields;
 	foreach(StructureVieweditSubFeild* svsf, sVSFs){
@@ -176,8 +181,13 @@ void StructureViewEdit::fill(QJsonObject structureView)
 {
 	if(!structureView.isEmpty() ){
 		this->structureView = structureView;
-		label->setText(structureView.value("Label").toString());
+		if(structureView.value("Label").toString().isEmpty())
+			label->setText("F"+QString::number(rand()));
+		else
+			label->setText(structureView.value("Label").toString());
 		label->setMinimumWidth(100);
+		if(structureView.value("LabelHidden") != QJsonValue::Undefined)
+			hideLabel->setChecked(true);
 		if(structureView.value("SubFields").isArray() && structureView.value("SubFields").toArray().count() > 0){
 			foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
 				QString type = fieldVS.toObject().value("Type").toString();
@@ -185,7 +195,7 @@ void StructureViewEdit::fill(QJsonObject structureView)
 				sVSFs << svsf;
 				svsf->fillTypeFields(type,fieldVS,this->restrictedTypes);
 
-				QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
+				//QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 
 				RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
 				QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
@@ -306,7 +316,7 @@ void StructureViewEdit::addField()
 	StructureVieweditSubFeild * svsf = new StructureVieweditSubFeild(this);
 	svsf->fillTypeFields(type,QJsonObject(),this->restrictedTypes);
 	sVSFs << svsf;
-	QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
+	//QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 
 	RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
 	QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));

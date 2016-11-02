@@ -1,0 +1,9 @@
+(Array item FOR item IN ((Array item.`T`[0].`merplyTabel` FOR item IN MP0f END)[0])END)
+
+
+
+
+SELECT (Array itemw.`Pieces` FOR itemw IN ((Array item.`T`[0].`merplyTabel` FOR item IN MP0f END)[0])END) AS `Piece` , META(MP0d).id AS `MAWB0Key`
+FROM default MP0d UNNEST MP0d.Fields MP0f WHERE META(MP0d).id LIKE 'MAWB::%' 
+AND (Array item.`T`[0].`merplyTabel` FOR item IN MP0f END)
+

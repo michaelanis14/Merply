@@ -1,7 +1,8 @@
 #include "prsistance.h"
 
-#include<QFile>
-#include<QMessageBox>
+#include <QFile>
+#include <QMessageBox>
+#include <model.h>
 
 Prsistance::Prsistance(QObject *parent) : QObject(parent)
 {
@@ -142,7 +143,7 @@ QJsonArray Prsistance::table(QString line)
 
 bool Prsistance::init()
 {
-		qDebug() <<"Init" ;//<< Count("City::%\"");//<< Count("ViewStructure::Contact\"");
+	qDebug() <<"Init" ;//<< Count("City::%\"");//<< Count("ViewStructure::Contact\"");
 	/*
 	if(Count("ContactType") == -1){
 		write("ContactType",QString("Name->Customer"));
@@ -181,7 +182,7 @@ bool Prsistance::init()
 	if(Count("AirlinesCode::%\"") ==  0){
 		QStringList fileData = readCSVFile(":/initData/initData/AirlinesCodeData.csv");
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-	//	qDebug() << fileData;
+		//	qDebug() << fileData;
 		for(int i = 0; i < fileData.count();i++){
 			QStringList data = fileData.at(i).split(",");
 			//qDebug() << data << data.count();
@@ -225,7 +226,7 @@ bool Prsistance::init()
 	if(Count("AirportsCode::%\"") ==  0){
 		QStringList fileData = readCSVFile(":/initData/initData/AirportsCodeData.csv");
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-	//	qDebug() << fileData;
+		//	qDebug() << fileData;
 		for(int i = 0; i < fileData.count();i++){
 			QStringList data = fileData.at(i).split(",");
 			//qDebug() << data << data.count();
@@ -453,10 +454,13 @@ void Prsistance::GetJsonList(QString table, QString select,QString condition)
 void Prsistance::GetJsonEntityFields(QString table, QString select, QString condition)
 {
 	//qDebug() << table << select << condition;
+
 	QString where;
 	if(!condition.isEmpty()){
 		if(condition.split("=").count() > 1){
-			where = QString("AND ANY item in f SATISFIES item."+condition.split("=")[0]+"[0] = \""+condition.split("=")[1]+"\" END ");
+			where = QString("AND ANY oa IN d.Fields SATISFIES (ANY ia IN oa SATISFIES ia.`"+condition.split("=")[0]+"`[0] = \""+condition.split("=")[1]+"\" END) END ") ;
+
+			//where = QString("AND ANY item in f SATISFIES item.[0] =  END ");
 			}
 		else{
 			where = QString("AND "+condition);
@@ -466,9 +470,11 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 
 	//QString query = "SELECT fin."+select.trimmed()+"[0] AS `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f UNNEST f fin WHERE fin."+select+" AND META(d).id LIKE \""+table+"::%\" "+where;
 	//QString query = "SELECT fin."+select.trimmed()+"[0] AS `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f UNNEST f fin WHERE fin."+select+" AND META(d).id LIKE \""+table+"::%\" "+where;
-	QString query ="SELECT Array item.`"+select.trimmed()+"` FOR item IN f END As `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f WHERE  META(d).id LIKE '"+entities+"::%' "+where;
-//	qDebug() << query;
+	//QString query ="SELECT Array item.`"+select.trimmed()+"` FOR item IN f END As `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f WHERE  META(d).id LIKE '"+entities+"::%' "+where;
 
+
+	QString query = "SELECT  (Array (item[*]).`"+select.trimmed()+"` FOR item IN d.Fields   END)[0] AS `Value`,META(d).id AS `Key` FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where;
+	//qDebug() << query;
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	Database::Get()->query(query);
 
@@ -476,6 +482,10 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 void Prsistance::GetJsonListData(QList<QJsonDocument> items)
 {
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
+	//	foreach(QJsonDocument doc,items){
+	//qDebug() << doc;
+	//	}
+
 	emit GotJsonSelectList(items);
 }
 int Prsistance::Count(const QString table)
@@ -483,13 +493,13 @@ int Prsistance::Count(const QString table)
 
 	Database::Get()->query("SELECT COUNT(*) AS count  FROM  "+QString(DATABASE)+" WHERE META( "+QString(DATABASE)+").id LIKE \""+table);
 
-		if(!Database::Get()->getArray().isEmpty() && Database::Get()->getArray().count() > 0){
-			return Database::Get()->getArray().first().object().value("count").toInt();
-			}
-		else{
-			//	qDebug() <<"-1";
-			return 0;
-			}
+	if(!Database::Get()->getArray().isEmpty() && Database::Get()->getArray().count() > 0){
+		return Database::Get()->getArray().first().object().value("count").toInt();
+		}
+	else{
+		//	qDebug() <<"-1";
+		return 0;
+		}
 
 	return -1;
 }
@@ -502,8 +512,8 @@ QList<QJsonDocument> Prsistance::GetALL(const QString entity, const QString cond
 	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE '"+entity+"::%' "+where);
 	//	qDebug() << query <<"===";
 	Database::Get()->query(query);
-		//qDebug() << Database::Get()->getArray().first().object().value("count").toInt();
-		return Database::Get()->getArray();
+	//qDebug() << Database::Get()->getArray().first().object().value("count").toInt();
+	return Database::Get()->getArray();
 	//return QList<QJsonDocument>();
 }
 

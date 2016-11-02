@@ -38,6 +38,7 @@ protected:
 
 public slots:
 	void btn_Clicked(QString btn);
+	void gotSetttingsDocument(QJsonDocument strct);
 };
 
 #endif // VIEWGROUPS_H

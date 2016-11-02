@@ -1,5 +1,6 @@
 #ifndef STRUCTUREVIEWSEDITUI_H
 #define STRUCTUREVIEWSEDITUI_H
+
 #include "feildui.h"
 #include "structureviewedit.h"
 #include <QWidget>

@@ -1,6 +1,5 @@
 #include "subfeildui.h"
 #include "controller.h"
-#include "merplytabelview.h"
 
 SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView, QJsonValue data) : QWidget(parent)
 {
@@ -25,16 +24,14 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		//qDebug()<<"SELECT" << structureView.value("Select");
 		if(structureView.value("Editable").toString().compare("false") == 0)
 			combox->setEditable(false);
-
 		layout->addWidget(combox);
 		field = combox;
-
-
 		if(structureView.value("LocalFilter") != QJsonValue::Undefined && structureView.value("LocalFilter").toBool()){
 			//qDebug() << "local Field"<< structureView.value("Local").toString();
 			//qDebug() << Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			if(localFilter->combox){
+				//qDebug() << "COMBO";
 				QObject::connect(localFilter->combox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateFilter(QString)));
 				this->updateFilter(localFilter->combox->currentText());
 				//emit localFilter->combox->currentIndexChanged(localFilter->combox->currentIndex());
@@ -44,9 +41,11 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 				}
 			}
 		else{
-			//qDebug() << "NOT LOACL FILTER";
-			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
-			Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Condition").toString());
+			if(!structureView.value("Source").toString().isEmpty() && structureView.value("Source").toString().compare("_") != 0){
+				//	qDebug() << "NOT LOACL FILTER" <<structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Condition").toString() ;
+				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+				Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Condition").toString());
+				}
 			}
 		QJsonObject dataObj = data.toObject();
 		//qDebug() << data;
@@ -110,10 +109,28 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			}
 		}
 	else if(type.compare("Table") == 0){
-		merplyTabelView * table = new merplyTabelView(this,true,false);
+		table = new merplyTabelView(this,true,false);
 		//qDebug() << data.toObject() << structureView;
 		//Controller::Get()->getReportTableData(structureView);
-		table->fill(structureView);
+		QJsonObject firstclmn = structureView.value("Columns").toArray().first().toObject();
+		if(firstclmn.value("SourceLocalFilter") != QJsonValue::Undefined &&firstclmn.value("LocalSource").toBool()){
+			//	qDebug() << "local Field"<< firstclmn.value("SourceLocalFilter").toString();
+			//	qDebug() << Controller::Get()->getFirstSubField(firstclmn.value("SourceLocalFilter").toString());
+			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(firstclmn.value("SourceLocalFilter").toString());
+			localFilterCombobox = localFilter->combox;
+			if(localFilterCombobox){
+				//	qDebug() << "COMBO" << localFilter->combox->currentText();
+				QObject::connect(localFilter->combox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateTable(QString)));
+				this->updateTable(localFilter->combox->currentText());
+				//emit localFilter->combox->currentIndexChanged(localFilter->combox->currentIndex());
+				}
+			else{
+				qDebug() <<"Not Init ComboFilter for table init";
+				}
+			}
+		else {
+			table->fill(structureView);
+			}
 		QJsonObject dataObj = data.toObject();
 		if(!dataObj.isEmpty())
 			table->fillText(dataObj);
@@ -260,8 +277,23 @@ void SubFieldUI::serialData(QString serial)
 
 void SubFieldUI::updateFilter(QString filter)
 {
-	//qDebug() <<"filter" << filter;
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
-	Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Entity").toString()+"="+filter);
+	QString source = structureView.value("Source").toString().trimmed();
+	QString select = structureView.value("Select").toString().trimmed();
+	QString entity = structureView.value("Entity").toString().trimmed();
+	if(source.isEmpty() || select.isEmpty() || entity.isEmpty()){
+		return;
+		}
+	else{
+		//qDebug() <<"filter" << filter << structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Entity").toString()+"="+filter;
+		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
 
+		Controller::Get()->getJsonEntityFieldsList(source,select,entity+"="+filter);
+		}
+
+}
+
+void SubFieldUI::updateTable(QString)
+{
+	if(localFilterCombobox)
+		table->fill(structureView,localFilterCombobox->getKey());
 }

@@ -16,6 +16,7 @@ StructureVieweditSubFeildTableColumnEquation::StructureVieweditSubFeildTableColu
 
 
 	ops<<"+"<<"-"<<"*"<<"/";
+	conditions <<"No Condition"<<">"<<"<";
 	if(firstOperand){
 		firstOperation = new ERPComboBox(0);
 		firstOperation->addItems(ops);
@@ -23,6 +24,16 @@ StructureVieweditSubFeildTableColumnEquation::StructureVieweditSubFeildTableColu
 		}
 	columnOne = new ERPComboBox(0);
 	equationElementLayout->addRow((tr("First Term")), columnOne);
+
+	conditionOnOne = new ERPComboBox(0);
+	conditionOnOne->addItems(conditions);
+	equationElementLayout->addRow((tr("Condition")), conditionOnOne);
+
+	conditionColumnOne = new ERPComboBox(0);
+	conditionColumnOne->setHidden(true);
+	equationElementLayout->addRow((tr("Condition Column")), conditionColumnOne);
+	QObject::connect(conditionOnOne,SIGNAL(currentIndexChanged(int)),this,SLOT(updateConditionColmnOne(int)));
+
 
 	operation = new ERPComboBox(0);
 	operation->addItems(ops);
@@ -39,11 +50,20 @@ StructureVieweditSubFeildTableColumnEquation::StructureVieweditSubFeildTableColu
 	columnTwo = new ERPComboBox(0);
 	equationElementLayout->addRow((tr("Second Term")), columnTwo);
 
+	conditionOnTwo = new ERPComboBox(0);
+	conditionOnTwo->addItems(conditions);
+	equationElementLayout->addRow((tr("Condition")), conditionOnTwo);
+
+	conditionColumnTwo = new ERPComboBox(0);
+	conditionColumnTwo->setHidden(true);
+	equationElementLayout->addRow((tr("Condition Column")), conditionColumnTwo);
+	QObject::connect(conditionOnTwo,SIGNAL(currentIndexChanged(int)),this,SLOT(updateConditionColmnTwo(int)));
+
 	numbers  = new QLineEdit;
 	equationElementLayout->addRow((tr("Number")), numbers);
 
 
-	QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QJsonDocument>)),this,SLOT(gotclmnsData(QList<QJsonDocument>)));
+	QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QList<QJsonDocument> >)),this,SLOT(gotclmnsData(QList<QList<QJsonDocument> >)));
 	StructureViewGroupsUI::GetUI()->getTableFields(new ERPComboBox);
 	secondTerm->addItems(secondTermList);
 }
@@ -60,6 +80,14 @@ QJsonObject StructureVieweditSubFeildTableColumnEquation::save()
 		}
 	else {
 		save.insert("Number",numbers->text());
+		}
+	if(conditionOnOne->currentIndex() !=0){
+		save.insert("ConditionOnOne",conditionOnOne->currentIndex());
+		save.insert("ConditionColumnOne",conditionColumnOne->currentIndex());
+		}
+	if(conditionOnTwo->currentIndex() !=0){
+		save.insert("ConditionOnTwo",conditionOnTwo->currentIndex());
+		save.insert("ConditionColumnTwo",conditionColumnTwo->currentIndex());
 		}
 
 
@@ -86,20 +114,32 @@ void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 		if(data.value("Number") != QJsonValue::Undefined)
 			numbers->setText(data.value("Number").toString().trimmed());
 		}
+	if(data.value("ConditionColumnOne") != QJsonValue::Undefined){
+		conditionOnOne->setCurrentIndex(data.value("ConditionOnOne").toInt());
+		conditionColumnOne->setCurrentIndex(data.value("ConditionColumnOne").toInt());
+		}
+	if(data.value("ConditionColumnTwo") != QJsonValue::Undefined){
+		conditionOnTwo->setCurrentIndex(data.value("ConditionOnTwo").toInt());
+		conditionColumnTwo->setCurrentIndex(data.value("ConditionColumnTwo").toInt());
+		}
 }
 
-void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QJsonDocument> list)
+void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QList<QJsonDocument> > list)
 {
 	int oldClmnOneIndex = columnOne->currentIndex();
 	int oldClmnTwoIndex = columnTwo->currentIndex();
 	columnOne->clear();
 	columnTwo->clear();
+	foreach(QList<QJsonDocument> table,list){
 	int i = 0;
-	foreach (QJsonDocument doc, list) {
+	foreach (QJsonDocument doc, table) {
 		QString item = QString(tr("Column:")).append(QString::number(i)).append(" ").append(doc.object().value("clmnHeader").toString());
 		columnOne->addItem(item);
 		columnTwo->addItem(item);
+		conditionColumnOne->addItem(item);
+		conditionColumnTwo->addItem(item);
 		i++;
+		}
 		}
 	columnOne->setCurrentIndex(oldClmnOneIndex);
 	columnTwo->setCurrentIndex(oldClmnTwoIndex);
@@ -112,12 +152,39 @@ void StructureVieweditSubFeildTableColumnEquation::updateColmnTwo(int index)
 		equationElementLayout->labelForField(numbers)->setHidden(true);
 		columnTwo->setHidden(false);
 		equationElementLayout->labelForField(columnTwo)->setHidden(false);
-
+		conditionOnTwo->setHidden(false);
+		equationElementLayout->labelForField(conditionOnTwo)->setHidden(false);
 		}
 	else{
 		numbers->setHidden(false);
 		equationElementLayout->labelForField(numbers)->setHidden(false);
 		columnTwo->setHidden(true);
 		equationElementLayout->labelForField(columnTwo)->setHidden(true);
+		conditionOnTwo->setHidden(true);
+		equationElementLayout->labelForField(conditionOnTwo)->setHidden(true);
+		}
+}
+
+void StructureVieweditSubFeildTableColumnEquation::updateConditionColmnOne(int index)
+{
+	if(index == 0){
+		conditionColumnOne->setHidden(true);
+		equationElementLayout->labelForField(conditionColumnOne)->setHidden(true);
+		}
+	else{
+		conditionColumnOne->setHidden(false);
+		equationElementLayout->labelForField(conditionColumnOne)->setHidden(false);
+		}
+}
+
+void StructureVieweditSubFeildTableColumnEquation::updateConditionColmnTwo(int index)
+{
+	if(index == 0){
+		conditionColumnTwo->setHidden(true);
+		equationElementLayout->labelForField(conditionColumnTwo)->setHidden(true);
+		}
+	else {
+		conditionColumnTwo->setHidden(false);
+		equationElementLayout->labelForField(conditionColumnTwo)->setHidden(false);
 		}
 }

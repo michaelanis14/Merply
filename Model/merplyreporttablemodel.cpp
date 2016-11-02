@@ -7,6 +7,7 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 	this->strct = strct;
 	this->clmnsHeader = QStringList();
 	this->equationColumns.clear();
+	this->addedTotalRow = false;
 	//colmnsCount = 1;
 	if(strct.value("Columns").isArray()){
 		this->clmns = (strct.value("Columns").toArray());
@@ -20,6 +21,8 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 
 				equationColumns.insert(clmn.toObject().value("Header").toString(),clmn.toObject().value("EquationTerms").toArray());
 				}
+			if(clmn.toObject().value("TotalRow") != QJsonValue::Undefined)
+				totalColmns.append(clmnsHeader.count() - 1);
 			}
 		}
 	else{
@@ -73,6 +76,8 @@ bool MerplyReportTableModel::setData(const QModelIndex& index, const QVariant& v
 		cells[index.row() * colmnsCount + index.column()].setData(value.toString());
 		if(equationColumns.count() > 0 )
 			fillEquationColumns();
+		//if(totalColmns.count() > 0)
+		//	evalTotalRow();
 		emit dataChanged(index, index);
 		return true;
 		}
@@ -81,12 +86,17 @@ bool MerplyReportTableModel::setData(const QModelIndex& index, const QVariant& v
 
 bool MerplyReportTableModel::insertRows(int row, int count, const QModelIndex& parent)
 {
+	if(addedTotalRow){
+		//qDebug() << "RemoveRowsTotal";
+		this->removeRow(this->rowCount(QModelIndex())-1);
+		addedTotalRow = false;
+		}
 	bool state = false;
 	beginInsertRows(parent, row, row+count-1);
 	rowsCount = row +count;
 	cells.resize(colmnsCount * rowsCount);
-	cells[row * this->colmnsCount + 1].setData("dd");
-
+	//cells[row * this->colmnsCount + 1].setData("dd");
+	//qDebug() << cells.size();
 	state = true;
 	endInsertRows();
 
@@ -99,11 +109,11 @@ bool MerplyReportTableModel::removeRows(int row, int count, const QModelIndex& p
 	bool state = false;
 	beginRemoveRows(parent, row, row+count-1);
 
-	qDebug() << cells.count() << row << row * this->colmnsCount;
+//	qDebug() << cells.size() << row << row * this->colmnsCount;
 	for(int j = 0; j< colmnsCount; j++){
 		cells.removeAt(row * this->colmnsCount );
 		}
-	qDebug() << cells.count();
+	//qDebug() << cells.count();
 	//cells.resize(colmnsCount * rowsCount);
 	//cells[row * this->colmnsCount + 1].setData("dd");
 	rowsCount = rowsCount -count;
@@ -140,6 +150,38 @@ QJsonArray MerplyReportTableModel::getJsonData()
 			tabel.append(row);
 		}
 	return tabel;
+}
+
+void MerplyReportTableModel::evalTotalRow()
+{
+	if(addedTotalRow){
+		qDebug() << "RemoveTotal";
+		this->removeRow(this->rowCount(QModelIndex())-1);
+		addedTotalRow = false;
+
+		}
+	QVector<double> totals= QVector<double>(totalColmns.size());
+	for (int i = 0; i < totalColmns.size(); i++) {
+		double total = 0;
+		bool ok = false;
+		for(int j = 0; j < rowsCount; j++){
+			//qDebug() <<"Totalll"<< cells[j * this->colmnsCount + totalColmns.at(i)].getData().trimmed().toDouble(&ok);
+			total += cells[j * this->colmnsCount + totalColmns.at(i)].getData().trimmed().toDouble(&ok);
+			}
+		//qDebug() << i <<
+		totals.insert(i,total);
+		}
+
+	//qDebug() << total;
+	if(!addedTotalRow){
+		//qDebug() <<"addddd";
+		this->insertRow(this->rowCount(QModelIndex()));
+		this->addedTotalRow = true;
+		for (int i = 0; i < totalColmns.size();i++) {
+			//	qDebug() <<"THE TOTAL"<< totals.at(i) << totals ;
+			cells[(rowsCount-1) * this->colmnsCount + totalColmns.at(i)].setData(QString::number(totals.at(i)));
+			}
+		}
 }
 
 void MerplyReportTableModel::fill(QList<QJsonDocument> documents)
@@ -196,12 +238,17 @@ void MerplyReportTableModel::fill(QList<QJsonDocument> documents)
 				}
 
 			}
-
+		if(dataKey.isEmpty())
+			continue;
 
 		TableCell cell(dataKey,doc.object().value(dataKey).toString());
+		if(doc.object().value(dataKey).isArray())
+			qDebug() << "ISARRAAYYYY";
 		entityRowPointer.insert(doc.object().value(indexedKey).toString(),row);
 
 		//qDebug()<<joinKeys<<indexedKey << row << rowPointer.value(indexedKey)<< row * this->colmnsCount + clmnsHeader.indexOf(dataKey) <<clmnsHeader.indexOf(dataKey)<<dataKey << doc.object().value(dataKey).toString();
+		qDebug() << row << this->colmnsCount << clmnsHeader.indexOf(dataKey) << dataKey;
+
 		cells[row * this->colmnsCount + clmnsHeader.indexOf(dataKey)] = cell;
 		int oldRow = rowPointer.value(indexedKey);
 		oldRow++;
@@ -221,7 +268,7 @@ void MerplyReportTableModel::fill(QList<QJsonDocument> documents)
 	if(this->equationColumns.count() > 0)
 		emit equationColumnsSignal();
 	else emit done();
-	//qDebug()<<"TableModel Fill" << documents;
+	qDebug()<<"TableModel Fill" << documents;
 
 
 }
@@ -252,13 +299,15 @@ void MerplyReportTableModel::fillIndexTabel( QList<QJsonDocument> items)
 	foreach(QJsonDocument item,items){
 		QString  key = item.object().value("document_id").toString();
 		int j = 0;
+		cells[i * this->colmnsCount + j].setId(key);
 		foreach(QJsonValue value, item.object().value("Fields").toArray()){
 			foreach(QJsonValue viewGroup, value.toArray()){
 				QString valueString;
 				if(clmnsHeader.count()  > j)
 					valueString = Controller::Get()->toString(viewGroup.toObject().value(clmnsHeader.at(j)).toArray());
-				TableCell cell(key,valueString);
-				cells[i * this->colmnsCount + j] = cell;
+
+				cells[i * this->colmnsCount + j].setId(key);
+				cells[i * this->colmnsCount + j].setData(valueString);
 				j++;
 				}
 			}
@@ -283,11 +332,18 @@ void MerplyReportTableModel::fillEquationColumns()
 				double secondTerm = 0;
 				//qDebug() << eq.toObject();
 				if(eq.toObject().value("FirstColumn").toInt() >= 0){
+					if(eq.toObject().value("ConditionColumnOne") != QJsonValue::Undefined)
+						firstTerm = evalEquationCondition(eq.toObject().value("ConditionOnOne").toInt(),cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData().trimmed().toDouble(&ok),cells[j * this->colmnsCount + eq.toObject().value("ConditionColumnOne").toInt()].getData().trimmed().toDouble(&ok));
+
 					//qDebug() << eq.toObject().value("FirstColumn").toInt() << j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt() << cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData();
-					firstTerm = cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData().trimmed().toDouble(&ok);
-				}if(eq.toObject().value("SecondColmn") != QJsonValue::Undefined){
-					if(eq.toObject().value("SecondColmn").toInt() >= 0)
-						secondTerm = cells[j * this->colmnsCount + eq.toObject().value("SecondColmn").toInt()].getData().trimmed().toDouble(&ok);
+					else firstTerm = cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData().trimmed().toDouble(&ok);
+					}
+				if(eq.toObject().value("SecondColmn") != QJsonValue::Undefined){
+					if(eq.toObject().value("SecondColmn").toInt() >= 0){
+						if(eq.toObject().value("ConditionColumnTwo") != QJsonValue::Undefined)
+							secondTerm = evalEquationCondition(eq.toObject().value("ConditionOnTwo").toInt(),cells[j * this->colmnsCount + eq.toObject().value("SecondColmn").toInt()].getData().trimmed().toDouble(&ok),cells[j * this->colmnsCount + eq.toObject().value("ConditionColumnTwo").toInt()].getData().trimmed().toDouble(&ok));
+						else secondTerm = cells[j * this->colmnsCount + eq.toObject().value("SecondColmn").toInt()].getData().trimmed().toDouble(&ok);
+						}
 					}
 				else if(eq.toObject().value("Number") != QJsonValue::Undefined){
 					secondTerm = eq.toObject().value("Number").toString().toDouble();
@@ -334,7 +390,24 @@ void MerplyReportTableModel::fillEquationColumns()
 			}
 		}
 
+	if(totalColmns.count() > 0 && !addedTotalRow)
+		evalTotalRow();
 	emit done();
+}
+
+double MerplyReportTableModel::evalEquationCondition(int condition, double col1, double col2)
+{
+	if(condition == 1){
+		if(col1 > col2)
+			return col1;
+		else return col2;
+		}
+	else if(condition ==2){
+		if(col1 < col2)
+			return col1;
+		else return col2;
+		}
+	return 0;
 }
 
 void MerplyReportTableModel::setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage)

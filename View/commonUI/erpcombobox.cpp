@@ -35,10 +35,12 @@ void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 		foreach(QJsonValue arrVal,value.object().value("Value").toArray()){
 			//qDebug() << arrVal;
 			foreach(QJsonValue Val,arrVal.toArray()){
-			//	qDebug() << Val << keyString;
+				//	qDebug() << Val << keyString;
 				if(Val.isArray()){
 					foreach(QJsonValue subVal,Val.toArray()){
 						QString valueString = subVal.toString().trimmed();
+						//if(valueString)
+						//qDebug()<<"ARRY"<<i << valueString;
 						QComboBox::insertItem(i,valueString);
 						keys.insert(i,keyString);
 						i++;
@@ -46,9 +48,17 @@ void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 					}
 				else{
 					QString valueString = Val.toString().trimmed();
-					QComboBox::insertItem(i,valueString);
-					keys.insert(i,keyString);
-					i++;
+
+					if(valueString.isNull() || valueString.isEmpty()){
+				//		qDebug()<<"EMPTY"<<i << valueString;
+						continue;
+						}
+					else{
+						QComboBox::insertItem(i,valueString);
+					//	qDebug()<<"NOT ARRY"<<i << valueString;
+						keys.insert(i,keyString);
+						i++;
+						}
 					}
 				this->addedItems = true;
 				}

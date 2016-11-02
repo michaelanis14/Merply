@@ -36,10 +36,12 @@ public:
 	QList<QJsonDocument> items;
 	QString getRowKey(int row);
 	QJsonArray getJsonData();
+	void evalTotalRow();
 private:
 	int rowsCount;
 	int colmnsCount;
 	QVector<TableCell> cells;
+	QVector<int>totalColmns;
 	QHash<QString, int> i;
 	QHash<QString, int> rowPointer;
 	QHash<QString, int> entityRowPointer;
@@ -48,12 +50,14 @@ private:
 	QJsonObject strct;
 	QJsonArray clmns;
 	QStringList clmnsHeader;
+	bool addedTotalRow;
 signals:
 	void equationColumnsSignal();
 	void done();
 public slots:
 	void fillEquationColumns();
-	  void setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage);
+	double evalEquationCondition(int condition,double col1,double col2);
+	void setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage);
 	void fill(QList<QJsonDocument> documents);
 	void fillText(QJsonArray data);
 	void fillIndexTabel(QList<QJsonDocument> items);

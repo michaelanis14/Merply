@@ -14,7 +14,7 @@ StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(
 	this->setContentsMargins(0,0,0,0);
 	this->setObjectName("StructureVieweditSubFeild");
 	this->setStyleSheet("QWidget2#StructureVieweditSubFeild{ border: 1px solid gray; border-top : 1px solid blue;}");
-
+	this->filledLocalfilter = false;
 	layout = new QFormLayout(this);
 	layout->setContentsMargins(0,0,5,0);
 	layout->setSpacing(1);
@@ -101,48 +101,32 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 
 		}
 	else if(type.compare("Refrence") == 0){
+		loadData = true;
 		Source = new ERPComboBox(0);
+		Select = new ERPComboBox(0);
 		layout->addRow(new QLabel(tr("Source ")), Source);
 		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
 		Controller::Get()->getJsonList("ViewStructure","Title","default.Type =\"Entity\"");
-
-		Select = new ERPComboBox(0);
 		layout->addRow(new QLabel(tr("Select ")), Select);
-
 		condition = new QTextEdit;
 		condition->setText(fieldVS.toObject().value("Condition").toString());
 		layout->addRow(new QLabel(tr("Condition ")), condition);
-
 		Editable = new QCheckBox(0);
 		Editable->setChecked(fieldVS.toObject().value("Editable").toString().compare("true") ==0);
 		layout->addRow(new QLabel(tr("Editable ")), Editable);
-
-
 		initFilterWidget();
-
-
-
-		QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
-		QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
-
-
-		if(fieldVS.toObject().value("Source") != QJsonValue::Undefined){
-			//qDebug() << "Source" << fieldVS.toObject().value("Source").toString();
-			QString source = fieldVS.toObject().value("Source").toString().split("::").count() > 1 ?fieldVS.toObject().value("Source").toString().split("::")[1]:fieldVS.toObject().value("Source").toString();
-			Source->setCurrentText(source);
-			}
-		else {
-			updateSelect(Source->currentText());
-			}
-		if(fieldVS.toObject().value("Select") != QJsonValue::Undefined){
-			//qDebug() << "Select" << fieldVS.toObject().value("Select").toString();
-			Select->setCurrentText(fieldVS.toObject().value("Select").toString());
-			}
 		if(fieldVS.toObject().value("LocalFilter") != QJsonValue::Undefined && fieldVS.toObject().value("LocalFilter").toBool()){
 			filterOn->setCurrentIndex(1);
-			filterOnChanged(1);
-			localFilter->setCurrentText(fieldVS.toObject().value("Local").toString());
-			entityFilter->setCurrentText(fieldVS.toObject().value("Entity").toString());
+			this->filledLocalfilter = false;
+			//	filterOn->currentIndexChanged(filterOn->currentIndex());
+
+			//	qDebug() << fieldVS.toObject().value("Local").toString();
+			//localFilter->currentIndexChanged(localFilter->currentIndex());
+
+			//	qDebug() << fieldVS.toObject().value("Entity").toString();
+
+			//entityFilter->currentIndexChanged(entityFilter->currentIndex());
+			//entityFilter->setCurrentText();
 			}
 
 
@@ -154,7 +138,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		layout->addRow(new QLabel(tr("Default ")), defaultValue);
 
 		QStringList inputDTList;
-		inputDTList <<"IntToMillion"<<"DoubleToMillion";
+		inputDTList <<"Text" <<"IntToMillion"<<"DoubleToMillion";
 		inputDataType = new ERPComboBox(0);
 		inputDataType->addItems(inputDTList);
 		if(fieldVS.toObject().value("InputDataType") != QJsonValue::Undefined)
@@ -211,7 +195,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	if(fieldVS.toObject().value("Mandatory").toBool())
 		mandatory->setChecked(true);
 	layout->addRow("Mandatory", mandatory);
-	previewLayout->addWidget(new SubFieldUI(0,"V",this->save()));
+	//previewLayout->addWidget(new SubFieldUI(0,"V",this->save()));
 	//	qDebug() <<this->save();
 }
 
@@ -358,13 +342,27 @@ void StructureVieweditSubFeild::updateSelectData(QList<QString> fields)
 	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	Select->clear();
 	Select->addItems(fields);
+	if(loadData && fieldVS.toObject().value("Select") != QJsonValue::Undefined){
+		loadData = false;
+		Select->setCurrentIndex(Select->getItemsText().indexOf(fieldVS.toObject().value("Select").toString()));
+		//	qDebug() << "Select" << fieldVS.toObject().value("Select").toString() << fields << Select->getItemsText() << Select->getItemsText().indexOf(fieldVS.toObject().value("Select").toString()) << Select->currentIndex();
+		//	Select->currentIndexChanged(Select->currentIndex());
+		}
 }
 
 void StructureVieweditSubFeild::gotSourceData(QList<QJsonDocument> items)
 {
+	//qDebug() << __FILE__ << __LINE__<< "gotSourceData" << items;
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
 	Source->clear();
 	Source->addJsonItems(items);
+	QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
+	QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
+	if(fieldVS.toObject().value("Source") != QJsonValue::Undefined){
+		QString source = fieldVS.toObject().value("Source").toString().split("::").count() > 1 ?fieldVS.toObject().value("Source").toString().split("::")[1]:fieldVS.toObject().value("Source").toString();
+		Source->setCurrentIndex(Source->keys.indexOf(QString("ViewStructure::"+source)));
+		//	Source->currentIndexChanged(Source->currentIndex());
+		}
 }
 
 void StructureVieweditSubFeild::filterOnChanged(int index)
@@ -374,10 +372,12 @@ void StructureVieweditSubFeild::filterOnChanged(int index)
 			localFilterWidget->setHidden(true);
 			}
 		else if(index == 1){
-			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilter(QStringList)));
-			StructureViewGroupsUI::GetUI()->getFeildsNames();
+			//entityFilter->clear();
 			entityFilter->addItems(Select->getItemsText());
 			entityFilter->adjustSize();
+			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(fillLocalFilter(QStringList)));
+			StructureViewGroupsUI::GetUI()->getFeildsNames();
+
 			localFilterWidget->setHidden(false);
 			}
 		else if(index == 2){
@@ -394,6 +394,15 @@ void StructureVieweditSubFeild::fillLocalFilter(QStringList feilds)
 		localFilter->clear();
 		localFilter->addItems(feilds);
 		}
+	if(!filledLocalfilter){
+		localFilter->setCurrentIndex(localFilter->getItemsText().indexOf(fieldVS.toObject().value("Local").toString()));
+		localFilter->setCurrentText(fieldVS.toObject().value("Local").toString());
+		localFilter->adjustSize();
+		entityFilter->setCurrentIndex(entityFilter->getItemsText().indexOf(fieldVS.toObject().value("Entity").toString()));
+		entityFilter->setCurrentText(fieldVS.toObject().value("Entity").toString());
+		this->filledLocalfilter = true;
+		}
+
 }
 
 

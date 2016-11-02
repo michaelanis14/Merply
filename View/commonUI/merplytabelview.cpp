@@ -93,7 +93,7 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 		if(nActon.count() > 1){
 			if(nActon.at(1).compare("Add") == 0){
 
-				 model->insertRow(model->rowCount(QModelIndex()));
+				model->insertRow(model->rowCount(QModelIndex()));
 				//model->rowsInserted(QModelIndex(),);
 				return;
 				}
@@ -101,15 +101,15 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 				QModelIndexList indexes  = tableView->selectionModel()->selectedRows();
 				int countRow = indexes.count();
 				for( int i = countRow; i > 0; i--)
-					   model->removeRow( indexes.at(i-1).row(), QModelIndex());
+					model->removeRow( indexes.at(i-1).row(), QModelIndex());
 				// model->removeRows( tableView->selectedIndexes().first().row(), tableView->selectedIndexes().count());
 				}
 			}
 		QItemSelectionModel *select = tableView->selectionModel();
 		if(select && select->hasSelection()){
-
+			QString id = 	model->getRowKey(select->currentIndex().row());
+		//	qDebug() << id;
 			if(nActon.count() > 1){
-				QString id = 	model->getRowKey(select->currentIndex().row());
 				if(nActon.at(1).compare("Print") == 0){
 					//			Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 					}
@@ -119,7 +119,7 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 					Controller::Get()->showCreateEditeValueUI(id);
 					}
 				else if(nActon.at(1).compare("Delete") == 0){
-					if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?")))
+					if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?").append(" "+id)))
 						if(Controller::Get()->deleteDocument(id))
 							Controller::Get()->queryIndexView("ViewStructure::"+id.split("::")[0]);
 
@@ -136,7 +136,7 @@ void merplyTabelView::selectionChanged(const QItemSelection& , const QItemSelect
 }
 
 
-bool merplyTabelView::fill(QJsonObject columns)
+bool merplyTabelView::fill(QJsonObject columns,QString filter)
 {
 
 	model = new MerplyReportTableModel(columns);
@@ -144,7 +144,7 @@ bool merplyTabelView::fill(QJsonObject columns)
 	QObject::connect(this,SIGNAL(updateModel(QList<QJsonDocument>)),model,SLOT(fill(QList<QJsonDocument>)));
 
 	QObject::connect(Controller::Get(),SIGNAL(gotReportData(QList<QJsonDocument>)),this,SLOT(gotReportData(QList<QJsonDocument>)));
-	Controller::Get()->getReport(columns);
+	Controller::Get()->getReport(columns,filter);
 	return true;
 }
 

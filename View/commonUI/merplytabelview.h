@@ -37,7 +37,7 @@ class merplyTabelView : public QWidget
 
 public:
 	merplyTabelView(QWidget *parent = 0,bool add = false,bool edit = false);
-	bool fill(QJsonObject columns);
+	bool fill(QJsonObject columns,QString filter = "");
 	bool fillText(QJsonObject data);
 	void indexTable(const QString document_id, const QList<QJsonDocument> items);
 	QList<QJsonDocument> items;

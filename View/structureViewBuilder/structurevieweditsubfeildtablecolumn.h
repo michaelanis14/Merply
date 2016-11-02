@@ -8,6 +8,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QFormLayout>
+#include <QCheckBox>
 
 class StructureVieweditSubFeildTableColumn : public QWidget
 {
@@ -21,12 +22,12 @@ public:
 private:
 	QFormLayout *layout;
 	ERPComboBox* type;
-
+	QCheckBox* totalRow;
 	ERPComboBox* Source;
 	ERPComboBox* Select;
 	QLineEdit* defaultValue;
 	QJsonObject clmn;
-
+	bool filledLocalSourcefilter;
 	void initFilterWidget();
 	QWidget*filterWidget;
 	ERPComboBox* filterOn;
@@ -53,7 +54,8 @@ public slots:
 	void updateSelectData(QList<QString> fields);
 	void selectData(QList<QJsonDocument> items);
 	void filterOnChanged(int index);
-	void fillLocalFilter(QList<QJsonDocument> feilds);
+	void fillLocalFilter(QList<QList<QJsonDocument> > feilds);
+	void fillLocalFilterLocalSource(QStringList fields);
 	void localFilterChanged(int);
 	void updatelocalFilterData(QList<QString> fields);
 	void addEquationWidget(QJsonObject data = QJsonObject());

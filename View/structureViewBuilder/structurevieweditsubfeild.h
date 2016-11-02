@@ -33,7 +33,7 @@ private:
 	QLineEdit* defaultValue;
 	QLineEdit* charCount;
 	ERPComboBox* inputDataType;
-
+	bool loadData;
 	QLineEdit* title;
 	QDateEdit *date;
 	QString type;
@@ -51,6 +51,7 @@ private:
 	QWidget*localFilterWidget;
 	ERPComboBox* localFilter;
 	ERPComboBox* entityFilter;
+	bool filledLocalfilter;
 	QFormLayout* localFilterWidgetLayout;
 	QTextEdit* textEdit;
 	void paintEvent(QPaintEvent *event);

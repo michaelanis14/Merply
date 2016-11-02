@@ -118,6 +118,11 @@ void StructureViewGroupsUI::fill(QJsonObject structureView)
 	this->cas_value = structureView.value("cas_value").toString();
 	this->document_id = structureView.value("document_id").toString();
 
+	if(!structureView.value("Title").toString().isEmpty())
+		headerlbl->setTitle(structureView.value("Title").toString());
+	else headerlbl->setTitle("New Card");///+QString::number(Controller::Get()->Count("ViewStructure")));
+
+
 	QList<QWidget *> Widgets = viewGroups->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
 		{
@@ -253,12 +258,12 @@ void StructureViewGroupsUI::getFeildsNames()
 
 void StructureViewGroupsUI::getTableFields(ERPComboBox* excludeSource)
 {
-	QList<QJsonDocument> sourcesList;
+	QList<QList<QJsonDocument> > sourcesList;
 	foreach(StructureViewsEditUI* vg,sVSFUIs){
 		foreach (StructureViewEdit* feild, vg->sVSFs) {
 			StructureVieweditSubFeild* svsf = feild->getTableFeild();
 			if(svsf->getType().contains("Table")){
-				sourcesList = svsf->getTableEdit()->getClmnsSources(excludeSource);
+				sourcesList.append(svsf->getTableEdit()->getClmnsSources(excludeSource));
 				}
 			}
 		}

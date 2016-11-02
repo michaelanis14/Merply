@@ -117,7 +117,15 @@ void ViewGroups::btn_Clicked(QString btn)
 {
 	//qDebug() << btn;
 	if(btn.contains("settings")){
-		StructureViewGroupsUI::ShowUI(this->structureView);
-
+		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotSetttingsDocument(QJsonDocument)));
+		Controller::Get()->getDoc(this->structureView.value("document_id").toString());
 		}
+}
+
+void ViewGroups::gotSetttingsDocument(QJsonDocument strct)
+{
+	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotSetttingsDocument(QJsonDocument)));
+
+	this->structureView = strct.object();
+	StructureViewGroupsUI::ShowUI(strct.object());
 }

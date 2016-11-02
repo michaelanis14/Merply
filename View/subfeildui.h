@@ -14,6 +14,7 @@
 
 #include "rangevalidator.h"
 #include "erpcombobox.h"
+#include "merplytabelview.h"
 
 class SubFieldUI : public QWidget
 {
@@ -29,6 +30,8 @@ private:
 	QJsonObject structureView;
 	ERPComboBox* combox;
 	QString strID;
+	merplyTabelView * table;
+	ERPComboBox* localFilterCombobox;
 signals:
 
 public slots:
@@ -37,6 +40,7 @@ public slots:
 		void refrenceData(QList<QJsonDocument> items);
 		void serialData(QString serial);
 		void updateFilter(QString filter);
+		void updateTable(QString);
 };
 
 #endif // SUBFIELDUI_H

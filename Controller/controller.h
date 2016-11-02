@@ -75,6 +75,7 @@ public:
 	void editControllerCancelPressed();
 	SubFieldUI* getFirstSubField(QString feildName);
 	//Model Interface
+
 	//Navigation
 	void initNavigation();
 	void addSubNavigation(double key, QList<QTreeWidgetItem*> subNav);
@@ -96,7 +97,12 @@ public:
 	bool saveNavigationPages();
 	QJsonObject saveSubNavigation(QTreeWidgetItem* item);
 
-	void getReport(QJsonObject clmns);
+	void getReport(QJsonObject clmns, QString filter="");
+	QString getLocalSourceReport(QJsonObject clmn, int index, QString filter);
+	void insertCachedCreateEditUI(QString key, QWidget* instance);
+	QWidget* getCachedCreateEditUI(QString key);
+	bool isCachedCreateEditUI(QString key);
+
 	//
 	void getReportTableData(QJsonObject strct);
 

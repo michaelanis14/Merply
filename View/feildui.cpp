@@ -18,7 +18,8 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 	if(structureView.value("Label") != QJsonValue::Undefined){
 		label = new QLabel(structureView.value("Label").toString());
 		}
-	layout->addWidget(label);
+	if(structureView.value("LabelHidden") == QJsonValue::Undefined)
+		layout->addWidget(label);
 
 	QWidget*fieldsWidget = new QWidget(this);
 	fieldsWidget->setContentsMargins(0,0,0,0);
@@ -123,7 +124,7 @@ QString FeildUI::checkMandatory()
 {
 	foreach(SubFieldUI* subfeild,subFields){
 		if(!subfeild->checkMandatory())
-		return label->text();
+			return label->text();
 		}
 	return "";
 }

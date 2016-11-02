@@ -20,6 +20,7 @@ public:
 	void hideTypeFields();
 	SettingsCtrlsUI* topCntrlsPreview;
 	QLineEdit* label;
+	QCheckBox* hideLabel;
 	QStringList getFieldsType();
 	StructureVieweditSubFeild * getTableFeild();
 private:
