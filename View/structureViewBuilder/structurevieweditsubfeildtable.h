@@ -19,7 +19,9 @@ private:
 	QHBoxLayout *layout;
 	QHBoxLayout *clmnsLayout;
 	QList<StructureVieweditSubFeildTableColumn*> clmns;
-
+	QCheckBox* addEnable;
+	QCheckBox* removeEnable;
+	QCheckBox* editEnable;
 signals:
 	void tableChanged();
 

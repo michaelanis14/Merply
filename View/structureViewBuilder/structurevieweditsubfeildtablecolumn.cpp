@@ -57,6 +57,9 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	totalRow = new QCheckBox;
 	layout->addRow(new QLabel(tr("TotalRow ")), totalRow);
 
+	editabel = new QCheckBox;
+	layout->addRow(new QLabel(tr("Editable ")), editabel);
+
 	QObject::connect(type,SIGNAL(currentIndexChanged(int)),this,SLOT(updateFields(int)));
 	type->setCurrentIndex(0);
 	this->updateFields(0);
@@ -75,6 +78,9 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 	clmn.insert("Type",type->currentText());
 	if(totalRow->isChecked())
 		clmn.insert("TotalRow",totalRow->isChecked());
+
+	clmn.insert("Editable",editabel->isChecked());
+
 	if(type->currentIndex() == 0){
 		clmn.insert("Source",Source->getKey());
 		clmn.insert("Select",Select->currentText());
@@ -117,6 +123,9 @@ void StructureVieweditSubFeildTableColumn::fill(QJsonObject clmn)
 	//qDebug() <<"clmnnnn"<< this->clmn;
 	if(clmn.value("TotalRow") != QJsonValue::Undefined)
 		this->totalRow->setChecked(true);
+	if(clmn.value("Editable") == QJsonValue::Undefined)
+		this->editabel->setChecked(true);
+	else this->editabel->setChecked(clmn.value("Editable").toBool());
 	if(this->type->currentIndex() == 2){
 		QJsonArray equationTerms =  clmn.value("EquationTerms").toArray();
 		foreach(QJsonValue equationTerm,equationTerms){

@@ -591,7 +591,7 @@ QJsonObject Controller::saveSubNavigation(QTreeWidgetItem * item)
 void Controller::getReport(QJsonObject clmns,QString filter)
 {
 
-	qDebug() << clmns;
+	//qDebug() << clmns;
 	bool addedSelectItems = false;
 	if(clmns.value("Columns").isArray()){
 		//QJsonArray arr = (columns.value("Columns").toArray());
@@ -606,8 +606,11 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 				//qDebug() <<"Text"<< clmn;
 				}
 			else if(clmn.toObject().value("LocalSource")!= QJsonValue::Undefined){
+				if(i > 0 && i < clmns.value("Columns").toArray().count()){
+					query+= " UNION ALL ";
+					orderby += ",";
+					}
 				QString source = clmnObj.value("Source").toString().split("::")[1];
-
 				addedSelectItems = true;
 				query+= getLocalSourceReport(clmn.toObject(),i,filter);
 				orderby += "`"+source+QString::number(i)+"Key`";
@@ -709,7 +712,7 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 		//qDebug() << "Before Query";
 
 		if(addedSelectItems){
-			qDebug() <<"Report Q:"<< query;
+		//	qDebug() <<"Report Q:"<< query;
 			qRegisterMetaType<QList<QJsonDocument> >("MyStruct");
 			QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)),Qt::QueuedConnection);
 			//Database::Get()->query(query);

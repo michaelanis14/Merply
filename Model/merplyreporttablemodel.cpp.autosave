@@ -81,7 +81,7 @@ QVariant MerplyReportTableModel::data(const QModelIndex& index, int role) const
 bool MerplyReportTableModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
 	if (index.isValid() && role == Qt::EditRole) {
-		qDebug() <<value.toString();
+		//qDebug() <<value.toString();
 		cells[index.row() * colmnsCount + index.column()].setData(value.toString());
 		if(equationColumns.count() > 0 )
 			fillEquationColumns();

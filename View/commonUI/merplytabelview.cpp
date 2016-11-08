@@ -19,6 +19,8 @@
 merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 	QWidget(parent)
 {
+	this->add = add;
+	this->edit = edit;
 	this->setObjectName("merplyTabelView");
 	this->setContentsMargins(0,0,0,0);
 	//	this->model = new QStandardItemModel(this);
@@ -48,18 +50,7 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 	lblLayout->setContentsMargins(0,0,0,0);
 	lblLayout->setContentsMargins(0,2,0,0);
 
-	QStringList btnsList;
-	if(add){
-		btnsList << "Add->Add" << "Remove->Remove";
-
-
-		}
-	if(edit){
-		btnsList << "Print->Print"<< "Edit->Edit"<< "Delete->Delete";
-		}
-
-
-	controllers = new HControllers(0,btnsList);
+	controllers = new HControllers;
 	controllers->setObjectName("controllers");
 
 
@@ -82,7 +73,7 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 	report = new QtRPT(this);
 
 
-
+	initHController(QJsonObject());
 
 }
 void merplyTabelView::controller_Clicked(QString nameAction)
@@ -108,7 +99,7 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 		QItemSelectionModel *select = tableView->selectionModel();
 		if(select && select->hasSelection()){
 			QString id = 	model->getRowKey(select->currentIndex().row());
-		//	qDebug() << id;
+			//	qDebug() << id;
 			if(nActon.count() > 1){
 				if(nActon.at(1).compare("Print") == 0){
 					//			Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
@@ -145,6 +136,23 @@ bool merplyTabelView::fill(QJsonObject columns,QString filter)
 
 	QObject::connect(Controller::Get(),SIGNAL(gotReportData(QList<QJsonDocument>)),this,SLOT(gotReportData(QList<QJsonDocument>)));
 	Controller::Get()->getReport(columns,filter);
+
+	initHController(columns);
+	return true;
+}
+
+bool merplyTabelView::fillLocalSource(QJsonObject columns, QString filter)
+{
+	//if(model)
+	//	model->deleteLater();
+	model = new MerplyReportTableModel(columns);
+	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+	QObject::connect(this,SIGNAL(updateModel(QList<QJsonDocument>)),model,SLOT(fillLocalSource(QList<QJsonDocument>)));
+
+	QObject::connect(Controller::Get(),SIGNAL(gotReportData(QList<QJsonDocument>)),this,SLOT(gotReportData(QList<QJsonDocument>)));
+	Controller::Get()->getReport(columns,filter);
+
+	initHController(columns);
 	return true;
 }
 
@@ -152,6 +160,7 @@ bool merplyTabelView::fillText(QJsonObject data)
 {
 	QJsonArray dataArray = data.value("merplyTabel").toArray();
 	model->fillText(dataArray);
+	//initHController(QJsonObject());
 	return true;
 }
 
@@ -170,7 +179,7 @@ void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocu
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
 	Controller::Get()->getFields(document_id);
 
-
+//	initHController(QJsonObject());
 
 }
 
@@ -180,6 +189,34 @@ QJsonObject merplyTabelView::save()
 	table.insert("merplyTabel",this->model->getJsonData());
 	//qDebug() << this->model->getJsonData();
 	return table;
+}
+
+void merplyTabelView::initHController(QJsonObject columns)
+{
+	QStringList btns;
+	if(columns.isEmpty()){
+		if(add){
+			btns << "Add->Add" << "Remove->Remove";
+			}
+		if(edit){
+			btns << "Print->Print"<< "Edit->Edit"<< "Delete->Delete";
+			}
+		}
+	else{
+		//	qDebug() << "CON : "<< add<<edit<<columns;
+		if(edit){
+			btns << "Print->Print";
+			}
+
+		if(add && columns.value("Add").toBool())
+			btns <<"Add->Add";
+		if(edit && columns.value("Edit").toBool())
+			btns <<"Edit->Edit";
+		if(add && columns.value("Remove").toBool())
+			btns <<"Remove->Remove";
+		}
+	controllers->clear();
+	controllers->fill(btns);
 }
 
 void merplyTabelView::printTabel(){

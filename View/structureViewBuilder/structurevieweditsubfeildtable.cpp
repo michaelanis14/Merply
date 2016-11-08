@@ -19,6 +19,16 @@ StructureVieweditSubFeildTable::StructureVieweditSubFeildTable(QWidget *parent) 
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
 	layout->setMargin(0);
+
+	addEnable = new QCheckBox;
+	layout->addWidget(new QLabel(tr("Add ")));
+	layout->addWidget( addEnable);
+	removeEnable = new QCheckBox;
+	layout->addWidget(new QLabel(tr("Remove ")));
+	layout->addWidget( removeEnable);
+	editEnable = new QCheckBox;
+	layout->addWidget(new QLabel(tr("Edit ")));
+	layout->addWidget( editEnable);
 	//layout->addRow();
 
 
@@ -32,6 +42,9 @@ QJsonObject StructureVieweditSubFeildTable::save()
 {
 	QJsonObject saveTable;
 	saveTable.insert("Type","Table");
+	saveTable.insert("Add",addEnable->isChecked());
+	saveTable.insert("Edit",editEnable->isChecked());
+	saveTable.insert("Remove",removeEnable->isChecked());
 	QJsonArray clmnsArray;
 	if(!clmns.isEmpty()){
 		foreach(StructureVieweditSubFeildTableColumn* clmn,clmns){
@@ -60,6 +73,16 @@ QList<QJsonDocument> StructureVieweditSubFeildTable::getClmnsSources(ERPComboBox
 
 void StructureVieweditSubFeildTable::fill(QJsonObject tblStractureView)
 {
+	if(tblStractureView.value("Add") == QJsonValue::Undefined)
+		this->addEnable->setChecked(true);
+	else this->addEnable->setChecked(tblStractureView.value("Add").toBool());
+	if(tblStractureView.value("Edit") == QJsonValue::Undefined)
+		this->editEnable->setChecked(true);
+	else this->editEnable->setChecked(tblStractureView.value("Edit").toBool());
+	if(tblStractureView.value("Remove") == QJsonValue::Undefined)
+		this->removeEnable->setChecked(true);
+	else this->removeEnable->setChecked(tblStractureView.value("Remove").toBool());
+
 	clmns.clear();
 	StructureVieweditSubFeildTableColumn * clmnWidget;
 	if(!tblStractureView.isEmpty() && tblStractureView.value("Columns").isArray()){

@@ -36,7 +36,7 @@ private:
 	ERPComboBox* localFilter;
 	ERPComboBox* entityFilter;
 	QFormLayout* localFilterWidgetLayout;
-
+	QCheckBox* editabel;
 	void initEquationWidget();
 	QWidget*equationWidget;
 	QFormLayout* equationWidgetLayout;

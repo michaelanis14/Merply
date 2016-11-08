@@ -46,6 +46,7 @@ private:
 	QHash<QString, int> rowPointer;
 	QHash<QString, int> entityRowPointer;
 	QHash<QString, QJsonArray> equationColumns;
+	QHash<QString,  QJsonObject> editableColumns;
 	QHash<QString,QJsonObject> Textclmns;
 	QJsonObject strct;
 	QJsonArray clmns;
@@ -61,6 +62,8 @@ public slots:
 	void fill(QList<QJsonDocument> documents);
 	void fillText(QJsonArray data);
 	void fillIndexTabel(QList<QJsonDocument> items);
+	void fillLocalSource(QList<QJsonDocument> items);
+
 };
 
 #endif // MERPLYREPORTTABLEMODEL_H

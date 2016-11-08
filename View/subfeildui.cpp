@@ -295,5 +295,5 @@ void SubFieldUI::updateFilter(QString filter)
 void SubFieldUI::updateTable(QString)
 {
 	if(localFilterCombobox)
-		table->fill(structureView,localFilterCombobox->getKey());
+		table->fillLocalSource(structureView,localFilterCombobox->getKey());
 }
