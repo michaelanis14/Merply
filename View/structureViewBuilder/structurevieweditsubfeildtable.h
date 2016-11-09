@@ -15,6 +15,7 @@ public:
 	QJsonObject save();
 	QList<QJsonDocument> getClmnsSources(ERPComboBox* excludeSource);
 	void fill(QJsonObject tblStractureView);
+	QStringList getHeaders();
 private:
 	QHBoxLayout *layout;
 	QHBoxLayout *clmnsLayout;
@@ -22,7 +23,9 @@ private:
 	QCheckBox* addEnable;
 	QCheckBox* removeEnable;
 	QCheckBox* editEnable;
+	QJsonObject tblStractureView;
 signals:
+
 	void tableChanged();
 
 

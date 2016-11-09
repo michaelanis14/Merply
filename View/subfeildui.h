@@ -41,6 +41,10 @@ public slots:
 		void serialData(QString serial);
 		void updateFilter(QString filter);
 		void updateTable(QString);
+		void updateEquationField();
+		double evalEquationCondition(int condition,double col1,double col2);
+
+
 };
 
 #endif // SUBFIELDUI_H

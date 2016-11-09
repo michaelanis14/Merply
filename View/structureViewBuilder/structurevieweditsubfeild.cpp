@@ -5,6 +5,7 @@
 #include "structureviewedit.h"
 #include "controller.h"
 #include "prsistance.h"
+#include "removebtn.h"
 
 StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(parent)
 {
@@ -58,7 +59,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	if(!restrictedTypes.isEmpty()){
 		types << restrictedTypes;
 		}else
-		types << "Index"<<"Text"<< "Refrence" <<"Date"<< "Fixed" <<"Serial" << "Table" <<"TextArea";
+		types << "Index"<<"Text"<< "Refrence" <<"Date"<< "Fixed" <<"Serial" << "Table" <<"TextArea" <<"Equation";
 	typeSelect->addItems(types);
 	typeSelect->setCurrentIndex(types.indexOf(type));
 	//if(restrictedTypes.isEmpty())
@@ -190,6 +191,15 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		date->setDate(QDate::fromString(fieldVS.toObject().value("date").toString(),"dd-MMM-yyyy"));
 		layout->addRow("Date", date);
 		}
+	else if(type.compare("Equation") == 0){
+		initEquationWidget();
+		QJsonArray equationTerms =  fieldVS.toObject().value("EquationTerms").toArray();
+		foreach(QJsonValue equationTerm,equationTerms){
+			addEquationWidget(equationTerm.toObject());
+			}
+		}
+
+
 
 	mandatory = new QCheckBox(this);
 	if(fieldVS.toObject().value("Mandatory").toBool())
@@ -255,6 +265,13 @@ QJsonObject StructureVieweditSubFeild::save()
 			//qDebug() << date->date().toString(Qt::DefaultLocaleShortDate);
 			//	saveObject.insert("date",date->date().toString(Qt::DefaultLocaleShortDate));
 			}
+		else if(type.compare("Equation") == 0){
+			QJsonArray equationTerms;
+			foreach(StructureVieweditSubFeildEquation* eqTerm,equationElements){
+				equationTerms << eqTerm->save();
+				}
+			saveObject.insert("EquationTerms",equationTerms);
+			}
 		}
 	return saveObject;
 }
@@ -309,6 +326,25 @@ void StructureVieweditSubFeild::initFilterWidget()
 	filterWidgetLayout->addRow(localFilterWidget);
 
 	layout->addRow(filterWidget);
+}
+
+void StructureVieweditSubFeild::initEquationWidget()
+{
+	equationWidget = new QWidget;
+	equationWidget->setContentsMargins(0,0,0,0);
+	equationWidget->setAutoFillBackground(true);
+	equationWidget->setObjectName("equationWidget");
+	equationWidgetLayout = new QFormLayout(equationWidget);
+	equationWidget->setLayout(equationWidgetLayout);
+	equationWidgetLayout->setFormAlignment(Qt::AlignLeft);
+	equationWidgetLayout->setLabelAlignment(Qt::AlignLeft);
+	equationWidgetLayout->setSpacing(0);
+	equationWidgetLayout->setMargin(0);
+
+	QPushButton* addEqElement = new QPushButton("add Element");
+	equationWidgetLayout->addRow(addEqElement);
+	QObject::connect(addEqElement,SIGNAL(pressed()),this,SLOT(addEquationWidget()));
+	layout->addRow(equationWidget);
 }
 
 void StructureVieweditSubFeild::updateFields(QString type)
@@ -403,6 +439,24 @@ void StructureVieweditSubFeild::fillLocalFilter(QStringList feilds)
 		this->filledLocalfilter = true;
 		}
 
+}
+
+void StructureVieweditSubFeild::addEquationWidget(QJsonObject data)
+{
+	StructureVieweditSubFeildEquation* eqElemnet = new StructureVieweditSubFeildEquation(0,equationElements.count() > 0 ?true:false);
+	if(!data.isEmpty()){
+		//	qDebug() << "Fill addEquationWidget"<< data;
+		eqElemnet->fill(data);
+		}
+	equationElements << eqElemnet;
+	RemoveBtn* removeEqElement = new RemoveBtn(this,eqElemnet);
+	QObject::connect(removeEqElement,SIGNAL(remove(QWidget*)),this,SLOT(removeEqElement(QWidget*)));
+	equationWidgetLayout->addWidget(removeEqElement);
+}
+
+void StructureVieweditSubFeild::removeEqElement(QWidget* eqElement)
+{
+	equationElements.removeOne((StructureVieweditSubFeildEquation*)eqElement);
 }
 
 

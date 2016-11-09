@@ -249,9 +249,17 @@ void StructureViewGroupsUI::getFeildsNames()
 	QStringList feildNames;
 	foreach(StructureViewsEditUI* vg,sVSFUIs){
 		foreach (StructureViewEdit* feild, vg->sVSFs) {
-			if(!feild->label->text().trimmed().isEmpty() && !feild->getFieldsType().contains("Table"))
-				feildNames << feild->label->text();
+			if(!feild->label->text().trimmed().isEmpty()){
+				if( !feild->getFieldsType().contains("Table"))
+					feildNames << feild->label->text();
+				else{
+					foreach(QString header,feild->getTableFeild()->getTableEdit()->getHeaders()){
+						feildNames << header.append("$").append(feild->label->text());
+						}
+					}
+				}
 			}
+
 		}
 	emit gotFieldsNames(feildNames);
 }

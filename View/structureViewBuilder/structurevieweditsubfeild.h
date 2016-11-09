@@ -4,6 +4,8 @@
 #include "subfeildui.h"
 
 #include "structurevieweditsubfeildtable.h"
+#include "structurevieweditsubfeildequation.h"
+
 
 #include <QObject>
 #include <QWidget>
@@ -54,6 +56,10 @@ private:
 	bool filledLocalfilter;
 	QFormLayout* localFilterWidgetLayout;
 	QTextEdit* textEdit;
+	void initEquationWidget();
+	QWidget*equationWidget;
+	QFormLayout* equationWidgetLayout;
+	QList<StructureVieweditSubFeildEquation*> equationElements;
 	void paintEvent(QPaintEvent *event);
 signals:
 	void changed();
@@ -65,6 +71,9 @@ public slots:
 	void gotSourceData(QList<QJsonDocument> items);
 	void filterOnChanged(int index);
 	void fillLocalFilter(QStringList feilds);
+
+	void addEquationWidget(QJsonObject data = QJsonObject());
+	void removeEqElement(QWidget* eqElement);
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILD_H

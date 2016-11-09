@@ -328,7 +328,7 @@ void SubFieldUI::updateEquationField()
 
 			double tempSecondField;
 			SubFieldUI* secondTermField = Controller::Get()->getFirstSubField(eq.toObject().value("SecondColmn").toString());
-			if(secondTermField && (QString((secondTermField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) &&  ((QLineEdit*)secondTermField->field))
+			if((QString((secondTermField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) &&  ((QLineEdit*)secondTermField->field))
 				tempSecondField = ((QLineEdit*)secondTermField->field)->text().trimmed().toDouble(&ok);
 
 			if(eq.toObject().value("FirstColumn").toInt() >= 0){

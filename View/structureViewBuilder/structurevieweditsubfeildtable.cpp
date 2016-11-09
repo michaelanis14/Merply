@@ -73,6 +73,7 @@ QList<QJsonDocument> StructureVieweditSubFeildTable::getClmnsSources(ERPComboBox
 
 void StructureVieweditSubFeildTable::fill(QJsonObject tblStractureView)
 {
+	this->tblStractureView = tblStractureView;
 	if(tblStractureView.value("Add") == QJsonValue::Undefined)
 		this->addEnable->setChecked(true);
 	else this->addEnable->setChecked(tblStractureView.value("Add").toBool());
@@ -112,6 +113,17 @@ void StructureVieweditSubFeildTable::fill(QJsonObject tblStractureView)
 	QObject::connect(addColumn,SIGNAL(pressed()),this,SIGNAL(tableChanged()));
 
 	layout->addWidget(addColumn);
+}
+
+QStringList StructureVieweditSubFeildTable::getHeaders()
+{
+	QStringList headers;
+	if(!tblStractureView.isEmpty() && tblStractureView.value("Columns").isArray()){
+			foreach(QJsonValue clmn,tblStractureView.value("Columns").toArray()){
+				headers << clmn.toObject().value("Header").toString();
+				}
+		}
+	return headers;
 }
 
 void StructureVieweditSubFeildTable::addColumn()
