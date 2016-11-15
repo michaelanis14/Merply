@@ -24,7 +24,26 @@ unix: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.5.4/l
 INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.5.4/include
 DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.5.4/include
 
-DESTDIR = $${DEST_DIRECTORY}
+#DESTDIR = $${DEST_DIRECTORY}
+CONFIG(release, debug|release) {
+    CONFIG -= debug release
+    CONFIG += release
+
+release:DESTDIR = release
+release:OBJECTS_DIR = release/.obj
+release:MOC_DIR = release/.moc
+release:RCC_DIR = release/.rcc
+release:UI_DIR = release/.ui
+}
+debug:DESTDIR = debug
+debug:OBJECTS_DIR = debug/.obj
+debug:MOC_DIR = debug/.moc
+debug:RCC_DIR = debug/.rcc
+debug:UI_DIR = debug/.ui
+
+!contains(DEFINES,NO_BARCODE) {
+LIBS += -L$${DESTDIR}/lib -lQtZint
+}
 
 SOURCES += main.cpp\
     mainwindow.cpp \
@@ -105,9 +124,9 @@ unix {
     RCC_DIR = tmp-lin64
 }
 
-CONFIG += c++11
-CONFIG += app_bundle
-CONFIG -= debug_and_release debug_and_release_target
+#CONFIG += c++11
+#CONFIG += app_bundle
+#CONFIG -= debug_and_release debug_and_release_target
 
 
 

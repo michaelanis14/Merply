@@ -44,6 +44,7 @@ StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject struct
 
 
 	sctrlUI = new SettingsCtrlsUI();
+	sctrlUI->addbtn("Print",":/resources/icons/icons/1479148339_free-37.png","print");
 	sctrlUI->addbtn("Add",":/resources/icons/add.png","add");
 	sctrlUI->addbtn("Save",":/resources/icons/save.png","save");
 
@@ -206,6 +207,10 @@ void StructureViewGroupsUI::btn_Clicked(QString btn)
 		}
 	else if(btn.contains("Cancel")){
 		this->editControllerCancelPressed();
+		}
+	else if(btn.contains("Print")){
+
+		Controller::Get()->runQRPTDesingerapp();
 		}
 }
 

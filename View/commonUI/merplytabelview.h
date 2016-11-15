@@ -43,6 +43,9 @@ public:
 	void indexTable(const QString document_id, const QList<QJsonDocument> items);
 	QList<QJsonDocument> items;
 	QJsonObject save();
+
+	MerplyReportTableModel* getModel() const;
+
 private:
 	QVBoxLayout* layout;
 	QHBoxLayout* lblLayout;

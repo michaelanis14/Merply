@@ -139,6 +139,7 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 
 	SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
 	sctrlUI->addbtn("Add Field",":/resources/icons/add.png","add");
+
 	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(controller_Clicked(QString)));
 	sctrlUI->setAutoFillBackground(true);
 	layout->addWidget(sctrlUI);
@@ -154,7 +155,7 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 		}
 	else controller_Clicked("Add");
 
-
+	//layout->addWidget(new QPushButton("Edite Print"));
 }
 
 QJsonObject StructureViewsEditUI::save()

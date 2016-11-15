@@ -110,7 +110,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		}
 	else if(type.compare("Table") == 0){
 		table = new merplyTabelView(this,true,false);
-		//qDebug() << data.toObject() << structureView;
+		//Debug() << data.toObject() << structureView;
 		//Controller::Get()->getReportTableData(structureView);
 		QJsonObject firstclmn = structureView.value("Columns").toArray().first().toObject();
 		if(firstclmn.value("SourceLocalFilter") != QJsonValue::Undefined &&firstclmn.value("LocalSource").toBool()){
@@ -320,47 +320,78 @@ void SubFieldUI::updateEquationField()
 			bool ok = false;
 			double firstTerm = 0;
 			double secondTerm = 0;
-			qDebug() << eq;
+			//	qDebug() << eq;
 			double tempFirstField;
-			SubFieldUI* firstTermField = Controller::Get()->getFirstSubField(eq.toObject().value("FirstColumn").toString());
-			if((QString((firstTermField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) &&(QLineEdit*)firstTermField->field)
-				tempFirstField = ((QLineEdit*)firstTermField->field)->text().trimmed().toDouble(&ok);
 
-			double tempSecondField;
-			SubFieldUI* secondTermField = Controller::Get()->getFirstSubField(eq.toObject().value("SecondColmn").toString());
-			if(secondTermField && (QString((secondTermField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) &&  ((QLineEdit*)secondTermField->field))
-				tempSecondField = ((QLineEdit*)secondTermField->field)->text().trimmed().toDouble(&ok);
-
-			if(eq.toObject().value("FirstColumn").toInt() >= 0){
-				if(eq.toObject().value("ConditionColumnOne") != QJsonValue::Undefined){
-					double tempFirstCondField;
-					SubFieldUI* firstTermCondField = Controller::Get()->getFirstSubField(eq.toObject().value("ConditionColumnOne").toString());
-					if((QString((firstTermCondField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) && (QLineEdit*)firstTermCondField->field)
-						tempFirstCondField = ((QLineEdit*)firstTermCondField->field)->text().trimmed().toDouble(&ok);
-
-					firstTerm = evalEquationCondition(eq.toObject().value("ConditionOnOne").toInt(),tempFirstCondField,tempFirstField);
+			QString firstClmn = eq.toObject().value("FirstColumn").toString();
+			if(firstClmn.contains("$")){
+				tempFirstField = getClmnDataCount(firstClmn);
+				if(tempFirstField < -1){
+					//qDebug() << "ERORR : Table is not Init connceted signal to recalculte!";
+					((QLineEdit*)field)->setText(QString::number(-1));
+					return;
 					}
-				//qDebug() << eq.toObject().value("FirstColumn").toInt() << j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt() << cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData();
-				else firstTerm = tempFirstField;
 				}
-			if(eq.toObject().value("SecondColmn") != QJsonValue::Undefined){
-				if(eq.toObject().value("SecondColmn").toInt() >= 0){
-					if(eq.toObject().value("ConditionColumnTwo") != QJsonValue::Undefined){
-						double tempSecondCondField;
-						SubFieldUI* secondTermCondField = Controller::Get()->getFirstSubField(eq.toObject().value("ConditionColumnTwo").toString());
-						if((QString((secondTermCondField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) && (QLineEdit*)secondTermCondField->field)
-							tempSecondCondField = ((QLineEdit*)secondTermCondField->field)->text().trimmed().toDouble(&ok);
-
-						secondTerm = evalEquationCondition(eq.toObject().value("ConditionOnTwo").toInt(),tempSecondCondField,tempSecondField);
-						}else secondTerm = tempSecondField;
+			else{
+				SubFieldUI* firstTermField = Controller::Get()->getFirstSubField(firstClmn);
+				if((QString((firstTermField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) &&(QLineEdit*)firstTermField->field){
+					tempFirstField = ((QLineEdit*)firstTermField->field)->text().trimmed().toDouble(&ok);
+					QObject::connect(((QLineEdit*)firstTermField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
 					}
+				}
+			double tempSecondField = 0;
+			QString secondClmn = eq.toObject().value("SecondColmn").toString();
+			if(secondClmn.contains("$")){
+				tempSecondField = getClmnDataCount(secondClmn);
+				if(tempSecondField < -1){
+					//qDebug() << "ERORR : Table is not Init connceted signal to recalculte!";
+					((QLineEdit*)field)->setText(QString::number(-1));
+					return;
+					}
+				}
+			else{
+				SubFieldUI* secondTermField = Controller::Get()->getFirstSubField(secondClmn);
+
+				if((QString((secondTermField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) &&  ((QLineEdit*)secondTermField->field)){
+					tempSecondField = ((QLineEdit*)secondTermField->field)->text().trimmed().toDouble(&ok);
+					QObject::connect(((QLineEdit*)secondTermField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
+					}
+				}
+
+			if(eq.toObject().value("ConditionColumnOne") != QJsonValue::Undefined){
+				double tempFirstCondField = 0;
+				SubFieldUI* firstTermCondField = Controller::Get()->getFirstSubField(eq.toObject().value("ConditionColumnOne").toString());
+				if((QString((firstTermCondField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) && (QLineEdit*)firstTermCondField->field){
+					tempFirstCondField = ((QLineEdit*)firstTermCondField->field)->text().trimmed().toDouble(&ok);
+					QObject::connect(((QLineEdit*)firstTermCondField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
+					}
+
+				firstTerm = evalEquationCondition(eq.toObject().value("ConditionOnOne").toInt(),tempFirstCondField,tempFirstField);
+				}
+			//qDebug() << eq.toObject().value("FirstColumn").toInt() << j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt() << cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData();
+			else firstTerm = tempFirstField;
+
+			if(eq.toObject().value("SecondColmn") != QJsonValue::Undefined){
+
+				if(eq.toObject().value("ConditionColumnTwo") != QJsonValue::Undefined){
+					double tempSecondCondField = 0;
+					SubFieldUI* secondTermCondField = Controller::Get()->getFirstSubField(eq.toObject().value("ConditionColumnTwo").toString());
+					if((QString((secondTermCondField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) && (QLineEdit*)secondTermCondField->field){
+						tempSecondCondField = ((QLineEdit*)secondTermCondField->field)->text().trimmed().toDouble(&ok);
+						QObject::connect(((QLineEdit*)secondTermCondField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
+						}
+
+					secondTerm = evalEquationCondition(eq.toObject().value("ConditionOnTwo").toInt(),tempSecondCondField,tempSecondField);
+					}else secondTerm = tempSecondField;
+
 				}
 			else if(eq.toObject().value("Number") != QJsonValue::Undefined){
 				secondTerm = eq.toObject().value("Number").toString().toDouble();
 				//qDebug() << "NUMBERRRR" << secondTerm;
 				}
-			//qDebug() << ok << firstTerm << secondTerm;
+
 			if(ok){
+				//qDebug() << "GetTotal:"<< ok << firstTerm << secondTerm;
 				if(eq.toObject().value("Operation").toInt() == 0){
 					subTotal = firstTerm + secondTerm;
 					}
@@ -391,12 +422,39 @@ void SubFieldUI::updateEquationField()
 					}
 				else total = subTotal;
 				}
+			else {
+				total = -1;
+				}
 			}
 
 
-	//qDebug() <<this->structureView << localFilter;
+	//qDebug() <<total;
 
 	((QLineEdit*)field)->setText(QString::number(total));
+}
+
+double SubFieldUI::getClmnDataCount(QString strct)
+{
+
+	QString fieldName = strct.split("$").count() == 2? strct.split("$")[1]:"";
+	QString columnName = strct.split("$").count() == 2?strct.split("$")[0]:"";
+
+	double total = 0;
+	SubFieldUI* tableSubField = Controller::Get()->getFirstSubField(fieldName);
+	if(tableSubField->field && QString( tableSubField->field->metaObject()->className()).compare("merplyTabelView") == 0){
+		QObject::disconnect(((merplyTabelView*)tableSubField->field)->getModel(),SIGNAL(done()),this,SLOT(updateEquationField()));
+		QObject::connect(((merplyTabelView*)tableSubField->field)->getModel(),SIGNAL(done()),this,SLOT(updateEquationField()));
+		if( ((merplyTabelView*)tableSubField->field)->getModel()->getRowsCount() == 0 )
+			{
+			total = -2;
+			}
+		else {
+			total = ((merplyTabelView*)tableSubField->field)->getModel()->getTotalClmn(columnName);
+
+			}
+		}
+	//qDebug() << total << strct.split("$").count() << fieldName;
+	return total;
 }
 
 double SubFieldUI::evalEquationCondition(int condition, double col1, double col2)

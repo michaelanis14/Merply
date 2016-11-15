@@ -27,12 +27,22 @@ include(QtRPT/QtRpt.pri)
 #else:unix: LIBS += -L$$PWD/lib/TurboActivate/amd64/ \
 #    -lTurboActivate
 
+release:DESTDIR = release
+release:OBJECTS_DIR = release/.obj
+release:MOC_DIR = release/.moc
+release:RCC_DIR = release/.rcc
+release:UI_DIR = release/.ui
 
+debug:DESTDIR = debug
+debug:OBJECTS_DIR = debug/.obj
+debug:MOC_DIR = debug/.moc
+debug:RCC_DIR = debug/.rcc
+debug:UI_DIR = debug/.ui
 
-CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+#CONFIG(S, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 CONFIG += static
-CONFIG   -= x86_64
+#CONFIG   -= x86_64
 # remove possible other optimization flags
 QMAKE_CXXFLAGS_RELEASE -= -O
 QMAKE_CXXFLAGS_RELEASE -= -O1
@@ -41,9 +51,9 @@ QMAKE_CXXFLAGS_RELEASE -= -O2
 # add the desired -O3 if not present
 #QMAKE_CXXFLAGS_RELEASE *= -O2
 
-
-
-
+!contains(DEFINES,NO_BARCODE) {
+LIBS += -L$${DESTDIR}/lib -lQtZint
+}
 
 unix: LIBS += -L$$PWD/../../../../../../usr/local/Cellar/libcouchbase/2.5.4/lib/ -lcouchbase
 

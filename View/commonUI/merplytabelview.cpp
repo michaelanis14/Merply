@@ -99,10 +99,10 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 		QItemSelectionModel *select = tableView->selectionModel();
 		if(select && select->hasSelection()){
 			QString id = 	model->getRowKey(select->currentIndex().row());
-			//	qDebug() << id;
+				qDebug() << id;
 			if(nActon.count() > 1){
 				if(nActon.at(1).compare("Print") == 0){
-					//			Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
+				//////////////				Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 					}
 				else if(nActon.at(1).compare("Edit") == 0){
 
@@ -189,6 +189,11 @@ QJsonObject merplyTabelView::save()
 	table.insert("merplyTabel",this->model->getJsonData());
 	//qDebug() << this->model->getJsonData();
 	return table;
+}
+
+MerplyReportTableModel* merplyTabelView::getModel() const
+{
+	return model;
 }
 
 void merplyTabelView::initHController(QJsonObject columns)
@@ -321,7 +326,7 @@ void merplyTabelView::printEntity(const QString& id)
 						this, SLOT(setValue(const int, const QString, QVariant&, const int)));
 
 
-	//	qDebug() <<"print" <<id << indexedTable.value(id);
+		qDebug() <<"print" <<id;
 	currenctPrintID = id;
 	QString fileName = ":/example4.xml";
 
@@ -355,7 +360,7 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 
 void merplyTabelView::setValue(const int , const QString paramName, QVariant& paramValue, const int )
 {
-	qDebug() <<"setValue TabelView"<< paramName;
+	//qDebug() <<"setValue TabelView"<< paramName;
 	QJsonValue value;// = indexedTable.value(currenctPrintID).value(paramName);
 	if(value != QJsonValue::Undefined)
 		paramValue = value.toVariant();

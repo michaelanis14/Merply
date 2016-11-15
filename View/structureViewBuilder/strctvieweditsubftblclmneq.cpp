@@ -73,9 +73,13 @@ QJsonObject StructureVieweditSubFeildTableColumnEquation::save()
 	QJsonObject save;
 	if(firstOperand)
 		save.insert("FirstOperation",firstOperation->currentIndex());
+	if(columnOne->currentIndex() == -1)
+		columnOne->setCurrentIndex(0);
 	save.insert("FirstColumn",columnOne->currentIndex());
 	save.insert("Operation",operation->currentIndex());
 	if(secondTerm->currentIndex() == 0){
+		if(columnTwo->currentIndex() == -1)
+			columnTwo->setCurrentIndex(0);
 		save.insert("SecondColmn",columnTwo->currentIndex());
 		}
 	else {
@@ -100,14 +104,19 @@ void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 	//if(data.value("SecondColmn") != QJsonValue::Undefined){
 	if(firstOperand)
 		firstOperation->setCurrentIndex(data.value("FirstOperation").toInt());
-	if(data.value("FirstColumn") != QJsonValue::Undefined)
+	if(data.value("FirstColumn") != QJsonValue::Undefined){
 		columnOne->setCurrentIndex(data.value("FirstColumn").toInt());
+		if(columnOne->currentIndex() == -1)
+			columnOne->setCurrentIndex(0);
+		}
 	if(data.value("Operation") != QJsonValue::Undefined)
 		operation->setCurrentIndex(data.value("Operation").toInt());
 	if(data.value("SecondColmn") != QJsonValue::Undefined){
 		secondTerm->setCurrentIndex(0);
 		//qDebug() << data.value("SecondColmn").toInt();
 		columnTwo->setCurrentIndex(data.value("SecondColmn").toInt());
+		if(columnTwo->currentIndex() == -1)
+			columnTwo->setCurrentIndex(0);
 		}
 	else {
 		secondTerm->setCurrentIndex(1);
@@ -122,6 +131,8 @@ void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 		conditionOnTwo->setCurrentIndex(data.value("ConditionOnTwo").toInt());
 		conditionColumnTwo->setCurrentIndex(data.value("ConditionColumnTwo").toInt());
 		}
+
+
 }
 
 void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QList<QJsonDocument> > list)
@@ -131,15 +142,15 @@ void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QList<QJso
 	columnOne->clear();
 	columnTwo->clear();
 	foreach(QList<QJsonDocument> table,list){
-	int i = 0;
-	foreach (QJsonDocument doc, table) {
-		QString item = QString(tr("Column:")).append(QString::number(i)).append(" ").append(doc.object().value("clmnHeader").toString());
-		columnOne->addItem(item);
-		columnTwo->addItem(item);
-		conditionColumnOne->addItem(item);
-		conditionColumnTwo->addItem(item);
-		i++;
-		}
+		int i = 0;
+		foreach (QJsonDocument doc, table) {
+			QString item = QString(tr("Column:")).append(QString::number(i)).append(" ").append(doc.object().value("clmnHeader").toString());
+			columnOne->addItem(item);
+			columnTwo->addItem(item);
+			conditionColumnOne->addItem(item);
+			conditionColumnTwo->addItem(item);
+			i++;
+			}
 		}
 	columnOne->setCurrentIndex(oldClmnOneIndex);
 	columnTwo->setCurrentIndex(oldClmnTwoIndex);

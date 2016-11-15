@@ -118,7 +118,7 @@ public:
 	//Access Control
 
 
-
+	bool runQRPTDesingerapp();
 private:
 	explicit Controller(QObject * parent = 0);
 	static Controller* p_instance;

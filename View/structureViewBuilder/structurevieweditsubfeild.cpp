@@ -182,8 +182,10 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		layout->addRow("Tabel",tableEdit);
 		}
 	else if(type.compare("Serial") == 0){
-		defaultValue = new QLineEdit(0);
-		defaultValue->setText(fieldVS.toObject().value("startNum").toString());
+		defaultValue = new QLineEdit;
+		if(fieldVS.toObject().value("startNum").toInt() > 0)
+			defaultValue->setText(QString::number(fieldVS.toObject().value("startNum").toInt()));
+		else defaultValue->setText(QString::number(1));
 		layout->addRow(new QLabel(tr("Start Number")), defaultValue);
 		}
 	else if(type.compare("Date") == 0){
@@ -260,6 +262,7 @@ QJsonObject StructureVieweditSubFeild::save()
 		else  if(type.compare("Serial") == 0){
 			if(!defaultValue->text().isEmpty())
 				saveObject.insert("startNum",defaultValue->text().toInt());
+			else saveObject.insert("startNum",1);
 			}
 		else if(type.compare("Date") == 0){
 			//qDebug() << date->date().toString(Qt::DefaultLocaleShortDate);

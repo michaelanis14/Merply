@@ -42,6 +42,7 @@ public slots:
 		void updateFilter(QString filter);
 		void updateTable(QString);
 		void updateEquationField();
+		double getClmnDataCount(QString strct);
 		double evalEquationCondition(int condition,double col1,double col2);
 
 

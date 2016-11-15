@@ -821,6 +821,15 @@ QString Controller::getLastKeyID()
 	return Database::Get()->getLastKeyID();
 }
 
+bool Controller::runQRPTDesingerapp()
+{
+	QProcess *p = new QProcess(this);
+	QString programPath;
+	programPath= QDir::currentPath()+"/../RPTD/debug/QtRptDesigner" ;
+	qDebug() << programPath;
+	p->start(programPath);
+}
+
 void Controller::setShowWarning(bool value)
 {
 	Model::Get()->setShowWarning(value);

@@ -37,6 +37,9 @@ public:
 	QString getRowKey(int row);
 	QJsonArray getJsonData();
 	void evalTotalRow();
+	double getTotalClmn(QString clmn);
+	int getRowsCount() const;
+
 private:
 	int rowsCount;
 	int colmnsCount;
