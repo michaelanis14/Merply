@@ -921,6 +921,8 @@ void MainWindow::showSetting() {
 	repPage->showGrid(settings.value("ShowGrid",true).toBool());
 }
 
+
+/////Michael Bishara
 void MainWindow::showDataSource() {
 	//sqlDesigner->setVisible( ui->actDataSource->isChecked() );
 	//if (ui->actDataSource->isChecked() ) {
@@ -1018,7 +1020,7 @@ void MainWindow::openFile() {
 		QString folderPath = QApplication::applicationDirPath();
 		if (settings.value("recentFileList").toStringList().count() > 0)
 			folderPath = QFileInfo(settings.value("recentFileList").toStringList().at(0)).path();
-		fileName = QFileDialog::getOpenFileName(this, tr("Select File"), folderPath, "XML (*.xml)");
+		fileName = QFileDialog::getSaveFileName(this);
 		if (fileName.isEmpty())
 			return;
 		}
@@ -1541,6 +1543,7 @@ void MainWindow::saveReport() {
 	printXmlJson.insert("XMLSTRCT",xmlDoc->toString());
 
 	if (fileName.isEmpty() || fileName.isNull() || sender() == ui->actSaveAs) {
+		////Michael Bishara
 		QString tmpfileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("XML Files (*.*)"));
 		if (tmpfileName.isEmpty() || tmpfileName.isNull() ) return;
 		QFileInfo fileInfo(tmpfileName);

@@ -9,6 +9,7 @@
 #include "QPrinter"
 #include "QPrintDialog"
 #include "controller.h"
+#include "printcontroller.h"
 
 #include <QLabel>
 #include <QVariant>
@@ -102,6 +103,7 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 				qDebug() << id;
 			if(nActon.count() > 1){
 				if(nActon.at(1).compare("Print") == 0){
+					PrintController::Get()->printEntity(id);
 				//////////////				Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 					}
 				else if(nActon.at(1).compare("Edit") == 0){

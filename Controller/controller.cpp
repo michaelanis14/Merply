@@ -307,7 +307,11 @@ QString Controller::toString(QJsonArray array)
 			data += toString(array.at(j).toArray());
 		else if(array.at(j).isObject()){
 			//	qDebug()<<"Obj" << array.at(j).toObject();
-			data += array.at(j).toObject().value("Value").toString();
+			if(array.at(j).toObject().value("Value") != QJsonValue::Undefined)
+				data += array.at(j).toObject().value("Value").toString();
+			else if(array.at(j).toObject().value("merplyTabel") != QJsonValue::Undefined){
+				qDebug() << "TODO:"<<"printValues of table";
+				}
 			}
 		else data += array.at(j).toString();
 
@@ -432,6 +436,8 @@ void Controller::showCreateEditeValueUIData(QJsonDocument value)
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeValueUIData(QJsonDocument)));
 	CreateEditUI::ShowUI(QJsonObject(),value.object());
 }
+
+
 void Controller::linkPressed(QJsonObject link)
 {
 	qDebug() << link;
@@ -712,7 +718,7 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 		//qDebug() << "Before Query";
 
 		if(addedSelectItems){
-		//	qDebug() <<"Report Q:"<< query;
+			//	qDebug() <<"Report Q:"<< query;
 			qRegisterMetaType<QList<QJsonDocument> >("MyStruct");
 			QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)),Qt::QueuedConnection);
 			//Database::Get()->query(query);
@@ -734,15 +740,15 @@ QString Controller::getLocalSourceReport(QJsonObject clmn,int index,QString filt
 	QString field = selectField.count() > 1?selectField[1]:clmn.value("Select").toString();
 
 	QString source = clmn.value("Source").toString().split("::")[1];
-//	QString sourceEFilter = clmn.value("SourceEntityFilter").toString();
-//	QString sourceLFilter = clmn.value("SourceLocalFilter").toString();
+	//	QString sourceEFilter = clmn.value("SourceEntityFilter").toString();
+	//	QString sourceLFilter = clmn.value("SourceLocalFilter").toString();
 	QString uniqueRef = QString(source.at(0)).append(QString(select.at(0))).append(QString::number(rand())) ;
 
 
 	QString query;
 	query = "SELECT (Array itemw.`"+select+"` FOR itemw IN ((Array item.`"+field+"`[0].`merplyTabel` FOR item IN "+uniqueRef+"f END)[0])END) AS `"+clmn.value("Header").toString()+"` , META("+uniqueRef+"d).id AS `"+source+QString::number(index)+"Key`"
-			"FROM default "+uniqueRef+"d UNNEST "+uniqueRef+"d.Fields "+uniqueRef+"f WHERE META("+uniqueRef+"d).id = '"+filter+"' "
-			"AND (Array item.`"+field+"`[0].`merplyTabel` FOR item IN "+uniqueRef+"f END)";
+																																																													"FROM default "+uniqueRef+"d UNNEST "+uniqueRef+"d.Fields "+uniqueRef+"f WHERE META("+uniqueRef+"d).id = '"+filter+"' "
+																																																																																									   "AND (Array item.`"+field+"`[0].`merplyTabel` FOR item IN "+uniqueRef+"f END)";
 	//qDebug() << "LocalSorce Q: " << query;
 	return query;
 }
@@ -829,6 +835,7 @@ bool Controller::runQRPTDesingerapp()
 	qDebug() << programPath;
 	p->start(programPath);
 }
+
 
 void Controller::setShowWarning(bool value)
 {
