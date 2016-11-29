@@ -337,6 +337,7 @@ void MerplyReportTableModel::fillIndexTabel( QList<QJsonDocument> items)
 {
 
 	int i = 0;
+
 	cells = QVector<TableCell>(colmnsCount * items.count());
 	foreach(QJsonDocument item,items){
 		QString  key = item.object().value("document_id").toString();
@@ -344,12 +345,14 @@ void MerplyReportTableModel::fillIndexTabel( QList<QJsonDocument> items)
 		cells[i * this->colmnsCount + j].setId(key);
 		foreach(QJsonValue value, item.object().value("Fields").toArray()){
 			foreach(QJsonValue viewGroup, value.toArray()){
+				if(clmnsHeader.count()  > j){
 				QString valueString;
-				if(clmnsHeader.count()  > j)
-					valueString = Controller::Get()->toString(viewGroup.toObject().value(clmnsHeader.at(j)).toArray());
 
-				cells[i * this->colmnsCount + j].setId(key);
-				cells[i * this->colmnsCount + j].setData(valueString);
+					valueString = Controller::Get()->toString(viewGroup.toObject().value(clmnsHeader.at(j)).toArray());
+				//qDebug() <<cells[(i * this->colmnsCount) + j].getId()<<(i * this->colmnsCount) + j<< key;
+				cells[(i * this->colmnsCount) + j].setId(key);
+				cells[(i * this->colmnsCount) + j].setData(valueString);
+					}
 				j++;
 				}
 			}
@@ -426,9 +429,9 @@ void MerplyReportTableModel::fillEquationColumns()
 				bool ok = false;
 				double firstTerm = 0;
 				double secondTerm = 0;
-			//	qDebug() << eq.toObject();
+				//qDebug() << eq.toObject();
 				if(eq.toObject().value("FirstColumn").toInt() >= 0){
-					if(eq.toObject().value("ConditionColumnOne") != QJsonValue::Undefined)
+					if(eq.toObject().value("ConditionColumnOne") != QJsonValue::Undefined && eq.toObject().value("ConditionColumnOne").toInt() > -1)
 						firstTerm = evalEquationCondition(eq.toObject().value("ConditionOnOne").toInt(),cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData().trimmed().toDouble(&ok),cells[j * this->colmnsCount + eq.toObject().value("ConditionColumnOne").toInt()].getData().trimmed().toDouble(&ok));
 
 					//qDebug() << eq.toObject().value("FirstColumn").toInt() << j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt() << cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData();
@@ -436,7 +439,7 @@ void MerplyReportTableModel::fillEquationColumns()
 					}
 				if(eq.toObject().value("SecondColmn") != QJsonValue::Undefined){
 					if(eq.toObject().value("SecondColmn").toInt() >= 0){
-						if(eq.toObject().value("ConditionColumnTwo") != QJsonValue::Undefined)
+						if(eq.toObject().value("ConditionColumnTwo") != QJsonValue::Undefined && eq.toObject().value("ConditionColumnTwo").toInt() > -1)
 							secondTerm = evalEquationCondition(eq.toObject().value("ConditionOnTwo").toInt(),cells[j * this->colmnsCount + eq.toObject().value("SecondColmn").toInt()].getData().trimmed().toDouble(&ok),cells[j * this->colmnsCount + eq.toObject().value("ConditionColumnTwo").toInt()].getData().trimmed().toDouble(&ok));
 						else secondTerm = cells[j * this->colmnsCount + eq.toObject().value("SecondColmn").toInt()].getData().trimmed().toDouble(&ok);
 						}

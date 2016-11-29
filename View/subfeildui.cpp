@@ -325,9 +325,14 @@ void SubFieldUI::updateEquationField()
 
 			QString firstClmn = eq.toObject().value("FirstColumn").toString();
 			if(firstClmn.contains("$")){
+
 				tempFirstField = getClmnDataCount(firstClmn);
+				ok = true;
+				//qDebug() << "TABELL" <<tempFirstField;
+
+				//TODO : connect table update signal just like text update
 				if(tempFirstField < -1){
-					//qDebug() << "ERORR : Table is not Init connceted signal to recalculte!";
+					qDebug() << "ERORR : Table is not Init connceted signal to recalculte!";
 					((QLineEdit*)field)->setText(QString::number(-1));
 					return;
 					}
@@ -344,7 +349,7 @@ void SubFieldUI::updateEquationField()
 			if(secondClmn.contains("$")){
 				tempSecondField = getClmnDataCount(secondClmn);
 				if(tempSecondField < -1){
-					//qDebug() << "ERORR : Table is not Init connceted signal to recalculte!";
+					qDebug() << "ERORR : Table is not Init connceted signal to recalculte!";
 					((QLineEdit*)field)->setText(QString::number(-1));
 					return;
 					}
@@ -386,12 +391,12 @@ void SubFieldUI::updateEquationField()
 
 				}
 			else if(eq.toObject().value("Number") != QJsonValue::Undefined){
-				secondTerm = eq.toObject().value("Number").toString().toDouble();
-				//qDebug() << "NUMBERRRR" << secondTerm;
+				secondTerm = eq.toObject().value("Number").toString().toDouble(&ok);
+			//	qDebug() << "NUMBERRRR" << secondTerm;
 				}
 
 			if(ok){
-				//qDebug() << "GetTotal:"<< ok << firstTerm << secondTerm;
+				qDebug() << "GetTotal:"<< ok << firstTerm << secondTerm;
 				if(eq.toObject().value("Operation").toInt() == 0){
 					subTotal = firstTerm + secondTerm;
 					}
@@ -441,7 +446,7 @@ double SubFieldUI::getClmnDataCount(QString strct)
 
 	double total = 0;
 	SubFieldUI* tableSubField = Controller::Get()->getFirstSubField(fieldName);
-	if(tableSubField->field && QString( tableSubField->field->metaObject()->className()).compare("merplyTabelView") == 0){
+	if(((merplyTabelView*)tableSubField->field)->getModel() != NULL && QString( tableSubField->field->metaObject()->className()).compare("merplyTabelView") == 0){
 		QObject::disconnect(((merplyTabelView*)tableSubField->field)->getModel(),SIGNAL(done()),this,SLOT(updateEquationField()));
 		QObject::connect(((merplyTabelView*)tableSubField->field)->getModel(),SIGNAL(done()),this,SLOT(updateEquationField()));
 		if( ((merplyTabelView*)tableSubField->field)->getModel()->getRowsCount() == 0 )

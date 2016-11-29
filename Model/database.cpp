@@ -348,6 +348,12 @@ QString Database::getLastKeyID() const
 }
 
 
+/**
+ * @brief Database::storeDoc
+ * @param key
+ * @param document
+ * @return
+ */
 bool Database::storeDoc(QString key,QJsonDocument document) {
 	//qDebug() <<key << key.split("::").count() << key;
 	if(key.split("::").count() <  2){
@@ -478,6 +484,14 @@ Database::Database():
 */
 }
 Database* Database::p_instance = 0;
+/**
+ * @brief Database::Get
+ * Checks if the instance is zero "not inti" then
+ * starts a new thread, moving the instace to the new thread
+ * finally starting the tread
+ * Else if the instance already init, it returns this instance
+ * @return p_instance "the static database refrence"
+ */
 Database* Database::Get()
 {
 	if (p_instance == 0){
@@ -485,6 +499,6 @@ Database* Database::Get()
 		p_instance = new Database();
 		p_instance->moveToThread(thread);
 		thread->start();
-}
+		}
 	return p_instance;
 }

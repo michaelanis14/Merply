@@ -6,7 +6,9 @@ ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, 
 {
 
 	this->structureView = structureView;
+
 	layout = new QVBoxLayout(this);
+
 	//layout->setContentsMargins(2,2,2,2);
 	//layout->setSpacing(0);
 	//this->setContentsMargins(2,2,2,2);

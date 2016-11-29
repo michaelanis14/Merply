@@ -153,7 +153,16 @@ bool Prsistance::init()
 		write("ContactType",QString("Name->Other"));
 		}
 */
-
+	if(Count("ViewStructure::Users\"") ==  0){
+		QString jsonFile = readFile(":/initData/initData/Users.json");
+		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		Database::Get()->storeDoc("ViewStructure::Users",doc);
+		}
+	if(Count("ViewStructure::Groups\"") ==  0){
+		QString jsonFile = readFile(":/initData/initData/Groups.json");
+		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		Database::Get()->storeDoc("ViewStructure::Groups",doc);
+		}
 	if(Count("ViewStructure::Contact\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/contact.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
@@ -474,7 +483,7 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 
 
 	QString query = "SELECT  (Array (item[*]).`"+select.trimmed()+"` FOR item IN d.Fields   END)[0] AS `Value`,META(d).id AS `Key` FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where;
-	//qDebug() << query;
+	qDebug() << query;
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	Database::Get()->query(query);
 

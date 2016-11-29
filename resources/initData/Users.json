@@ -1,0 +1,53 @@
+{
+  "Title": "Users",
+  "Type": "Entity",
+  "Viewgroups": [
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "ArrayList": false,
+            "Label": "Name",
+            "SubFields": [
+              {
+                "CharCount": "-1",
+                "InputDataType": "Text",
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": false,
+            "Label": "UserPassword",
+            "SubFields": [
+              {
+                "CharCount": "-1",
+                "InputDataType": "Text",
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          },
+          {
+            "ArrayList": true,
+            "Label": "Groups",
+            "SubFields": [
+              {
+                "Condition": "",
+                "Editable": false,
+                "Mandatory": false,
+                "Select": "Name",
+                "Source": "ViewStructure::Groups",
+                "Type": "Refrence"
+              }
+            ]
+          }
+        ],
+        "GroupTitle": "UserData",
+        "Style": "vertical"
+      }
+    }
+  ],
+  "document_id": "ViewStructure::Users"
+}

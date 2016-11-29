@@ -1,0 +1,27 @@
+{
+  "Title": "Groups",
+  "Type": "Entity",
+  "Viewgroups": [
+    {
+      "Viewgroup": {
+        "Fields": [
+          {
+            "ArrayList": false,
+            "Label": "Name",
+            "SubFields": [
+              {
+                "CharCount": "-1",
+                "InputDataType": "Text",
+                "Mandatory": false,
+                "Type": "Text"
+              }
+            ]
+          }
+        ],
+        "GroupTitle": "",
+        "Style": "vertical"
+      }
+    }
+  ],
+  "document_id": "ViewStructure::Groups"
+}
