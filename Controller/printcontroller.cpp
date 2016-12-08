@@ -16,7 +16,7 @@ PrintController* PrintController::Get()
 }
 void PrintController::printEntity(QString id)
 {
-	//qDebug() <<"printEntity"<< id;
+	//qDebug() << __FILE__ << __LINE__  <<"printEntity"<< id;
 	QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintEntity(QJsonDocument)));
 	Controller::Get()->getDoc(id);
 }
@@ -30,7 +30,7 @@ void PrintController::gotPrintEntity(QJsonDocument document)
 	QString documentID = "PrintStructure::"+document.object().value("document_id").toString().split("::")[0];
 	getFieldstoValueMap(this->printDocumnet.object());
 	QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintStrct(QJsonDocument)));
-	//qDebug() <<"gotPrintEntity"<< documentID;
+	//qDebug() << __FILE__ << __LINE__  <<"gotPrintEntity"<< documentID;
 	Controller::Get()->getDoc(documentID);
 
 }
@@ -42,23 +42,35 @@ void PrintController::getFieldstoValueMap(QJsonObject entity)
 			QStringList keys;
 
 			keys = fvvapn.toObject().keys();
-			//qDebug() << fvvapn.toObject() << keys;
+			//qDebug() << __FILE__ << __LINE__  << fvvapn.toObject() << keys;
 			foreach(QString key,keys){
 
-				foreach(QJsonValue value,fvvapn.toObject().value(key).toArray()){
+				foreach(QJsonValue value,fvvapn.toObject().value(key).toArray())
+					{
+
 					if(value.isString())
 						fieldsValues.insert(key,value.toString());
 					else if(value.isObject()){
 						if(value.toObject().value("Value") != QJsonValue::Undefined)
 							fieldsValues.insert(key,value.toObject().value("Value").toString());
 						else if(value.toObject().value("merplyTabel") != QJsonValue::Undefined){
-							if(value.toObject().value("merplyTabel").isArray())
-								reportData = value.toObject().value("merplyTabel").toArray();
+							//	qDebug() << value;
+							if(value.toObject().value("merplyTabel").isArray()){
+
+								foreach (QJsonValue row, value.toObject().value("merplyTabel").toArray()) {
+									QString rowValue = row.toObject().value("Value").toString();
+									if(!rowValue.isEmpty() && rowValue.compare("0") !=0)
+										reportData.append(row);
+									}
+								//TODO : instead of Merging tables have better refrences
+
+								//qDebug() << reportData;
+								}
 							}
 						}
 					}
 
-				//qDebug() << fvvapn.toObject().value(key).toString();
+				//qDebug() << __FILE__ << __LINE__  << fvvapn.toObject().value(key).toString();
 				}
 
 
@@ -94,18 +106,22 @@ void PrintController::gotPrintStrct(QJsonDocument strct)
 	xmlDocument.setContent(printStrct.object().value("XMLSTRCT").toString());
 	report->loadReport(xmlDocument);
 	report->recordCount << reportData.count();
-	//qDebug() <<"gotPrintStrct"<< printStrct.object().value("XMLSTRCT").toString();
+	//qDebug() << reportData.count();
+	//qDebug() << __FILE__ << __LINE__  <<"gotPrintStrct"<< printStrct.object().value("XMLSTRCT").toString();
 	report->printExec();
 }
 
 void PrintController::setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage)
 {
-	//qDebug() << paramName << recNo << reportPage;
+	//qDebug() << __FILE__ << __LINE__  << paramName << recNo << reportPage;
+
+	//qDebug() << reportData.at(recNo).toObject().value(paramName);
 	if(fieldsValues.contains(paramName))
 		paramValue = fieldsValues.value(paramName) ;
 	else if(reportData.at(recNo).toObject().value(paramName) != QJsonValue::Undefined){
-			paramValue =reportData.at(recNo).toObject().value(paramName);
-			}
+
+		paramValue =reportData.at(recNo).toObject().value(paramName).toString();
+		}
 
 
 }

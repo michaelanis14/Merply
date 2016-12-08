@@ -68,7 +68,7 @@ QJsonObject ViewGroups::save()
 		}
 	entity.insert("Fields",fields);
 	//entity.insert("Title",this->structureView.value("Title"))
-	//qDebug() << entity;
+	//qDebug() << __FILE__ << __LINE__  << entity;
 	return (entity);
 }
 
@@ -115,7 +115,7 @@ void ViewGroups::paintEvent(QPaintEvent *)
 
 void ViewGroups::btn_Clicked(QString btn)
 {
-	//qDebug() << btn;
+	//qDebug() << __FILE__ << __LINE__  << btn;
 	if(btn.contains("settings")){
 		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotSetttingsDocument(QJsonDocument)));
 		Controller::Get()->getDoc(this->structureView.value("document_id").toString());

@@ -5,7 +5,7 @@
 FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJsonObject data) : QWidget(parent)
 {
 
-	//qDebug() << structureView;
+	//qDebug() << __FILE__ << __LINE__  << structureView;
 
 	this->layout = new QHBoxLayout(this);
 	this->layout->setContentsMargins(0,0,0,0);

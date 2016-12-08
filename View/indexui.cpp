@@ -26,12 +26,12 @@ IndexUI::IndexUI(QWidget *parent) : MainDisplay(parent)
 
 
 	layout->addWidget(table);
-//	qDebug() <<"Index";
+//	qDebug() << __FILE__ << __LINE__  <<"Index";
 
 }
 IndexUI* IndexUI::p_instance = 0;
 void IndexUI::ShowUI(const QString document_id, const QList<QJsonDocument> documents) {
-	//qDebug() << id;
+	//qDebug() << __FILE__ << __LINE__  << id;
 
 	if(p_instance == 0)
 		p_instance = new IndexUI();
@@ -59,9 +59,9 @@ void IndexUI::fill(const QString document_id,const QList<QJsonDocument> items)
 		while(i < MAX_COUNTER && !Controller::Get()->documentInList(all,Database::Get()->getLastKeyID())){
 			all = Controller::Get()->getAll(this->id,"");
 			i++;
-			//qDebug() << "LazyLoading" << Database::Get()->getLastKeyID();
+			//qDebug() << __FILE__ << __LINE__  << "LazyLoading" << Database::Get()->getLastKeyID();
 			}
-		//qDebug() << Database::Get()->getDocument();
+		//qDebug() << __FILE__ << __LINE__  << Database::Get()->getDocument();
 		table->indexTable(xmlNode,all,true,true);
 		Database::Get()->setLastKeyID("");
 		}
@@ -70,7 +70,7 @@ void IndexUI::fill(const QString document_id,const QList<QJsonDocument> items)
 		}
 
 */
-	//qDebug() << items;
+	//qDebug() << __FILE__ << __LINE__  << items;
 	this->document_id = document_id;
 	table->indexTable(document_id,items);
 }

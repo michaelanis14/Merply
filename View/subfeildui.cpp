@@ -4,8 +4,8 @@
 SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView, QJsonValue data) : QWidget(parent)
 {
 
-	//qDebug() << "wassup" << structureView;
-	//	qDebug() << "data" << data;
+	//qDebug() << __FILE__ << __LINE__  << "wassup" << structureView;
+	//	qDebug() << __FILE__ << __LINE__  << "data" << data;
 	this->structureView = QJsonObject();
 	this->structureView = structureView;
 	layout = new QHBoxLayout(this);
@@ -21,38 +21,38 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 
 	if(type.compare("Refrence") == 0){
 		combox = new ERPComboBox(this,false);
-		//qDebug()<<"SELECT" << structureView.value("Select");
+		//qDebug() << __FILE__ << __LINE__ <<"SELECT" << structureView.value("Select");
 		if(structureView.value("Editable").toString().compare("false") == 0)
 			combox->setEditable(false);
 		layout->addWidget(combox);
 		field = combox;
 		if(structureView.value("LocalFilter") != QJsonValue::Undefined && structureView.value("LocalFilter").toBool()){
-			//qDebug() << "local Field"<< structureView.value("Local").toString();
-			//qDebug() << Controller::Get()->getFirstSubField(structureView.value("Local").toString());
+			//qDebug() << __FILE__ << __LINE__  << "local Field"<< structureView.value("Local").toString();
+			//qDebug() << __FILE__ << __LINE__  << Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			if(localFilter->combox){
-				//qDebug() << "COMBO";
+				//qDebug() << __FILE__ << __LINE__  << "COMBO";
 				QObject::connect(localFilter->combox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateFilter(QString)));
 				this->updateFilter(localFilter->combox->currentText());
 				//emit localFilter->combox->currentIndexChanged(localFilter->combox->currentIndex());
 				}
 			else{
-				qDebug() <<"Not Init";
+				qDebug() << __FILE__ << __LINE__  <<"Not Init" << structureView.value("Local").toString() << structureView;
 				}
 			}
 		else{
 			if(!structureView.value("Source").toString().isEmpty() && structureView.value("Source").toString().compare("_") != 0){
-				//	qDebug() << "NOT LOACL FILTER" <<structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Condition").toString() ;
+				//	qDebug() << __FILE__ << __LINE__  << "NOT LOACL FILTER" <<structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Condition").toString() ;
 				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
 				Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Condition").toString());
 				}
 			}
 		QJsonObject dataObj = data.toObject();
-		//qDebug() << data;
+		//qDebug() << __FILE__ << __LINE__  << data;
 		if(!dataObj.isEmpty()){
 			combox->setCurrentIndex(combox->findText(dataObj.value("Value").toString()));
 			}
-		//qDebug() << structureView.value("Source").toString() << structureView.value("Select").toString();
+		//qDebug() << __FILE__ << __LINE__  << structureView.value("Source").toString() << structureView.value("Select").toString();
 		}
 	else if(type.compare("Text") == 0){
 
@@ -110,30 +110,36 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		}
 	else if(type.compare("Table") == 0){
 		table = new merplyTabelView(this,true,false);
-		//Debug() << data.toObject() << structureView;
+	//	qDebug() << __FILE__ << __LINE__ <<"DATAA" << data.toObject() << structureView;
 		//Controller::Get()->getReportTableData(structureView);
 		QJsonObject firstclmn = structureView.value("Columns").toArray().first().toObject();
 		if(firstclmn.value("SourceLocalFilter") != QJsonValue::Undefined &&firstclmn.value("LocalSource").toBool()){
-			//	qDebug() << "local Field"<< firstclmn.value("SourceLocalFilter").toString();
-			//	qDebug() << Controller::Get()->getFirstSubField(firstclmn.value("SourceLocalFilter").toString());
+			//	qDebug() << __FILE__ << __LINE__  << "local Field"<< firstclmn.value("SourceLocalFilter").toString();
+			//	qDebug() << __FILE__ << __LINE__  << Controller::Get()->getFirstSubField(firstclmn.value("SourceLocalFilter").toString());
 			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(firstclmn.value("SourceLocalFilter").toString());
 			localFilterCombobox = localFilter->combox;
 			if(localFilterCombobox){
-				//	qDebug() << "COMBO" << localFilter->combox->currentText();
+				//	qDebug() << __FILE__ << __LINE__  << "COMBO" << localFilter->combox->currentText();
 				QObject::connect(localFilter->combox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateTable(QString)));
 				this->updateTable(localFilter->combox->currentText());
 				//emit localFilter->combox->currentIndexChanged(localFilter->combox->currentIndex());
 				}
 			else{
-				qDebug() <<"Not Init ComboFilter for table init";
+				qDebug() << __FILE__ << __LINE__  <<"Not Init ComboFilter for table init";
 				}
 			}
 		else {
 			table->fill(structureView);
 			}
+
+
 		QJsonObject dataObj = data.toObject();
-		if(!dataObj.isEmpty())
+		if(!dataObj.isEmpty()){
 			table->fillText(dataObj);
+			}
+		else if(structureView.value("initData") != QJsonValue::Undefined){
+			table->fillText(structureView.value("initData").toObject());
+			}
 		layout->addWidget(table);
 		field = table;
 		}
@@ -256,7 +262,7 @@ bool SubFieldUI::checkMandatory()
 
 void SubFieldUI::indexedFillEvent(QString completion)
 {
-	qDebug() << completion;
+	qDebug() << __FILE__ << __LINE__  << completion;
 
 }
 
@@ -268,11 +274,13 @@ void SubFieldUI::linkPressed()
 void SubFieldUI::refrenceData(QList<QJsonDocument> items)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+
 	if(combox){
+
 		combox->clear();
 		combox->addJsonItems(items);
 		}
-	//qDebug() << items;
+	//qDebug() << __FILE__ << __LINE__  << items;
 }
 
 void SubFieldUI::serialData(QString serial)
@@ -282,7 +290,7 @@ void SubFieldUI::serialData(QString serial)
 		int i = structureView.value("startNum").toInt();
 		int current = serial.toInt();
 		int serialized = i + current;
-		//qDebug() << serialized << i << current;
+		//qDebug() << __FILE__ << __LINE__  << serialized << i << current;
 		if(serialized > i)
 			((QLineEdit*)field)->setText(QString::number(serialized));
 		}
@@ -297,7 +305,7 @@ void SubFieldUI::updateFilter(QString filter)
 		return;
 		}
 	else{
-		//qDebug() <<"filter" << filter << structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Entity").toString()+"="+filter;
+		//qDebug() << __FILE__ << __LINE__  <<"filter" << filter << structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Entity").toString()+"="+filter;
 		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
 
 		Controller::Get()->getJsonEntityFieldsList(source,select,entity+"="+filter);
@@ -317,63 +325,96 @@ void SubFieldUI::updateEquationField()
 	if(this->structureView.value("EquationTerms").isArray())
 		foreach(QJsonValue eq,this->structureView.value("EquationTerms").toArray()){
 			double subTotal = 0;
-			bool ok = false;
+			bool ok = true;
 			double firstTerm = 0;
 			double secondTerm = 0;
-			//	qDebug() << eq;
-			double tempFirstField;
+			//qDebug() << __FILE__ << __LINE__  << eq;
+			double tempFirstField = -2;
 
 			QString firstClmn = eq.toObject().value("FirstColumn").toString();
+			SubFieldUI* firstTermField = Controller::Get()->getFirstSubField(firstClmn);
 			if(firstClmn.contains("$")){
 
 				tempFirstField = getClmnDataCount(firstClmn);
 				ok = true;
-				//qDebug() << "TABELL" <<tempFirstField;
-
 				//TODO : connect table update signal just like text update
 				if(tempFirstField < -1){
-					qDebug() << "ERORR : Table is not Init connceted signal to recalculte!";
-					((QLineEdit*)field)->setText(QString::number(-1));
-					return;
+					qDebug() << __FILE__ << __LINE__  << "ERORR : Table is not Init connceted signal to recalculte!";
+					//((QLineEdit*)field)->setText(QString::number(-1));
+					//return;
 					}
 				}
 			else{
-				SubFieldUI* firstTermField = Controller::Get()->getFirstSubField(firstClmn);
+
 				if((QString((firstTermField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) &&(QLineEdit*)firstTermField->field){
-					tempFirstField = ((QLineEdit*)firstTermField->field)->text().trimmed().toDouble(&ok);
+					if(!((QLineEdit*)firstTermField->field)->text().trimmed().isEmpty())
+						tempFirstField = ((QLineEdit*)firstTermField->field)->text().trimmed().toDouble(&ok);
+					QObject::disconnect(((QLineEdit*)firstTermField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
 					QObject::connect(((QLineEdit*)firstTermField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
 					}
+				else if((QString((firstTermField->field)->metaObject()->className()).contains("ERPComboBox")) &&(ERPComboBox*)firstTermField->field){
+					if(! ((ERPComboBox*)firstTermField->field)->currentText().trimmed().isEmpty())
+						tempFirstField = ((ERPComboBox*)firstTermField->field)->currentText().trimmed().toDouble(&ok);
+					QObject::disconnect(((ERPComboBox*)firstTermField->field),SIGNAL(currentTextChanged(QString)),this,SLOT(updateEquationField()));
+					QObject::connect(((ERPComboBox*)firstTermField->field),SIGNAL(currentTextChanged(QString)),this,SLOT(updateEquationField()));
+					}
 				}
-			double tempSecondField = 0;
+			double tempSecondField = -2;
 			QString secondClmn = eq.toObject().value("SecondColmn").toString();
+			SubFieldUI* secondTermField = Controller::Get()->getFirstSubField(secondClmn);
 			if(secondClmn.contains("$")){
 				tempSecondField = getClmnDataCount(secondClmn);
 				if(tempSecondField < -1){
-					qDebug() << "ERORR : Table is not Init connceted signal to recalculte!";
-					((QLineEdit*)field)->setText(QString::number(-1));
-					return;
+					//tempSecondField = 0;
+					//qDebug() << __FILE__ << __LINE__  << "ERORR : Table is not Init connceted signal to recalculte!";
+					//((QLineEdit*)field)->setText(QString::number(-1));
+					//return;
 					}
 				}
 			else{
-				SubFieldUI* secondTermField = Controller::Get()->getFirstSubField(secondClmn);
-
 				if((QString((secondTermField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) &&  ((QLineEdit*)secondTermField->field)){
-					tempSecondField = ((QLineEdit*)secondTermField->field)->text().trimmed().toDouble(&ok);
+					if(!((QLineEdit*)secondTermField->field)->text().trimmed().isEmpty())
+						tempSecondField = ((QLineEdit*)secondTermField->field)->text().trimmed().toDouble(&ok);
+					QObject::disconnect(((QLineEdit*)secondTermField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
 					QObject::connect(((QLineEdit*)secondTermField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
+					}
+				else if((QString((secondTermField->field)->metaObject()->className()).contains("ERPComboBox")) &&(ERPComboBox*)secondTermField->field){
+					if(! ((ERPComboBox*)secondTermField->field)->currentText().trimmed().isEmpty())
+						tempSecondField = ((ERPComboBox*)secondTermField->field)->currentText().trimmed().toDouble(&ok);
+					QObject::disconnect(((ERPComboBox*)secondTermField->field),SIGNAL(currentTextChanged(QString)),this,SLOT(updateEquationField()));
+					QObject::connect(((ERPComboBox*)secondTermField->field),SIGNAL(currentTextChanged(QString)),this,SLOT(updateEquationField()));
 					}
 				}
 
 			if(eq.toObject().value("ConditionColumnOne") != QJsonValue::Undefined){
 				double tempFirstCondField = 0;
-				SubFieldUI* firstTermCondField = Controller::Get()->getFirstSubField(eq.toObject().value("ConditionColumnOne").toString());
-				if((QString((firstTermCondField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) && (QLineEdit*)firstTermCondField->field){
-					tempFirstCondField = ((QLineEdit*)firstTermCondField->field)->text().trimmed().toDouble(&ok);
-					QObject::connect(((QLineEdit*)firstTermCondField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
+				QString condOnColOne = eq.toObject().value("ConditionColumnOne").toString();
+				if(condOnColOne.contains("$")){
+
+					tempFirstCondField = getClmnDataCount(condOnColOne);
+					ok = true;
+					//qDebug() << __FILE__ << __LINE__  << "TABELL" <<tempFirstField;
+
+					//TODO : connect table update signal just like text update
+					if(tempFirstField < -1){
+						qDebug() << __FILE__ << __LINE__  << "ERORR : Table is not Init connceted signal to recalculte!";
+						((QLineEdit*)field)->setText(QString::number(-1));
+						return;
+						}
+					}
+				else{
+					SubFieldUI* firstTermCondField = Controller::Get()->getFirstSubField(condOnColOne);
+					if((QString((firstTermCondField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) && (QLineEdit*)firstTermCondField->field){
+						tempFirstCondField = ((QLineEdit*)firstTermCondField->field)->text().trimmed().toDouble(&ok);
+						QObject::disconnect(((QLineEdit*)firstTermCondField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
+
+						QObject::connect(((QLineEdit*)firstTermCondField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
+						}
 					}
 
 				firstTerm = evalEquationCondition(eq.toObject().value("ConditionOnOne").toInt(),tempFirstCondField,tempFirstField);
 				}
-			//qDebug() << eq.toObject().value("FirstColumn").toInt() << j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt() << cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData();
+			//qDebug() << __FILE__ << __LINE__  << eq.toObject().value("FirstColumn").toInt() << j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt() << cells[j * this->colmnsCount + eq.toObject().value("FirstColumn").toInt()].getData();
 			else firstTerm = tempFirstField;
 
 			if(eq.toObject().value("SecondColmn") != QJsonValue::Undefined){
@@ -383,6 +424,8 @@ void SubFieldUI::updateEquationField()
 					SubFieldUI* secondTermCondField = Controller::Get()->getFirstSubField(eq.toObject().value("ConditionColumnTwo").toString());
 					if((QString((secondTermCondField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) && (QLineEdit*)secondTermCondField->field){
 						tempSecondCondField = ((QLineEdit*)secondTermCondField->field)->text().trimmed().toDouble(&ok);
+						QObject::disconnect(((QLineEdit*)secondTermCondField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
+
 						QObject::connect(((QLineEdit*)secondTermCondField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
 						}
 
@@ -390,23 +433,31 @@ void SubFieldUI::updateEquationField()
 					}else secondTerm = tempSecondField;
 
 				}
+
 			else if(eq.toObject().value("Number") != QJsonValue::Undefined){
 				secondTerm = eq.toObject().value("Number").toString().toDouble(&ok);
-			//	qDebug() << "NUMBERRRR" << secondTerm;
 				}
 
 			if(ok){
-				qDebug() << "GetTotal:"<< ok << firstTerm << secondTerm;
+				//qDebug() << __FILE__ << __LINE__  << "GetTotal:"<< ok << firstTerm << secondTerm;
 				if(eq.toObject().value("Operation").toInt() == 0){
+					firstTerm < -1? firstTerm = 0:true;
+					secondTerm < -1? secondTerm = 0:true;
 					subTotal = firstTerm + secondTerm;
 					}
 				else if(eq.toObject().value("Operation").toInt() == 1){
+					firstTerm < -1? firstTerm = 0:true;
+					secondTerm < -1? secondTerm = 0:true;
 					subTotal = firstTerm - secondTerm;
 					}
 				else if(eq.toObject().value("Operation").toInt() == 2){
+					firstTerm < -1? firstTerm = 1:true;
+					secondTerm < -1? secondTerm = 1:true;
 					subTotal = firstTerm * secondTerm;
 					}
 				else if(eq.toObject().value("Operation").toInt() == 3){
+					firstTerm < -1? firstTerm = 1:true;
+					secondTerm < -1? secondTerm = 1:true;
 					subTotal = firstTerm / secondTerm;
 					}
 
@@ -423,7 +474,7 @@ void SubFieldUI::updateEquationField()
 					else if(eq.toObject().value("FirstOperation").toInt() == 3){
 						total /= subTotal;
 						}
-					//qDebug() << subTotal << total;
+					//qDebug() << __FILE__ << __LINE__  << subTotal << total;
 					}
 				else total = subTotal;
 				}
@@ -433,7 +484,7 @@ void SubFieldUI::updateEquationField()
 			}
 
 
-	//qDebug() <<total;
+	//qDebug() << __FILE__ << __LINE__  <<total;
 
 	((QLineEdit*)field)->setText(QString::number(total));
 }
@@ -447,8 +498,8 @@ double SubFieldUI::getClmnDataCount(QString strct)
 	double total = 0;
 	SubFieldUI* tableSubField = Controller::Get()->getFirstSubField(fieldName);
 	if(((merplyTabelView*)tableSubField->field)->getModel() != NULL && QString( tableSubField->field->metaObject()->className()).compare("merplyTabelView") == 0){
-		QObject::disconnect(((merplyTabelView*)tableSubField->field)->getModel(),SIGNAL(done()),this,SLOT(updateEquationField()));
-		QObject::connect(((merplyTabelView*)tableSubField->field)->getModel(),SIGNAL(done()),this,SLOT(updateEquationField()));
+		QObject::disconnect(((merplyTabelView*)tableSubField->field)->getModel(),SIGNAL(changed()),this,SLOT(updateEquationField()));
+		QObject::connect(((merplyTabelView*)tableSubField->field)->getModel(),SIGNAL(changed()),this,SLOT(updateEquationField()));
 		if( ((merplyTabelView*)tableSubField->field)->getModel()->getRowsCount() == 0 )
 			{
 			total = -2;
@@ -458,12 +509,13 @@ double SubFieldUI::getClmnDataCount(QString strct)
 
 			}
 		}
-	//qDebug() << total << strct.split("$").count() << fieldName;
+	//qDebug() << __FILE__ << __LINE__  << total << strct << fieldName;
 	return total;
 }
 
 double SubFieldUI::evalEquationCondition(int condition, double col1, double col2)
 {
+	//qDebug() << __FILE__ << __LINE__  << condition << col1 << col2;
 	if(condition == 1){
 		if(col1 > col2)
 			return col1;

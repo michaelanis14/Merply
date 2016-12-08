@@ -6,7 +6,7 @@
 
 PermissionFieldUI::PermissionFieldUI(QWidget *parent, QString name) : QWidget(parent)
 {
-	//qDebug()<<"SAVED" << saved;
+	//qDebug() << __FILE__ << __LINE__ <<"SAVED" << saved;
 	layout = new QFormLayout;
 	this->setLayout(layout);
 	this->setContentsMargins(0,0,0,0);
@@ -116,7 +116,7 @@ QJsonObject PermissionFieldUI::save()
 			tabObject.insert("Key",tab->text(0));
 			tabObject.insert("Value",tab->text(1));
 			allowed << tabObject;
-			//qDebug() << tab->text(1) << tab->text(0);
+			//qDebug() << __FILE__ << __LINE__  << tab->text(1) << tab->text(0);
 			}
 		save.insert("Allowed",allowed);
 
@@ -127,7 +127,7 @@ QJsonObject PermissionFieldUI::save()
 			tabObject.insert("Key",tab->text(0));
 			tabObject.insert("Value",tab->text(1));
 			denied << tabObject;
-			//qDebug() << tab->text(1) << tab->text(0);
+			//qDebug() << __FILE__ << __LINE__  << tab->text(1) << tab->text(0);
 			}
 		save.insert("Denied",denied);
 		}
@@ -225,7 +225,7 @@ void PermissionFieldUI::load(QJsonObject saved)
 	btnAddAllowed->setEnabled(true);
 	btnAddDeny->setEnabled(true);
 
-	//qDebug() << saved.value("Permissions").toString().toInt();
+	//qDebug() << __FILE__ << __LINE__  << saved.value("Permissions").toString().toInt();
 	if(saved.value("Permissions").toString().toInt() == 100)
 		readPermissons->setCurrentIndex(0);
 	else if(saved.value("Permissions").toString().toInt() == 101)
@@ -305,7 +305,7 @@ void PermissionFieldUI::denyGroupPressed(QTreeWidgetItem* item, int column)
 				items.append(QJsonDocument(jsonitem));
 				usersforAllowedList->addJsonItems(items);
 				usersforDeniedList->addJsonItems(items);
-				//qDebug() << item->text(1) << item->text(0);
+				//qDebug() << __FILE__ << __LINE__  << item->text(1) << item->text(0);
 				if(item->text(1).compare("Everyone") == 0){
 					usersforAllowedList->setEnabled(true);
 					btnAddAllowed->setEnabled(true);
@@ -317,7 +317,7 @@ void PermissionFieldUI::denyGroupPressed(QTreeWidgetItem* item, int column)
 
 			}
 		else{
-			//qDebug() << item->text(1).toInt() << item->text(0);
+			//qDebug() << __FILE__ << __LINE__  << item->text(1).toInt() << item->text(0);
 			item->parent()->removeChild(item);
 			//Controller::RemoveSubNavigation(item->text(1).toInt());
 
@@ -343,7 +343,7 @@ void PermissionFieldUI::addAllowed()
 		QString key = usersforAllowedList->getKey();
 		addAllowed(title,key);
 		}
-	//qDebug() << save();
+	//qDebug() << __FILE__ << __LINE__  << save();
 }
 
 void PermissionFieldUI::loadUsers(QList<QJsonDocument> users)

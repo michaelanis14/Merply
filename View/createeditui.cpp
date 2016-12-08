@@ -56,12 +56,15 @@ void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data) {
 
 	//CreateEditUI* p_instance;
 	QString key = viewStructure.value("document_id").toString().split("::").count() > 1?viewStructure.value("document_id").toString().split("::")[1]:"";
-	if(!key.isEmpty()){
+	if(!key.isEmpty())
+		{
 		if( !Controller::Get()->isCachedCreateEditUI(key)){
 			p_instance = new CreateEditUI(0,viewStructure, data);
+			qDebug() << __FILE__ << __LINE__ << "insertCachedCreateEditUI"<<key<<p_instance;
 			Controller::Get()->insertCachedCreateEditUI(key,p_instance);
 			}
 		else{
+			qDebug() << __FILE__ << __LINE__ << "getCachedCreateEditUI"<<key;
 			p_instance = (CreateEditUI*)Controller::Get()->getCachedCreateEditUI(key);
 			}
 		}
@@ -70,7 +73,7 @@ void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data) {
 		p_instance->fill(QJsonObject(), data);
 		}
 	else {
-		qDebug()<< __FILE__ << __LINE__ << "ERRLOG" << viewStructure.value("document_id").toString() << "SPLIT COUNT";
+		qDebug() << __FILE__ << __LINE__ << __FILE__ << __LINE__ << "ERRLOG" << viewStructure.value("document_id").toString() << "SPLIT COUNT";
 		return;
 		}
 	MainForm::Get()->ShowDisplay(p_instance);
@@ -84,7 +87,7 @@ void CreateEditUI::fill(QJsonObject viewStructure, QJsonObject data)
 
 	this->data = data;
 	this->cas = data.value("cas_value").toString();
-	//qDebug() <<"Fill"<< this->cas;
+	//qDebug() << __FILE__ << __LINE__  <<"Fill"<< this->cas;
 
 	viewGroups = ViewGroups::Create(this->viewStructure,data) ;
 	createEditWidgetLayout->addWidget(viewGroups);
@@ -137,7 +140,7 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 			this->clearErrorsWidget();
 			QString errs = viewGroups->checkMandatory();
 			if(errs.isEmpty()){
-			//	qDebug()<<"Controller Clicked to save" << this->cas;
+				//	qDebug() << __FILE__ << __LINE__ <<"Controller Clicked to save" << this->cas;
 				if(this->cas.isEmpty()){
 
 					QString key = this->viewStructure.value("document_id").toString().replace("ViewStructure::","");

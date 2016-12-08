@@ -32,16 +32,16 @@ merplyTableControllers::merplyTableControllers(QWidget *parent,QString id, const
 void merplyTableControllers::btn_editClicked()
 {
 	emit editClicked(id);
-	//qDebug() << "Edit" << id;
+	//qDebug() << __FILE__ << __LINE__  << "Edit" << id;
 }
 
 void merplyTableControllers::btn_deleteClicked()
 {
 	emit deleteClicked(id);
-	//	qDebug() <<"Delete" << id;
+	//	qDebug() << __FILE__ << __LINE__  <<"Delete" << id;
 }
 void merplyTableControllers::btn_printClicked()
 {
 	emit printClicked(id);
-//	qDebug() <<"Print" << id;
+//	qDebug() << __FILE__ << __LINE__  <<"Print" << id;
 }

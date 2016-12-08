@@ -100,7 +100,7 @@ QJsonObject StructureVieweditSubFeildTableColumnEquation::save()
 
 void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 {
-	//qDebug() << data;
+	//qDebug() << __FILE__ << __LINE__  << data;
 	//if(data.value("SecondColmn") != QJsonValue::Undefined){
 	if(firstOperand)
 		firstOperation->setCurrentIndex(data.value("FirstOperation").toInt());
@@ -113,7 +113,7 @@ void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 		operation->setCurrentIndex(data.value("Operation").toInt());
 	if(data.value("SecondColmn") != QJsonValue::Undefined){
 		secondTerm->setCurrentIndex(0);
-		//qDebug() << data.value("SecondColmn").toInt();
+		//qDebug() << __FILE__ << __LINE__  << data.value("SecondColmn").toInt();
 		columnTwo->setCurrentIndex(data.value("SecondColmn").toInt());
 		if(columnTwo->currentIndex() == -1)
 			columnTwo->setCurrentIndex(0);

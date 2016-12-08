@@ -46,7 +46,7 @@ void RemoveBtn::hideRemovebtn(bool hidden)
 
 void RemoveBtn::removeAll()
 {
-	//qDebug() << "RemoveAll";
+	//qDebug() << __FILE__ << __LINE__  << "RemoveAll";
 	QList<QWidget *> Widgets = this->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
 		{

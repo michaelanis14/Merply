@@ -75,6 +75,7 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 
 
 	initHController(QJsonObject());
+	this->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 }
 void merplyTabelView::controller_Clicked(QString nameAction)
@@ -100,7 +101,7 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 		QItemSelectionModel *select = tableView->selectionModel();
 		if(select && select->hasSelection()){
 			QString id = 	model->getRowKey(select->currentIndex().row());
-				qDebug() << id;
+				qDebug() << __FILE__ << __LINE__  << id;
 			if(nActon.count() > 1){
 				if(nActon.at(1).compare("Print") == 0){
 					PrintController::Get()->printEntity(id);
@@ -125,7 +126,7 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 void merplyTabelView::selectionChanged(const QItemSelection& , const QItemSelection& )
 {
 	controllers->setEnabled(true);
-	//qDebug() << "SELECTIONN";
+	//qDebug() << __FILE__ << __LINE__  << "SELECTIONN";
 }
 
 
@@ -155,6 +156,8 @@ bool merplyTabelView::fillLocalSource(QJsonObject columns, QString filter)
 	Controller::Get()->getReport(columns,filter);
 
 	initHController(columns);
+
+
 	return true;
 }
 
@@ -173,11 +176,11 @@ void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocu
 	//	if(model){
 	//		if(model->rowCount( )== items.count()
 	//			&& items.first().object().value("document_id").toString().compare(model->getRowKey(0)) == 0){
-	//	//	//qDebug() << "Lazyyy" ;
+	//	//	//qDebug() << __FILE__ << __LINE__  << "Lazyyy" ;
 	//	return;
 	//		}
 	//}
-	//qDebug() << "Not Lazy"  ;
+	//qDebug() << __FILE__ << __LINE__  << "Not Lazy"  ;
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
 	Controller::Get()->getFields(document_id);
 
@@ -189,7 +192,7 @@ QJsonObject merplyTabelView::save()
 {
 	QJsonObject table;
 	table.insert("merplyTabel",this->model->getJsonData());
-	//qDebug() << this->model->getJsonData();
+	//qDebug() << __FILE__ << __LINE__  << this->model->getJsonData();
 	return table;
 }
 
@@ -210,7 +213,7 @@ void merplyTabelView::initHController(QJsonObject columns)
 			}
 		}
 	else{
-		//	qDebug() << "CON : "<< add<<edit<<columns;
+		//	qDebug() << __FILE__ << __LINE__  << "CON : "<< add<<edit<<columns;
 		if(edit){
 			btns << "Print->Print";
 			}
@@ -328,7 +331,7 @@ void merplyTabelView::printEntity(const QString& id)
 						this, SLOT(setValue(const int, const QString, QVariant&, const int)));
 
 
-		qDebug() <<"print" <<id;
+		qDebug() << __FILE__ << __LINE__  <<"print" <<id;
 	currenctPrintID = id;
 	QString fileName = ":/example4.xml";
 
@@ -362,7 +365,7 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 
 void merplyTabelView::setValue(const int , const QString paramName, QVariant& paramValue, const int )
 {
-	//qDebug() <<"setValue TabelView"<< paramName;
+	//qDebug() << __FILE__ << __LINE__  <<"setValue TabelView"<< paramName;
 	QJsonValue value;// = indexedTable.value(currenctPrintID).value(paramName);
 	if(value != QJsonValue::Undefined)
 		paramValue = value.toVariant();
@@ -371,7 +374,7 @@ void merplyTabelView::setValue(const int , const QString paramName, QVariant& pa
 
 void merplyTabelView::modelFinished()
 {
-	//qDebug() << "ModelDone";
+	//qDebug() << __FILE__ << __LINE__  << "ModelDone";
 	tableView->setModel(model);
 
 	QObject::connect(
@@ -379,5 +382,7 @@ void merplyTabelView::modelFinished()
 				SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),this,
 				SLOT(selectionChanged(const QItemSelection &, const QItemSelection &))
 				);
+
+	this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
 }
 

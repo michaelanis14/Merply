@@ -48,7 +48,7 @@ StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(
 
 void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,QStringList restrictedTypes)
 {
-	//qDebug() << "fffield" << fieldVS;
+	//qDebug() << __FILE__ << __LINE__  << "fffield" << fieldVS;
 	this->filled = true;
 	this->type = type;
 	this->restrictedTypes = restrictedTypes;
@@ -97,8 +97,8 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 
 
 		//QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
-		QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
-		QObject::connect(title,SIGNAL(textChanged(QString)),this,SIGNAL(changed()));
+		//QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
+		//QObject::connect(title,SIGNAL(textChanged(QString)),this,SIGNAL(changed()));
 
 		}
 	else if(type.compare("Refrence") == 0){
@@ -121,10 +121,10 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 			this->filledLocalfilter = false;
 			//	filterOn->currentIndexChanged(filterOn->currentIndex());
 
-			//	qDebug() << fieldVS.toObject().value("Local").toString();
+			//	qDebug() << __FILE__ << __LINE__  << fieldVS.toObject().value("Local").toString();
 			//localFilter->currentIndexChanged(localFilter->currentIndex());
 
-			//	qDebug() << fieldVS.toObject().value("Entity").toString();
+			//	qDebug() << __FILE__ << __LINE__  << fieldVS.toObject().value("Entity").toString();
 
 			//entityFilter->currentIndexChanged(entityFilter->currentIndex());
 			//entityFilter->setCurrentText();
@@ -176,9 +176,11 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		}
 	else if(type.compare("Table") == 0){
 		tableEdit = new StructureVieweditSubFeildTable(this);
-		//qDebug() << "TABEL STCT"<< fieldVS.toObject();
+		//qDebug() << __FILE__ << __LINE__  << "TABEL STCT"<< fieldVS.toObject();
 		tableEdit->fill(fieldVS.toObject());
-		//	QObject::connect(tableEdit,SIGNAL(tableChanged()),this,SIGNAL(changed()));
+
+		QObject::disconnect(tableEdit,SIGNAL(tableChanged()),this,SIGNAL(changed()));
+		QObject::connect(tableEdit,SIGNAL(tableChanged()),this,SIGNAL(changed()));
 		layout->addRow("Tabel",tableEdit);
 		}
 	else if(type.compare("Serial") == 0){
@@ -208,7 +210,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		mandatory->setChecked(true);
 	layout->addRow("Mandatory", mandatory);
 	//previewLayout->addWidget(new SubFieldUI(0,"V",this->save()));
-	//	qDebug() <<this->save();
+	//	qDebug() << __FILE__ << __LINE__  <<this->save();
 }
 
 QJsonObject StructureVieweditSubFeild::save()
@@ -216,7 +218,7 @@ QJsonObject StructureVieweditSubFeild::save()
 	QJsonObject saveObject;
 	if(!this->type.isEmpty() && filled)
 		{
-		//qDebug() << this->type << filled << Link;
+		//qDebug() << __FILE__ << __LINE__  << this->type << filled << Link;
 		saveObject.insert("Type",type);
 		saveObject.insert("Mandatory",mandatory->isChecked());
 		if(type.compare("Link") == 0){
@@ -226,7 +228,7 @@ QJsonObject StructureVieweditSubFeild::save()
 			}
 
 		else if(type.compare("Refrence") == 0){
-			//qDebug() <<"Save Refrence subfield:213"<< Select->getKey() << Source->getKey();
+			//qDebug() << __FILE__ << __LINE__  <<"Save Refrence subfield:213"<< Select->getKey() << Source->getKey();
 			saveObject.insert("Select",Select->currentText());
 			saveObject.insert("Source",Source->getKey());
 			saveObject.insert("Condition",condition->toPlainText());
@@ -256,7 +258,7 @@ QJsonObject StructureVieweditSubFeild::save()
 			saveObject.insert("Source",Source->getKey());
 			}
 		else if(type.compare("Table") == 0){
-			//qDebug() << tableEdit->save();
+			//qDebug() << __FILE__ << __LINE__  << tableEdit->save();
 			saveObject = tableEdit->save();
 			}
 		else  if(type.compare("Serial") == 0){
@@ -265,7 +267,7 @@ QJsonObject StructureVieweditSubFeild::save()
 			else saveObject.insert("startNum",1);
 			}
 		else if(type.compare("Date") == 0){
-			//qDebug() << date->date().toString(Qt::DefaultLocaleShortDate);
+			//qDebug() << __FILE__ << __LINE__  << date->date().toString(Qt::DefaultLocaleShortDate);
 			//	saveObject.insert("date",date->date().toString(Qt::DefaultLocaleShortDate));
 			}
 		else if(type.compare("Equation") == 0){
@@ -365,7 +367,7 @@ void StructureVieweditSubFeild::updateFields(QString type)
 		}
 
 	this->fillTypeFields(type,this->fieldVS,this->restrictedTypes);
-	emit changed();
+	//emit changed();
 }
 
 void StructureVieweditSubFeild::updateSelect(QString)
@@ -384,7 +386,7 @@ void StructureVieweditSubFeild::updateSelectData(QList<QString> fields)
 	if(loadData && fieldVS.toObject().value("Select") != QJsonValue::Undefined){
 		loadData = false;
 		Select->setCurrentIndex(Select->getItemsText().indexOf(fieldVS.toObject().value("Select").toString()));
-		//	qDebug() << "Select" << fieldVS.toObject().value("Select").toString() << fields << Select->getItemsText() << Select->getItemsText().indexOf(fieldVS.toObject().value("Select").toString()) << Select->currentIndex();
+		//	qDebug() << __FILE__ << __LINE__  << "Select" << fieldVS.toObject().value("Select").toString() << fields << Select->getItemsText() << Select->getItemsText().indexOf(fieldVS.toObject().value("Select").toString()) << Select->currentIndex();
 		//	Select->currentIndexChanged(Select->currentIndex());
 		}
 }
@@ -448,7 +450,7 @@ void StructureVieweditSubFeild::addEquationWidget(QJsonObject data)
 {
 	StructureVieweditSubFeildEquation* eqElemnet = new StructureVieweditSubFeildEquation(0,equationElements.count() > 0 ?true:false);
 	if(!data.isEmpty()){
-		//	qDebug() << "Fill addEquationWidget"<< data;
+		//	qDebug() << __FILE__ << __LINE__  << "Fill addEquationWidget"<< data;
 		eqElemnet->fill(data);
 		}
 	equationElements << eqElemnet;

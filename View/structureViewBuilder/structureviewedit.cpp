@@ -66,7 +66,7 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 
 
 	label = new QLineEdit();
-	hideLabel = new QCheckBox(tr("Hide Label"));
+
 	QObject::connect(label,SIGNAL(textEdited(QString)),this,SLOT(updatePreview()));
 	label->setText(tr("New Field"));
 	//labelWidget = new QWidget();
@@ -82,7 +82,14 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 	//labelWidgetLayout->setAlignment(Qt::AlignLeft);
 	//labelWidgetLayout->addWidget(label);
 	layout->addWidget(label,0,Qt::AlignTop);
+
+
+	hideLabel = new QCheckBox(tr("Hide Label"));
+	hideField = new QCheckBox(tr("Hide Field"));
+	initData = new QCheckBox(tr("Save init Data"));
 	layout->addWidget(hideLabel,0,Qt::AlignTop);
+	layout->addWidget(hideField,0,Qt::AlignTop);
+	layout->addWidget(initData,0,Qt::AlignTop);
 
 	arrayWidget = new QWidget(this);
 	arrayWidget->setContentsMargins(2,0,2,0);
@@ -140,10 +147,26 @@ QJsonObject StructureViewEdit::save()
 		label->setText("F"+QString::number(rand()));
 	if(hideLabel->isChecked())
 		saveObject.insert("LabelHidden",true);
+	if(hideField->isChecked())
+		saveObject.insert("FieldHidden",true);
+	if(initData->isChecked())
+		saveObject.insert("initData",true);
+
 	saveObject.insert("ArrayList",array->isChecked());
 	QJsonArray subFields;
 	foreach(StructureVieweditSubFeild* svsf, sVSFs){
-		subFields.append(svsf->save());
+		QJsonObject sSFSave = svsf->save();
+
+		if(initData->isChecked()){
+			QJsonObject savedPreview = previewField->save();
+		//	qDebug() << __FILE__ << __LINE__  << savedPreview;
+			if(savedPreview.keys().count() > 0 && savedPreview.value(savedPreview.keys().first()) != QJsonValue::Undefined){
+				QJsonObject tblObj = savedPreview.value(savedPreview.keys().first()).toArray().first().toObject();
+			//	qDebug() << __FILE__ << __LINE__  << tblObj;
+				sSFSave.insert("initData",tblObj);
+				}
+			}
+		subFields.append(sSFSave);
 		}
 	saveObject.insert("SubFields",subFields);
 	return saveObject;
@@ -188,6 +211,10 @@ void StructureViewEdit::fill(QJsonObject structureView)
 		label->setMinimumWidth(100);
 		if(structureView.value("LabelHidden") != QJsonValue::Undefined)
 			hideLabel->setChecked(true);
+		if(structureView.value("FieldHidden") != QJsonValue::Undefined)
+			hideLabel->setChecked(true);
+		if(structureView.value("initData") != QJsonValue::Undefined)
+			initData->setChecked(true);
 		if(structureView.value("SubFields").isArray() && structureView.value("SubFields").toArray().count() > 0){
 			foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
 				QString type = fieldVS.toObject().value("Type").toString();
@@ -195,7 +222,8 @@ void StructureViewEdit::fill(QJsonObject structureView)
 				sVSFs << svsf;
 				svsf->fillTypeFields(type,fieldVS,this->restrictedTypes);
 
-				//QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
+				QObject::disconnect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
+				QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 
 				RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
 				QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
@@ -235,11 +263,13 @@ bool StructureViewEdit::setHidden(bool hidden)
 	typeFields->setHidden(hidden);
 	label->setHidden(hidden);
 	arrayWidget->setHidden(hidden);
+	hideLabel->setHidden(hidden);
+	hideField->setHidden(hidden);
+	initData->setHidden(hidden);
 	if(sctrlUI) sctrlUI->setHidden(hidden);
 
-	preview->setHidden(!hidden);
+	//preview->setHidden(hidden);
 	if(hidden){
-
 		topCntrls->setHidden(false);
 		topCntrlsPreview->setHidden(true);
 		}
@@ -277,10 +307,12 @@ void StructureViewEdit::updatePreview(bool oldStrct)
 		}
 
 	if(!oldStrct){
-		previewLayout->addWidget(new FeildUI(0,"this->strID",this->save()));
+		previewField = new FeildUI(0,"this->strID",this->save());
+		previewLayout->addWidget(previewField);
 		}
 	else if(!this->structureView.isEmpty()){
-		previewLayout->addWidget(new FeildUI(0,"this->strID",this->structureView));
+		previewField = new FeildUI(0,"this->strID",this->structureView);
+		previewLayout->addWidget(previewField);
 		}
 
 	emit changed();
@@ -316,7 +348,8 @@ void StructureViewEdit::addField()
 	StructureVieweditSubFeild * svsf = new StructureVieweditSubFeild(this);
 	svsf->fillTypeFields(type,QJsonObject(),this->restrictedTypes);
 	sVSFs << svsf;
-	//QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
+	QObject::disconnect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
+	QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 
 	RemoveBtn* rmvtbn =  new RemoveBtn(0,svsf);
 	QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));

@@ -21,13 +21,15 @@ public:
 	SettingsCtrlsUI* topCntrlsPreview;
 	QLineEdit* label;
 	QCheckBox* hideLabel;
+	QCheckBox* hideField;
+	QCheckBox* initData;
 	QStringList getFieldsType();
 	StructureVieweditSubFeild * getTableFeild();
 private:
 	QHBoxLayout *layout;
 	//ERPComboBox* typeSelect;
 	QWidget* labelWidget;
-
+	FeildUI* previewField;
 	QWidget* typeFields;
 	QHBoxLayout *typeFieldsLayout;
 	QList<StructureVieweditSubFeild *> sVSFs;

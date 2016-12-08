@@ -182,7 +182,7 @@ private slots:
 	void openDBGroupProperty();
 	void checkUpdates();
 	void showPreview();
-	void showDataSource();
+	void showDataSource(bool newfile = true);
 	void undo();
 	void redo();
 	void openReadme();

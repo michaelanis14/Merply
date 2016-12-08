@@ -89,7 +89,7 @@ void NavigationEditUI::loadMainNavigation(QJsonDocument navDoc)
 	subNavigation->clear();
 	Controller::Get()->clearMainNavigation();
 	Controller::Get()->clearSubNavigation();
-	//qDebug() << navDocs;
+	//qDebug() << __FILE__ << __LINE__  << navDocs;
 	foreach(QJsonValue mainNav,navDoc.object().value("MainNavigations").toArray()){
 		QString title = mainNav.toObject().value("Title").toString();
 
@@ -115,7 +115,7 @@ QList<QTreeWidgetItem *> NavigationEditUI::loadSubNavigation(QJsonArray subNav)
 	QList<QTreeWidgetItem *> items;
 	foreach(QJsonValue tab,subNav){
 		double key = tab.toObject().value("ID").toDouble();
-		//qDebug() <<"KEY "<< key;
+		//qDebug() << __FILE__ << __LINE__  <<"KEY "<< key;
 		QString title = tab.toObject().value("Title").toString();
 		if(key!=0 && !title.isEmpty())
 			Controller::Get()->addPage(key,tab.toObject().value("Page").toObject());
@@ -140,7 +140,7 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 	//if(column == 0)
 	//	emit subNavPressed(Controller::getSubNavigation(item->text(column)));
 	//else
-	//qDebug()<<"SubNav" << item->text(1) << column;
+	//qDebug() << __FILE__ << __LINE__ <<"SubNav" << item->text(1) << column;
 
 	subNavigation->resizeColumnToContents(0);
 
@@ -151,7 +151,7 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 		if(subNavigation->indexOfTopLevelItem(item) != -1){
 			QList<QTreeWidgetItem*> subNav =  Controller::Get()->getSubNavigation(mainNavigation->selectedItems().last()->text(0).toDouble());
 			if(subNav.removeOne(item) && subNavigation->takeTopLevelItem(subNavigation->indexOfTopLevelItem(item))){
-				//qDebug() <<"Removee"<< subNavigation->indexOfTopLevelItem(item) << item->text(1).toDouble();
+				//qDebug() << __FILE__ << __LINE__  <<"Removee"<< subNavigation->indexOfTopLevelItem(item) << item->text(1).toDouble();
 				Controller::Get()->addSubNavigation(mainNavigation->selectedItems().last()->text(0).toDouble(),subNav);
 				}
 			}
@@ -162,7 +162,7 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 			}
 		}
 	else if(column == 0 && currentSubNav != item->text(1).toDouble() && oldItemSubNavSelected){
-		//qDebug() << oldItemSubNavSelected << oldItemSubNavSelected->isSelected() << oldItemSubNavSelected->childCount() << oldItemSubNavSelected->text(1);
+		//qDebug() << __FILE__ << __LINE__  << oldItemSubNavSelected << oldItemSubNavSelected->isSelected() << oldItemSubNavSelected->childCount() << oldItemSubNavSelected->text(1);
 		oldItemSubNavSelected->setSelected(true);
 		QItemSelectionModel *selection = new QItemSelectionModel( subNavigation->model() );
 		QItemSelectionModel *select = subNavigation->selectionModel();
@@ -185,7 +185,7 @@ void NavigationEditUI::subNavPressed(QTreeWidgetItem* item, int column)
 
 void NavigationEditUI::save()
 {
-	//qDebug() << "save";
+	//qDebug() << __FILE__ << __LINE__  << "save";
 	if(mainNavigation->selectedItems().count() > 0)
 		{
 		subNavigation->clearFocus();
@@ -242,8 +242,8 @@ void NavigationEditUI::addSubNavChild(QTreeWidgetItem* parent)
 
 	QItemSelectionModel *select = subNavigation->selectionModel();
 
-	//qDebug() << select->hasSelection() ;//check if has selection
-	//qDebug() << select->selectedRows().last() ;// return selected row(s)
+	//qDebug() << __FILE__ << __LINE__  << select->hasSelection() ;//check if has selection
+	//qDebug() << __FILE__ << __LINE__  << select->selectedRows().last() ;// return selected row(s)
 
 	selection->select(select->selectedRows().last(), QItemSelectionModel::Select | QItemSelectionModel::Rows);
 	subNavigation->resizeColumnToContents(select->selectedRows().last().column());
@@ -303,8 +303,8 @@ void NavigationEditUI::addSubNavTopItem()
 
 	QItemSelectionModel *select = subNavigation->selectionModel();
 
-	//qDebug() << select->hasSelection() ;//check if has selection
-	//qDebug() << select->selectedRows().last() ;// return selected row(s)
+	//qDebug() << __FILE__ << __LINE__  << select->hasSelection() ;//check if has selection
+	//qDebug() << __FILE__ << __LINE__  << select->selectedRows().last() ;// return selected row(s)
 
 	QList<QTreeWidgetItem*> subNav =  Controller::Get()->getSubNavigation(mainNavigation->selectedItems().last()->text(0).toDouble());
 	subNav.append(child);
@@ -372,7 +372,7 @@ void NavigationEditUI::fillSubNavigation(double key)
 		this->rootOnly = !AccessController::Get()->hasRootGroupAccess();
 
 	QList<QTreeWidgetItem*> subNavItems = Controller::Get()->getSubNavigation(key);
-	//qDebug() << subNavItems.count() << subNavItems;
+	//qDebug() << __FILE__ << __LINE__  << subNavItems.count() << subNavItems;
 	subNavigation->clearSelection();
 	int count = subNavigation->topLevelItemCount();
 	for(int i = 0; i < count;i++){
@@ -414,7 +414,7 @@ void NavigationEditUI::fillSubNavigation(double key)
 			subNavigation->setColumnCount(2);
 			}
 		if(subNavigation->topLevelItemCount() > 0){
-			//qDebug() << page << subNavigation->topLevelItem(0)->text(1).toDouble();
+			//qDebug() << __FILE__ << __LINE__  << page << subNavigation->topLevelItem(0)->text(1).toDouble();
 			subNavigation->selectionModel()->select(subNavigation->model()->index(0,0,QModelIndex()),QItemSelectionModel::Select| QItemSelectionModel::Rows);
 			page =  (Controller::Get()->getPage(subNavigation->topLevelItem(0)->text(1).toDouble()));
 			NavigationPageEditUI::ShowUI(page);
@@ -459,7 +459,7 @@ void NavigationEditUI::paintEvent(QPaintEvent *)
 
 void NavigationEditUI::btn_Clicked(QString btn)
 {
-	//qDebug() << btn;
+	//qDebug() << __FILE__ << __LINE__  << btn;
 	if(btn.contains("settings")){
 		//	navigationUI::Get()->setHidden(true);
 		//	NavigationEditUI::Get()->setParent(MainForm::Get());
@@ -469,7 +469,7 @@ void NavigationEditUI::btn_Clicked(QString btn)
 		}
 
 
-	//qDebug() << btn;
+	//qDebug() << __FILE__ << __LINE__  << btn;
 	if(btn.contains("Cancel")){
 		this->editControllerCancelPressed();
 		}
@@ -504,7 +504,7 @@ void NavigationEditUI::editControllerSavePressed()
 void NavigationEditUI::mainNavPressed(QTreeWidgetItem* item, int column)
 {
 
-	//qDebug() << "Main" <<item->text(0)  << column;
+	//qDebug() << __FILE__ << __LINE__  << "Main" <<item->text(0)  << column;
 
 	//item->setText(0,"Pressedd");
 	//
@@ -517,7 +517,7 @@ void NavigationEditUI::mainNavPressed(QTreeWidgetItem* item, int column)
 					if(mainNavigation->takeTopLevelItem(mainNavigation->indexOfTopLevelItem(item)))
 						Controller::Get()->removeMainNavigation(item->text(0).toDouble());
 				}
-			//qDebug() << "Remove Main Nav"<< item->text(0) << column;
+			//qDebug() << __FILE__ << __LINE__  << "Remove Main Nav"<< item->text(0) << column;
 			if(mainNavigation->topLevelItem(0)){
 				fillSubNavigation(mainNavigation->topLevelItem(0)->text(0).toDouble());
 				}

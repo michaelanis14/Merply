@@ -196,7 +196,7 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 				cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
 
 				}
-			//qDebug() << cards->currentIndex() << structureView.value("CardData") << structureView;
+			//qDebug() << __FILE__ << __LINE__  << cards->currentIndex() << structureView.value("CardData") << structureView;
 
 			view->setCurrentIndex(viewList.indexOf(structureView.value("Select").toString()));
 			card->setChecked(true);
@@ -206,7 +206,7 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 	else{
 		//if(structureView.value("Title").toString().isEmpty())
 		//	this->headerlbl->setTitle(tr("New Page"));
-		//qDebug() << structureView.value("Card").toString();
+		//qDebug() << __FILE__ << __LINE__  << structureView.value("Card").toString();
 		if(structureView.value("CardData") != QJsonValue::Undefined){
 			this->getPageData(QJsonDocument(structureView.value("CardData").toObject()));
 			}
@@ -232,7 +232,7 @@ void NavigationPageEditUI::save(bool updateDataBase)
 		QJsonObject savedPage = pageEdit->save();
 		if(updateDataBase){
 			if(savedPage.value("document_id") != QJsonValue::Undefined){
-				//qDebug() << savedPage.value("document_id");
+				//qDebug() << __FILE__ << __LINE__  << savedPage.value("document_id");
 				saveObject.insert("Card",savedPage.value("document_id").toString());
 				Controller::Get()->UpdateDoc(QJsonDocument(savedPage));
 				emit this->saved(saveObject);
@@ -268,7 +268,7 @@ void NavigationPageEditUI::save(bool updateDataBase)
 		//;
 
 		//	while(Controller::getLastKeyID().toDouble() == -1){
-		//	qDebug() << Controller::getLastKeyID();
+		//	qDebug() << __FILE__ << __LINE__  << Controller::getLastKeyID();
 		//		}
 
 		//	emit this->saved(saveObject);
@@ -280,11 +280,11 @@ void NavigationPageEditUI::save(bool updateDataBase)
 }
 void NavigationPageEditUI::gotLastKeyData(QString key)
 {
-	//qDebug() << "KEYYYYYYY" << key;
+	//qDebug() << __FILE__ << __LINE__  << "KEYYYYYYY" << key;
 	QObject::disconnect(Controller::Get(),SIGNAL(gotLastKey(QString)),this,SLOT(gotLastKeyData(QString)));
 	saveObject.insert("Card",key);
 	emit this->saved(saveObject);
-	//qDebug() << "GOTTTTLASTTTTKEYYY DATAAA" <<  key;
+	//qDebug() << __FILE__ << __LINE__  << "GOTTTTLASTTTTKEYYY DATAAA" <<  key;
 }
 NavigationPageEditUI*NavigationPageEditUI::Get()
 {
@@ -306,7 +306,7 @@ void NavigationPageEditUI::btn_Clicked(QString btn)
 		//	addViewgroup();
 		}
 	else if(btn.contains("Save")){
-		//	qDebug() << this->save();
+		//	qDebug() << __FILE__ << __LINE__  << this->save();
 		//Controller::Get()->storeDoc("ViewStructure",QJsonDocument(this->save()));
 		emit editControllerSavePressed();
 		}
@@ -323,7 +323,7 @@ void NavigationPageEditUI::newCardToggled(bool state)
 		//QObject::connect(this, SIGNAL(editControllerSavePressed()), newCardStructure, SLOT(editControllerSavePressed()));
 
 		newCardDetails->setHidden(false);
-		qDebug() << "newCard" ;
+		qDebug() << __FILE__ << __LINE__  << "newCard" ;
 		newCardDetails->layout()->itemAt(0)->widget()->setHidden(false);
 		headerlbl->setEnabled(true);
 		headerlbl->setTitle("New Card");
@@ -389,7 +389,7 @@ void NavigationPageEditUI::updatePagePreview()
 {
 	if(page->isChecked()){
 
-		//	qDebug() << "updatePAge";
+		//	qDebug() << __FILE__ << __LINE__  << "updatePAge";
 		clearPreview();
 		PageUI*page = new PageUI(0,pageEdit->save());
 		page->headerlbl->setHidden(true);
@@ -411,7 +411,7 @@ void NavigationPageEditUI::deleteCard()
 void NavigationPageEditUI::updateNewCardPreview()
 {
 	if(newCard->isChecked()){
-		//qDebug() << "newCard";
+		//qDebug() << __FILE__ << __LINE__  << "newCard";
 		clearPreview();
 		ViewGroups* vg = ViewGroups::Create(newCardStructure->save(),QJsonObject());
 		previewLayout->addWidget(vg);
@@ -447,7 +447,7 @@ void NavigationPageEditUI::clearPreview()
 
 void NavigationPageEditUI::loadCard(QJsonDocument document)
 {
-	//	qDebug() << "Reploaded" << preview->isHidden() << document.object();
+	//	qDebug() << __FILE__ << __LINE__  << "Reploaded" << preview->isHidden() << document.object();
 	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadCard(QJsonDocument)));
 	previewLayout->addWidget(ViewGroups::Create(document.object(),QJsonObject()));
 }

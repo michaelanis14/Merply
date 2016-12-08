@@ -15,8 +15,8 @@ ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, 
 	//this->setObjectName("ViewGroup");
 	this->feilds =  QList<FeildUI*>();
 	this->strID = strID;
-	//qDebug() << structureView.value("Viewgroup").toObject().value("GroupTitle").toString();
-		//qDebug() << structureView;
+	//qDebug() << __FILE__ << __LINE__  << structureView.value("Viewgroup").toObject().value("GroupTitle").toString();
+		//qDebug() << __FILE__ << __LINE__  << structureView;
 	if(structureView.value("Viewgroup").isObject()){
 
 		QJsonObject viewgroup = structureView.value("Viewgroup").toObject();
@@ -24,9 +24,9 @@ ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, 
 
 		if(viewgroup.value("Fields").isArray()){
 			int d = 0;
-			//qDebug() << data.at(d);
+			//qDebug() << __FILE__ << __LINE__  << data.at(d);
 			foreach (QJsonValue fieldVS, viewgroup.value("Fields").toArray()) {
-				//qDebug() << fieldVS.toObject();
+				//qDebug() << __FILE__ << __LINE__  << fieldVS.toObject();
 				FeildUI* feild = new FeildUI(0,strID,fieldVS.toObject(),data.at(d).toObject());
 				feilds << feild;
 				ViewGroups::Fieldsgroups.insert(fieldVS.toObject().value("Label").toString().trimmed(),feild);

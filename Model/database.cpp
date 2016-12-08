@@ -59,7 +59,7 @@ bool Database::updateDoc(QJsonDocument document)
 	lcb_t instance = Database::InitDatabase();
 
 
-	//qDebug() << "UPDATE DOC" << document << document.object().value("document_id").toString().toLatin1();
+	//qDebug() << __FILE__ << __LINE__  << "UPDATE DOC" << document << document.object().value("document_id").toString().toLatin1();
 	//lcb_set_store_callback(instance, on_stored_status);
 	struct lcb_store_cmd_st cmd;// = { 0 };
 	lcb_store_cmd_t *cmdlist = &cmd;
@@ -69,13 +69,13 @@ bool Database::updateDoc(QJsonDocument document)
 	QString strJson(document.toJson(QJsonDocument::Compact));;
 	QByteArray ba = strJson.toLatin1();
 	const char *doc = ba.data();
-	//qDebug() <<"Prsistance UpdateDOC"<< document.object().value("document_id").toString() << strJson;
+	//qDebug() << __FILE__ << __LINE__  <<"Prsistance UpdateDOC"<< document.object().value("document_id").toString() << strJson;
 	cmd.v.v0.key = docbKey;
 	cmd.v.v0.nkey = strlen(docbKey);
 	cmd.v.v0.bytes = doc;
 	cmd.v.v0.nbytes = strlen(doc);
 	cmd.v.v0.operation = LCB_REPLACE;
-	//qDebug() <<document.object().value("cas_value").toString().toLongLong();
+	//qDebug() << __FILE__ << __LINE__  <<document.object().value("cas_value").toString().toLongLong();
 	cmd.v.v0.cas =  document.object().value("cas_value").toString().toLongLong();
 	lcb_set_store_callback(instance, on_stored_status);
 	lcb_set_get_callback(instance, get_callback);
@@ -84,7 +84,7 @@ bool Database::updateDoc(QJsonDocument document)
 		lcb_wait(instance);
 		} else {
 		fprintf(stderr, "Couldn’t schedule operation: %s\n", lcb_strerror(instance, err));
-		qDebug()<< __FILE__ << __LINE__ << "ERRLOG" << document;
+		qDebug() << __FILE__ << __LINE__ << __FILE__ << __LINE__ << "ERRLOG" << document;
 		}
 
 
@@ -216,20 +216,20 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 		else{
 			emit Database::Get()->gotValue(QString(byteArray));
 			Database::Get()->LastKeyID = QString(byteArray);
-			qDebug() << "ERR @Database 219" << parserError.errorString() << QString(byteArray);
-			//qDebug() <<"Last Keyy"<< Database::Get()->LastKeyID;
+			qDebug() << __FILE__ << __LINE__  << "ERR @Database 219" << parserError.errorString() << QString(byteArray);
+			//qDebug() << __FILE__ << __LINE__  <<"Last Keyy"<< Database::Get()->LastKeyID;
 			}
 		} else {
 		QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
-		//qDebug() << QString(keyByte);
+		//qDebug() << __FILE__ << __LINE__  << QString(keyByte);
 		fprintf(stderr, "Couldn’t retrieve item: %s %s %d\n", lcb_strerror(instance, err),resp->v.v0.key,(int)resp->v.v0.nkey);
 		}
 }
 
 bool Database::getDoc(QString key) {
 	//Query("SELECT * from default WHERE  \"id = Contact::* \"");
-	//qDebug() << "hello";
-	//qDebug() <<"Key:"<< key;
+	//qDebug() << __FILE__ << __LINE__  << "hello";
+	//qDebug() << __FILE__ << __LINE__  <<"Key:"<< key;
 	Database::Get()->LastKeyID = "-1";
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){
@@ -273,17 +273,17 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 			Database::Get()->array << documentToArray;
 			}
 		else{
-			qDebug() << parserError.errorString() << "emitting Value Line: DATABASE268";
+			qDebug() << __FILE__ << __LINE__  << parserError.errorString() << "emitting Value Line: DATABASE268";
 			Database::Get()->emit gotValue(QString(byteArray));
-			//	qDebug() << Database::Get()->value;
+			//	qDebug() << __FILE__ << __LINE__  << Database::Get()->value;
 			}
 
 		} else {
-		//	qDebug() << Database::Get()->array;
+		//	qDebug() << __FILE__ << __LINE__  << Database::Get()->array;
 
 		//Database::Get()->document = QJsonDocument(Database::Get()->array);
 		Database::Get()->emit gotDocuments(Database::Get()->array);
-		//qDebug() << Database::Get()->document.array();
+		//qDebug() << __FILE__ << __LINE__  << Database::Get()->document.array();
 		//.toJson(QJsonDocument::Compact);
 		//	qDebug("Got metadata: %.*s\n", (int)resp->nrow, resp->row);
 		}
@@ -291,7 +291,7 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 }
 void Database::query(QString query)
 {
-	//qDebug()<<"Query:: " << query;
+	//qDebug() << __FILE__ << __LINE__ <<"Query:: " << query;
 	lcb_t instance = Database::InitDatabase();
 	Database::Get()->array = QList<QJsonDocument>();
 	if(instance == NULL){
@@ -314,13 +314,13 @@ void Database::query(QString query)
 		lcb_n1p_free(nparams);
 		lcb_wait(instance);
 
-		//qDebug() << "sucess q" << query;
+		//qDebug() << __FILE__ << __LINE__  << "sucess q" << query;
 		Database::KillDatabase(instance);
 		return ;
 
 		}
 	else{
-		qDebug() << "FAIL query" << query;
+		qDebug() << __FILE__ << __LINE__  << "FAIL query" << query;
 		lcb_n1p_free(nparams);
 		lcb_wait(instance);
 		Database::KillDatabase(instance);
@@ -333,7 +333,7 @@ void Database::query(QString query)
 
 QList<QJsonDocument> Database::getArray() const
 {
-	//qDebug() << array <<"--------";
+	//qDebug() << __FILE__ << __LINE__  << array <<"--------";
 	return array;
 }
 
@@ -355,12 +355,12 @@ QString Database::getLastKeyID() const
  * @return
  */
 bool Database::storeDoc(QString key,QJsonDocument document) {
-	//qDebug() <<key << key.split("::").count() << key;
+	//qDebug() << __FILE__ << __LINE__  <<key << key.split("::").count() << key;
 	if(key.split("::").count() <  2){
 		Database::IncrementKey(key);
 		int keyID = Database::GetKey(key);
 		if(keyID == -1){
-			qDebug() << "Error Key Value is -1, Database StoreDoc Line:354 Key:" <<key;
+			qDebug() << __FILE__ << __LINE__  << "Error Key Value is -1, Database StoreDoc Line:354 Key:" <<key;
 			return false;
 			}
 
@@ -390,7 +390,7 @@ bool Database::storeDoc(QString key,QJsonDocument document) {
 	cmd.v.v0.bytes = doc;
 	cmd.v.v0.nbytes = strlen(doc);
 	cmd.v.v0.operation = LCB_ADD;
-	//qDebug() <<document.object().value("cas_value").toString().toLongLong();
+	//qDebug() << __FILE__ << __LINE__  <<document.object().value("cas_value").toString().toLongLong();
 	cmd.v.v0.cas =  document.object().value("cas_value").toString().toLongLong();
 
 	lcb_set_store_callback(instance, on_stored_status);

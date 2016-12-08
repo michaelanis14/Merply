@@ -10,14 +10,14 @@ BarCode::BarCode(QWidget *parent) : QWidget(parent) {
         bc = 0;
         QLibrary library("QtZint");
         if (!library.load())
-            qDebug() << library.errorString();
+            qDebug() << __FILE__ << __LINE__  << library.errorString();
 
         typedef Zint::QZint*(*CreateZint)();
         CreateZint cwf = (CreateZint)library.resolve("createWidget");
         if (cwf) {
             bc = cwf();
         } else {
-            qDebug() << "Could not create Zint from the loaded library";
+            qDebug() << __FILE__ << __LINE__  << "Could not create Zint from the loaded library";
         }
     #endif
     m_value = "QtRPT";

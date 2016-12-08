@@ -66,7 +66,7 @@ void timelineUI::mousePressEvent(QMouseEvent *event){
 			emit btnLoadPressed();
 		}
 		else if( child->objectName().compare("Run") == 0){
-			qDebug() << "run";
+			qDebug() << __FILE__ << __LINE__  << "run";
 			emit btnRunPressed();
 		}
 

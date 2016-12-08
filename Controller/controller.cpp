@@ -116,24 +116,24 @@ void Controller::loadNavigationData(QJsonDocument document)
 
 void Controller::subNavPressed(QJsonObject view)
 {
-	//qDebug() << view;
+	//qDebug() << __FILE__ << __LINE__  << view;
 	if(AccessController::Get()->hasReadAccess(view))
 		if(view.value("Type").toString().contains("Entity") && !view.value("Card").toString().isEmpty()){
 			if(view.value("Select").toString().contains("Index")){
 				QString card = view.value("Card").toString();
-				//qDebug() <<"Cards"<< card;
+				//qDebug() << __FILE__ << __LINE__  <<"Cards"<< card;
 				queryIndexView(card);
 
 				}
 			else{
 				QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedData(QJsonDocument)));
-				//qDebug() <<"getDocument"<< view.value("Card").toString();
+				//qDebug() << __FILE__ << __LINE__  <<"getDocument"<< view.value("Card").toString();
 				Database::Get()->getDoc(view.value("Card").toString());
 
 				}
 			}
 		else {if(view.value("Type").toString().contains("Page")){
-				//qDebug() <<"PAgee"<< view.value("Card").toString();
+				//qDebug() << __FILE__ << __LINE__  <<"PAgee"<< view.value("Card").toString();
 				QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedPageData(QJsonDocument)));
 				Database::getDoc(view.value("Card").toString());
 				}
@@ -148,7 +148,7 @@ void Controller::queryIndexView(QString vStrctKey)
 	QString card = vStrctKey.replace("ViewStructure::","");
 	card.append("::%");
 	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
-	//qDebug()<<"QINDEX : " << query;
+	//qDebug() << __FILE__ << __LINE__ <<"QINDEX : " << query;
 
 
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedIndexData(QList<QJsonDocument>)));
@@ -186,7 +186,7 @@ void Controller::editControllerCancelDataPressed(QJsonDocument document)
 
 void Controller::subNavPressedData(QJsonDocument documents)
 {
-	//	qDebug() << "SubPreseed" << documents;
+	//	qDebug() << __FILE__ << __LINE__  << "SubPreseed" << documents;
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedData(QJsonDocument)));
 	CreateEditUI::ShowUI(documents.object(),QJsonObject());
 }
@@ -276,7 +276,7 @@ void Controller::getValueData(QString value)
 
 void Controller::getLastKeyData(QString key)
 {
-	//qDebug()<<"GOTTTTLASTTTTKEYYY CONTROLLER" << key;
+	//qDebug() << __FILE__ << __LINE__ <<"GOTTTTLASTTTTKEYYY CONTROLLER" << key;
 	QObject::disconnect(Database::Get(),SIGNAL(gotLastKey(QString)),Controller::Get(),SLOT(getLastKeyData(QString)));
 	emit Controller::Get()->gotLastKey(key);
 }
@@ -306,11 +306,11 @@ QString Controller::toString(QJsonArray array)
 		if(array.at(j).isArray())
 			data += toString(array.at(j).toArray());
 		else if(array.at(j).isObject()){
-			//	qDebug()<<"Obj" << array.at(j).toObject();
+			//	qDebug() << __FILE__ << __LINE__ <<"Obj" << array.at(j).toObject();
 			if(array.at(j).toObject().value("Value") != QJsonValue::Undefined)
 				data += array.at(j).toObject().value("Value").toString();
 			else if(array.at(j).toObject().value("merplyTabel") != QJsonValue::Undefined){
-				qDebug() << "TODO:"<<"printValues of table";
+				qDebug() << __FILE__ << __LINE__  << "TODO:"<<"printValues of table";
 				}
 			}
 		else data += array.at(j).toString();
@@ -340,7 +340,7 @@ void Controller::getFields(QString Title)
 	if(!Title.isEmpty() && Title.compare("_") != 0){
 		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getFieldsData(QList<QJsonDocument>)));
 		QString query = "SELECT array_star(default.Viewgroups[*].Viewgroup).Fields FROM  `default` WHERE META(`default`).id = '"+Title+"'";
-		//	qDebug() << "getFields"<<query;
+		//	qDebug() << __FILE__ << __LINE__  << "getFields"<<query;
 		Database::Get()->query(query);
 		}
 }
@@ -365,7 +365,7 @@ void Controller::getFieldsData(QList<QJsonDocument> documents)
 					}
 				}
 			}
-		//qDebug() <<"Fieldss"<<fieldsName;
+		//qDebug() << __FILE__ << __LINE__  <<"Fieldss"<<fieldsName;
 		emit gotFieldsData( fieldsName);
 		}
 }
@@ -387,7 +387,7 @@ void Controller::updateLayoutViewGroups(QString entityName,QList<StructureViewsE
 		groups << "default";
 		layoutViewGroups.insert(entityName,groups);
 		}
-	//qDebug() << layoutViewGroups;
+	//qDebug() << __FILE__ << __LINE__  << layoutViewGroups;
 	}
 }
 
@@ -408,7 +408,7 @@ bool Controller::UpdateDoc(QJsonDocument document)
 
 void Controller::showCreateEditeStrUI(QString str)
 {
-	//qDebug() << str.split("::")[1] <<"Check cached";
+	//qDebug() << __FILE__ << __LINE__  << str.split("::")[1] <<"Check cached";
 	QString key = str.split("::").count() > 1?str.split("::")[1]:"";
 	if(!key.isEmpty() && Model::Get()->cachedCreateEditUI.contains(key))
 		MainForm::Get()->ShowDisplay(Model::Get()->cachedCreateEditUI.value(key));
@@ -440,15 +440,15 @@ void Controller::showCreateEditeValueUIData(QJsonDocument value)
 
 void Controller::linkPressed(QJsonObject link)
 {
-	qDebug() << link;
+	qDebug() << __FILE__ << __LINE__  << link;
 
 	if(link.value("Type").toString().contains("Link")){
 		//	Database::Get()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
 		QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(linkPressedData(QJsonDocument)));
 		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE "+QString(DATABASE)+".Title = '"+link.value("Source").toString()+"'");
-		//qDebug()<<"Q : " << query;
+		//qDebug() << __FILE__ << __LINE__ <<"Q : " << query;
 		Database::Get()->query(query);
-		//qDebug() << view.value("Card").toString() << d;
+		//qDebug() << __FILE__ << __LINE__  << view.value("Card").toString() << d;
 		}
 
 }
@@ -532,12 +532,12 @@ bool Controller::saveNavigation()
 		mainNav.insert("Title",i.value());
 		mainNav.insert("ID",i.key());
 		QJsonArray items;
-		//qDebug() << i.key();
+		//qDebug() << __FILE__ << __LINE__  << i.key();
 		foreach(QTreeWidgetItem * tab,getSubNavigation(i.key())){
 			items.append(saveSubNavigation(tab));
 			}
 		mainNav.insert("Items",items);
-		//	qDebug() << mainNav;
+		//	qDebug() << __FILE__ << __LINE__  << mainNav;
 		//mainNavs.append(QJsonDocument(mainNav));
 		mainNavs << mainNav;
 		}
@@ -550,7 +550,7 @@ bool Controller::saveNavigation()
 
 bool Controller::saveNavigationPages()
 {
-	//	qDebug() << "SaveN";
+	//	qDebug() << __FILE__ << __LINE__  << "SaveN";
 	bool savedPages = true;
 	QMapIterator<double, QJsonObject > i(Model::Get()->getPages());
 	while (i.hasNext()) {
@@ -567,7 +567,7 @@ bool Controller::saveNavigationPages()
 					Controller::Get()->storeDoc("Page",QJsonDocument(cardData));
 					}
 
-				qDebug()<<"withoutID" << page;
+				qDebug() << __FILE__ << __LINE__ <<"withoutID" << page;
 				}
 			page.remove("CardData");
 			addPage(i.key(),page);
@@ -584,7 +584,7 @@ QJsonObject Controller::saveSubNavigation(QTreeWidgetItem * item)
 	itemTab.insert("Page",getPage(item->text(1).toDouble()));
 	itemTab.insert("TabPermissions",getPage(item->text(1).toDouble()).value("TabPermissions"));
 
-	//qDebug() << item->text(1).toDouble() << getPage(item->text(1).toDouble());
+	//qDebug() << __FILE__ << __LINE__  << item->text(1).toDouble() << getPage(item->text(1).toDouble());
 	if(item->childCount() > 0){
 		QJsonArray items = QJsonArray();
 		for(int i = 0; i < item->childCount();i++)
@@ -597,7 +597,7 @@ QJsonObject Controller::saveSubNavigation(QTreeWidgetItem * item)
 void Controller::getReport(QJsonObject clmns,QString filter)
 {
 
-	//qDebug() << clmns;
+	//qDebug() << __FILE__ << __LINE__  << clmns;
 	bool addedSelectItems = false;
 	if(clmns.value("Columns").isArray()){
 		//QJsonArray arr = (columns.value("Columns").toArray());
@@ -605,19 +605,21 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 		QString query;
 		QString orderby;
 		orderby += " ORDER BY ";
+		bool hasSelectQuery = false;
 		foreach(QJsonValue clmn,clmns.value("Columns").toArray()){
 			QJsonObject clmnObj = clmn.toObject();
 
 			if(clmn.toObject().value("Type").toString().compare("Text") == 0){
-				//qDebug() <<"Text"<< clmn;
+				//qDebug() << __FILE__ << __LINE__  <<"Text"<< clmn;
 				}
 			else if(clmn.toObject().value("LocalSource")!= QJsonValue::Undefined){
-				if(i > 0 && i < clmns.value("Columns").toArray().count()){
+				if(hasSelectQuery && i > 0 && i < clmns.value("Columns").toArray().count()){
 					query+= " UNION ALL ";
 					orderby += ",";
 					}
 				QString source = clmnObj.value("Source").toString().split("::")[1];
 				addedSelectItems = true;
+				hasSelectQuery = true;
 				query+= getLocalSourceReport(clmn.toObject(),i,filter);
 				orderby += "`"+source+QString::number(i)+"Key`";
 				}
@@ -630,17 +632,17 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 				QString selectStr = clmnObj.value("Select").toString();
 				QString uniqueRef = QString(source.at(0)).append(QString(selectStr.at(0))).append(QString::number(i)) ;
 
-				if(i > 0 && i < clmns.value("Columns").toArray().count()){
+				if(hasSelectQuery && i > 0 && i < clmns.value("Columns").toArray().count()){
 					query+= " UNION ALL ";
 					orderby += ",";
 					}
-
+				hasSelectQuery = true;
 				query += "SELECT ";
 				query += "(Array item.`"+selectStr+"`[0] FOR item IN "+uniqueRef+"ff END)[0] AS `"+clmnObj.value("Header").toString()+"`";
 				query += " , META("+uniqueRef+"d).id AS `"+source+QString::number(i)+"Key`";
 
 				orderby += "`"+source+QString::number(i)+"Key`";
-				//	qDebug() << clmnObj.value("LocalFilter").toString() << clmnObj.value("LocalFilter").toString().split("::").count() <<clmnObj.value("Source").toString() <<clmnObj.value("Source").toString().split("::").count();
+				//	qDebug() << __FILE__ << __LINE__  << clmnObj.value("LocalFilter").toString() << clmnObj.value("LocalFilter").toString().split("::").count() <<clmnObj.value("Source").toString() <<clmnObj.value("Source").toString().split("::").count();
 				if(clmnObj.value("LocalFilter") != QJsonValue::Undefined
 						&&	clmnObj.value("Source").toString().split("::").count() > 1
 						&&	clmnObj.value("LocalFilter").toString().split("::").count() > 1)
@@ -672,16 +674,16 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 					query += QString(" AND ") + QString("(Array item.`"+selectStr+"`[0] FOR item IN "+uniqueRef+"ff END)[0] ");
 					}
 				if(clmnObj.value("LocalSource") != QJsonValue::Undefined){
-					//	qDebug() <<"clmnObj.value().toString()";
+					//	qDebug() << __FILE__ << __LINE__  <<"clmnObj.value().toString()";
 					}
 
-				//qDebug() << i << (clmns.value("Columns").toArray().count() - 1) << query;
+				//qDebug() << __FILE__ << __LINE__  << i << (clmns.value("Columns").toArray().count() - 1) << query;
 
 				}
 			i++;
 			}
 		query+= orderby;
-		//	qDebug() << query;
+		//	qDebug() << __FILE__ << __LINE__  << query;
 		/*
 		QString query;
 		query += "SELECT ";
@@ -713,12 +715,12 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 			}
 
 
-		qDebug() << query;
+		qDebug() << __FILE__ << __LINE__  << query;
 		*/
-		//qDebug() << "Before Query";
+		//qDebug() << __FILE__ << __LINE__  << "Before Query";
 
 		if(addedSelectItems){
-			//	qDebug() <<"Report Q:"<< query;
+				qDebug() << __FILE__ << __LINE__  <<"Report Q:"<< query;
 			qRegisterMetaType<QList<QJsonDocument> >("MyStruct");
 			QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)),Qt::QueuedConnection);
 			//Database::Get()->query(query);
@@ -749,13 +751,13 @@ QString Controller::getLocalSourceReport(QJsonObject clmn,int index,QString filt
 	query = "SELECT (Array itemw.`"+select+"` FOR itemw IN ((Array item.`"+field+"`[0].`merplyTabel` FOR item IN "+uniqueRef+"f END)[0])END) AS `"+clmn.value("Header").toString()+"` , META("+uniqueRef+"d).id AS `"+source+QString::number(index)+"Key`"
 																																																													"FROM default "+uniqueRef+"d UNNEST "+uniqueRef+"d.Fields "+uniqueRef+"f WHERE META("+uniqueRef+"d).id = '"+filter+"' "
 																																																																																									   "AND (Array item.`"+field+"`[0].`merplyTabel` FOR item IN "+uniqueRef+"f END)";
-	//qDebug() << "LocalSorce Q: " << query;
+	//qDebug() << __FILE__ << __LINE__  << "LocalSorce Q: " << query;
 	return query;
 }
 
 void Controller::insertCachedCreateEditUI(QString key,QWidget* instance)
 {
-	//qDebug() << "insert"<<key<< instance;
+	//qDebug() << __FILE__ << __LINE__  << "insert"<<key<< instance;
 	Model::Get()->cachedCreateEditUI.insert(key,(CreateEditUI*)instance);
 }
 
@@ -765,13 +767,13 @@ QWidget* Controller::getCachedCreateEditUI(QString key)
 }
 bool Controller::isCachedCreateEditUI(QString key)
 {
-	//qDebug() << "insert"<<key<< instance;
+	//qDebug() << __FILE__ << __LINE__  << "insert"<<key<< instance;
 	return Model::Get()->cachedCreateEditUI.contains(key);
 }
 
 void Controller::getReportData(QList<QJsonDocument> documents)
 {
-	//qDebug() << "GotReport Data" ;
+	//qDebug() << __FILE__ << __LINE__  << "GotReport Data" ;
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)));
 	emit gotReportData(documents);
 
@@ -782,7 +784,7 @@ void Controller::getReportTableData(QJsonObject strct)
 {
 	foreach(QJsonValue clmn, strct.value("Columns").toArray()){
 		if(clmn.toObject().value("Type").toString().compare("Database") == 0){
-			//	qDebug() << clmn.toObject().value("Select").toString() << clmn.toObject().value("Source").toString();
+			//	qDebug() << __FILE__ << __LINE__  << clmn.toObject().value("Select").toString() << clmn.toObject().value("Source").toString();
 			}
 		}
 }
@@ -832,7 +834,7 @@ bool Controller::runQRPTDesingerapp()
 	QProcess *p = new QProcess(this);
 	QString programPath;
 	programPath= QDir::currentPath()+"/../RPTD/debug/QtRptDesigner" ;
-	qDebug() << programPath;
+	//qDebug() << __FILE__ << __LINE__  << programPath;
 	p->start(programPath);
 }
 
@@ -854,10 +856,10 @@ bool Controller::showWarning(QString warning){
 		}
 	/*
 	if (reply == QMessageBox::Ok) {
-	  qDebug() << "Yes was clicked";
+	  qDebug() << __FILE__ << __LINE__  << "Yes was clicked";
 	 // QApplication::quit();
 	} else {
-	  qDebug() << "Yes was *not* clicked";
+	  qDebug() << __FILE__ << __LINE__  << "Yes was *not* clicked";
 	}
 	*/
 	return true;
@@ -915,9 +917,9 @@ bool Controller::deleteDocument(QString id)
 
 bool Controller::Compare(QJsonObject first, QJsonObject second)
 {
-	//	qDebug() << "COMPAREEEEEEEEEEE";
-	//	qDebug() << first;
-	//	qDebug() << second;
+	//	qDebug() << __FILE__ << __LINE__  << "COMPAREEEEEEEEEEE";
+	//	qDebug() << __FILE__ << __LINE__  << first;
+	//	qDebug() << __FILE__ << __LINE__  << second;
 	foreach(QString key,first.keys()){
 		if(first[key] != second[key])
 			return false;

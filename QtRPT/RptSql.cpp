@@ -30,9 +30,9 @@ limitations under the License.
 
 RptSql::RptSql(QString dbType, QString dbName, QString dbHost, QString dbUser, QString dbPassword, int dbPort, QString dbConnectionName, QObject *parent) : QObject(parent) {
     /*#ifdef QT_DEBUG
-      qDebug() << "Running a debug build";
+      qDebug() << __FILE__ << __LINE__  << "Running a debug build";
     #else
-      qDebug() << "Running a release build";
+      qDebug() << __FILE__ << __LINE__  << "Running a release build";
     #endif*/
 
     db = QSqlDatabase::addDatabase(dbType, dbConnectionName.isEmpty() ? QLatin1String(QSqlDatabase::defaultConnection) : dbConnectionName);
@@ -47,10 +47,10 @@ RptSql::RptSql(QString dbType, QString dbName, QString dbHost, QString dbUser, Q
 bool RptSql::openQuery(QString sql, QString dbCoding, QString charsetCoding) {
     db.open();
     if (!db.isOpen()) {
-        qDebug() << "Failed open DB";
-        qDebug()<<db.lastError().text();
+        qDebug() << __FILE__ << __LINE__  << "Failed open DB";
+        qDebug() << __FILE__ << __LINE__ <<db.lastError().text();
     } else {
-        qDebug() << "open DB";
+        qDebug() << __FILE__ << __LINE__  << "open DB";
     }
 
     query = new QSqlQuery(db);
@@ -65,7 +65,7 @@ bool RptSql::openQuery(QString sql, QString dbCoding, QString charsetCoding) {
     }
 
     if (!query->exec(sql)) {
-        qDebug()<<query->lastError().text();
+        qDebug() << __FILE__ << __LINE__ <<query->lastError().text();
         return false;
     }
 
@@ -75,7 +75,7 @@ bool RptSql::openQuery(QString sql, QString dbCoding, QString charsetCoding) {
 QString RptSql::getFieldValue(QString fieldName, int recNo) {
     if (query->isActive()){
         if (recNo >= getRecordCount()) {
-            qDebug() << "recNo more than recordCount";
+            qDebug() << __FILE__ << __LINE__  << "recNo more than recordCount";
             return "";
         } else {
             query->seek(recNo);
@@ -83,7 +83,7 @@ QString RptSql::getFieldValue(QString fieldName, int recNo) {
             return query->value(fieldNo).toString();
         }
     } else {
-        qDebug() << "Query is not active";
+        qDebug() << __FILE__ << __LINE__  << "Query is not active";
         return "";
     }
 }
@@ -91,7 +91,7 @@ QString RptSql::getFieldValue(QString fieldName, int recNo) {
 QImage RptSql::getFieldImage(QString fieldName, int recNo) {
     if (query->isActive()){
         if (recNo >= getRecordCount()) {
-            qDebug() << "recNo more than recordCount";
+            qDebug() << __FILE__ << __LINE__  << "recNo more than recordCount";
             return QImage();
         } else {
             query->seek(recNo);
@@ -99,7 +99,7 @@ QImage RptSql::getFieldImage(QString fieldName, int recNo) {
             return QImage::fromData(query->value(fieldNo).toByteArray());
         }
     } else {
-        qDebug() << "Query is not active";
+        qDebug() << __FILE__ << __LINE__  << "Query is not active";
         return QImage();
     }
 }

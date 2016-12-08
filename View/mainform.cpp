@@ -153,7 +153,7 @@ void MainForm::ShowDisplay(MainDisplay * display) {
 	p_instance->boxLayout->addWidget((QWidget*)display);
 	if (p_instance->currentDisplay != 0)
 		display->setGeometry(0,0,p_instance->currentDisplay->width(),p_instance->currentDisplay->height());
-	//qDebug() << p_instance->currentDisplay->objectName() << p_instance->currentDisplay->height();
+	//qDebug() << __FILE__ << __LINE__  << p_instance->currentDisplay->objectName() << p_instance->currentDisplay->height();
 	p_instance->currentDisplay = display;
 	p_instance->currentDisplay->scrollAreaFormPanel->setGeometry(0,0,display->width(),display->height());
 

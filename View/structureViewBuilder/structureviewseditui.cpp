@@ -190,9 +190,9 @@ void StructureViewsEditUI::loadGroup()
 
 
 		QString group = structureView.value("Viewgroup").toObject().value("Group").toString();
-		//qDebug() << group;
+		//qDebug() << __FILE__ << __LINE__  << group;
 		emit styleChanged();
-		//qDebug() << Controller::Get()->getLayoutViewGroups(this->entityName).contains(group);
+		//qDebug() << __FILE__ << __LINE__  << Controller::Get()->getLayoutViewGroups(this->entityName).contains(group);
 		//if()
 
 		if(!Controller::Get()->getLayoutViewGroups(structureView.value("Title").toString()).contains(group)){

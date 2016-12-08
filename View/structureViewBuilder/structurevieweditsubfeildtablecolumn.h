@@ -37,6 +37,7 @@ private:
 	ERPComboBox* entityFilter;
 	QFormLayout* localFilterWidgetLayout;
 	QCheckBox* editabel;
+	QCheckBox* showIndex;
 	void initEquationWidget();
 	QWidget*equationWidget;
 	QFormLayout* equationWidgetLayout;
@@ -44,7 +45,7 @@ private:
 	QList<StructureVieweditSubFeildTableColumnEquation*> equationElements;
 
 	QStringList typsList;
-
+	ERPComboBox* inputData;
 
 signals:
 	void columnChanged();

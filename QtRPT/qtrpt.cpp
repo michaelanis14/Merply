@@ -720,10 +720,10 @@ void QtRPT::drawFields(RptFieldObject *fieldObject, int bandTop, bool draw) {
                 element.left = left_;
                 element.value = txt;
                 crossTab->addElement(element);
-                //qDebug()<<QString("left %1 top %2").arg(left_).arg(top_);
+                //qDebug() << __FILE__ << __LINE__ <<QString("left %1 top %2").arg(left_).arg(top_);
                 int col = left_/200;
                 int row = top_/200;
-                //qDebug()<<QString(txt+" col-%1 row-%2").arg(col).arg(row);
+                //qDebug() << __FILE__ << __LINE__ <<QString(txt+" col-%1 row-%2").arg(col).arg(row);
                 if (col == 0) col = 1;
                 if (row == 0) row = 1;
                 /*m_xlsx->write(row,col, txt);
@@ -915,14 +915,14 @@ QVariant QtRPT::processHighligthing(RptFieldObject *field, HiType type) {
                 exp.remove("backgroundColor=");
                 QString formulaStr = exp.insert(1,"'");
                 formulaStr = exp.insert(0,cond);
-                //qDebug()<<field->name;
-                //qDebug()<<colorToString(field->backgroundColor);
+                //qDebug() << __FILE__ << __LINE__ <<field->name;
+                //qDebug() << __FILE__ << __LINE__ <<colorToString(field->backgroundColor);
                 formulaStr = sectionField(field->parentBand,formulaStr,true)+"':'"+colorToString(field->m_backgroundColor)+"'";
                 //formulaStr = sectionField(field->parentBand,formulaStr,true)+"':'rgba(255,0,255,255)'";
                 QScriptEngine myEngine;
-                //qDebug()<<formulaStr;
-                //qDebug()<<myEngine.evaluate(formulaStr).toString();
-                //qDebug()<<"---";
+                //qDebug() << __FILE__ << __LINE__ <<formulaStr;
+                //qDebug() << __FILE__ << __LINE__ <<myEngine.evaluate(formulaStr).toString();
+                //qDebug() << __FILE__ << __LINE__ <<"---";
                 return myEngine.evaluate(formulaStr).toString();
             }
         }
@@ -937,7 +937,7 @@ bool QtRPT::isFieldVisible(RptFieldObject *fieldObject) {
         formulaStr = sectionField(fieldObject->parentBand,fieldObject->printing,true);
         QScriptEngine myEngine;
         //myEngine.globalObject().setProperty("quant1","3");
-        //qDebug()<<myEngine.evaluate("quant1;").toString();
+        //qDebug() << __FILE__ << __LINE__ <<myEngine.evaluate("quant1;").toString();
         visible = myEngine.evaluate(formulaStr).toInteger();
 
         //QScriptValue fun = myEngine.evaluate("(function(a, b) { return a == b; })");
@@ -945,7 +945,7 @@ bool QtRPT::isFieldVisible(RptFieldObject *fieldObject) {
         //QScriptValueList args;
         /*args << "k" << "k";
         QScriptValue threeAgain = fun.call(QScriptValue(), args);
-        qDebug()<<threeAgain.toString();*/
+        qDebug() << __FILE__ << __LINE__ <<threeAgain.toString();*/
 
     } else {
         visible = formulaStr.toInt();
@@ -1199,9 +1199,9 @@ QString QtRPT::sectionField(RptBandObject *band, QString value, bool exp, bool f
                                 fieldName.replace("]","");
                                 fieldName.replace(rptSql->objectName()+".","");
                                 QString tmp = rptSql->getFieldValue(fieldName, m_recNo);
-                                qDebug()<<"value from DB: "<<tmp;
+                                qDebug() << __FILE__ << __LINE__ <<"value from DB: "<<tmp;
                                 formulaStr.replace(tl.at(j), tmp);
-                                qDebug()<<"formula with value: "<<formulaStr;
+                                qDebug() << __FILE__ << __LINE__ <<"formula with value: "<<formulaStr;
                             }
                         } else {
                             formulaStr.replace(tl.at(j), sectionValue(tl.at(j)));
@@ -1440,7 +1440,7 @@ void QtRPT::printXLSX(const QString &filePath, bool open) {
     printPreview(printer);
 
     crossTab->resortMatrix();
-    qDebug()<<crossTab;
+    qDebug() << __FILE__ << __LINE__ <<crossTab;
 
     //m_xlsx->write("A1", "Hello Qt!");
     //m_xlsx->saveAs(filePath);

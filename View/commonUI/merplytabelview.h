@@ -43,7 +43,7 @@ public:
 	void indexTable(const QString document_id, const QList<QJsonDocument> items);
 	QList<QJsonDocument> items;
 	QJsonObject save();
-
+	MerplyReportTableModel* model;
 	MerplyReportTableModel* getModel() const;
 
 private:
@@ -51,7 +51,7 @@ private:
 	QHBoxLayout* lblLayout;
 	QLabel* print;
 	QTableView* tableView;
-	MerplyReportTableModel* model;
+
 	HControllers* controllers ;
 	QString currenctPrintID;
 	QtRPT *report;

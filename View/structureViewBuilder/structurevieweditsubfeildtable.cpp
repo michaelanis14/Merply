@@ -90,6 +90,7 @@ void StructureVieweditSubFeildTable::fill(QJsonObject tblStractureView)
 		foreach(QJsonValue clmn,tblStractureView.value("Columns").toArray()){
 			clmnWidget = new StructureVieweditSubFeildTableColumn(this,clmn.toObject());
 			clmnWidget->fill(clmn.toObject());
+			QObject::disconnect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
 			QObject::connect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
 			clmns << clmnWidget;
 			RemoveBtn* removeClmnBtn = new RemoveBtn(this,clmnWidget);
@@ -101,6 +102,7 @@ void StructureVieweditSubFeildTable::fill(QJsonObject tblStractureView)
 	else{
 		clmnWidget = new StructureVieweditSubFeildTableColumn(this,QJsonObject());
 		clmns << clmnWidget;
+		QObject::disconnect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
 		QObject::connect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
 		RemoveBtn* removeClmnBtn = new RemoveBtn(this,clmnWidget);
 		QObject::connect(removeClmnBtn,SIGNAL(remove(QWidget*)),this,SLOT(removColumn(QWidget*)));
@@ -110,6 +112,7 @@ void StructureVieweditSubFeildTable::fill(QJsonObject tblStractureView)
 		}
 	QPushButton* addColumn = new QPushButton("+");
 	QObject::connect(addColumn,SIGNAL(pressed()),this,SLOT(addColumn()));
+	QObject::disconnect(addColumn,SIGNAL(pressed()),this,SIGNAL(tableChanged()));
 	QObject::connect(addColumn,SIGNAL(pressed()),this,SIGNAL(tableChanged()));
 
 	layout->addWidget(addColumn);
@@ -130,6 +133,7 @@ void StructureVieweditSubFeildTable::addColumn()
 {
 	StructureVieweditSubFeildTableColumn *clmnWidget = new StructureVieweditSubFeildTableColumn(this,QJsonObject());
 	clmns << clmnWidget;
+	QObject::disconnect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
 	QObject::connect(clmnWidget,SIGNAL(columnChanged()),this,SIGNAL(tableChanged()));
 	RemoveBtn* removeClmnBtn = new RemoveBtn(this,clmnWidget);
 	QObject::connect(removeClmnBtn,SIGNAL(remove(QWidget*)),this,SLOT(removColumn(QWidget*)));

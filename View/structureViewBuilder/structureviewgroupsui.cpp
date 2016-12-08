@@ -91,8 +91,8 @@ QJsonObject StructureViewGroupsUI::save()
 		}
 	saveObject.insert("Viewgroups",ViewGroups);
 	if(!document_id.isEmpty()){
-		saveObject.insert("cas_value",cas_value);
-		saveObject.insert("document_id",document_id);
+		saveObject.insert("cas_value",cas_value); //Inserting Document ID TODO: REMOVE
+		saveObject.insert("document_id",document_id);//TODO: REMOVE
 		}
 
 	return saveObject;
@@ -115,7 +115,7 @@ void StructureViewGroupsUI::ShowUI(QJsonObject structureView) {
 
 void StructureViewGroupsUI::fill(QJsonObject structureView)
 {
-	//	qDebug() << structureView.value("document_id").toString() << structureView;
+	//	qDebug() << __FILE__ << __LINE__  << structureView.value("document_id").toString() << structureView;
 	this->cas_value = structureView.value("cas_value").toString();
 	this->document_id = structureView.value("document_id").toString();
 
@@ -191,7 +191,7 @@ StructureViewGroupsUI* StructureViewGroupsUI::GetUI()
 
 void StructureViewGroupsUI::btn_Clicked(QString btn)
 {
-	//qDebug() << btn;
+	//qDebug() << __FILE__ << __LINE__  << btn;
 	if(btn.contains("Settings")){
 		//StructureViewGroupsUI::ShowUI(this->structureView);
 
@@ -202,7 +202,7 @@ void StructureViewGroupsUI::btn_Clicked(QString btn)
 
 		}
 	else if(btn.contains("Save")){
-		//	qDebug() << this->save();
+		//	qDebug() << __FILE__ << __LINE__  << this->save();
 		this->editControllerSavePressed();
 		}
 	else if(btn.contains("Cancel")){
@@ -241,7 +241,7 @@ void StructureViewGroupsUI::editControllerCancelPressed()
 void StructureViewGroupsUI::editControllerSavePressed()
 {
 	QJsonObject savedObj = this->save();
-	//qDebug() <<"SAVE: editControllerSavePressed"<< savedObj;
+	//qDebug() << __FILE__ << __LINE__  <<"SAVE: editControllerSavePressed"<< savedObj;
 	if(savedObj.value("document_id") == QJsonValue::Undefined)
 		Controller::Get()->storeDoc("ViewStructure",QJsonDocument(savedObj));
 	else Controller::Get()->UpdateDoc(QJsonDocument(savedObj));
@@ -313,7 +313,7 @@ void StructureViewGroupsUI::mousePressEvent(QMouseEvent *event){
 	QWidget *child=  static_cast<QWidget *>(childAt(event->pos()));
 	if  (!child)
 		return;
-	//else qDebug() << child->objectName();
+	//else qDebug() << __FILE__ << __LINE__  << child->objectName();
 
 }
 

@@ -37,9 +37,9 @@ limitations under the License.
 #include <RptSqlConnection.h>
 
 #if QT_VERSION >= 0x50000
-	#ifdef QXLSX_LIBRARY
-		#include "xlsxdocument.h"
-	#endif
+#ifdef QXLSX_LIBRARY
+#include "xlsxdocument.h"
+#endif
 #endif
 
 
@@ -78,11 +78,11 @@ static QList<AggregateValues> listOfPair;
 static QList<int> listIdxOfGroup;
 
 #ifndef QTRPT_LIBRARY
-	class QtRPT : public QObject
-#else
-	#include <qtrpt_global.h>
-	class QTRPTSHARED_EXPORT QtRPT : public QObject
-#endif
+class QtRPT : public QObject
+		#else
+#include <qtrpt_global.h>
+class QTRPTSHARED_EXPORT QtRPT : public QObject
+		#endif
 
 {
 	Q_OBJECT
@@ -115,7 +115,7 @@ public:
 	void setUserSqlConnection(int pageReport, QString dsName, QString dbType, QString dbName, QString dbHost, QString dbUser, QString dbPassword, int dbPort, QString dbConnectionName, QString sql, QString dbCoding = "UTF8", QString charsetCoding = "UTF8");
 	void activateUserSqlConnection(int pageReport, bool bActive);
 
-	private:
+private:
 	QPixmap *m_backgroundImage;
 	QPrinter *printer;
 	QPainter *painter;
@@ -210,7 +210,7 @@ private slots:
 };
 
 #ifdef QTRPT_LIBRARY
-	extern "C" QTRPTSHARED_EXPORT QtRPT* createQtRPT();
+extern "C" QTRPTSHARED_EXPORT QtRPT* createQtRPT();
 #endif
 
 #endif // QTRPT_H

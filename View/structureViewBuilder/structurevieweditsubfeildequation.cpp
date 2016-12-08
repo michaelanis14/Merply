@@ -82,21 +82,21 @@ QJsonObject StructureVieweditSubFeildEquation::save()
 		save.insert("Number",numbers->text());
 		}
 	if(conditionOnOne->currentIndex() !=0){
-		save.insert("ConditionOnOne",conditionOnOne->currentText());
+		save.insert("ConditionOnOne",conditionOnOne->currentIndex());
 		save.insert("ConditionColumnOne",conditionColumnOne->currentText());
 		}
 	if(conditionOnTwo->currentIndex() !=0){
-		save.insert("ConditionOnTwo",conditionOnTwo->currentText());
+		save.insert("ConditionOnTwo",conditionOnTwo->currentIndex());
 		save.insert("ConditionColumnTwo",conditionColumnTwo->currentText());
 		}
 
-	qDebug() << save;
+	//qDebug() << __FILE__ << __LINE__  << save;
 	return save;
 }
 
 void StructureVieweditSubFeildEquation::fill(QJsonObject data)
 {
-//	qDebug() << data;
+	//  qDebug() << __FILE__ << __LINE__  << data;
 	//if(data.value("SecondColmn") != QJsonValue::Undefined){
 	if(firstOperand)
 		firstOperation->setCurrentIndex(data.value("FirstOperation").toInt());
@@ -106,7 +106,7 @@ void StructureVieweditSubFeildEquation::fill(QJsonObject data)
 		operation->setCurrentIndex(data.value("Operation").toInt());
 	if(data.value("SecondColmn") != QJsonValue::Undefined){
 		secondTerm->setCurrentIndex(0);
-		//qDebug() << data.value("SecondColmn").toString();
+		//qDebug() << __FILE__ << __LINE__  << data.value("SecondColmn").toString();
 		columnTwo->setCurrentText(data.value("SecondColmn").toString());
 		}
 	else {
@@ -115,11 +115,13 @@ void StructureVieweditSubFeildEquation::fill(QJsonObject data)
 			numbers->setText(data.value("Number").toString().trimmed());
 		}
 	if(data.value("ConditionColumnOne") != QJsonValue::Undefined){
-		conditionOnOne->setCurrentText(data.value("ConditionOnOne").toString());
+		conditionOnOne->setCurrentIndex(data.value("ConditionOnOne").toInt());
+		updateConditionColmnOne(data.value("ConditionOnOne").toInt());
 		conditionColumnOne->setCurrentText(data.value("ConditionColumnOne").toString());
 		}
 	if(data.value("ConditionColumnTwo") != QJsonValue::Undefined){
-		conditionOnTwo->setCurrentText(data.value("ConditionOnTwo").toString());
+		conditionOnTwo->setCurrentIndex(data.value("ConditionOnTwo").toInt());
+		updateConditionColmnOne(data.value("ConditionOnTwo").toInt());
 		conditionColumnTwo->setCurrentText(data.value("ConditionColumnTwo").toString());
 		}
 }

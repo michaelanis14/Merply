@@ -58,6 +58,7 @@ private:
 signals:
 	void equationColumnsSignal();
 	void done();
+	void changed();
 public slots:
 	void fillEquationColumns();
 	double evalEquationCondition(int condition,double col1,double col2);

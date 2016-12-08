@@ -923,17 +923,19 @@ void MainWindow::showSetting() {
 
 
 /////Michael Bishara
-void MainWindow::showDataSource() {
+void MainWindow::showDataSource(bool newfile) {
 	//sqlDesigner->setVisible( ui->actDataSource->isChecked() );
 	//if (ui->actDataSource->isChecked() ) {
 
 	//}
-
-	QString tmpfileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("XML Files (*.*)"));
-	if (tmpfileName.isEmpty() || tmpfileName.isNull() ) return;
-	QFileInfo fileInfo(tmpfileName);
-	QString filename(fileInfo.fileName());
-	fileName = filename;
+	if(newfile){
+		QString tmpfileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("XML Files (*.*)"));
+		//if (tmpfileName.isEmpty() || tmpfileName.isNull() ) return;
+		QFileInfo fileInfo(tmpfileName);
+		QString filename(fileInfo.fileName());
+		if(!filename.isEmpty())
+			fileName = filename;
+		}
 	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotDocument(QJsonDocument)));
 	Database::Get()->getDoc("PrintStructure::"+fileName);
 
@@ -1554,6 +1556,7 @@ void MainWindow::saveReport() {
 		QJsonObject xmlStrct = loadedXmlJson.object();
 		xmlStrct.insert("XMLSTRCT",xmlDoc->toString());
 		Database::Get()->updateDoc(QJsonDocument(xmlStrct));
+		showDataSource(false);
 		}
 	//qDebug() << "SAVEEE" << fileName;
 

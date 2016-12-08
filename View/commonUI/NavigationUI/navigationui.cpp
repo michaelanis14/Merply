@@ -28,7 +28,7 @@ navigationUI::navigationUI(QWidget *parent) :
 
 //	if(AccessController::Get()->hasAdminGroupAccess()){
 	if(true){
-	qDebug() << "admin";
+	qDebug() << __FILE__ << __LINE__  << "admin";
 		SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
 		sctrlUI->setFixedHeight(Controller::GetNavigationSettingsBarHeight());
 		sctrlUI->addbtn("Settings",":/resources/icons/settings.png","settings");
@@ -168,7 +168,7 @@ void navigationUI::mainNavPressed(QTreeWidgetItem* item, int )
 	subNavigation->clearFocus();
 
 	if(subNavigation->topLevelItemCount() > 0){
-		//qDebug() << page << subNavigation->topLevelItem(0)->text(1).toDouble();
+		//qDebug() << __FILE__ << __LINE__  << page << subNavigation->topLevelItem(0)->text(1).toDouble();
 		subNavigation->selectionModel()->select(subNavigation->model()->index(0,0,QModelIndex()),QItemSelectionModel::Select| QItemSelectionModel::Rows);
 		subNavPressed(subNavigation->topLevelItem(0),0);
 		}
@@ -181,7 +181,7 @@ void navigationUI::subNavPressed(QTreeWidgetItem* item, int )
 
 void navigationUI::btn_Clicked(QString btn)
 {
-	//qDebug() << btn;
+	//qDebug() << __FILE__ << __LINE__  << btn;
 	if(btn.contains("settings")){
 		navigationUI::Get()->setHidden(true);
 		NavigationEditUI::Get()->setParent(MainForm::Get());

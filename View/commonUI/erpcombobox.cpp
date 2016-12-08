@@ -26,21 +26,34 @@ ERPComboBox::ERPComboBox(QWidget *parent, bool indexedFill) :
 }
 void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 	int i = 0;
-	//qDebug() << items;
+	//qDebug() << __FILE__ << __LINE__  << items;
 	foreach (const QJsonDocument & value, items){
 
 		//QString valueString = value.object().value("Value").toString();
 		QString keyString = value.object().value("Key").toString();
-
+		QString valueString;
 		foreach(QJsonValue arrVal,value.object().value("Value").toArray()){
-			//qDebug() << arrVal;
+			//qDebug() << __FILE__ << __LINE__  << arrVal;
 			foreach(QJsonValue Val,arrVal.toArray()){
-				//	qDebug() << Val << keyString;
-				if(Val.isArray()){
+				//qDebug() << __FILE__ << __LINE__ <<"VAL" << Val << keyString;
+				if(Val.isObject()){
+					//qDebug() << __FILE__ << __LINE__  << "isObJect" << Val;
+					if(Val.toObject().value("Key") != QJsonValue::Undefined)
+						keyString = Val.toObject().value("Key").toString();
+					if(Val.toObject().value("Value") != QJsonValue::Undefined)
+						valueString = Val.toObject().value("Value").toString();
+
+					QComboBox::insertItem(i,valueString);
+					keys.insert(i,keyString);
+					i++;
+					}
+				else if(Val.isArray()){
 					foreach(QJsonValue subVal,Val.toArray()){
-						QString valueString = subVal.toString().trimmed();
-						//if(valueString)
-						//qDebug()<<"ARRY"<<i << valueString;
+
+						//qDebug() << __FILE__ << __LINE__  << "chechkkk" << subVal;
+
+						valueString = subVal.toString().trimmed();
+
 						QComboBox::insertItem(i,valueString);
 						keys.insert(i,keyString);
 						i++;
@@ -48,14 +61,13 @@ void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 					}
 				else{
 					QString valueString = Val.toString().trimmed();
-
 					if(valueString.isNull() || valueString.isEmpty()){
-				//		qDebug()<<"EMPTY"<<i << valueString;
+						//		qDebug() << __FILE__ << __LINE__ <<"EMPTY"<<i << valueString;
 						continue;
 						}
 					else{
 						QComboBox::insertItem(i,valueString);
-					//	qDebug()<<"NOT ARRY"<<i << valueString;
+						//	qDebug() << __FILE__ << __LINE__ <<"NOT ARRY"<<i << valueString;
 						keys.insert(i,keyString);
 						i++;
 						}
@@ -74,7 +86,7 @@ void ERPComboBox::focusOutEvent(QFocusEvent *e)
 
 		QRegExp re("\\d*");
 		if(this->currentText()==""){
-			//qDebug() <<"EMP";
+			//qDebug() << __FILE__ << __LINE__  <<"EMP";
 			this->clearEditText();
 			this->setCurrentText(this->itemText(this->currentIndex()));
 			}
@@ -87,12 +99,12 @@ void ERPComboBox::focusOutEvent(QFocusEvent *e)
 				this->setCurrentText(this->itemText(this->currentIndex()));
 			}
 		else if(this->completer()->currentCompletion() ==""){
-			//qDebug()  <<"noComp";
+			//qDebug() << __FILE__ << __LINE__   <<"noComp";
 			this->clearEditText();
 			this->setCurrentText(this->itemText(this->currentIndex()));
 			}
 		else{
-			//qDebug() <<this->findText(this->completer()->currentCompletion());
+			//qDebug() << __FILE__ << __LINE__  <<this->findText(this->completer()->currentCompletion());
 
 			this->clearEditText();
 			this->setCurrentIndex((this->findText(this->completer()->currentCompletion())));
@@ -151,11 +163,11 @@ bool ERPComboBox::eventFilter(QObject *obj, QEvent *event)
 	if (indexedFill && event->type() == QEvent::KeyRelease)
 		{
 		//QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-		//	qDebug()<<"CO" << this->completer()->currentCompletion();
+		//	qDebug() << __FILE__ << __LINE__ <<"CO" << this->completer()->currentCompletion();
 		if(oldCompletion.compare(this->completer()->currentCompletion()) != 0){
 			oldCompletion = this->completer()->currentCompletion();
 			emit indexedFillEvent(oldCompletion);
-			//	qDebug() << this->completer()->currentCompletion();
+			//	qDebug() << __FILE__ << __LINE__  << this->completer()->currentCompletion();
 			}
 
 		}
@@ -192,7 +204,7 @@ void ERPComboBox::setCurrentIndex(int index)
 //QLabel *child=  static_cast<QLabel *>(childAt(event->pos()));
 
 //	event->accept();
-//	qDebug() <<"M" << indexedFill;
+//	qDebug() << __FILE__ << __LINE__  <<"M" << indexedFill;
 //if(!this->indexedFill)
 //		QWidget::mousePressEvent(event);
 

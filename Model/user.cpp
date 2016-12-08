@@ -6,7 +6,7 @@ User::User(QString id,QString username,QString name)
 	this->id = id;
 	this->username = username;
 	this->name = name;
-	//qDebug() << name << username;
+	//qDebug() << __FILE__ << __LINE__  << name << username;
 }
 
 QString User::getUsername() const

@@ -37,7 +37,7 @@ public:
 				}
 
 
-			//	else qDebug() << receiver->objectName() <<receiver->metaObject()->className() << receiver->parent()->parent()->parent()->metaObject()->className();
+			//	else qDebug() << __FILE__ << __LINE__  << receiver->objectName() <<receiver->metaObject()->className() << receiver->parent()->parent()->parent()->metaObject()->className();
 			}
 		if (event->type() == QEvent::FocusOut){
 			if(qobject_cast<QLineEdit*>(receiver)){
@@ -45,7 +45,7 @@ public:
 
 				}
 			}
-		//	qDebug() << receiver->objectName() ;
+		//	qDebug() << __FILE__ << __LINE__  << receiver->objectName() ;
 		return false;
 		//	return false;
 	}
@@ -102,9 +102,9 @@ int main(int argc, char *argv[])
 	if (args.count() == 3)
 		{
 		Controller::Get()->setShowWarning(false);
-		qDebug() << "Load File " << args.at(1);
+		qDebug() << __FILE__ << __LINE__  << "Load File " << args.at(1);
 		//Controller::Get()->loadFile(args.at(1));
-		qDebug() << "Saved at " << args.at(2);
+		qDebug() << __FILE__ << __LINE__  << "Saved at " << args.at(2);
 	//	Controller::Get()->save(false);
 		return 0;
 		}
