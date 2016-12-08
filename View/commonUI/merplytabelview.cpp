@@ -109,7 +109,7 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 					}
 				else if(nActon.at(1).compare("Edit") == 0){
 
-					Controller::Get()->showCreateEditeStrUI("ViewStructure::"+id.split("::")[0]);
+					Controller::Get()->showCreateEditeStrUI("ViewStructure::"+id.split("::")[0],false);
 					Controller::Get()->showCreateEditeValueUI(id);
 					}
 				else if(nActon.at(1).compare("Delete") == 0){

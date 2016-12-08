@@ -43,7 +43,7 @@ public:
 
 
 	//lazyloading
-	QMap< QString,CreateEditUI* > cachedCreateEditUI;
+	QMap< QString,QWidget* > cachedCreateEditUI;
 
 	//Navigation
 	void addSubNavigation(double key, QList<QTreeWidgetItem*> subNav);

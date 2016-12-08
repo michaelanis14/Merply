@@ -9,7 +9,6 @@
 #define Controller_H
 
 #include "accesscontroller.h"
-
 #include <structureviewseditui.h>
 
 #include <QObject>
@@ -68,7 +67,7 @@ public:
 	bool storeDoc(QString key,QJsonDocument document);
 	static bool UpdateDoc(QJsonDocument document);
 
-	void showCreateEditeStrUI(QString str);
+	void showCreateEditeStrUI(QString str, bool create);
 	void showCreateEditeValueUI(QString key);
 	void queryIndexView(QString vStrctKey);
 
@@ -143,7 +142,7 @@ public slots:
 	void getReportData(QList<QJsonDocument> documents);
 	void getLastKeyData(QString key);
 
-
+	void showCreateEditeStrUICreateTrueData(QJsonDocument str);
 	void showCreateEditeStrUIData(QJsonDocument str);
 	void showCreateEditeValueUIData(QJsonDocument value);
 

@@ -6,6 +6,11 @@
 
 
 
+CreateEditUI::CreateEditUI(QWidget* parent ) : MainDisplay(parent)
+{
+
+}
+
 CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObject data) : MainDisplay(parent)
 {
 
@@ -52,20 +57,22 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 }
 
 CreateEditUI* CreateEditUI::p_instance = 0;
-void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data) {
+void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data,bool create) {
 
 	//CreateEditUI* p_instance;
 	QString key = viewStructure.value("document_id").toString().split("::").count() > 1?viewStructure.value("document_id").toString().split("::")[1]:"";
 	if(!key.isEmpty())
 		{
-		if( !Controller::Get()->isCachedCreateEditUI(key)){
-			p_instance = new CreateEditUI(0,viewStructure, data);
-			qDebug() << __FILE__ << __LINE__ << "insertCachedCreateEditUI"<<key<<p_instance;
-			Controller::Get()->insertCachedCreateEditUI(key,p_instance);
+
+		if( create || !Controller::Get()->isCachedCreateEditUI(key)){
+			CreateEditUI* p =  new CreateEditUI(0,viewStructure, data);
+			qDebug() << __FILE__ << __LINE__ << "insertCachedCreateEditUI"<<key<< &p_instance;
+			Controller::Get()->insertCachedCreateEditUI(key,p);
+			p_instance = p;
 			}
 		else{
-			qDebug() << __FILE__ << __LINE__ << "getCachedCreateEditUI"<<key;
-			p_instance = (CreateEditUI*)Controller::Get()->getCachedCreateEditUI(key);
+			//qDebug() << __FILE__ << __LINE__ << "getCachedCreateEditUI"<<key;
+			p_instance = (CreateEditUI*)(Controller::Get()->getCachedCreateEditUI(key));
 			}
 		}
 	else if(!data.isEmpty()){

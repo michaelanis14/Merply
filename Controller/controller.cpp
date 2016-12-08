@@ -188,7 +188,7 @@ void Controller::subNavPressedData(QJsonDocument documents)
 {
 	//	qDebug() << __FILE__ << __LINE__  << "SubPreseed" << documents;
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedData(QJsonDocument)));
-	CreateEditUI::ShowUI(documents.object(),QJsonObject());
+	CreateEditUI::ShowUI(documents.object(),QJsonObject(),false);
 }
 
 void Controller::subNavPressedIndexData(QList<QJsonDocument> documents)
@@ -280,6 +280,8 @@ void Controller::getLastKeyData(QString key)
 	QObject::disconnect(Database::Get(),SIGNAL(gotLastKey(QString)),Controller::Get(),SLOT(getLastKeyData(QString)));
 	emit Controller::Get()->gotLastKey(key);
 }
+
+
 
 QString Controller::getDatabaseName()
 {
@@ -406,13 +408,20 @@ bool Controller::UpdateDoc(QJsonDocument document)
 	return Database::Get()->updateDoc(document);
 }
 
-void Controller::showCreateEditeStrUI(QString str)
+void Controller::showCreateEditeStrUI(QString str,bool create)
 {
 	//qDebug() << __FILE__ << __LINE__  << str.split("::")[1] <<"Check cached";
 	QString key = str.split("::").count() > 1?str.split("::")[1]:"";
-	if(!key.isEmpty() && Model::Get()->cachedCreateEditUI.contains(key))
-		MainForm::Get()->ShowDisplay(Model::Get()->cachedCreateEditUI.value(key));
+	if(create){
+		QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUICreateTrueData(QJsonDocument)));
+		Database::getDoc(str);
+		}
+	else if(!key.isEmpty() && Model::Get()->cachedCreateEditUI.contains(key)){
+		//	qDebug() << __FILE__ << __LINE__  << key <<"Cached" ;
+		MainForm::Get()->ShowDisplay((CreateEditUI*)Model::Get()->cachedCreateEditUI.value(key));
+		}
 	else{
+		//	qDebug() << __FILE__ << __LINE__  << key <<"NOT Cached";
 		QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUIData(QJsonDocument)));
 		Database::getDoc(str);
 		}
@@ -421,10 +430,13 @@ void Controller::showCreateEditeStrUI(QString str)
 void Controller::showCreateEditeStrUIData(QJsonDocument str)
 {
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUIData(QJsonDocument)));
-	CreateEditUI::ShowUI(str.object(),QJsonObject());
-
+	CreateEditUI::ShowUI(str.object(),QJsonObject(),false);
 }
-
+void Controller::showCreateEditeStrUICreateTrueData(QJsonDocument str)
+{
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUICreateTrueData(QJsonDocument)));
+	CreateEditUI::ShowUI(str.object(),QJsonObject(),true);
+}
 void Controller::showCreateEditeValueUI(QString key)
 {
 	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeValueUIData(QJsonDocument)));
@@ -434,7 +446,18 @@ void Controller::showCreateEditeValueUI(QString key)
 void Controller::showCreateEditeValueUIData(QJsonDocument value)
 {
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeValueUIData(QJsonDocument)));
-	CreateEditUI::ShowUI(QJsonObject(),value.object());
+	QString key  = value.object().value("document_id").toString().split("::")[0];
+	if(!key.isEmpty() && Model::Get()->cachedCreateEditUI.contains(key)){
+		//qDebug() << __FILE__ << __LINE__  << key <<"is Cached Value";
+		((CreateEditUI*)Model::Get()->cachedCreateEditUI.value(key))->ShowUI(QJsonObject(),value.object(),false);
+		//((CreateEditUI*)MainForm::Get()->GetCurrentDisplay())->ShowUI(QJsonObject(),value.object());
+		//MainForm::Get()->ShowDisplay();
+		}
+	else{
+		//qDebug() << __FILE__ << __LINE__  << key <<"Not Cached Value";
+		CreateEditUI::ShowUI(QJsonObject(),value.object(),false);
+		}
+
 }
 
 
@@ -456,7 +479,7 @@ void Controller::linkPressedData(QJsonDocument document)
 {
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(linkPressedData(QJsonDocument)));
 
-	CreateEditUI::ShowUI(document.object(),QJsonObject());
+	CreateEditUI::ShowUI(document.object(),QJsonObject(),false);
 }
 
 void Controller::addSubNavigation(double key, QList<QTreeWidgetItem*> subNav)
@@ -720,7 +743,7 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 		//qDebug() << __FILE__ << __LINE__  << "Before Query";
 
 		if(addedSelectItems){
-				qDebug() << __FILE__ << __LINE__  <<"Report Q:"<< query;
+			qDebug() << __FILE__ << __LINE__  <<"Report Q:"<< query;
 			qRegisterMetaType<QList<QJsonDocument> >("MyStruct");
 			QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)),Qt::QueuedConnection);
 			//Database::Get()->query(query);
@@ -755,15 +778,16 @@ QString Controller::getLocalSourceReport(QJsonObject clmn,int index,QString filt
 	return query;
 }
 
-void Controller::insertCachedCreateEditUI(QString key,QWidget* instance)
+void Controller::insertCachedCreateEditUI(QString key, QWidget* instance)
 {
 	//qDebug() << __FILE__ << __LINE__  << "insert"<<key<< instance;
-	Model::Get()->cachedCreateEditUI.insert(key,(CreateEditUI*)instance);
+	Model::Get()->cachedCreateEditUI.insert(key,instance);
 }
 
 QWidget* Controller::getCachedCreateEditUI(QString key)
 {
-	return Model::Get()->cachedCreateEditUI.value(key);
+	return (Model::Get()->cachedCreateEditUI.value(key));
+
 }
 bool Controller::isCachedCreateEditUI(QString key)
 {

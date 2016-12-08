@@ -18,7 +18,7 @@ class MainDisplay : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit MainDisplay(QWidget* parent);
+	explicit MainDisplay(QWidget* parent = 0);
 	QScrollArea *scrollAreaFormPanel;
 	QWidget *formPanel;
 	void paintEvent(QPaintEvent *);

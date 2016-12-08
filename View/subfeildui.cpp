@@ -110,7 +110,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		}
 	else if(type.compare("Table") == 0){
 		table = new merplyTabelView(this,true,false);
-	//	qDebug() << __FILE__ << __LINE__ <<"DATAA" << data.toObject() << structureView;
+		//	qDebug() << __FILE__ << __LINE__ <<"DATAA" << data.toObject() << structureView;
 		//Controller::Get()->getReportTableData(structureView);
 		QJsonObject firstclmn = structureView.value("Columns").toArray().first().toObject();
 		if(firstclmn.value("SourceLocalFilter") != QJsonValue::Undefined &&firstclmn.value("LocalSource").toBool()){
@@ -223,7 +223,7 @@ QJsonValue SubFieldUI::save()
 	else if(QString(field->metaObject()->className()).compare("QTextEdit") == 0 ){
 		save =((QTextEdit*)field)->toPlainText();
 		}
-	else if(field->objectName().compare("checkbox") == 0){
+	else if(QString(field->metaObject()->className()).compare("QCheckBox") == 0 ){
 		//	save = component.name;
 		save =((QCheckBox*)field)->isChecked();
 		//	save =" ";
@@ -245,15 +245,34 @@ QJsonValue SubFieldUI::save()
 bool SubFieldUI::checkMandatory()
 {
 
-	if(structureView.isEmpty()
+	if(!structureView.isEmpty()
 			&& structureView.value("Mandatory") != QJsonValue::Undefined
 			&& structureView.value("Mandatory").toBool()){
-		if(this->save().toString().isEmpty()){
+		QJsonValue saved = this->save();
+
+		if(saved.isObject()){
+			if(saved.toObject().value("Value").toString().isEmpty()){
+				field->setObjectName("error");
+				field->style()->unpolish(field);
+				field->style()->polish(field);
+				field->update();
+				return false;
+				}
+
+			}
+		else if(this->save().toString().isEmpty()){
+			//	qDebug()<< this->save().isNull() << this->save().toString() << field;
 			field->setObjectName("error");
 			field->style()->unpolish(field);
 			field->style()->polish(field);
 			field->update();
 			return false;
+			}
+		else{
+			field->setObjectName("NotError");
+			field->style()->unpolish(field);
+			field->style()->polish(field);
+			field->update();
 			}
 
 		}

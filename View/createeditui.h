@@ -13,8 +13,9 @@ class CreateEditUI : public MainDisplay
 {
 	Q_OBJECT
 public:
+	CreateEditUI(QWidget *parent = 0);
 	explicit CreateEditUI(QWidget *parent = 0,QJsonObject viewStructure = QJsonObject(),QJsonObject data = QJsonObject());
-	static void ShowUI(QJsonObject viewStructure,QJsonObject data);
+	static void ShowUI(QJsonObject viewStructure, QJsonObject data, bool create);
 private:
 	static CreateEditUI* p_instance;
 	void fill(QJsonObject viewStructure,QJsonObject data);
