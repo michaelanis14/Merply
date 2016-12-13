@@ -334,14 +334,14 @@ bool Controller::documentInList(QList<QJsonDocument> all, QString key)
 
 QList<QJsonDocument> Controller::getEnities()
 {
-	return Prsistance::GetALL("ViewStructure","default.Type =\"Entity\"");
+	return Prsistance::GetALL("ViewStructure",QString(DATABASE).append(".Type =\"Entity\""));
 }
 
 void Controller::getFields(QString Title)
 {
 	if(!Title.isEmpty() && Title.compare("_") != 0){
 		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getFieldsData(QList<QJsonDocument>)));
-		QString query = "SELECT array_star(default.Viewgroups[*].Viewgroup).Fields FROM  `default` WHERE META(`default`).id = '"+Title+"'";
+		QString query = "SELECT array_star("+QString(DATABASE)+".Viewgroups[*].Viewgroup).Fields FROM  `"+QString(DATABASE)+"` WHERE META(`"+QString(DATABASE)+"`).id = '"+Title+"'";
 		//	qDebug() << __FILE__ << __LINE__  << "getFields"<<query;
 		Database::Get()->query(query);
 		}

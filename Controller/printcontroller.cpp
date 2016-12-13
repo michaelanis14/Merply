@@ -36,7 +36,7 @@ void PrintController::gotPrintEntity(QJsonDocument document)
 }
 void PrintController::getFieldstoValueMap(QJsonObject entity)
 {
-
+	reportData = QJsonArray();
 	foreach(QJsonValue fv,entity.value("Fields").toArray()){
 		foreach(QJsonValue fvvapn,fv.toArray()){
 			QStringList keys;
@@ -56,11 +56,17 @@ void PrintController::getFieldstoValueMap(QJsonObject entity)
 						else if(value.toObject().value("merplyTabel") != QJsonValue::Undefined){
 							//	qDebug() << value;
 							if(value.toObject().value("merplyTabel").isArray()){
-
+								//qDebug() << value.toObject().value("merplyTabel");
 								foreach (QJsonValue row, value.toObject().value("merplyTabel").toArray()) {
 									QString rowValue = row.toObject().value("Value").toString();
+
 									if(!rowValue.isEmpty() && rowValue.compare("0") !=0)
 										reportData.append(row);
+									else{
+										QString rowAmount = row.toObject().value("Amount").toString();
+										if(!rowAmount.isEmpty() && rowAmount.compare("0") !=0)
+											reportData.append(row);
+										}
 									}
 								//TODO : instead of Merging tables have better refrences
 

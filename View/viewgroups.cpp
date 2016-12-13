@@ -27,6 +27,9 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
 			ViewGroup* viewgroup = new ViewGroup(0,structureView.value("document_id").toString(),item.toObject(),dataVGs.at(d).toArray());
+			QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
+			spRight.setHorizontalStretch(1);
+			viewgroup->setSizePolicy(spRight);
 
 			QJsonObject viewGroupObject = item.toObject().value("Viewgroup").toObject();
 			if(viewGroupObject.value("Style").toString().compare("horizontail") == 0){
@@ -45,8 +48,9 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 					}
 				else{
 					if(HViewGroups.find(group) != HViewGroups.end())
-						if(HViewGroups.find(group).value()->layout())
+						if(HViewGroups.find(group).value()->layout()){
 							HViewGroups.find(group).value()->layout()->addWidget(viewgroup);
+							}
 					}
 				}
 			else 	layout->addWidget(viewgroup);

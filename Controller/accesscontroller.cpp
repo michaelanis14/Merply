@@ -29,7 +29,7 @@ void AccessController::login(QString username, QString password)
 		}
 	else{
 		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(loginData(QList<QJsonDocument>)));
-		QString query = QString("SELECT (`"+QString(DATABASE)+"`).*  ,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \"Users::%\"  AND Fields[0][1].Username[0] = '"+username+"' AND Fields[0][2].UserPassword[0] = '"+password+"'");
+		QString query = QString("SELECT (`"+QString(DATABASE)+"`).*  ,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \"Users::%\"  AND Fields[0][0].`Username`[0] = '"+username+"' AND Fields[0][1].`UserPassword`[0] = '"+password+"'");
 		//qDebug() << __FILE__ << __LINE__ <<"Q : " << query;
 		Database::Get()->query(query);
 		}

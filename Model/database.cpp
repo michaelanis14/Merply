@@ -131,17 +131,24 @@ lcb_t Database::InitDatabase(QString connStr)
 {
 	// initializing
 	//Database::Get()->document = QJsonDocument();
-	connStr = "";
+	connStr = "couchbase://localhost/"+QString(DATABASE);
 	Database::Get()->array.clear();
 
 	struct lcb_create_st cropts;// = { 0 };
 	cropts.version = 3;
-	cropts.v.v3.connstr = "couchbase://localhost/default";
+	QByteArray databaseByte = connStr.toLatin1();
+	const char *databseCharK = databaseByte.data();
+	cropts.v.v3.connstr = databseCharK;
+	//cropts.v.v3.passwd ="2019066";
+	//cropts.v.v3.username="admin";
+
+	qDebug() << cropts.v.v3.connstr<<cropts.v.v3.passwd <<cropts.v.v3.username;
 	lcb_error_t err;
 	lcb_t instance;
 	err = lcb_create(&instance, &cropts);
 	if (err != LCB_SUCCESS) {
 		qDebug("Couldn't create instance!\n");
+		qDebug() <<  lcb_strerror(instance, err);
 		return  NULL;
 		}
 
@@ -227,7 +234,7 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 }
 
 bool Database::getDoc(QString key) {
-	//Query("SELECT * from default WHERE  \"id = Contact::* \"");
+	//Query("SELECT * from QString(DATABASE)  WHERE  \"id = Contact::* \"");
 	//qDebug() << __FILE__ << __LINE__  << "hello";
 	//qDebug() << __FILE__ << __LINE__  <<"Key:"<< key;
 	Database::Get()->LastKeyID = "-1";

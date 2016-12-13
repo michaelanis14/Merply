@@ -1,7 +1,7 @@
 #ifndef PRSISTANCE_H
 #define PRSISTANCE_H
 
-#define DATABASE "default"
+
 
 #include "database.h"
 

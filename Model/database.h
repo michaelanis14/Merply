@@ -17,6 +17,8 @@
 #include <libcouchbase/couchbase.h>
 #include <libcouchbase/n1ql.h>
 
+#define DATABASE "AM"
+
 class Database: public QObject
 {
 

@@ -1,0 +1,478 @@
+{
+      "MainNavigations": [
+        {
+          "ID": 1,
+          "Items": [
+            {
+              "ID": 2,
+              "Page": {
+                "Card": "ViewStructure::Contact",
+                "Permissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Select": "Index",
+                "TabPermissions": {
+                  "Read": {
+                    "Allowed": [
+                      {
+                        "Key": "Users::1",
+                        "Value": "M"
+                      }
+                    ],
+                    "Denied": [],
+                    "Permissions": "000111"
+                  }
+                },
+                "Title": "",
+                "Type": "Entity"
+              },
+              "TabPermissions": {
+                "Read": {
+                  "Allowed": [
+                    {
+                      "Key": "Users::1",
+                      "Value": "M"
+                    }
+                  ],
+                  "Denied": [],
+                  "Permissions": "000111"
+                }
+              },
+              "Title": "Contact"
+            },
+            {
+              "ID": 6,
+              "Page": {
+                "Card": "NavigationUI::1",
+                "Permissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "TabPermissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Title": "City",
+                "Type": "Page"
+              },
+              "TabPermissions": {
+                "Read": {
+                  "Permissions": "000100"
+                }
+              },
+              "Title": "miscellaneous"
+            },
+            {
+              "ID": 14,
+              "Page": {
+                "Card": "Page::1",
+                "Permissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "TabPermissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Title": "Invoice Reports",
+                "Type": "Page"
+              },
+              "TabPermissions": {
+                "Read": {
+                  "Permissions": "000100"
+                }
+              },
+              "Title": "Report"
+            },
+            {
+              "ID": 15,
+              "Page": {
+                "Card": "ViewStructure::MAWB",
+                "Permissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Select": "Index",
+                "TabPermissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Title": "MAWB",
+                "Type": "Entity"
+              },
+              "TabPermissions": {
+                "Read": {
+                  "Permissions": "000100"
+                }
+              },
+              "Title": "AWB"
+            },
+            {
+              "ID": 16,
+              "Page": {
+                "Card": "ViewStructure::DeliveryOrderAir",
+                "Permissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Select": "Index",
+                "TabPermissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Title": "Invoice Air",
+                "Type": "Entity"
+              },
+              "TabPermissions": {
+                "Read": {
+                  "Permissions": "000100"
+                }
+              },
+              "Title": "AirLine Delivery Order"
+            },
+            {
+              "ID": 18,
+              "Page": {},
+              "Title": "New Top Button"
+            }
+          ],
+          "Title": "Contacts"
+        },
+        {
+          "ID": 3,
+          "Items": [
+            {
+              "ID": 4,
+              "Page": {
+                "Card": "ViewStructure::Invoice",
+                "Permissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Select": "Index",
+                "TabPermissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Title": "Invoice",
+                "Type": "Entity"
+              },
+              "TabPermissions": {
+                "Read": {
+                  "Permissions": "000100"
+                }
+              },
+              "Title": "Invoices"
+            },
+            {
+              "ID": 5,
+              "Page": {
+                "Card": "ViewStructure::Returns",
+                "Permissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Select": "Index",
+                "TabPermissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Title": "Returns",
+                "Type": "Entity"
+              },
+              "TabPermissions": {
+                "Read": {
+                  "Permissions": "000100"
+                }
+              },
+              "Title": "Returns"
+            },
+            {
+              "ID": 16,
+              "Page": {
+                "Card": "ViewStructure::DeliveryOrderAir",
+                "Permissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Select": "Index",
+                "TabPermissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Title": "Invoice Air",
+                "Type": "Entity"
+              },
+              "TabPermissions": {
+                "Read": {
+                  "Permissions": "000100"
+                }
+              },
+              "Title": "Invoice Air"
+            }
+          ],
+          "Title": "Invoices"
+        },
+        {
+          "ID": 9,
+          "Items": [
+            {
+              "ID": 10,
+              "Items": [
+                {
+                  "ID": 11,
+                  "Page": {
+                    "Card": "ViewStructure::City",
+                    "Permissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Select": "Index",
+                    "TabPermissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Title": "",
+                    "Type": "Entity"
+                  },
+                  "TabPermissions": {
+                    "Read": {
+                      "Permissions": "000100"
+                    }
+                  },
+                  "Title": "City"
+                },
+                {
+                  "ID": 13,
+                  "Page": {
+                    "Card": "ViewStructure::Country",
+                    "Permissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Select": "Index",
+                    "TabPermissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Title": "Country",
+                    "Type": "Entity"
+                  },
+                  "TabPermissions": {
+                    "Read": {
+                      "Permissions": "000100"
+                    }
+                  },
+                  "Title": "Country"
+                },
+                {
+                  "ID": 15,
+                  "Page": {
+                    "Card": "ViewStructure::MAWB",
+                    "Permissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Select": "Index",
+                    "TabPermissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Title": "MAWB",
+                    "Type": "Entity"
+                  },
+                  "TabPermissions": {
+                    "Read": {
+                      "Permissions": "000100"
+                    }
+                  },
+                  "Title": "AirLineCodes"
+                },
+                {
+                  "ID": 16,
+                  "Page": {
+                    "Card": "ViewStructure::DeliveryOrderAir",
+                    "Permissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Select": "Index",
+                    "TabPermissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Title": "Invoice Air",
+                    "Type": "Entity"
+                  },
+                  "TabPermissions": {
+                    "Read": {
+                      "Permissions": "000100"
+                    }
+                  },
+                  "Title": "AirportsCode"
+                },
+                {
+                  "ID": 17,
+                  "Page": {},
+                  "Title": "AirportsReport"
+                },
+                {
+                  "ID": 22,
+                  "Page": {
+                    "Card": "ViewStructure::CollectionFees",
+                    "Permissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Select": "Index",
+                    "TabPermissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Title": "CollectionFees",
+                    "Type": "Entity"
+                  },
+                  "TabPermissions": {
+                    "Read": {
+                      "Permissions": "000100"
+                    }
+                  },
+                  "Title": "CollectionFees"
+                }
+              ],
+              "Page": {
+                "Card": "ViewStructure::City",
+                "Permissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Select": "Index",
+                "TabPermissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Title": "",
+                "Type": "Entity"
+              },
+              "TabPermissions": {
+                "Read": {
+                  "Permissions": "000100"
+                }
+              },
+              "Title": "Miscellaneous Cards"
+            },
+            {
+              "ID": 18,
+              "Page": {},
+              "Title": "Accounting Information"
+            },
+            {
+              "ID": 19,
+              "Items": [
+                {
+                  "ID": 20,
+                  "Page": {
+                    "Card": "ViewStructure::Users",
+                    "Permissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Select": "Index",
+                    "TabPermissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Title": "Users",
+                    "Type": "Entity"
+                  },
+                  "TabPermissions": {
+                    "Read": {
+                      "Permissions": "000100"
+                    }
+                  },
+                  "Title": "Users"
+                },
+                {
+                  "ID": 21,
+                  "Page": {
+                    "Card": "ViewStructure::Groups",
+                    "Permissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Select": "Index",
+                    "TabPermissions": {
+                      "Read": {
+                        "Permissions": "000100"
+                      }
+                    },
+                    "Title": "Groups",
+                    "Type": "Entity"
+                  },
+                  "TabPermissions": {
+                    "Read": {
+                      "Permissions": "000100"
+                    }
+                  },
+                  "Title": "Groups"
+                }
+              ],
+              "Page": {
+                "Card": "Page::3",
+                "Permissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "TabPermissions": {
+                  "Read": {
+                    "Permissions": "000100"
+                  }
+                },
+                "Title": "Permission Control",
+                "Type": "Page"
+              },
+              "TabPermissions": {
+                "Read": {
+                  "Permissions": "000100"
+                }
+              },
+              "Title": "Permission Control"
+            }
+          ],
+          "Title": "Settings"
+        }
+      ],
+      "document_id": "NavigationUI::1"
+    }

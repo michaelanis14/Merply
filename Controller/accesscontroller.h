@@ -1,6 +1,8 @@
 #ifndef ACCESSCONTROLLER_H
 #define ACCESSCONTROLLER_H
 
+#include "database.h"
+
 #include <QObject>
 #include <QJsonDocument>
 #include <QJsonValue>

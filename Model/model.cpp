@@ -27,7 +27,7 @@ Model::Model():QObject()
 	subNavigation =  QMap<double, QList<QTreeWidgetItem *> >();
 	pages =  QMap<double, QJsonObject >();
 	loggedUser = 0;
-	this->defaulConnStrg = "couchbase://localhost/default";
+	this->defaulConnStrg = "couchbase://localhost/";//default";
 }
 
 bool Model::getShowWarning() const

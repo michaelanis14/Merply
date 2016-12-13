@@ -158,6 +158,11 @@ bool Prsistance::init()
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		Database::Get()->storeDoc("ViewStructure::Users",doc);
 		}
+	if(Count("NavigationUI::1\"") ==  0){
+		QString jsonFile = readFile(":/initData/initData/NavigationUI.json");
+		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		Database::Get()->storeDoc("NavigationUI::1",doc);
+		}
 	if(Count("ViewStructure::Groups\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/Groups.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());

@@ -70,5 +70,6 @@
         <file>initData/AirlinesCodeData.csv</file>
         <file>initData/Users.json</file>
         <file>initData/Groups.json</file>
+        <file>initData/NavigationUI.json</file>
     </qresource>
 </RCC>
