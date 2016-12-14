@@ -86,7 +86,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 			Source->setCurrentText(fieldVS.toObject().value("Source").toString());
 		layout->addRow(new QLabel(tr("Source ")), Source);
 		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
-		Controller::Get()->getJsonList("ViewStructure","Title",QString(DATABASE).append(".Type =\"Entity\""));
+		Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 
 
 		Select = new ERPComboBox(0);
@@ -107,7 +107,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		Select = new ERPComboBox(0);
 		layout->addRow(new QLabel(tr("Source ")), Source);
 		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
-		Controller::Get()->getJsonList("ViewStructure","Title",QString(DATABASE).append(".Type =\"Entity\""));
+		Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 		layout->addRow(new QLabel(tr("Select ")), Select);
 		condition = new QTextEdit;
 		condition->setText(fieldVS.toObject().value("Condition").toString());

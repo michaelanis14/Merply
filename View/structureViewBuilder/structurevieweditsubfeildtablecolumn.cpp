@@ -39,7 +39,7 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	Source = new ERPComboBox(0);
 	layout->addRow(new QLabel(tr("Source ")), Source);
 	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(selectData(QList<QJsonDocument>)));
-	Controller::Get()->getJsonList("ViewStructure","Title", QString(DATABASE).append(".Type =\"Entity\""));
+	Controller::Get()->getJsonList("ViewStructure","Title","`"+ QString(DATABASE).append("`.Type =\"Entity\""));
 
 	Select = new ERPComboBox(0);
 	//Select->setText(fieldVS.toObject().value("Select").toString());

@@ -1,5 +1,5 @@
 #include "headerlabel.h"
-
+#include "QDebug"
 HeaderLabel::HeaderLabel(QWidget *parent) : QWidget(parent)
 {
 	this->setContentsMargins(0,0,0,0);
@@ -20,6 +20,7 @@ HeaderLabel::HeaderLabel(QWidget *parent) : QWidget(parent)
 
 QString HeaderLabel::getTitle() const
 {
+	qDebug() << title->text();
 	return title->text();
 }
 

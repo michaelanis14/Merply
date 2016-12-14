@@ -235,6 +235,11 @@ int MerplyReportTableModel::getRowsCount() const
 	return rowsCount;
 }
 
+int MerplyReportTableModel::getColmnsCount() const
+{
+	return colmnsCount;
+}
+
 void MerplyReportTableModel::fill(QList<QJsonDocument> documents)
 {
 	rowsCount = 0;

@@ -20,3 +20,5 @@ Merply.pro.user
 *.stash
 
 *.autosave
+
+*.user

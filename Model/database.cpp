@@ -57,17 +57,16 @@ void  Database::arithmatic_callback(lcb_t instance, const void *,
 bool Database::updateDoc(QJsonDocument document)
 {
 	lcb_t instance = Database::InitDatabase();
+	//qDebug() << __FILE__ << __LINE__  << "UPDATE DOC" << document ;
+	//qDebug()  << document.object().value("document_id").toString().toLatin1();
 
-
-	//qDebug() << __FILE__ << __LINE__  << "UPDATE DOC" << document << document.object().value("document_id").toString().toLatin1();
 	//lcb_set_store_callback(instance, on_stored_status);
 	struct lcb_store_cmd_st cmd;// = { 0 };
 	lcb_store_cmd_t *cmdlist = &cmd;
 	QByteArray bKey = document.object().value("document_id").toString().toLatin1();
 	const char *docbKey = bKey.data();
 	document.object().remove("document_id");
-	QString strJson(document.toJson(QJsonDocument::Compact));;
-	QByteArray ba = strJson.toLatin1();
+	QByteArray ba =  document.toJson(QJsonDocument::Compact) ;
 	const char *doc = ba.data();
 	//qDebug() << __FILE__ << __LINE__  <<"Prsistance UpdateDOC"<< document.object().value("document_id").toString() << strJson;
 	cmd.v.v0.key = docbKey;
@@ -142,7 +141,7 @@ lcb_t Database::InitDatabase(QString connStr)
 	//cropts.v.v3.passwd ="2019066";
 	//cropts.v.v3.username="admin";
 
-	qDebug() << cropts.v.v3.connstr<<cropts.v.v3.passwd <<cropts.v.v3.username;
+	//qDebug() << cropts.v.v3.connstr<<cropts.v.v3.passwd <<cropts.v.v3.username;
 	lcb_error_t err;
 	lcb_t instance;
 	err = lcb_create(&instance, &cropts);
@@ -362,7 +361,7 @@ QString Database::getLastKeyID() const
  * @return
  */
 bool Database::storeDoc(QString key,QJsonDocument document) {
-	//qDebug() << __FILE__ << __LINE__  <<key << key.split("::").count() << key;
+//	qDebug() << __FILE__ << __LINE__  <<key << key.split("::").count() << key << document ;
 	if(key.split("::").count() <  2){
 		Database::IncrementKey(key);
 		int keyID = Database::GetKey(key);
@@ -386,10 +385,8 @@ bool Database::storeDoc(QString key,QJsonDocument document) {
 	struct lcb_store_cmd_st cmd;// = { 0 };
 	lcb_store_cmd_t *cmdlist = &cmd;
 
-	QString strJson(document.toJson(QJsonDocument::Compact));;
-	QByteArray ba = strJson.toLatin1();
+	QByteArray ba =  document.toJson(QJsonDocument::Compact) ;
 	const char *doc = ba.data();
-
 	QByteArray bKey = key.toLatin1();
 	const char *docbKey = bKey.data();
 	cmd.v.v0.key = docbKey;

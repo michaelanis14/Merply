@@ -111,7 +111,7 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	cardDetailsLayout->addWidget(btnRemoveCard);
 
 	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
-	Controller::Get()->getJsonList("ViewStructure","Title",QString(DATABASE).append(".Type =\"Entity\""));
+	Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 
 	//cardDetailsLayout->addRow(tr("View"),view);
 	layout->addWidget(cardDetails);
@@ -192,7 +192,7 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 			if(cards->currentIndex() == -1){
 				cards->clear();
 				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
-				Controller::Get()->getJsonList("ViewStructure","Title",QString(DATABASE).append(".Type =\"Entity\""));
+				Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 				cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
 
 				}

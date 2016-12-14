@@ -40,6 +40,8 @@ public:
 	double getTotalClmn(QString clmn);
 	int getRowsCount() const;
 
+	int getColmnsCount() const;
+
 private:
 	int rowsCount;
 	int colmnsCount;

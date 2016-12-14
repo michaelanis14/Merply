@@ -101,11 +101,11 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 		QItemSelectionModel *select = tableView->selectionModel();
 		if(select && select->hasSelection()){
 			QString id = 	model->getRowKey(select->currentIndex().row());
-				qDebug() << __FILE__ << __LINE__  << id;
+			qDebug() << __FILE__ << __LINE__  << id;
 			if(nActon.count() > 1){
 				if(nActon.at(1).compare("Print") == 0){
 					PrintController::Get()->printEntity(id);
-				//////////////				Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
+					//////////////				Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 					}
 				else if(nActon.at(1).compare("Edit") == 0){
 
@@ -184,7 +184,7 @@ void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocu
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
 	Controller::Get()->getFields(document_id);
 
-//	initHController(QJsonObject());
+	//	initHController(QJsonObject());
 
 }
 
@@ -331,7 +331,7 @@ void merplyTabelView::printEntity(const QString& id)
 						this, SLOT(setValue(const int, const QString, QVariant&, const int)));
 
 
-		qDebug() << __FILE__ << __LINE__  <<"print" <<id;
+	qDebug() << __FILE__ << __LINE__  <<"print" <<id;
 	currenctPrintID = id;
 	QString fileName = ":/example4.xml";
 
@@ -382,7 +382,7 @@ void merplyTabelView::modelFinished()
 				SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),this,
 				SLOT(selectionChanged(const QItemSelection &, const QItemSelection &))
 				);
-
-	this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
+	if(this->model->getColmnsCount() < 100)
+		this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
 }
 
