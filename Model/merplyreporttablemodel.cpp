@@ -13,9 +13,9 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 		this->clmns = (strct.value("Columns").toArray());
 
 		foreach(QJsonValue clmn,strct.value("Columns").toArray()){
-		//	if(clmn.toObject().value("ShowIndex") == QJsonValue::Undefined){
-		//		continue;
-		//		}
+			//	if(clmn.toObject().value("ShowIndex") == QJsonValue::Undefined){
+			//		continue;
+			//		}
 			clmnsHeader << clmn.toObject().value("Header").toString().split("$")[0];
 			if(clmn.toObject().value("Type").toString().compare("Text") == 0)
 				Textclmns.insert(clmn.toObject().value("Header").toString(),clmn.toObject());
@@ -359,7 +359,9 @@ void MerplyReportTableModel::fillIndexTabel( QList<QJsonDocument> items)
 	foreach(QJsonDocument item,items){
 		QString  key = item.object().value("document_id").toString();
 		int j = 0;
-		cells[i * this->colmnsCount + j].setId(key);
+		qDebug() << cells.count() << QString::number((i * this->colmnsCount + j)-1) << (((i * this->colmnsCount + j)-1) <= cells.count());
+		if(cells.count() > 0 && ((i * this->colmnsCount + j)-1) <= cells.count() )
+			cells[i * this->colmnsCount + j].setId(key);
 		foreach(QJsonValue value, item.object().value("Fields").toArray()){
 			foreach(QJsonValue viewGroup, value.toArray()){
 				if(clmnsHeader.count()  > j){
