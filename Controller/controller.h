@@ -58,7 +58,7 @@ public:
 
 	QList<QString> select(const QString query);
 	QList<QJsonDocument> getAll(const QString entity, const QString condition);
-	QString toString(QJsonArray array);
+	QString toString(QJsonValue value);
 	bool documentInList(QList<QJsonDocument> all, QString key);
 	QList<QJsonDocument> getEnities();
 	void getFields(QString Title);

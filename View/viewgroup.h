@@ -11,8 +11,8 @@ class ViewGroup  : public QGroupBox
 {
 public:
 	explicit ViewGroup(QWidget *parent = 0,QString strID = ""
-			,QJsonObject structureView = QJsonObject(),QJsonArray data = QJsonArray());
-	QJsonArray save();
+			,QJsonObject structureView = QJsonObject(),QJsonObject data = QJsonObject());
+	void save(QJsonObject* entity);
 
 	QList<FeildUI*> feilds;
 private:

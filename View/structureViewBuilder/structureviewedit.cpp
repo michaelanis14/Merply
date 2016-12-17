@@ -158,11 +158,12 @@ QJsonObject StructureViewEdit::save()
 		QJsonObject sSFSave = svsf->save();
 
 		if(initData->isChecked()){
-			QJsonObject savedPreview = previewField->save();
-		//	qDebug() << __FILE__ << __LINE__  << savedPreview;
-			if(savedPreview.keys().count() > 0 && savedPreview.value(savedPreview.keys().first()) != QJsonValue::Undefined){
-				QJsonObject tblObj = savedPreview.value(savedPreview.keys().first()).toArray().first().toObject();
-			//	qDebug() << __FILE__ << __LINE__  << tblObj;
+			QJsonObject* savedPreview;
+			previewField->save(savedPreview);
+			//	qDebug() << __FILE__ << __LINE__  << savedPreview;
+			if(savedPreview->keys().count() > 0 && savedPreview->value(savedPreview->keys().first()) != QJsonValue::Undefined){
+				QJsonObject tblObj = savedPreview->value(savedPreview->keys().first()).toArray().first().toObject();
+				//	qDebug() << __FILE__ << __LINE__  << tblObj;
 				sSFSave.insert("initData",tblObj);
 				}
 			}

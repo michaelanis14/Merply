@@ -1,6 +1,7 @@
 #include "feildui.h"
 #include "removebtn.h"
 #include "QPushButton"
+#include "QJsonValue"
 
 FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJsonObject data) : QWidget(parent)
 {
@@ -41,17 +42,30 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 
 		if(structureView.value("ArrayList") != QJsonValue::Undefined   && structureView.value("ArrayList").toBool()){
 
-			QJsonArray arrDataSubFields = data.value(structureView.value("Label").toString()).toArray();
+			QStringList arrDataSubFields = data.value(structureView.value("Label").toString()).toString().split(";");
+			qDebug() << arrDataSubFields;
 			if(arrDataSubFields.isEmpty())
 				goto emptyData;
 
-			int counter = 0;
-			foreach (QJsonValue field, arrDataSubFields) {
+			if(structureView.value("SubFields").toArray().count() == arrDataSubFields.count()){
+				int counter = 0;
+				foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
+					SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),arrDataSubFields.at(counter));
+					subFieldsWidgetLayout->addWidget(subfeild);
+					subFields << subfeild;
+					counter++;
+					}
+
+				}
+
+
+			/*
+			foreach (QString field, arrDataSubFields) {
 				if(counter == 0){
 					int d = 0;
 					QJsonArray dataSubFields = field.toArray();
 					foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
-						SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),dataSubFields.at(d));
+						SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),arrDataSubFields.at(d));
 						subFieldsWidgetLayout->addWidget(subfeild);
 						subFields << subfeild;
 						d++;
@@ -62,33 +76,45 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 					}
 				counter++;
 				}
+			*/
 			}
 
 		else{
 emptyData:
+
+			/*
 			int d = 0;
-			QJsonArray dataSubFields = data.value(structureView.value("Label").toString()).toArray();
+		//	qDebug() << structureView.value("Label").toString() << data.value(structureView.value("Label").toString()).toString() << data;
+
+			QStringList dataSubFields = data.value(structureView.value("Label").toString()).toString().split(";");
+
 			foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
 				SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),dataSubFields.at(d));
 				subFieldsWidgetLayout->addWidget(subfeild);
 				subFields << subfeild;
 				d++;
 				}
+
+
+			*/
+
+			SubFieldUI* subfeild = new SubFieldUI(0,this->strID,structureView.value("SubFields").toArray().first().toObject(),data.value(structureView.value("Label").toString()));
+			subFieldsWidgetLayout->addWidget(subfeild);
+			subFields << subfeild;
 			}
+
 
 		}
 
 	if(structureView.value("ArrayList") != QJsonValue::Undefined   && structureView.value("ArrayList").toBool()){
-		QPushButton* arrybtn = new QPushButton(tr("+"));
-		QObject::connect(arrybtn,SIGNAL(clicked()),this,SLOT(addsubFields()));
-		layout->addWidget(arrybtn);
+		//QPushButton* arrybtn = new QPushButton(tr("+"));
+		//QObject::connect(arrybtn,SIGNAL(clicked()),this,SLOT(addsubFields()));
+		//layout->addWidget(arrybtn);
 		}
 }
 
-QJsonObject FeildUI::save()
+void FeildUI::save(QJsonObject* entity)
 {
-	QJsonObject field;
-
 	if(structureView.value("ArrayList") != QJsonValue::Undefined   && structureView.value("ArrayList").toBool()){
 		QJsonArray arrySubfieldsValues;
 
@@ -108,16 +134,29 @@ QJsonObject FeildUI::save()
 				}
 			arrySubfieldsValues.append(subfieldsValues);
 			}
-		field.insert(this->label->text(),arrySubfieldsValues);
+		entity->insert(this->label->text(),arrySubfieldsValues);
 		}
 	else{
-		QJsonArray subfieldsValues;
-		foreach(SubFieldUI* subfeild,subFields){
-			subfieldsValues.append(subfeild->save());
+
+		if(!subFields.isEmpty()){
+			if(subFields.count() > 1){
+				//qDebug() << "subFields.count() > 1";
+				QString subfieldsValues;
+				foreach(SubFieldUI* subfeild,subFields){
+					if(!subfieldsValues.isEmpty())
+						subfieldsValues.append(";");
+					subfieldsValues.append(subfeild->save().toString());
+					}
+				}
+			else if(!subFields.isEmpty()){
+			//	qDebug() << "!subFields.isEmpty()";
+				QJsonValue savedField = subFields.first()->save();
+				if(!savedField.isNull())
+					entity->insert(this->label->text(),subFields.first()->save());
+				}
 			}
-		field.insert(this->label->text(),subfieldsValues);
+
 		}
-	return field;
 }
 
 QString FeildUI::checkMandatory()

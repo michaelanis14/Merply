@@ -19,127 +19,6 @@ Prsistance*Prsistance::Get()
 
 
 
-bool Prsistance::write(QString table, QList<QString> lines, bool update){
-	QJsonObject json = QJsonObject();
-	foreach(QString line,lines){
-		int splitCount = line.split("->").count();
-		if(splitCount > 0){
-			if(splitCount == 2){
-				json[line.split("->")[0]] = line.split("->")[1];
-
-				}
-			else{
-				QJsonArray array;
-
-				QJsonArray table = Prsistance::table(line);
-				if(!table.isEmpty()){
-					//	qDebug() << __FILE__ << __LINE__ << "table";
-					array = table;
-					}
-
-				else{
-					QJsonArray inArray;
-					for(int i = 1;splitCount > i;i++){
-						inArray << line.split("->").at(i);
-						//qDebug() << __FILE__ << __LINE__<<line.split("->")[0]<<line << line.split("->").at(i);
-						}
-					array << inArray;
-
-					//	qDebug() << __FILE__ << __LINE__ << line.split("->")[0] <<json.value(line.split("->")[0]);
-					if(json.value(line.split("->")[0]) == QJsonValue::Undefined){
-						json.insert(line.split("->")[0],array);
-						}
-					else{
-						QJsonArray tempArray;
-						if(json.value(line.split("->")[0]).isArray())
-							tempArray = json.value(line.split("->")[0]).toArray();
-
-						else {
-							{
-							QJsonArray temp;
-							temp << json.value(line.split("->")[0]).toString();
-							tempArray <<temp;
-							}
-							}
-						tempArray << inArray;
-						json.insert(line.split("->")[0],tempArray);
-						}
-
-
-
-					}
-
-				}
-			}
-
-		/*		else{
-					//qDebug() << __FILE__ << __LINE__ << "NOT Array"<< line;
-					QJsonArray tempArray;
-					QJsonArray table = Prsistance::table(line);
-
-					if(!table.isEmpty()){
-						tempArray <<table;
-						qDebug() << __FILE__ << __LINE__ << table;
-						}
-
-					*/
-		}
-
-
-	//qDebug() << __FILE__ << __LINE__ << line;
-
-
-	QJsonDocument doc(json);
-
-	//QString strJson(doc.toJson(QJsonDocument::Indented));
-	//qDebug() << __FILE__ << __LINE__ << strJson;
-	if(update)
-		return	Database::Get()->updateDoc(doc);
-	else return Database::Get()->storeDoc(table,doc);
-
-
-}
-
-void Prsistance::write(QString table, QString line)
-{
-	QList<QString> lines;
-	lines.append(line);
-	Prsistance::write(table,lines,false);
-}
-
-
-
-QJsonArray Prsistance::table(QString line)
-{
-	QJsonArray array;
-	QString key = line.split("->")[0];
-	line.replace(0,QString(line.split("->")[0]).count(),"");
-	//qDebug() << __FILE__ << __LINE__ << line;
-	QString s =  QString("->")+QString(key) + QString("->");
-	int splitCount = line.split(s).count();
-	//qDebug() << __FILE__ << __LINE__ << s << line.split(s);
-	if(line.split(s).count() > 1){
-		//array
-		for(int i = 0; i < splitCount; i++){
-			QJsonArray row;
-			//	qDebug() << __FILE__ << __LINE__ << "QString(line.split(s)[i]).split()" << QString(line.split(s)[i]).split("->");
-			for(int j = 0; j < QString(line.split(s)[i]).split("->").count(); j++){
-				QString rowString = QString(line.split(s)[i]).split("->")[j];
-				if(!(rowString.trimmed().isEmpty())){
-					//		qDebug() << __FILE__ << __LINE__ << rowString.trimmed();
-					row <<  rowString.trimmed();
-					//	qDebug() << __FILE__ << __LINE__ << row << array;
-					}
-				}
-			if(!row.isEmpty())
-				array << row;
-			}
-
-		}
-	return array;
-
-
-}
 
 bool Prsistance::init()
 {
@@ -200,39 +79,30 @@ bool Prsistance::init()
 		for(int i = 0; i < fileData.count();i++){
 			QStringList data = fileData.at(i).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
-			QJsonArray arryObj;
+			QJsonObject c;
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				QJsonObject c;
-				c.insert("Prefix",QJsonArray() <<data.at(0));
-				arryObj << c;
+				c.insert("Prefix",  data.at(0));
 				}
 			if(1 < data.count() && !data.at(1).isEmpty()){
-				QJsonObject c;
-				c.insert("ICAO",QJsonArray() <<data.at(1));
-				arryObj << c;
+				c.insert("ICAO",  data.at(1));
+
 				}
 			if(2 <= data.count() && !data.at(2).isEmpty()){
-				QJsonObject c;
-				c.insert("IATA",QJsonArray() <<data.at(2));
-				arryObj << c;
+				c.insert("IATA",  data.at(2));
+
 				}
 			if(3 < data.count() && !data.at(3).isEmpty()){
-				QJsonObject c;
-				c.insert("Name",QJsonArray() <<data.at(3));
-				arryObj << c;
+				c.insert("Name",  data.at(3));
+
 				}
 			if(4 < data.count() && !data.at(4).isEmpty()){
-				QJsonObject c;
 				QJsonObject country;
 				country.insert("Value",data.at(4));
-				c.insert("Country",QJsonArray() <<country);
-				arryObj << c;
+				c.insert("Country",country);
 				}
-			if(!arryObj.isEmpty()){
-				QJsonObject fieldsArry;
-				fieldsArry.insert("Fields",QJsonArray() << arryObj);
+			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database::Get()->storeDoc("AirlinesCode",QJsonDocument(fieldsArry));
+				Database::Get()->storeDoc("AirlinesCode",QJsonDocument(c));
 				}
 			}
 
@@ -244,46 +114,33 @@ bool Prsistance::init()
 		for(int i = 0; i < fileData.count();i++){
 			QStringList data = fileData.at(i).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
-			QJsonArray arryObj;
+			QJsonObject c;
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				QJsonObject c;
-				c.insert("Airport",QJsonArray() <<data.at(0));
-				arryObj << c;
+				c.insert("Airport",  data.at(0));
 				}
 			if(1 < data.count() && !data.at(1).isEmpty()){
-				QJsonObject c;
 				QJsonObject city;
 				city.insert("Value",data.at(1));
-				c.insert("City",QJsonArray() << city);
-				arryObj << c;
+				c.insert("City",   city);
+
 				}
 			if(2 < data.count() && !data.at(2).isEmpty()){
-				QJsonObject c;
 				QJsonObject country;
 				country.insert("Value",data.at(2));
-				c.insert("Country",QJsonArray() <<country);
-				arryObj << c;
+				c.insert("Country",  country);
 				}
 			if(3 <= data.count() && !data.at(3).isEmpty()){
-				QJsonObject c;
-				c.insert("IATA",QJsonArray() <<data.at(3));
-				arryObj << c;
+				c.insert("IATA",  data.at(3));
 				}
 			if(4 < data.count() && !data.at(4).isEmpty()){
-				QJsonObject c;
-				c.insert("ICAO",QJsonArray() <<data.at(4));
-				arryObj << c;
+				c.insert("ICAO",  data.at(4));
 				}
 			if(5 < data.count() && !data.at(5).isEmpty()){
-				QJsonObject c;
-				c.insert("FAA",QJsonArray() <<data.at(5));
-				arryObj << c;
+				c.insert("FAA",  data.at(5));
 				}
-			if(!arryObj.isEmpty()){
-				QJsonObject fieldsArry;
-				fieldsArry.insert("Fields",QJsonArray() << arryObj);
-				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database::Get()->storeDoc("AirportsCode",QJsonDocument(fieldsArry));
+			if(!c.isEmpty()){
+					//qDebug() << __FILE__ << __LINE__ << fieldsArry;
+				Database::Get()->storeDoc("AirportsCode",QJsonDocument(c));
 				}
 			}
 
@@ -293,47 +150,44 @@ bool Prsistance::init()
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		foreach(QJsonValue country,doc.object().value("countries").toObject().value("country").toArray()){
 			//QJsonObject c;
-			QJsonArray arryObj;
-
+			QJsonObject c;
 			if(country.toObject().value("countryCode") != QJsonValue::Undefined){
-				QJsonObject c;
-				c.insert("Code",QJsonArray() <<country.toObject().value("countryCode").toString());
-				arryObj << c;
+
+				c.insert("Code",  country.toObject().value("countryCode").toString());
+
 				}
 			if(country.toObject().value("countryName") != QJsonValue::Undefined){
-				QJsonObject c;
-				c.insert("Name",QJsonArray() <<country.toObject().value("countryName").toString());
-				arryObj << c;
+
+				c.insert("Name",  country.toObject().value("countryName").toString());
+
 				}
 			if(country.toObject().value("currencyCode") != QJsonValue::Undefined){
-				QJsonObject c;
-				c.insert("Currency",QJsonArray() <<country.toObject().value("currencyCode").toString());
-				arryObj << c;
+
+				c.insert("Currency",  country.toObject().value("currencyCode").toString());
+
 				}
 			if(country.toObject().value("capital") != QJsonValue::Undefined){
-				QJsonObject c;
-				c.insert("Capital",QJsonArray() <<country.toObject().value("capital").toString());
-				arryObj << c;
+
+				c.insert("Capital",  country.toObject().value("capital").toString());
+
 				}
 			if(country.toObject().value("continentName") != QJsonValue::Undefined){
-				QJsonObject c;
-				c.insert("Continent",QJsonArray() <<country.toObject().value("continentName").toString());
-				arryObj << c;
+
+				c.insert("Continent",  country.toObject().value("continentName").toString());
+
 				}
 			if(country.toObject().value("continent") != QJsonValue::Undefined){
-				QJsonObject c;
-				c.insert("ContinentCode",QJsonArray() <<country.toObject().value("continent").toString());
-				arryObj << c;
+
+				c.insert("ContinentCode",  country.toObject().value("continent").toString());
+
 				}
 			if(country.toObject().value("languages") != QJsonValue::Undefined){
-				QJsonObject c;
-				c.insert("Languages",QJsonArray() <<country.toObject().value("languages").toString());
-				arryObj << c;
+
+				c.insert("Languages",  country.toObject().value("languages").toString());
+
 				}
-			if(!arryObj.isEmpty()){
-				QJsonObject fieldsArry;
-				fieldsArry.insert("Fields",QJsonArray() << arryObj);
-				Database::Get()->storeDoc("Country",QJsonDocument(fieldsArry));
+			if(!c.isEmpty()){
+				Database::Get()->storeDoc("Country",QJsonDocument(c));
 				}
 			}
 		}
@@ -346,36 +200,31 @@ bool Prsistance::init()
 		QJsonDocument docC = QJsonDocument::fromJson(jsonFileC.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__  << docC;
 		foreach(QJsonValue country,docC.object().value("countries").toObject().value("country").toArray()){
-			QJsonArray arryObj;
 
+	QJsonObject c;
 			if(doc.object().value(country.toObject().value("countryName").toString()) != QJsonValue::Undefined){
 				//qDebug() << __FILE__ << __LINE__ << c;
-				QJsonObject c;
-				c.insert("Country",QJsonArray() <<country.toObject().value("countryName").toString());
-				arryObj << c;
+
+				c.insert("Country",country.toObject().value("countryName").toString());
+
 
 				QJsonArray cities;
 				foreach(QJsonValue city,doc.object().value(country.toObject().value("countryName").toString()).toArray()){
-					QJsonArray cityarr;
-					cityarr << QString(QString(city.toString().toLatin1()).toUtf8());
-					cities << cityarr;
+					cities << QString(QString(city.toString()).toUtf8());
 					}
 
-				QJsonObject ci;
-				ci.insert("Cities", cities);
-				arryObj << ci;
+				c.insert("Cities", cities);
 				//qDebug() << __FILE__ << __LINE__ <<doc.object().value(country.toObject().value("countryName").toString()).toArray();
 				}
-			if(!arryObj.isEmpty()){
-				QJsonObject fieldsArry;
-				fieldsArry.insert("Fields",QJsonArray() << arryObj);
-				Database::Get()->storeDoc("City",QJsonDocument(fieldsArry));
+			if(!c.isEmpty()){
+
+				Database::Get()->storeDoc("City",QJsonDocument(c));
 				}
 			}
 
 
 		}
-	if(Count("ContactType::%\"") == 0){
+	if(Count("ContactType::%\"") == 100){
 
 
 
@@ -472,7 +321,7 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 	QString where;
 	if(!condition.isEmpty()){
 		if(condition.split("=").count() > 1){
-			where = QString("AND ANY oa IN d.Fields SATISFIES (ANY ia IN oa SATISFIES ia.`"+condition.split("=")[0]+"`[0] = \""+condition.split("=")[1]+"\" END) END ") ;
+			where = QString("AND d.`"+condition.split("=")[0]+"` = \""+condition.split("=")[1]+"\" ") ;
 
 			//where = QString("AND ANY item in f SATISFIES item.[0] =  END ");
 			}
@@ -487,7 +336,7 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 	//QString query ="SELECT Array item.`"+select.trimmed()+"` FOR item IN f END As `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f WHERE  META(d).id LIKE '"+entities+"::%' "+where;
 
 
-	QString query = "SELECT  (Array (item[*]).`"+select.trimmed()+"` FOR item IN d.Fields   END)[0] AS `Value`,META(d).id AS `Key` FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where;
+	QString query = "SELECT  d.`"+select.trimmed()+"` AS `Value`,META(d).id AS `Key` FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where;
 	//qDebug() << __FILE__ << __LINE__ << query;
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	Database::Get()->query(query);
@@ -497,7 +346,7 @@ void Prsistance::GetJsonListData(QList<QJsonDocument> items)
 {
 	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	//	foreach(QJsonDocument doc,items){
-	//qDebug() << __FILE__ << __LINE__ << doc;
+	//qDebug() << __FILE__ << __LINE__ << items;
 	//	}
 
 	emit GotJsonSelectList(items);
@@ -524,7 +373,7 @@ QList<QJsonDocument> Prsistance::GetALL(const QString entity, const QString cond
 	if(!condition.isEmpty())
 		where = QString("AND "+condition);
 	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE '"+entity+"::%' "+where);
-	//	qDebug() << __FILE__ << __LINE__ << query <<"===";
+		qDebug() << __FILE__ << __LINE__ << query <<"===";
 	Database::Get()->query(query);
 	//qDebug() << __FILE__ << __LINE__ << Database::Get()->getArray().first().object().value("count").toInt();
 	return Database::Get()->getArray();

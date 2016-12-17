@@ -32,9 +32,7 @@ void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 		//QString valueString = value.object().value("Value").toString();
 		QString keyString = value.object().value("Key").toString();
 		QString valueString;
-		foreach(QJsonValue arrVal,value.object().value("Value").toArray()){
-			//qDebug() << __FILE__ << __LINE__  << arrVal;
-			foreach(QJsonValue Val,arrVal.toArray()){
+		QJsonValue Val = value.object().value("Value");
 				//qDebug() << __FILE__ << __LINE__ <<"VAL" << Val << keyString;
 				if(Val.isObject()){
 					//qDebug() << __FILE__ << __LINE__  << "isObJect" << Val;
@@ -73,8 +71,7 @@ void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 						}
 					}
 				this->addedItems = true;
-				}
-			}
+
 		}
 	if(count() > 0)
 		this->setEnabled(true);

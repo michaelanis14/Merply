@@ -17,10 +17,6 @@ class Prsistance : public QObject
 public:
 	explicit Prsistance(QObject *parent = 0);
 	static Prsistance* Get();
-	static bool write(QString table, QList<QString> lines,bool update);
-	static void write(QString table, QString line);
-
-	static QJsonArray table(QString line);
 	static bool init();
 	static QString readFile(QString path);
 	static QStringList readCSVFile(QString path);

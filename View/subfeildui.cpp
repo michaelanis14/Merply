@@ -48,7 +48,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 				}
 			}
 		QJsonObject dataObj = data.toObject();
-		//qDebug() << __FILE__ << __LINE__  << data;
+		qDebug() << __FILE__ << __LINE__  << data;
 		if(!dataObj.isEmpty()){
 			combox->setCurrentIndex(combox->findText(dataObj.value("Value").toString()));
 			}
@@ -205,23 +205,30 @@ void SubFieldUI::clear()
 
 QJsonValue SubFieldUI::save()
 {
-	QJsonValue save;
+	QJsonValue save = QJsonValue::Null;
 	if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
 		//	save += component.name;
-		QJsonObject comboFields;
-		comboFields.insert("Value", ((QComboBox*)field)->currentText());
-		comboFields.insert("Key", ((ERPComboBox*)field)->getKey());
-		save = comboFields;
+		QString value = ((QComboBox*)field)->currentText();
+		if(!value.trimmed().isEmpty()){
+			QJsonObject comboFields;
+			comboFields.insert("Value", ((QComboBox*)field)->currentText());
+			comboFields.insert("Key", ((ERPComboBox*)field)->getKey());
+			save = comboFields;
+			}
+		else save = QJsonValue::Null;
 		//save +=" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QLineEdit") == 0 ){
 		//	save += component.name;
-
-		save =((QLineEdit*)field)->text();
+		if(!((QLineEdit*)field)->text().trimmed().isEmpty())
+			save =((QLineEdit*)field)->text().trimmed();
+		else save = QJsonValue::Null;
 		//	save =" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QTextEdit") == 0 ){
-		save =((QTextEdit*)field)->toPlainText();
+		if(!((QTextEdit*)field)->toPlainText().trimmed().isEmpty())
+			save =((QTextEdit*)field)->toPlainText();
+		else save = QJsonValue::Null;
 		}
 	else if(QString(field->metaObject()->className()).compare("QCheckBox") == 0 ){
 		//	save = component.name;
@@ -231,8 +238,10 @@ QJsonValue SubFieldUI::save()
 	else if(QString(field->metaObject()->className()).compare("merplyTabelView") == 0){
 		//	save = component.name;
 		//		save =((merplyTabelView*)field)->save("this->key");
-
-		save = ((merplyTabelView*)field)->save();
+		QJsonObject tblSave = ((merplyTabelView*)field)->save();
+		if(!tblSave.isEmpty())
+			save = tblSave;
+		else save = QJsonValue::Null;
 		//	save =" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QDateEdit") == 0){

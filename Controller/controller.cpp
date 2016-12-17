@@ -300,26 +300,34 @@ QList<QJsonDocument> Controller::getAll(const QString entity, const QString cond
 	return Prsistance::GetALL(entity,condition);
 }
 
-QString Controller::toString(QJsonArray array)
+QString Controller::toString(QJsonValue value)
 {
 	QString data;
-
-	for(int j = 0; j < array.count(); j++){
-		if(array.at(j).isArray())
-			data += toString(array.at(j).toArray());
-		else if(array.at(j).isObject()){
-			//	qDebug() << __FILE__ << __LINE__ <<"Obj" << array.at(j).toObject();
-			if(array.at(j).toObject().value("Value") != QJsonValue::Undefined)
-				data += array.at(j).toObject().value("Value").toString();
-			else if(array.at(j).toObject().value("merplyTabel") != QJsonValue::Undefined){
-				qDebug() << __FILE__ << __LINE__  << "TODO:"<<"printValues of table";
+	if(value.isArray()){
+		QJsonArray array = value.toArray();
+		for(int j = 0; j < array.count(); j++){
+			if(array.at(j).isArray())
+				data += toString(array.at(j).toArray());
+			else if(array.at(j).isObject()){
+				//	qDebug() << __FILE__ << __LINE__ <<"Obj" << array.at(j).toObject();
+				if(array.at(j).toObject().value("Value") != QJsonValue::Undefined)
+					data += array.at(j).toObject().value("Value").toString();
+				else if(array.at(j).toObject().value("merplyTabel") != QJsonValue::Undefined){
+					qDebug() << __FILE__ << __LINE__  << "TODO:"<<"printValues of table";
+					}
 				}
-			}
-		else data += array.at(j).toString();
+			else data += array.at(j).toString();
 
-		if(j < array.count()-1)
-			data += ",";
+			if(j < array.count()-1)
+				data += ",";
+			}
+		}else if(value.isString())
+		data = value.toString();
+	else if(value.isObject()){
+		if(value.toObject().value("Value") != QJsonValue::Undefined)
+			data += value.toObject().value("Value").toString();
 		}
+
 	return data;
 }
 
@@ -620,7 +628,7 @@ QJsonObject Controller::saveSubNavigation(QTreeWidgetItem * item)
 void Controller::getReport(QJsonObject clmns,QString filter)
 {
 
-	//qDebug() << __FILE__ << __LINE__  << clmns;
+	qDebug() << __FILE__ << __LINE__  << clmns;
 	bool addedSelectItems = false;
 	if(clmns.value("Columns").isArray()){
 		//QJsonArray arr = (columns.value("Columns").toArray());
@@ -706,7 +714,7 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 			i++;
 			}
 		query+= orderby;
-		//	qDebug() << __FILE__ << __LINE__  << query;
+		qDebug() << __FILE__ << __LINE__  << query;
 		/*
 		QString query;
 		query += "SELECT ";

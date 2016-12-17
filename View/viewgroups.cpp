@@ -23,10 +23,10 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 
 	if(structureView.value("Viewgroups").isArray()){
 		int d = 0;
-		QJsonArray dataVGs =data.value("Fields").toArray();
+	//	QJsonArray dataVGs =data.value("Fields").toArray();
 
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
-			ViewGroup* viewgroup = new ViewGroup(0,structureView.value("document_id").toString(),item.toObject(),dataVGs.at(d).toArray());
+			ViewGroup* viewgroup = new ViewGroup(0,structureView.value("document_id").toString(),item.toObject(),data);
 			QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
 			spRight.setHorizontalStretch(1);
 			viewgroup->setSizePolicy(spRight);
@@ -65,15 +65,15 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 
 QJsonObject ViewGroups::save()
 {
-	QJsonObject entity;
-	QJsonArray fields;
+	QJsonObject* entity = new QJsonObject();
+
 	foreach(ViewGroup* vg,ViewGroups::Viewgroups ){
-		fields.append(vg->save());
+		vg->save(entity);
 		}
-	entity.insert("Fields",fields);
+	//entity.insert("Fields",fields);
 	//entity.insert("Title",this->structureView.value("Title"))
 	//qDebug() << __FILE__ << __LINE__  << entity;
-	return (entity);
+	return *(entity);
 }
 
 QHash<QString,FeildUI*> ViewGroups::Fieldsgroups = QHash<QString,FeildUI*>();
@@ -81,7 +81,7 @@ QList<ViewGroup*> ViewGroups::Viewgroups =  QList<ViewGroup*>();
 ViewGroups* ViewGroups::p_instance = 0;
 ViewGroups*ViewGroups::Create(QJsonObject structureView, QJsonObject data)
 {
-	 p_instance = new ViewGroups(0,structureView, data);
+	p_instance = new ViewGroups(0,structureView, data);
 	return p_instance;
 }
 
@@ -100,13 +100,13 @@ QString ViewGroups::checkMandatory()
 		QString err = i.value()->checkMandatory();
 		if(!err.isEmpty()){
 			if(!errs.isEmpty())
-				 errs.append(";");
-			 errs.append(err);
+				errs.append(";");
+			errs.append(err);
 
 			}
 
 		++i;
-	}
+		}
 	return errs;
 }
 void ViewGroups::paintEvent(QPaintEvent *)
