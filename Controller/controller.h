@@ -49,6 +49,7 @@ public:
 	QStringList getModelDocumentsNameByType(const QString& modelType);
 
 	int Count(const QString table);
+	int countIndex(const QString index);
 	void getDoc(QString key);
 	void getJsonList(QString table, QString select,QString condition = "");
 	void getJsonEntityFieldsList(QString table, QString select,QString condition = "");
@@ -62,6 +63,7 @@ public:
 	bool documentInList(QList<QJsonDocument> all, QString key);
 	QList<QJsonDocument> getEnities();
 	void getFields(QString Title);
+	void getIndexHeader(QString title);
 	void updateLayoutViewGroups(QString entityName, QList<StructureViewsEditUI*> sVEUIs);
 	QStringList getLayoutViewGroups(QString entity);
 	bool storeDoc(QString key,QJsonDocument document);
@@ -73,6 +75,8 @@ public:
 
 	void editControllerCancelPressed();
 	SubFieldUI* getFirstSubField(QString feildName);
+
+	void createIndexes(QJsonObject viewStrct);
 	//Model Interface
 
 	//Navigation
@@ -134,6 +138,7 @@ public slots:
 	void subNavPressedIndexData(QList<QJsonDocument> documents);
 	void subNavPressedPageData(QJsonDocument document);
 	void getFieldsData(QList<QJsonDocument> documents);
+	void getIndexHeaderData(QList<QJsonDocument> documents);
 	void linkPressedData(QJsonDocument document);
 	void getDocData(QJsonDocument document);
 	void GetJsonListData(QList<QJsonDocument> items);

@@ -170,6 +170,40 @@ SubFieldUI*Controller::getFirstSubField(QString feildName)
 	return new SubFieldUI();
 }
 
+void Controller::createIndexes(QJsonObject viewStrct)
+{
+	QString key;
+	if(viewStrct.value("document_id") != QJsonValue::Undefined)
+		key = viewStrct.value("document_id").toString().split("::")[1];
+	else key = viewStrct.value("Title").toString();
+
+	//qDebug() << __FILE__ << __LINE__  << viewStrct;
+	int i = 0;
+	foreach(QJsonValue vg,viewStrct.value("Viewgroups").toArray()){
+		//	qDebug() << __FILE__ << __LINE__  << vg;
+
+		foreach(QJsonValue fv,vg.toObject().value("Viewgroup").toObject().value("Fields").toArray()){
+			//	qDebug() << __FILE__ << __LINE__  << fv;
+			//	qDebug() << __FILE__ << __LINE__  << fvvapn;
+			if(fv.toObject().value("IndexField") != QJsonValue::Undefined){
+				QString lbl = fv.toObject().value("Label").toString().toLatin1();
+				if(lbl.contains("?"))
+					lbl = QString(key.at(0)).append(QString::number(i));
+			//	qDebug() << lbl;
+				QString indexname = QString(DATABASE).append("-").append(key.toLower()).append(lbl).append("-index");
+				int indexCount = Controller::Get()->countIndex(indexname);
+				if(indexCount == 0){
+					QString query = "CREATE INDEX `"+indexname+"` ON `AM`(`"+fv.toObject().value("Label").toString()+"`) WHERE META(`"+QString(DATABASE)+"`).id Like '"+key+"::%'  USING GSI";
+					Database::Get()->query(query);
+					//qDebug() << __FILE__ << __LINE__  << indexname;
+					//qDebug() << __FILE__ << __LINE__  << query;
+					}
+				}
+			i++;
+			}
+		}
+}
+
 void Controller::initNavigation()
 {
 	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
@@ -221,6 +255,11 @@ Controller* Controller::Get()
 int Controller::Count(const QString table)
 {
 	return Prsistance::Count(table);
+}
+
+int Controller::countIndex(const QString index)
+{
+	return Prsistance::CountIndexes(index);
 }
 
 void Controller::getDoc(QString key)
@@ -355,6 +394,8 @@ void Controller::getFields(QString Title)
 		}
 }
 
+
+
 void Controller::getFieldsData(QList<QJsonDocument> documents)
 {
 	//CreateEditUI::ShowUI(document.object(),QJsonObject());
@@ -370,6 +411,39 @@ void Controller::getFieldsData(QList<QJsonDocument> documents)
 						fieldsName.removeLast();
 						foreach(QJsonValue clmn,subFld.toObject().value("Columns").toArray()){
 							fieldsName <<clmn.toObject().value("Header").toString().append("$").append(tableName);
+							}
+						}
+					}
+				}
+			}
+		//qDebug() << __FILE__ << __LINE__  <<"Fieldss"<<fieldsName;
+		emit gotFieldsData( fieldsName);
+		}
+}
+void Controller::getIndexHeader(QString title)
+{
+	if(!title.isEmpty() && title.compare("_") != 0){
+		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getIndexHeaderData(QList<QJsonDocument>)));
+		QString query = "SELECT array_star("+QString(DATABASE)+".Viewgroups[*].Viewgroup).Fields FROM  `"+QString(DATABASE)+"` WHERE META(`"+QString(DATABASE)+"`).id = '"+title+"'";
+		//	qDebug() << __FILE__ << __LINE__  << "getFields"<<query;
+		Database::Get()->query(query);
+		}
+}
+void Controller::getIndexHeaderData(QList<QJsonDocument> documents){
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getIndexHeaderData(QList<QJsonDocument>)));
+	if(!documents.isEmpty() ){
+		QStringList fieldsName;
+		foreach(QJsonValue fv,documents.first().object().value("Fields").toArray()){
+			foreach(QJsonValue fvvapn,fv.toArray()){
+				if(fvvapn.toObject().value("ShowInIndex") == QJsonValue::Undefined)
+					continue;
+				fieldsName << fvvapn.toObject().value("Label").toString();
+				foreach(QJsonValue subFld,fvvapn.toObject().value("SubFields").toArray()){
+					if(subFld.toObject().value("Type").toString().compare("Table") == 0){
+						//QString tableName= fieldsName.count() > 0?fieldsName.at(fieldsName.count()-1):"";
+						fieldsName.removeLast();
+						foreach(QJsonValue clmn,subFld.toObject().value("Columns").toArray()){
+							fieldsName <<clmn.toObject().value("Header").toString();
 							}
 						}
 					}
@@ -868,6 +942,7 @@ bool Controller::runQRPTDesingerapp()
 	programPath= QDir::currentPath()+"/../RPTD/debug/QtRptDesigner" ;
 	//qDebug() << __FILE__ << __LINE__  << programPath;
 	p->start(programPath);
+	return true;
 }
 
 

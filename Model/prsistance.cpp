@@ -367,6 +367,21 @@ int Prsistance::Count(const QString table)
 	return -1;
 }
 
+int Prsistance::CountIndexes(const QString index)
+{
+	Database::Get()->query("SELECT COUNT(*) AS count  FROM  system:indexes WHERE name= \""+index+"\"");
+
+	if(!Database::Get()->getArray().isEmpty() && Database::Get()->getArray().count() > 0){
+		return Database::Get()->getArray().first().object().value("count").toInt();
+		}
+	else{
+		//	qDebug() << __FILE__ << __LINE__ <<"-1";
+		return 0;
+		}
+
+	return -1;
+}
+
 QList<QJsonDocument> Prsistance::GetALL(const QString entity, const QString condition)
 {
 	QString where;

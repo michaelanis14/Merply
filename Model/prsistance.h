@@ -25,6 +25,7 @@ public:
 	static void GetJsonEntityFields(QString table, QString select,QString condition = "");
 
 	static int Count(const QString table);
+	static int CountIndexes(const QString index);
 	static QList<QJsonDocument> GetALL(const QString entity,const QString condition);
 	static bool Select(const QString query);
 	static QString GetDatabaseName();

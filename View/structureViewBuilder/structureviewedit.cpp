@@ -84,12 +84,17 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 	layout->addWidget(label,0,Qt::AlignTop);
 
 
-	hideLabel = new QCheckBox(tr("Hide Label"));
-	hideField = new QCheckBox(tr("Hide Field"));
-	initData = new QCheckBox(tr("Save init Data"));
+	hideLabel = new QCheckBox(tr("HL"));
+	hideField = new QCheckBox(tr("HF"));
+	initData = new QCheckBox(tr("SID"));
+	indexField = new QCheckBox(tr("I"));
+	showInIdexView = new QCheckBox(tr("SIV"));
+	showInIdexView->setChecked(true);
 	layout->addWidget(hideLabel,0,Qt::AlignTop);
 	layout->addWidget(hideField,0,Qt::AlignTop);
 	layout->addWidget(initData,0,Qt::AlignTop);
+	layout->addWidget(indexField,0,Qt::AlignTop);
+	layout->addWidget(showInIdexView,0,Qt::AlignTop);
 
 	arrayWidget = new QWidget(this);
 	arrayWidget->setContentsMargins(2,0,2,0);
@@ -151,6 +156,10 @@ QJsonObject StructureViewEdit::save()
 		saveObject.insert("FieldHidden",true);
 	if(initData->isChecked())
 		saveObject.insert("initData",true);
+	if(indexField->isChecked())
+		saveObject.insert("IndexField",true);
+	if(showInIdexView->isChecked())
+		saveObject.insert("ShowInIndex",true);
 
 	saveObject.insert("ArrayList",array->isChecked());
 	QJsonArray subFields;
@@ -216,6 +225,13 @@ void StructureViewEdit::fill(QJsonObject structureView)
 			hideLabel->setChecked(true);
 		if(structureView.value("initData") != QJsonValue::Undefined)
 			initData->setChecked(true);
+		if(structureView.value("IndexField") != QJsonValue::Undefined)
+			indexField->setChecked(true);
+		if(structureView.value("ShowInIndex") != QJsonValue::Undefined)
+			showInIdexView->setChecked(true);
+		else showInIdexView->setChecked(false);
+
+
 		if(structureView.value("SubFields").isArray() && structureView.value("SubFields").toArray().count() > 0){
 			foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
 				QString type = fieldVS.toObject().value("Type").toString();
@@ -267,6 +283,9 @@ bool StructureViewEdit::setHidden(bool hidden)
 	hideLabel->setHidden(hidden);
 	hideField->setHidden(hidden);
 	initData->setHidden(hidden);
+	indexField->setHidden(hidden);
+	showInIdexView->setHidden(hidden);
+
 	if(sctrlUI) sctrlUI->setHidden(hidden);
 
 	//preview->setHidden(hidden);

@@ -182,7 +182,7 @@ void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocu
 	//}
 	//qDebug() << __FILE__ << __LINE__  << "Not Lazy"  ;
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
-	Controller::Get()->getFields(document_id);
+	Controller::Get()->getIndexHeader(document_id);
 
 	//	initHController(QJsonObject());
 

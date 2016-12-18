@@ -23,6 +23,8 @@ public:
 	QCheckBox* hideLabel;
 	QCheckBox* hideField;
 	QCheckBox* initData;
+	QCheckBox* indexField;
+	QCheckBox* showInIdexView;
 	QStringList getFieldsType();
 	StructureVieweditSubFeild * getTableFeild();
 private:

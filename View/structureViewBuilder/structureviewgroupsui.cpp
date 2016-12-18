@@ -247,6 +247,7 @@ void StructureViewGroupsUI::editControllerSavePressed()
 		Controller::Get()->storeDoc("ViewStructure",QJsonDocument(savedObj));
 	else Controller::Get()->UpdateDoc(QJsonDocument(savedObj));
 
+	Controller::Get()->createIndexes(savedObj);
 	Controller::Get()->editControllerCancelPressed();
 }
 
