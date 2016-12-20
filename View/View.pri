@@ -2,7 +2,8 @@ INCLUDEPATH +=  View/commonUI \
 		View/commonUI/NavigationUI \
 		View/VisualDesign \
 		View/structureViewBuilder\
-		View/permissionsUI
+		View/permissionsUI \
+		View/commonUI/MerplyTabel
 
 
 
@@ -44,7 +45,8 @@ SOURCES += View/maindisplay.cpp \
     $$PWD/commonUI/logintabui.cpp \
     $$PWD/commonUI/NavigationUI/widgetsstructureviewediteui.cpp \
     $$PWD/structureViewBuilder/strctvieweditsubftblclmneq.cpp \
-    $$PWD/structureViewBuilder/structurevieweditsubfeildequation.cpp
+    $$PWD/structureViewBuilder/structurevieweditsubfeildequation.cpp \
+    $$PWD/commonUI/MerplyTabel/mtabelcombobox.cpp
 
 HEADERS  += View/maindisplay.h \
     View/commonUI/rangevalidator.h \
@@ -85,7 +87,8 @@ HEADERS  += View/maindisplay.h \
     $$PWD/commonUI/logintabui.h \
     $$PWD/commonUI/NavigationUI/widgetsstructureviewediteui.h \
     $$PWD/structureViewBuilder/strctvieweditsubftblclmneq.h \
-    $$PWD/structureViewBuilder/structurevieweditsubfeildequation.h
+    $$PWD/structureViewBuilder/structurevieweditsubfeildequation.h \
+    $$PWD/commonUI/MerplyTabel/mtabelcombobox.h
 
 #FORMS    += View/mainwindow.ui
 

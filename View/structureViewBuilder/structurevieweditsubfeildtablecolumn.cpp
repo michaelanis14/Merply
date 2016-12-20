@@ -28,7 +28,7 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	typsList << ("Database")<< ("Text")<< ("Equation");
 	type = new ERPComboBox(0);
 	QStringList typs;
-	typs << tr("Database")<< tr("Text")<< tr("Equation");
+	typs << tr("Database")<< tr("Text")<< tr("Equation")<< tr("Refrence");
 	type->addItems(typs);
 	type->setCurrentIndex(typs.indexOf(clmn.value("Type").toString()));
 	layout->addRow(new QLabel(tr("Type ")), type);
@@ -48,6 +48,10 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 
 	initFilterWidget();
 	initEquationWidget();
+
+	condition = new QTextEdit;
+	condition->setText(clmn.value("Condition").toString());
+	layout->addRow(new QLabel(tr("Condition ")), condition);
 
 	defaultValue = new QLineEdit(0);
 	defaultValue->setHidden(true);
@@ -119,7 +123,17 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 			}
 		clmn.insert("EquationTerms",equationTerms);
 		}
-	else {
+	else if(type->currentIndex() == 3){
+		//Refrence
+		clmn.insert("Source",Source->getKey());
+		clmn.insert("Select",Select->currentText());
+		if(filterOn->currentIndex() ==1){
+			clmn.insert("LocalFilter",localFilter->getKey());
+			clmn.insert("EntityFilter",entityFilter->currentText());
+			}
+		}
+
+	else{
 		clmn.insert("Default",defaultValue->text());
 		clmn.insert("inputData",inputData->currentIndex());
 		}
@@ -127,6 +141,7 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 
 	return clmn;
 }
+
 
 ERPComboBox* StructureVieweditSubFeildTableColumn::getSource() const
 {
@@ -180,21 +195,20 @@ void StructureVieweditSubFeildTableColumn::updateFields(int value)
 
 	if(value == 0){
 		equationWidget->setHidden(true);
-
 		defaultValue->setHidden(true);
-
 		layout->labelForField(defaultValue)->setHidden(true);
+		inputData->setHidden(true);
+
 		Source->setHidden(false);
 		layout->labelForField(Source)->setHidden(false);
 		if(!clmn.value("Source").toString().isEmpty())
 			Source->setCurrentText(clmn.value("Source").toString());
-
 		Select->setHidden(false);
 		layout->labelForField(Select)->setHidden(false);
 		if(!clmn.value("Select").toString().isEmpty())
 			Select->setCurrentText(clmn.value("Select").toString());
 		filterWidget->setHidden(false);
-		inputData->setHidden(true);
+
 		}
 	else if(value== 2){
 
@@ -210,6 +224,28 @@ void StructureVieweditSubFeildTableColumn::updateFields(int value)
 		inputData->setHidden(true);
 		equationWidget->setHidden(false);
 		}
+	else if(value == 3){
+		equationWidget->setHidden(true);
+		defaultValue->setHidden(true);
+		layout->labelForField(defaultValue)->setHidden(true);
+		inputData->setHidden(true);
+
+		Source->setHidden(false);
+		layout->labelForField(Source)->setHidden(false);
+		if(!clmn.value("Source").toString().isEmpty())
+			Source->setCurrentText(clmn.value("Source").toString());
+		Select->setHidden(false);
+		layout->labelForField(Select)->setHidden(false);
+		if(!clmn.value("Select").toString().isEmpty())
+			Select->setCurrentText(clmn.value("Select").toString());
+		filterWidget->setHidden(false);
+
+		//	initFilterWidget();
+		if(clmn.value("LocalFilter") != QJsonValue::Undefined && clmn.value("LocalFilter").toBool()){
+			filterOn->setCurrentIndex(1);
+			this->filledLocalfilter = false;
+			}
+		}
 	else{
 		Source->setHidden(true);
 		layout->labelForField(Source)->setHidden(true);
@@ -222,6 +258,9 @@ void StructureVieweditSubFeildTableColumn::updateFields(int value)
 		inputData->setHidden(false);
 		filterWidget->setHidden(true);
 		equationWidget->setHidden(true);
+
+		//layout->labelForField(condition)->setHidden(true);
+
 		}
 
 	emit columnChanged();

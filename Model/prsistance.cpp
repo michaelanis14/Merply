@@ -139,7 +139,7 @@ bool Prsistance::init()
 				c.insert("FAA",  data.at(5));
 				}
 			if(!c.isEmpty()){
-					//qDebug() << __FILE__ << __LINE__ << fieldsArry;
+				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
 				Database::Get()->storeDoc("AirportsCode",QJsonDocument(c));
 				}
 			}
@@ -201,7 +201,7 @@ bool Prsistance::init()
 		//	qDebug() << __FILE__ << __LINE__  << docC;
 		foreach(QJsonValue country,docC.object().value("countries").toObject().value("country").toArray()){
 
-	QJsonObject c;
+			QJsonObject c;
 			if(doc.object().value(country.toObject().value("countryName").toString()) != QJsonValue::Undefined){
 				//qDebug() << __FILE__ << __LINE__ << c;
 
@@ -254,6 +254,53 @@ bool Prsistance::init()
 
 		}
 
+	if(Count("Contact::%\"") <10){
+		QStringList fileData = readCSVFile(":/initData/AM/Clients.csv");
+		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		//	qDebug() << __FILE__ << __LINE__ << fileData;
+		for(int i = 0; i < fileData.count();i++){
+			QStringList data = fileData.at(i).split(",");
+			//qDebug() << __FILE__ << __LINE__ << data << data.count();
+			QJsonObject c;
+			if(0 < data.count() && !data.at(0).isEmpty()){
+				c.insert("الأسم",  data.at(0));
+				}
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				c.insert("تليفون",  data.at(1));
+				}
+			if(0 < data.count() && !data.at(2).isEmpty()){
+				c.insert("فاكس",  data.at(2));
+				}
+			if(0 < data.count() && !data.at(3).isEmpty()){
+				c.insert("موبيل",  data.at(3));
+				}
+			if(0 < data.count() && !data.at(4).isEmpty()){
+				c.insert("code",  data.at(4));
+				}
+			if(true){
+				QJsonObject country;
+				country.insert("Key","Country::315");
+				country.insert("Value","Egypt");
+				c.insert("البلد",country);
+				}
+			if(true){
+				QJsonObject city;
+				city.insert("Key","City::296");
+				city.insert("Value","Cairo");
+				c.insert("المدينه",city);
+				}
+			if(true){
+				QJsonObject contactType;
+				contactType.insert("Key","ContactType::1");
+				contactType.insert("Value","عميل");
+				c.insert("النوع",contactType);
+				}
+			if(!c.isEmpty()){
+				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
+				Database::Get()->storeDoc("Contact",QJsonDocument(c));
+				}
+			}
+		}
 	//if()
 	return true;
 }
@@ -388,7 +435,7 @@ QList<QJsonDocument> Prsistance::GetALL(const QString entity, const QString cond
 	if(!condition.isEmpty())
 		where = QString("AND "+condition);
 	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE '"+entity+"::%' "+where);
-		qDebug() << __FILE__ << __LINE__ << query <<"===";
+	qDebug() << __FILE__ << __LINE__ << query <<"===";
 	Database::Get()->query(query);
 	//qDebug() << __FILE__ << __LINE__ << Database::Get()->getArray().first().object().value("count").toInt();
 	return Database::Get()->getArray();

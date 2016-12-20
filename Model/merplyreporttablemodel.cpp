@@ -1,6 +1,8 @@
 #include "merplyreporttablemodel.h"
 #include "controller.h"
 
+#include "mtabelcombobox.h"
+
 MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTableModel()
 {
 	rowsCount = 0;
@@ -92,6 +94,7 @@ bool MerplyReportTableModel::setData(const QModelIndex& index, const QVariant& v
 					return false;
 				}
 			}
+
 		cells[index.row() * colmnsCount + index.column()].setData(value.toString());
 		if(equationColumns.count() > 0 )
 			fillEquationColumns();

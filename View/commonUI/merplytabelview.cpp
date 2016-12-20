@@ -11,6 +11,8 @@
 #include "controller.h"
 #include "printcontroller.h"
 
+#include "mtabelcombobox.h"
+
 #include <QLabel>
 #include <QVariant>
 
@@ -161,10 +163,12 @@ bool merplyTabelView::fillLocalSource(QJsonObject columns, QString filter)
 	return true;
 }
 
+//this just adds data to a tabel that already been init
 bool merplyTabelView::fillText(QJsonObject data)
 {
 	QJsonArray dataArray = data.value("merplyTabel").toArray();
 	model->fillText(dataArray);
+
 	//initHController(QJsonObject());
 	return true;
 }
@@ -183,7 +187,8 @@ void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocu
 	//qDebug() << __FILE__ << __LINE__  << "Not Lazy"  ;
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
 	Controller::Get()->getIndexHeader(document_id);
-
+	MTabelCombobox *comboDelegate = new MTabelCombobox(this);
+	tableView->setItemDelegateForColumn(0,comboDelegate );
 	//	initHController(QJsonObject());
 
 }
@@ -382,6 +387,9 @@ void merplyTabelView::modelFinished()
 				SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),this,
 				SLOT(selectionChanged(const QItemSelection &, const QItemSelection &))
 				);
+	MTabelCombobox *comboDelegate = new MTabelCombobox(this);
+	tableView->setItemDelegateForColumn(1,comboDelegate );
+	qDebug() << "DEEE";
 	if(this->model->getColmnsCount() < 100)
 		this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
 }

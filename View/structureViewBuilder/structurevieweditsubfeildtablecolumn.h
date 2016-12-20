@@ -9,6 +9,7 @@
 #include <QWidget>
 #include <QFormLayout>
 #include <QCheckBox>
+#include <QTextEdit>
 
 class StructureVieweditSubFeildTableColumn : public QWidget
 {
@@ -46,6 +47,11 @@ private:
 
 	QStringList typsList;
 	ERPComboBox* inputData;
+
+	//Refrence
+	QTextEdit* condition;
+	QCheckBox* Editable;
+	bool filledLocalfilter;
 
 signals:
 	void columnChanged();

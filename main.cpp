@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
 	QApplication::setOrganizationName("Merply - Michael Bishara e.U.");
 	QApplication::setOrganizationDomain("www.merply.com");
 	QApplication::setApplicationName("Merply");
+	//QApplication::setLayoutDirection(Qt::RightToLeft);
 
 #ifdef Q_OS_WIN32
 	MEMORYSTATUSEX memory_status;

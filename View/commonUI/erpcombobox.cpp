@@ -5,6 +5,8 @@
 **************************************/
 
 #include "erpcombobox.h"
+
+#include "controller.h"
 #include "QDebug"
 #include "QCompleter"
 #include <QPair>
@@ -33,7 +35,7 @@ void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 		QString keyString = value.object().value("Key").toString();
 		QString valueString;
 		QJsonValue Val = value.object().value("Value");
-				//qDebug() << __FILE__ << __LINE__ <<"VAL" << Val << keyString;
+			//	qDebug() << __FILE__ << __LINE__ <<"VAL" << Val << keyString;
 				if(Val.isObject()){
 					//qDebug() << __FILE__ << __LINE__  << "isObJect" << Val;
 					if(Val.toObject().value("Key") != QJsonValue::Undefined)
@@ -48,9 +50,9 @@ void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 				else if(Val.isArray()){
 					foreach(QJsonValue subVal,Val.toArray()){
 
-						//qDebug() << __FILE__ << __LINE__  << "chechkkk" << subVal;
+						//qDebug() << __FILE__ << __LINE__  << "chechkkk" << subVal <<Controller::Get()->toString(subVal);
 
-						valueString = subVal.toString().trimmed();
+						valueString = Controller::Get()->toString(subVal);
 
 						QComboBox::insertItem(i,valueString);
 						keys.insert(i,keyString);
@@ -73,6 +75,7 @@ void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
 				this->addedItems = true;
 
 		}
+	this->adjustSize();
 	if(count() > 0)
 		this->setEnabled(true);
 }
