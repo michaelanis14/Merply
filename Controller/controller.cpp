@@ -702,7 +702,7 @@ QJsonObject Controller::saveSubNavigation(QTreeWidgetItem * item)
 void Controller::getReport(QJsonObject clmns,QString filter)
 {
 
-	qDebug() << __FILE__ << __LINE__  << clmns;
+	qDebug() << __FILE__ << __LINE__<<"getReport"  << clmns;
 	bool addedSelectItems = false;
 	if(clmns.value("Columns").isArray()){
 		//QJsonArray arr = (columns.value("Columns").toArray());
@@ -735,7 +735,7 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 				QString source = clmnObj.value("Source").toString().split("::")[1];
 
 				QString selectStr = clmnObj.value("Select").toString();
-				QString uniqueRef = QString(source.at(0)).append(QString(selectStr.at(0))).append(QString::number(i)) ;
+				QString uniqueRef = QString(source.toLatin1().at(0)).append(QString(selectStr.toLatin1().at(0))).append(QString::number(i)) ;
 
 				if(hasSelectQuery && i > 0 && i < clmns.value("Columns").toArray().count()){
 					query+= " UNION ALL ";
@@ -743,8 +743,8 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 					}
 				hasSelectQuery = true;
 				query += "SELECT ";
-				query += "(Array item.`"+selectStr+"`[0] FOR item IN "+uniqueRef+"ff END)[0] AS `"+clmnObj.value("Header").toString()+"`";
-				query += " , META("+uniqueRef+"d).id AS `"+source+QString::number(i)+"Key`";
+				query += "`"+selectStr+"` AS `"+clmnObj.value("Header").toString()+"`";
+				query += " , META(`"+uniqueRef+"d`).id AS `"+source+QString::number(i)+"Key`";
 
 				orderby += "`"+source+QString::number(i)+"Key`";
 				//	qDebug() << __FILE__ << __LINE__  << clmnObj.value("LocalFilter").toString() << clmnObj.value("LocalFilter").toString().split("::").count() <<clmnObj.value("Source").toString() <<clmnObj.value("Source").toString().split("::").count();
@@ -773,10 +773,10 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 					}
 				else {
 					query += "FROM ";
-					query += QString(DATABASE) +" "+uniqueRef+"d UNNEST "+uniqueRef+"d.Fields "+uniqueRef+"ff UNNEST "+uniqueRef+"d.Fields "+uniqueRef+"f ";
+					query += QString(DATABASE) +" `"+uniqueRef+"d` ";
 					query += "WHERE ";
-					query += "META("+uniqueRef+"d).id LIKE '"+source+"::%'";
-					query += QString(" AND ") + QString("(Array item.`"+selectStr+"`[0] FOR item IN "+uniqueRef+"ff END)[0] ");
+					query += "META(`"+uniqueRef+"d`).id LIKE '"+source+"::%'";
+					//query += QString(" AND ") + QString("(Array item.`"+selectStr+"`[0] FOR item IN "+uniqueRef+"ff END)[0] ");
 					}
 				if(clmnObj.value("LocalSource") != QJsonValue::Undefined){
 					//	qDebug() << __FILE__ << __LINE__  <<"clmnObj.value().toString()";
@@ -788,7 +788,7 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 			i++;
 			}
 		query+= orderby;
-		qDebug() << __FILE__ << __LINE__  << query;
+		qDebug() << __FILE__ << __LINE__ <<"getReport" << query;
 		/*
 		QString query;
 		query += "SELECT ";

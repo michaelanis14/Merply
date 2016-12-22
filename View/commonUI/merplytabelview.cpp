@@ -67,7 +67,7 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 	connect(controllers, SIGNAL(btnClicked(const QString&)), this, SLOT(controller_Clicked(QString)));
 	tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	tableView->setSelectionMode(QAbstractItemView::SingleSelection);
-
+	tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
 
 	layout->addWidget(tableView);
 
@@ -88,9 +88,16 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 		if(nActon.count() > 1){
 			if(nActon.at(1).compare("Add") == 0){
 
-				model->insertRow(model->rowCount(QModelIndex()));
+				if(model->insertRow(model->rowCount(QModelIndex()))){
+					//qDebug() << (model->getRowsCount()-1)<< (model->getRowsCount());
+					QModelIndex index = tableView->model()->index((model->getRowsCount()-1),0, QModelIndex());
+					tableView->setCurrentIndex(index);
+					tableView->edit(index);
+					//tableView->e
+					}
 				//model->rowsInserted(QModelIndex(),);
 				return;
+
 				}
 			else if(nActon.at(1).compare("Remove") == 0){
 				QModelIndexList indexes  = tableView->selectionModel()->selectedRows();
@@ -135,14 +142,19 @@ void merplyTabelView::selectionChanged(const QItemSelection& , const QItemSelect
 bool merplyTabelView::fill(QJsonObject columns,QString filter)
 {
 
+	//TODO: Better connect to Signals
+
+	//	qDebug() << __FILE__ << __LINE__ << "fill";
 	model = new MerplyReportTableModel(columns);
-	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
-	QObject::connect(this,SIGNAL(updateModel(QList<QJsonDocument>)),model,SLOT(fill(QList<QJsonDocument>)));
+	QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+	//QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+	//QObject::connect(this,SIGNAL(updateModel(QList<QJsonDocument>)),model,SLOT(fill(QList<QJsonDocument>)));
 
 	QObject::connect(Controller::Get(),SIGNAL(gotReportData(QList<QJsonDocument>)),this,SLOT(gotReportData(QList<QJsonDocument>)));
 	Controller::Get()->getReport(columns,filter);
 
 	initHController(columns);
+	initDelegateClmns(columns);
 	return true;
 }
 
@@ -150,14 +162,17 @@ bool merplyTabelView::fillLocalSource(QJsonObject columns, QString filter)
 {
 	//if(model)
 	//	model->deleteLater();
+	//qDebug() << __FILE__ << __LINE__ << "fillLocalSource";
 	model = new MerplyReportTableModel(columns);
-	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+	//QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+	//QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 	QObject::connect(this,SIGNAL(updateModel(QList<QJsonDocument>)),model,SLOT(fillLocalSource(QList<QJsonDocument>)));
 
 	QObject::connect(Controller::Get(),SIGNAL(gotReportData(QList<QJsonDocument>)),this,SLOT(gotReportData(QList<QJsonDocument>)));
 	Controller::Get()->getReport(columns,filter);
 
 	initHController(columns);
+	initDelegateClmns(columns);
 
 
 	return true;
@@ -166,8 +181,14 @@ bool merplyTabelView::fillLocalSource(QJsonObject columns, QString filter)
 //this just adds data to a tabel that already been init
 bool merplyTabelView::fillText(QJsonObject data)
 {
+	//qDebug() << __FILE__ << __LINE__ << data;
 	QJsonArray dataArray = data.value("merplyTabel").toArray();
-	model->fillText(dataArray);
+	if(!dataArray.isEmpty()){
+		QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+		QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+		model->fillText(dataArray);
+		}
+	else modelFinished();
 
 	//initHController(QJsonObject());
 	return true;
@@ -187,8 +208,7 @@ void merplyTabelView::indexTable(const QString document_id,const QList<QJsonDocu
 	//qDebug() << __FILE__ << __LINE__  << "Not Lazy"  ;
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
 	Controller::Get()->getIndexHeader(document_id);
-	MTabelCombobox *comboDelegate = new MTabelCombobox(this);
-	tableView->setItemDelegateForColumn(0,comboDelegate );
+
 	//	initHController(QJsonObject());
 
 }
@@ -232,6 +252,19 @@ void merplyTabelView::initHController(QJsonObject columns)
 		}
 	controllers->clear();
 	controllers->fill(btns);
+}
+
+void merplyTabelView::initDelegateClmns(QJsonObject columns)
+{
+	int i = 0;
+	foreach(QJsonValue clmn,columns.value("Columns").toArray()){
+		if(clmn.toObject().value("Type").toString().compare("Refrence") == 0){
+			MTabelCombobox *comboDelegate = new MTabelCombobox(this,clmn.toObject());
+			tableView->setItemDelegateForColumn(i,comboDelegate);
+			//qDebug() << "DEEE";
+			}
+		i++;
+		}
 }
 
 void merplyTabelView::printTabel(){
@@ -380,16 +413,21 @@ void merplyTabelView::setValue(const int , const QString paramName, QVariant& pa
 void merplyTabelView::modelFinished()
 {
 	//qDebug() << __FILE__ << __LINE__  << "ModelDone";
+	QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+
 	tableView->setModel(model);
 
+	QObject::disconnect(
+				tableView->selectionModel(),
+				SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),this,
+				SLOT(selectionChanged(const QItemSelection &, const QItemSelection &))
+				);
 	QObject::connect(
 				tableView->selectionModel(),
 				SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),this,
 				SLOT(selectionChanged(const QItemSelection &, const QItemSelection &))
 				);
-	MTabelCombobox *comboDelegate = new MTabelCombobox(this);
-	tableView->setItemDelegateForColumn(1,comboDelegate );
-	qDebug() << "DEEE";
+
 	if(this->model->getColmnsCount() < 100)
 		this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
 }

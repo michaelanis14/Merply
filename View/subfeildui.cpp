@@ -140,6 +140,9 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		else if(structureView.value("initData") != QJsonValue::Undefined){
 			table->fillText(structureView.value("initData").toObject());
 			}
+		else{
+			table->fillText(QJsonObject());
+			}
 		layout->addWidget(table);
 		field = table;
 		}

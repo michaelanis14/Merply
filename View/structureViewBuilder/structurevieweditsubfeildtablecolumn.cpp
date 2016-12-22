@@ -25,9 +25,9 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	layout->addRow(new QLabel(tr("Header ")), header);
 
 	//	qDebug() << __FILE__ << __LINE__   << clmn;
-	typsList << ("Database")<< ("Text")<< ("Equation");
+	//typsList << ("Database")<< ("Text")<< ("Equation");
 	type = new ERPComboBox(0);
-	QStringList typs;
+	//QStringList typs;
 	typs << tr("Database")<< tr("Text")<< tr("Equation")<< tr("Refrence");
 	type->addItems(typs);
 	type->setCurrentIndex(typs.indexOf(clmn.value("Type").toString()));
@@ -127,6 +127,7 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 		//Refrence
 		clmn.insert("Source",Source->getKey());
 		clmn.insert("Select",Select->currentText());
+
 		if(filterOn->currentIndex() ==1){
 			clmn.insert("LocalFilter",localFilter->getKey());
 			clmn.insert("EntityFilter",entityFilter->currentText());
@@ -151,7 +152,7 @@ ERPComboBox* StructureVieweditSubFeildTableColumn::getSource() const
 void StructureVieweditSubFeildTableColumn::fill(QJsonObject clmn)
 {
 	//qDebug() << __FILE__ << __LINE__  <<"clmnnnn"<< clmn;
-	this->type->setCurrentIndex(typsList.indexOf(clmn.value("Type").toString().trimmed()));
+	this->type->setCurrentIndex(typs.indexOf(clmn.value("Type").toString().trimmed()));
 	this->clmn = clmn;
 	//qDebug() << __FILE__ << __LINE__  <<"clmnnnn"<< this->clmn;
 	if(clmn.value("TotalRow") != QJsonValue::Undefined)
@@ -198,6 +199,7 @@ void StructureVieweditSubFeildTableColumn::updateFields(int value)
 		defaultValue->setHidden(true);
 		layout->labelForField(defaultValue)->setHidden(true);
 		inputData->setHidden(true);
+		layout->labelForField(inputData)->setHidden(true);
 
 		Source->setHidden(false);
 		layout->labelForField(Source)->setHidden(false);
@@ -222,6 +224,7 @@ void StructureVieweditSubFeildTableColumn::updateFields(int value)
 
 		filterWidget->setHidden(true);
 		inputData->setHidden(true);
+		layout->labelForField(inputData)->setHidden(true);
 		equationWidget->setHidden(false);
 		}
 	else if(value == 3){
@@ -229,6 +232,7 @@ void StructureVieweditSubFeildTableColumn::updateFields(int value)
 		defaultValue->setHidden(true);
 		layout->labelForField(defaultValue)->setHidden(true);
 		inputData->setHidden(true);
+		layout->labelForField(inputData)->setHidden(true);
 
 		Source->setHidden(false);
 		layout->labelForField(Source)->setHidden(false);
@@ -256,6 +260,7 @@ void StructureVieweditSubFeildTableColumn::updateFields(int value)
 		if(!clmn.value("Default").toString().isEmpty())
 			defaultValue->setText(clmn.value("Default").toString());
 		inputData->setHidden(false);
+		layout->labelForField(inputData)->setHidden(false);
 		filterWidget->setHidden(true);
 		equationWidget->setHidden(true);
 

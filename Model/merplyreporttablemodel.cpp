@@ -18,13 +18,17 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 			//	if(clmn.toObject().value("ShowIndex") == QJsonValue::Undefined){
 			//		continue;
 			//		}
+
 			clmnsHeader << clmn.toObject().value("Header").toString().split("$")[0];
 			if(clmn.toObject().value("Type").toString().compare("Text") == 0)
 				Textclmns.insert(clmn.toObject().value("Header").toString(),clmn.toObject());
-			if(clmn.toObject().value("Type").toString().compare("Equation") == 0){
-
+			else if(clmn.toObject().value("Type").toString().compare("Refrence") == 0)
+				Refrenceclmns.insert(clmn.toObject().value("Header").toString(),clmn.toObject());
+			else if(clmn.toObject().value("Type").toString().compare("Equation") == 0){
 				equationColumns.insert(clmn.toObject().value("Header").toString(),clmn.toObject().value("EquationTerms").toArray());
 				}
+
+
 			if(clmn.toObject().value("TotalRow") != QJsonValue::Undefined)
 				totalColmns.append(clmnsHeader.count() - 1);
 			if(clmn.toObject().value("Editable") == QJsonValue::Undefined ||
@@ -77,7 +81,7 @@ QVariant MerplyReportTableModel::data(const QModelIndex& index, int role) const
 	if (!index.isValid() || role != Qt::DisplayRole)
 		return QVariant();
 
-	//qDebug() << __FILE__ << __LINE__  <<"Edit";
+	//qDebug() << __FILE__ << __LINE__  <<"Edit"<< cells[index.row() * colmnsCount + index.column()].getData();
 
 	return cells[index.row() * colmnsCount + index.column()].getData();
 }
@@ -90,8 +94,9 @@ bool MerplyReportTableModel::setData(const QModelIndex& index, const QVariant& v
 			if(Textclmns.value(clmnsHeader.at(index.column())).value("inputData").toInt() == 1){
 				bool ok = true;
 				value.toDouble(&ok);
-				if(!ok)
+				if(!ok){
 					return false;
+					}
 				}
 			}
 
@@ -118,6 +123,7 @@ bool MerplyReportTableModel::insertRows(int row, int count, const QModelIndex& p
 	beginInsertRows(parent, row, row+count-1);
 	rowsCount = row +count;
 	cells.resize(colmnsCount * rowsCount);
+
 	//cells[row * this->colmnsCount + 1].setData("dd");
 	//qDebug() << __FILE__ << __LINE__  << cells.size();
 	state = true;
@@ -149,8 +155,11 @@ Qt::ItemFlags MerplyReportTableModel::flags(const QModelIndex& index) const
 {
 	if(index.isValid())
 		if(!equationColumns.contains(clmnsHeader.at(index.column())))
-			if(editableColumns.contains(clmnsHeader.at(index.column())) && Textclmns.contains(clmnsHeader.at(index.column())))
+			if((editableColumns.contains(clmnsHeader.at(index.column())) && Textclmns.contains(clmnsHeader.at(index.column())))
+					|| (Refrenceclmns.contains(clmnsHeader.at(index.column())))){
+			//		qDebug() << __FILE__ << __LINE__ << "EDitabel";
 				return QAbstractTableModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsEnabled |Qt::ItemIsSelectable;
+				}
 
 	return QAbstractTableModel::flags(index) & ~Qt::ItemIsEditable ;
 }
@@ -337,10 +346,12 @@ void MerplyReportTableModel::fillText(QJsonArray data)
 
 	cells =  QVector<TableCell>(colmnsCount * data.count());
 	rowsCount = data.count();
+	//qDebug() << rowCount();
 	for(int i = 0; i < data.count(); i++){
 		QJsonObject row =  data.at(i).toObject();
 		for(int j = 0; j <clmnsHeader.count(); j++){
 			QString value = row.value(clmnsHeader.at(j)).toString();
+			//qDebug() << value;
 			if(!value.isEmpty()){
 				cells[i * this->colmnsCount + j].setData(value);
 				}
@@ -362,7 +373,7 @@ void MerplyReportTableModel::fillIndexTabel( QList<QJsonDocument> items)
 	foreach(QJsonDocument item,items){
 		QString  key = item.object().value("document_id").toString();
 		int j = 0;
-	//	qDebug() << cells.count() << QString::number((i * this->colmnsCount + j)-1) << (((i * this->colmnsCount + j)-1) <= cells.count());
+		//	qDebug() << cells.count() << QString::number((i * this->colmnsCount + j)-1) << (((i * this->colmnsCount + j)-1) <= cells.count());
 		if(cells.count() > 0 && ((i * this->colmnsCount + j)-1) <= cells.count() )
 			cells[i * this->colmnsCount + j].setId(key);
 

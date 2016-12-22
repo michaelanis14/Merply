@@ -45,7 +45,7 @@ private:
 
 	QList<StructureVieweditSubFeildTableColumnEquation*> equationElements;
 
-	QStringList typsList;
+	QStringList typs;
 	ERPComboBox* inputData;
 
 	//Refrence

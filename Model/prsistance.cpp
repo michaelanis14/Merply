@@ -255,7 +255,7 @@ bool Prsistance::init()
 		}
 
 	if(Count("Contact::%\"") <10){
-		QStringList fileData = readCSVFile(":/initData/AM/Clients.csv");
+		QStringList fileData = readCSVFile("/AM/Clients.csv");
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
 		for(int i = 0; i < fileData.count();i++){
@@ -301,6 +301,56 @@ bool Prsistance::init()
 				}
 			}
 		}
+	if(Count("Category1::%\"") ==0){
+		QStringList fileData = readCSVFile("/Volumes/Data/Merply/Project/Build/debug/AM/C1.csv");
+		qDebug() << fileData;
+		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		//	qDebug() << __FILE__ << __LINE__ << fileData;
+		for(int i = 0; i < 0;i++){
+			QStringList data = fileData.at(i).split(",");
+			//qDebug() << __FILE__ << __LINE__ << data << data.count();
+			QJsonObject c;
+			if(0 < data.count() && !data.at(0).isEmpty()){
+				c.insert("الأسم",  data.at(0));
+				}
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				c.insert("تليفون",  data.at(1));
+				}
+			if(0 < data.count() && !data.at(2).isEmpty()){
+				c.insert("فاكس",  data.at(2));
+				}
+			if(0 < data.count() && !data.at(3).isEmpty()){
+				c.insert("موبيل",  data.at(3));
+				}
+			if(0 < data.count() && !data.at(4).isEmpty()){
+				c.insert("code",  data.at(4));
+				}
+			if(true){
+				QJsonObject country;
+				country.insert("Key","Country::315");
+				country.insert("Value","Egypt");
+				c.insert("البلد",country);
+				}
+			if(true){
+				QJsonObject city;
+				city.insert("Key","City::296");
+				city.insert("Value","Cairo");
+				c.insert("المدينه",city);
+				}
+			if(true){
+				QJsonObject contactType;
+				contactType.insert("Key","ContactType::1");
+				contactType.insert("Value","عميل");
+				c.insert("النوع",contactType);
+				}
+			if(!c.isEmpty()){
+				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
+				Database::Get()->storeDoc("Category1",QJsonDocument(c));
+				}
+			}
+		}
+
+
 	//if()
 	return true;
 }
@@ -318,7 +368,7 @@ QString Prsistance::readFile(QString path)
 	QTextStream in(&file);
 
 	while(!in.atEnd()) {
-		QString line = in.readLine();
+		QString line = in.readLine().toUtf8();
 		jsonFile.append(line);
 		}
 
@@ -384,7 +434,7 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 
 
 	QString query = "SELECT  d.`"+select.trimmed()+"` AS `Value`,META(d).id AS `Key` FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where;
-	//qDebug() << __FILE__ << __LINE__ << query;
+	qDebug() << __FILE__ << __LINE__ << query;
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
 	Database::Get()->query(query);
 

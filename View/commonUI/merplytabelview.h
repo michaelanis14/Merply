@@ -58,6 +58,7 @@ private:
 	bool add;
 	bool edit;
 	void initHController(QJsonObject columns);
+	void initDelegateClmns(QJsonObject columns);
 	//QStandardItemModel *model;
 	//QStringList headerLabels;
 signals:

@@ -53,6 +53,7 @@ private:
 	QHash<QString, QJsonArray> equationColumns;
 	QHash<QString,  QJsonObject> editableColumns;
 	QHash<QString,QJsonObject> Textclmns;
+	QHash<QString,QJsonObject> Refrenceclmns;
 	QJsonObject strct;
 	QJsonArray clmns;
 	QStringList clmnsHeader;
