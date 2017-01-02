@@ -43,12 +43,12 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		else{
 			if(!structureView.value("Source").toString().isEmpty() && structureView.value("Source").toString().compare("_") != 0){
 				//	qDebug() << __FILE__ << __LINE__  << "NOT LOACL FILTER" <<structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Condition").toString() ;
-				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
 				Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Condition").toString());
 				}
 			}
 		QJsonObject dataObj = data.toObject();
-		qDebug() << __FILE__ << __LINE__  << data;
+	//	qDebug() << __FILE__ << __LINE__  << data;
 		if(!dataObj.isEmpty()){
 			combox->setCurrentIndex(combox->findText(dataObj.value("Value").toString()));
 			}
@@ -101,7 +101,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		layout->addWidget(combox);
 		field = combox;
 
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
 		Controller::Get()->getJsonList(structureView.value("Source").toString(),structureView.value("Select").toString());
 		QString dataString = data.toString();
 		if(!dataString.isEmpty()){
@@ -140,7 +140,9 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		else if(structureView.value("initData") != QJsonValue::Undefined){
 			table->fillText(structureView.value("initData").toObject());
 			}
-		else{
+
+
+		else if(structureView.value("Query") == QJsonValue::Undefined){
 			table->fillText(QJsonObject());
 			}
 		layout->addWidget(table);
@@ -177,10 +179,11 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 
 		}
 	else if(type.compare("Date") == 0){
-		QDateEdit *date = new QDateEdit(this);
+		QDateTimeEdit *date = new QDateTimeEdit(this);
+		//qDebug() << data.toString();
 		if(data.toString().isEmpty())
-			date->setDate(QDate::currentDate());
-		else date->setDate(QDate::fromString(data.toString(),Qt::DefaultLocaleShortDate));
+			date->setDateTime(QDateTime::currentDateTime());
+		else date->setDateTime(QDateTime::fromString(data.toString(),Qt::DefaultLocaleShortDate));
 		layout->addWidget(date);
 		field = date;
 		}
@@ -247,10 +250,11 @@ QJsonValue SubFieldUI::save()
 		else save = QJsonValue::Null;
 		//	save =" ";
 		}
-	else if(QString(field->metaObject()->className()).compare("QDateEdit") == 0){
-		save =((QDateEdit*)field)->date().toString(Qt::DefaultLocaleShortDate);
+	else if(QString(field->metaObject()->className()).compare("QDateTimeEdit") == 0){
+		save =((QDateTimeEdit*)field)->dateTime().toString(Qt::DefaultLocaleShortDate);
+		//qDebug() << save;
 		}
-
+//qDebug() << save;
 	return save;
 }
 
@@ -302,9 +306,9 @@ void SubFieldUI::linkPressed()
 	Controller::Get()->linkPressed(this->structureView);
 }
 
-void SubFieldUI::refrenceData(QList<QJsonDocument> items)
+void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
 
 	if(combox){
 
@@ -337,7 +341,7 @@ void SubFieldUI::updateFilter(QString filter)
 		}
 	else{
 		//qDebug() << __FILE__ << __LINE__  <<"filter" << filter << structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Entity").toString()+"="+filter;
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(refrenceData(QList<QJsonDocument>)));
+		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
 
 		Controller::Get()->getJsonEntityFieldsList(source,select,entity+"="+filter);
 		}

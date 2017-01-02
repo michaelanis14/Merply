@@ -14,11 +14,12 @@ public:
 	virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem&, const QModelIndex& index) const;
 	virtual void setEditorData(QWidget* editor, const QModelIndex& index) const;
 	virtual void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const;
+
 private:
 	QJsonObject strct;
-	QList<QJsonDocument> items;
+	QVector<QJsonDocument> items;
 public slots:
-	void gotReportData(QList<QJsonDocument> items);
+	void gotReportData(QVector<QJsonDocument> items);
 	bool eventFilter(QObject *object, QEvent *event);
 
 };

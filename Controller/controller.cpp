@@ -47,7 +47,7 @@ Controller::Controller(QObject *parent) :
 
 	//Worker* worker = new Worker();
 
-	QObject::connect(this,SIGNAL(queryDatabase(QString)),Database::Get(),SLOT(query(QString)),Qt::QueuedConnection);
+//	QObject::connect(this,SIGNAL(queryDatabase(QString)),Database::Get(),SLOT(query(QString)),Qt::QueuedConnection);
 
 }
 
@@ -86,7 +86,7 @@ void Controller::showDisplay()
 	//	navigationUI::Get()->setParent(MainWindow::GetMainDisplay());
 
 	//
-	Prsistance::init();
+	//Prsistance::init();
 	//QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
 	//Database::Get()->getDoc("ViewStructure::5");
 
@@ -138,7 +138,7 @@ void Controller::subNavPressed(QJsonObject view)
 				Database::getDoc(view.value("Card").toString());
 				}
 			}
-	else IndexUI::ShowUI("ViewStructure::91",QList<QJsonDocument>());
+	else IndexUI::ShowUI("ViewStructure::91",QVector<QJsonDocument>());
 }
 
 void Controller::queryIndexView(QString vStrctKey)
@@ -151,7 +151,7 @@ void Controller::queryIndexView(QString vStrctKey)
 	//qDebug() << __FILE__ << __LINE__ <<"QINDEX : " << query;
 
 
-	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedIndexData(QList<QJsonDocument>)));
+	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(subNavPressedIndexData(QVector<QJsonDocument>)));
 	Database::Get()->query(query);
 }
 
@@ -189,7 +189,7 @@ void Controller::createIndexes(QJsonObject viewStrct)
 				QString lbl = fv.toObject().value("Label").toString().toLatin1();
 				if(lbl.contains("?"))
 					lbl = QString(key.at(0)).append(QString::number(i));
-			//	qDebug() << lbl;
+				//	qDebug() << lbl;
 				QString indexname = QString(DATABASE).append("-").append(key.toLower()).append(lbl).append("-index");
 				int indexCount = Controller::Get()->countIndex(indexname);
 				if(indexCount == 0){
@@ -225,9 +225,9 @@ void Controller::subNavPressedData(QJsonDocument documents)
 	CreateEditUI::ShowUI(documents.object(),QJsonObject(),false);
 }
 
-void Controller::subNavPressedIndexData(QList<QJsonDocument> documents)
+void Controller::subNavPressedIndexData(QVector<QJsonDocument> documents)
 {
-	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(subNavPressedIndexData(QList<QJsonDocument>)));
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(subNavPressedIndexData(QVector<QJsonDocument>)));
 	if(!indexDocument_id.isEmpty())
 		IndexUI::ShowUI(this->indexDocument_id,documents);
 
@@ -277,20 +277,20 @@ void Controller::getDocData(QJsonDocument document)
 void Controller::getJsonList(QString table, QString select,QString condition)
 {
 
-	QObject::connect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QList<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
+	QObject::connect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QVector<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QVector<QJsonDocument>)));
 	Prsistance::GetJsonList(table,select,condition);
 }
 void Controller::getJsonEntityFieldsList(QString table, QString select,QString condition)
 {
 
-	QObject::connect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QList<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
+	QObject::connect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QVector<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QVector<QJsonDocument>)));
 	Prsistance::GetJsonEntityFields(table,select,condition);
 }
 
-void Controller::GetJsonListData(QList<QJsonDocument> items)
+void Controller::GetJsonListData(QVector<QJsonDocument> items)
 {
 
-	QObject::disconnect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QList<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QList<QJsonDocument>)));
+	QObject::disconnect(Prsistance::Get(),SIGNAL(GotJsonSelectList(QVector<QJsonDocument>)),Controller::Get(),SLOT(GetJsonListData(QVector<QJsonDocument>)));
 	emit gotJsonListData(items);
 }
 
@@ -334,7 +334,7 @@ QList<QString> Controller::select(const QString query)
 	return QList<QString>();
 }
 
-QList<QJsonDocument> Controller::getAll(const QString entity, const QString condition)
+QVector<QJsonDocument> Controller::getAll(const QString entity, const QString condition)
 {
 	return Prsistance::GetALL(entity,condition);
 }
@@ -366,11 +366,14 @@ QString Controller::toString(QJsonValue value)
 		if(value.toObject().value("Value") != QJsonValue::Undefined)
 			data += value.toObject().value("Value").toString();
 		}
+	else if(value.isDouble()){
+		data += QString::number(value.toDouble());
+		}
 
 	return data;
 }
 
-bool Controller::documentInList(QList<QJsonDocument> all, QString key)
+bool Controller::documentInList(QVector<QJsonDocument> all, QString key)
 {
 	foreach(QJsonDocument d,all){
 		if(d.object().value("document_id").toString().compare(key) == 0)
@@ -379,7 +382,7 @@ bool Controller::documentInList(QList<QJsonDocument> all, QString key)
 	return false;
 }
 
-QList<QJsonDocument> Controller::getEnities()
+QVector<QJsonDocument> Controller::getEnities()
 {
 	return Prsistance::GetALL("ViewStructure",QString(DATABASE).append(".Type =\"Entity\""));
 }
@@ -387,7 +390,7 @@ QList<QJsonDocument> Controller::getEnities()
 void Controller::getFields(QString Title)
 {
 	if(!Title.isEmpty() && Title.compare("_") != 0){
-		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getFieldsData(QList<QJsonDocument>)));
+		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getFieldsData(QVector<QJsonDocument>)));
 		QString query = "SELECT array_star("+QString(DATABASE)+".Viewgroups[*].Viewgroup).Fields FROM  `"+QString(DATABASE)+"` WHERE META(`"+QString(DATABASE)+"`).id = '"+Title+"'";
 		//	qDebug() << __FILE__ << __LINE__  << "getFields"<<query;
 		Database::Get()->query(query);
@@ -396,10 +399,10 @@ void Controller::getFields(QString Title)
 
 
 
-void Controller::getFieldsData(QList<QJsonDocument> documents)
+void Controller::getFieldsData(QVector<QJsonDocument> documents)
 {
 	//CreateEditUI::ShowUI(document.object(),QJsonObject());
-	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getFieldsData(QList<QJsonDocument>)));
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getFieldsData(QVector<QJsonDocument>)));
 	if(!documents.isEmpty() ){
 		QStringList fieldsName;
 		foreach(QJsonValue fv,documents.first().object().value("Fields").toArray()){
@@ -423,14 +426,14 @@ void Controller::getFieldsData(QList<QJsonDocument> documents)
 void Controller::getIndexHeader(QString title)
 {
 	if(!title.isEmpty() && title.compare("_") != 0){
-		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getIndexHeaderData(QList<QJsonDocument>)));
+		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getIndexHeaderData(QVector<QJsonDocument>)));
 		QString query = "SELECT array_star("+QString(DATABASE)+".Viewgroups[*].Viewgroup).Fields FROM  `"+QString(DATABASE)+"` WHERE META(`"+QString(DATABASE)+"`).id = '"+title+"'";
 		//	qDebug() << __FILE__ << __LINE__  << "getFields"<<query;
 		Database::Get()->query(query);
 		}
 }
-void Controller::getIndexHeaderData(QList<QJsonDocument> documents){
-	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getIndexHeaderData(QList<QJsonDocument>)));
+void Controller::getIndexHeaderData(QVector<QJsonDocument> documents){
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getIndexHeaderData(QVector<QJsonDocument>)));
 	if(!documents.isEmpty() ){
 		QStringList fieldsName;
 		foreach(QJsonValue fv,documents.first().object().value("Fields").toArray()){
@@ -628,7 +631,7 @@ bool Controller::saveNavigation()
 
 	saveNavigationPages();
 	QMapIterator<double, QString > i(Model::Get()->getMainNavigationModel());
-	//QList<QJsonDocument> mainNavs;
+	//QVector<QJsonDocument> mainNavs;
 	QJsonObject navigation;
 	QJsonArray mainNavs;
 	while (i.hasNext()) {
@@ -701,10 +704,15 @@ QJsonObject Controller::saveSubNavigation(QTreeWidgetItem * item)
 
 void Controller::getReport(QJsonObject clmns,QString filter)
 {
-
-	qDebug() << __FILE__ << __LINE__<<"getReport"  << clmns;
 	bool addedSelectItems = false;
-	if(clmns.value("Columns").isArray()){
+
+	if(clmns.value("Query") != QJsonValue::Undefined){
+		qRegisterMetaType<QVector<QJsonDocument> >("MyStruct");
+		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getReportData(QVector<QJsonDocument>)),Qt::QueuedConnection);
+		Database::Get()->query(clmns.value("Query").toString());
+	//	qDebug() << __FILE__ << __LINE__<<"getReport"  << clmns;
+		}
+	else if(clmns.value("Columns").isArray()){
 		//QJsonArray arr = (columns.value("Columns").toArray());
 		int i = 0;
 		QString query;
@@ -759,15 +767,15 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 
 
 
-					query += " , META("+uniqueRef+"a).id AS `"+localFilter+QString::number(i)+"Key`";
-					query += " , META("+uniqueRef+"d).id AS `Join"+localFilter+QString::number(i)+"Key`";
+					query += " , META(`"+uniqueRef+"a`).id AS `"+localFilter+QString::number(i)+"Key`";
+					query += " , META(`"+uniqueRef+"d`).id AS `Join"+localFilter+QString::number(i)+"Key`";
 					query += "FROM ";
-					query += QString(DATABASE) +" "+uniqueRef+"d UNNEST "+uniqueRef+"d.Fields "+uniqueRef+"ff UNNEST "+uniqueRef+"d.Fields "+uniqueRef+"f UNNEST (Array item.`"+entityFilter+"`[0] FOR item IN "+uniqueRef+"f END)[0] "+uniqueRef+"fk  INNER JOIN "+QString(DATABASE) +"  "+uniqueRef+"a ON KEYS "+uniqueRef+"fk.`Key`";
-					query += "UNNEST "+uniqueRef+"a  af UNNEST af.Fields "+uniqueRef+"aff UNNEST (Array item.Name[0] FOR item IN "+uniqueRef+"aff END) "+uniqueRef+"afs "; //UNNEST (Array item.Salutation[0] FOR item IN "+uniqueRef+"ff END) IC2fkrk";
+					query += QString(DATABASE) +" "+uniqueRef+"d UNNEST `"+uniqueRef+"d`.Fields "+uniqueRef+"ff UNNEST "+uniqueRef+"d.Fields "+uniqueRef+"f UNNEST (Array item.`"+entityFilter+"`[0] FOR item IN "+uniqueRef+"f END)[0] "+uniqueRef+"fk  INNER JOIN "+QString(DATABASE) +"  "+uniqueRef+"a ON KEYS "+uniqueRef+"fk.`Key`";
+					query += "UNNEST "+uniqueRef+"a  af UNNEST af.Fields `"+uniqueRef+"aff` UNNEST (Array item.Name[0] FOR item IN "+uniqueRef+"aff END) "+uniqueRef+"afs "; //UNNEST (Array item.Salutation[0] FOR item IN "+uniqueRef+"ff END) IC2fkrk";
 					query += "WHERE ";
 					query += "META("+uniqueRef+"d).id LIKE '"+source+"::%'";
-					query += QString(" AND ") + QString("(Array item.`"+selectStr+"`[0] FOR item IN "+uniqueRef+"ff END)[0] ");
-					query += QString(" AND ")+ QString("META("+uniqueRef+"a).id LIKE '"+localFilter+"::%' ");
+					query += QString(" AND ") + QString("(Array item.`"+selectStr+"`[0] FOR item IN `"+uniqueRef+"ff` END)[0] ");
+					query += QString(" AND ")+ QString("META(`"+uniqueRef+"a`).id LIKE '"+localFilter+"::%' ");
 
 
 					}
@@ -826,12 +834,12 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 
 		if(addedSelectItems){
 			qDebug() << __FILE__ << __LINE__  <<"Report Q:"<< query;
-			qRegisterMetaType<QList<QJsonDocument> >("MyStruct");
-			QObject::connect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)),Qt::QueuedConnection);
+			qRegisterMetaType<QVector<QJsonDocument> >("MyStruct");
+			//QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getReportData(QVector<QJsonDocument>)),Qt::QueuedConnection);
 			//Database::Get()->query(query);
-			emit queryDatabase(query);
+			//	emit queryDatabase(query);
 			}
-		else emit gotReportData(QList<QJsonDocument>());
+		else emit gotReportData(QVector<QJsonDocument>());
 
 
 		}
@@ -877,10 +885,10 @@ bool Controller::isCachedCreateEditUI(QString key)
 	return Model::Get()->cachedCreateEditUI.contains(key);
 }
 
-void Controller::getReportData(QList<QJsonDocument> documents)
+void Controller::getReportData(QVector<QJsonDocument> documents)
 {
-	//qDebug() << __FILE__ << __LINE__  << "GotReport Data" ;
-	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QList<QJsonDocument>)),this,SLOT(getReportData(QList<QJsonDocument>)));
+	//qDebug() << __FILE__ << __LINE__  << "GotReport Data" << documents;
+	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getReportData(QVector<QJsonDocument>)));
 	emit gotReportData(documents);
 
 }

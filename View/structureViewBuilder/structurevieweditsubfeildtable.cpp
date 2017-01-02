@@ -29,6 +29,10 @@ StructureVieweditSubFeildTable::StructureVieweditSubFeildTable(QWidget *parent) 
 	editEnable = new QCheckBox;
 	layout->addWidget(new QLabel(tr("Edit ")));
 	layout->addWidget( editEnable);
+
+	queryBox = new QTextEdit();
+	layout->addWidget(new QLabel(tr("Query ")));
+	layout->addWidget( queryBox);
 	//layout->addRow();
 
 
@@ -45,6 +49,11 @@ QJsonObject StructureVieweditSubFeildTable::save()
 	saveTable.insert("Add",addEnable->isChecked());
 	saveTable.insert("Edit",editEnable->isChecked());
 	saveTable.insert("Remove",removeEnable->isChecked());
+
+	if(!(queryBox->toPlainText().trimmed().isEmpty())){
+		qDebug() << queryBox->toPlainText();
+		saveTable.insert("Query",queryBox->toPlainText());
+}
 	QJsonArray clmnsArray;
 	if(!clmns.isEmpty()){
 		foreach(StructureVieweditSubFeildTableColumn* clmn,clmns){
@@ -55,9 +64,9 @@ QJsonObject StructureVieweditSubFeildTable::save()
 	return saveTable;
 }
 
-QList<QJsonDocument> StructureVieweditSubFeildTable::getClmnsSources(ERPComboBox* excludeSource)
+QVector<QJsonDocument> StructureVieweditSubFeildTable::getClmnsSources(ERPComboBox* excludeSource)
 {
-	QList<QJsonDocument> sourcesList;
+	QVector<QJsonDocument> sourcesList;
 	if(clmns.first() && !clmns.isEmpty()){
 		foreach(StructureVieweditSubFeildTableColumn* clmn,clmns){
 			if(clmn->getSource() != (excludeSource)){
@@ -84,6 +93,8 @@ void StructureVieweditSubFeildTable::fill(QJsonObject tblStractureView)
 		this->removeEnable->setChecked(true);
 	else this->removeEnable->setChecked(tblStractureView.value("Remove").toBool());
 
+	if(tblStractureView.value("Query") != QJsonValue::Undefined)
+		this->queryBox->setText(tblStractureView.value("Query").toString());
 	clmns.clear();
 	StructureVieweditSubFeildTableColumn * clmnWidget;
 	if(!tblStractureView.isEmpty() && tblStractureView.value("Columns").isArray()){
@@ -122,9 +133,9 @@ QStringList StructureVieweditSubFeildTable::getHeaders()
 {
 	QStringList headers;
 	if(!tblStractureView.isEmpty() && tblStractureView.value("Columns").isArray()){
-			foreach(QJsonValue clmn,tblStractureView.value("Columns").toArray()){
-				headers << clmn.toObject().value("Header").toString();
-				}
+		foreach(QJsonValue clmn,tblStractureView.value("Columns").toArray()){
+			headers << clmn.toObject().value("Header").toString();
+			}
 		}
 	return headers;
 }

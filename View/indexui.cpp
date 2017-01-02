@@ -30,7 +30,7 @@ IndexUI::IndexUI(QWidget *parent) : MainDisplay(parent)
 
 }
 IndexUI* IndexUI::p_instance = 0;
-void IndexUI::ShowUI(const QString document_id, const QList<QJsonDocument> documents) {
+void IndexUI::ShowUI(const QString document_id, const QVector<QJsonDocument> documents) {
 	//qDebug() << __FILE__ << __LINE__  << id;
 
 	if(p_instance == 0)
@@ -40,7 +40,7 @@ void IndexUI::ShowUI(const QString document_id, const QList<QJsonDocument> docum
 }
 
 
-void IndexUI::fill(const QString document_id,const QList<QJsonDocument> items)
+void IndexUI::fill(const QString document_id,const QVector<QJsonDocument> items)
 {
 /*	this->id = id;
 	QStringList idNumber = id.split("::");
@@ -48,7 +48,7 @@ void IndexUI::fill(const QString document_id,const QList<QJsonDocument> items)
 		this->id = idNumber.first();
 
 	xmlNode = Controller::Get()->addStyle(this->id);
-	QList<QJsonDocument> all = Controller::Get()->getAll(this->id,"");
+	QVector<QJsonDocument> all = Controller::Get()->getAll(this->id,"");
 
 	if(!Database::Get()->getLastKeyID().isEmpty()){
 		Controller::Get()->getDoc(Database::Get()->getLastKeyID());

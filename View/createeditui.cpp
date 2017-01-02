@@ -159,6 +159,7 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 					}
 				else{
 					QJsonObject vgsSave = viewGroups->save();
+					//qDebug() << vgsSave;
 					vgsSave.insert("cas_value",this->cas);
 					vgsSave.insert("document_id",this->data.value("document_id").toString());
 					Controller::Get()->UpdateDoc(QJsonDocument(vgsSave));

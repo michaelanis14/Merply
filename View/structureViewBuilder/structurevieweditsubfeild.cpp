@@ -85,7 +85,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		if(!fieldVS.toObject().value("Source").toString().isEmpty())
 			Source->setCurrentText(fieldVS.toObject().value("Source").toString());
 		layout->addRow(new QLabel(tr("Source ")), Source);
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
+		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
 		Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 
 
@@ -106,7 +106,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		Source = new ERPComboBox(0);
 		Select = new ERPComboBox(0);
 		layout->addRow(new QLabel(tr("Source ")), Source);
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
+		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
 		Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 		layout->addRow(new QLabel(tr("Select ")), Select);
 		condition = new QTextEdit;
@@ -391,10 +391,10 @@ void StructureVieweditSubFeild::updateSelectData(QList<QString> fields)
 		}
 }
 
-void StructureVieweditSubFeild::gotSourceData(QList<QJsonDocument> items)
+void StructureVieweditSubFeild::gotSourceData(QVector<QJsonDocument> items)
 {
 	//qDebug() << __FILE__ << __LINE__<< "gotSourceData" << items;
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(gotSourceData(QList<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
 	Source->clear();
 	Source->addJsonItems(items);
 	QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));

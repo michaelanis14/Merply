@@ -48,28 +48,31 @@ public:
 	//QJsonDocument getDocument() const;
 	static void rowCallback(lcb_t, int, const lcb_RESPN1QL *resp);
 
+	static lcb_t instance;
 
 
 
-
-	QList<QJsonDocument> getArray() const;
+	QVector<QJsonDocument> getArray() const;
 
 	QString getValue() const;
 	QString LastKeyID;
 	QString getLastKeyID() const;
 
+	void query(QString query);
+
 private:
 	static Database* p_instance;
 	//QJsonDocument document;
-	QList<QJsonDocument> array;
+	QJsonDocument documentToArray;
+	QVector<QJsonDocument> array;
 	bool connIssue;
 	//	QString value;
 
 public slots :
-	void query(QString query);
+
 signals:
 	void gotDocument(QJsonDocument document);
-	void gotDocuments(QList<QJsonDocument> array);
+	void gotDocuments(QVector<QJsonDocument> array);
 	void gotValue(QString value);
 	void gotLastKey(QString LastKeyID);
 };

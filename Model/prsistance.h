@@ -26,15 +26,15 @@ public:
 
 	static int Count(const QString table);
 	static int CountIndexes(const QString index);
-	static QList<QJsonDocument> GetALL(const QString entity,const QString condition);
+	static QVector<QJsonDocument> GetALL(const QString entity,const QString condition);
 	static bool Select(const QString query);
 	static QString GetDatabaseName();
 private:
 	static Prsistance* p_instance;
 signals:
-	void GotJsonSelectList(QList<QJsonDocument> items);
+	void GotJsonSelectList(QVector<QJsonDocument> items);
 public slots:
-	void GetJsonListData(QList<QJsonDocument> items);
+	void GetJsonListData(QVector<QJsonDocument> items);
 };
 
 #endif // PRSISTANCE_H

@@ -67,7 +67,7 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 
 	label = new QLineEdit();
 
-	QObject::connect(label,SIGNAL(textEdited(QString)),this,SLOT(updatePreview()));
+	//TODO:   QObject::connect(label,SIGNAL(textEdited(QString)),this,SLOT(updatePreview()));
 	label->setText(tr("New Field"));
 	//labelWidget = new QWidget();
 	//labelWidget->setContentsMargins(0,0,0,0);

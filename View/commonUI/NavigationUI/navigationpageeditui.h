@@ -61,7 +61,7 @@ public slots:
 	void newCardToggled(bool state);
 	void cardToggled(bool state);
 	void pageToggled(bool state);
-	void getCardData(QList<QJsonDocument> items);
+	void getCardData(QVector<QJsonDocument> items);
 	void getPageData(QJsonDocument page);
 	void updatePagePreview();
 	void deleteCard();

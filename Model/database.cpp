@@ -78,6 +78,8 @@ bool Database::updateDoc(QJsonDocument document)
 	cmd.v.v0.cas =  document.object().value("cas_value").toString().toLongLong();
 	lcb_set_store_callback(instance, on_stored_status);
 	lcb_set_get_callback(instance, get_callback);
+
+
 	lcb_error_t err = lcb_store(instance, NULL, 1, &cmdlist);
 	if (err == LCB_SUCCESS) {
 		lcb_wait(instance);
@@ -131,7 +133,17 @@ lcb_t Database::InitDatabase(QString connStr)
 	// initializing
 	//Database::Get()->document = QJsonDocument();
 	connStr = "couchbase://localhost/"+QString(DATABASE);
-	Database::Get()->array.clear();
+//	this->instance;
+	if(Database::Get()->instance){
+		//qDebug() << "static";
+		return Database::Get()->instance;
+		}
+
+	//connStr = "couchbase://ec2-35-166-198-84.us-west-2.compute.amazonaws.com/"+QString(DATABASE);
+	//connStr = "couchbase://138.68.70.131/"+QString(DATABASE);
+
+
+	//Database::Get()->array.clear();
 
 	struct lcb_create_st cropts;// = { 0 };
 	cropts.version = 3;
@@ -159,13 +171,14 @@ lcb_t Database::InitDatabase(QString connStr)
 		qDebug() << __FILE__ << __LINE__ << "Couldn't bootstrap! " << lcb_strerror(instance, err);
 		return NULL;
 		}
+	Database::Get()->instance = instance;
 	return instance;
 }
 
 bool Database::KillDatabase(lcb_t instance)
 {
 
-	lcb_destroy(instance);
+	//lcb_destroy(instance);
 	return true;
 }
 
@@ -269,17 +282,19 @@ bool Database::getDoc(QString key) {
 
 void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 
+	//qDebug() << "rowCallback" << (resp->rflags & LCB_RESP_F_FINAL);
 	if (! (resp->rflags & LCB_RESP_F_FINAL)) {
 		QJsonParseError parserError;
 		QByteArray byteArray(resp->row,resp->nrow);
-		QJsonDocument documentToArray =  QJsonDocument::fromJson(byteArray , &parserError);
-
+	//	QJsonDocument documentToArray =  QJsonDocument();
+		//documentToArray=  QJsonDocument::fromJson(byteArray , &parserError);
+		QJsonDocument::fromJson(byteArray , &parserError);
 		if(parserError.error == QJsonParseError::NoError){
-			documentToArray.toJson(QJsonDocument::Compact);
-			Database::Get()->array << documentToArray;
+		//	documentToArray.toJson(QJsonDocument::Compact);
+			Database::Get()->array.append(QJsonDocument::fromJson(byteArray , &parserError));
 			}
 		else{
-			qDebug() << __FILE__ << __LINE__  << parserError.errorString() << "emitting Value Line: DATABASE268";
+			qDebug() << __FILE__ << __LINE__  << parserError.errorString() << "emitting Value";
 			Database::Get()->emit gotValue(QString(byteArray));
 			//	qDebug() << __FILE__ << __LINE__  << Database::Get()->value;
 			}
@@ -299,7 +314,7 @@ void Database::query(QString query)
 {
 	//qDebug() << __FILE__ << __LINE__ <<"Query:: " << query;
 	lcb_t instance = Database::InitDatabase();
-	Database::Get()->array = QList<QJsonDocument>();
+	Database::Get()->array.clear();
 	if(instance == NULL){
 		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
 		return;
@@ -337,7 +352,7 @@ void Database::query(QString query)
 
 }
 
-QList<QJsonDocument> Database::getArray() const
+QVector<QJsonDocument> Database::getArray() const
 {
 	//qDebug() << __FILE__ << __LINE__  << array <<"--------";
 	return array;
@@ -423,7 +438,7 @@ Database::Database():
 {
 	//	this->document =  QJsonDocument();
 	//	this->value = QString();
-	this->array = QList<QJsonDocument>();
+	this->array = QVector<QJsonDocument>();
 	this->connIssue = false;
 	//IncrementKey("cont");
 	/*
@@ -487,6 +502,7 @@ Database::Database():
 	lcb_wait(instance); // get_callback is invoked here
 */
 }
+lcb_t Database::instance = 0;
 Database* Database::p_instance = 0;
 /**
  * @brief Database::Get
@@ -498,7 +514,8 @@ Database* Database::p_instance = 0;
  */
 Database* Database::Get()
 {
-	if (p_instance == 0){
+	if ( p_instance == 0){
+
 		QThread* thread = new QThread;
 		p_instance = new Database();
 		p_instance->moveToThread(thread);

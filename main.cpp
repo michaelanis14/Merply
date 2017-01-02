@@ -20,35 +20,7 @@
 class Merply_Application : public QApplication {
 public:
 	Merply_Application(int& argc, char** argv) : QApplication(argc, argv) {}
-	virtual bool notify(QObject *receiver, QEvent *event) {
-		QApplication::notify(receiver, event);
 
-		if (event->type() == QEvent::MouseButtonRelease) {
-			if(qobject_cast<QLabel*>(receiver))
-				Controller::Log(QStringList() << QTime::currentTime().toString() << receiver->metaObject()->className() << receiver->objectName() <<((QLabel*) receiver)->text());
-
-			else if ( receiver->objectName().compare("qt_scrollarea_viewport") == 0){
-				if(QString(receiver->parent()->parent()->parent()->metaObject()->className()).compare("QComboBox") == 0){
-					Controller::Log(QStringList()<< QTime::currentTime().toString() << receiver->parent()->parent()->parent()->metaObject()->className()  <<((QComboBox*) receiver->parent()->parent()->parent())->currentText()) ;
-					if(receiver->parent()->parent()->parent()->parent()->objectName().compare("ValueUI") == 0) {
-//						((ValueUI*) (receiver->parent()->parent()->parent()->parent()))->comboChanged();
-						}
-					}
-				}
-
-
-			//	else qDebug() << __FILE__ << __LINE__  << receiver->objectName() <<receiver->metaObject()->className() << receiver->parent()->parent()->parent()->metaObject()->className();
-			}
-		if (event->type() == QEvent::FocusOut){
-			if(qobject_cast<QLineEdit*>(receiver)){
-				Controller::Log(QStringList() << QTime::currentTime().toString() << receiver->metaObject()->className() << receiver->objectName() <<((QLineEdit*) receiver)->text());
-
-				}
-			}
-		//	qDebug() << __FILE__ << __LINE__  << receiver->objectName() ;
-		return false;
-		//	return false;
-	}
 };
 
 

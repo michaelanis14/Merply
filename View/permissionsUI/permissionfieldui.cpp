@@ -211,9 +211,9 @@ void PermissionFieldUI::loadUsersGroups()
 	usersforAllowedList->addJsonItems(basicPermissonsKeys);
 	usersforDeniedList->addJsonItems(basicPermissonsKeys);
 
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(loadUsers(QList<QJsonDocument>)));
+	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
 	Controller::Get()->getJsonList("Users","Fields[0][0].Name[0]");
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(loadUsers(QList<QJsonDocument>)));
+	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
 	Controller::Get()->getJsonList("Groups","Fields[0][0].Name[0]");
 
 }
@@ -267,7 +267,7 @@ void PermissionFieldUI::allowGroupPressed(QTreeWidgetItem* item, int column)
 	if(column == 2){
 		if(allowGroup->indexOfTopLevelItem(item) != -1){
 			if(allowGroup->takeTopLevelItem(allowGroup->indexOfTopLevelItem(item))){
-				QList<QJsonDocument> items;
+				QVector<QJsonDocument> items;
 				QJsonObject jsonitem;
 				jsonitem.insert("Value",item->text(1));
 				jsonitem.insert("Key",item->text(0));
@@ -298,7 +298,7 @@ void PermissionFieldUI::denyGroupPressed(QTreeWidgetItem* item, int column)
 	if(column == 2){
 		if(denyGroup->indexOfTopLevelItem(item) != -1){
 			if(denyGroup->takeTopLevelItem(denyGroup->indexOfTopLevelItem(item))){
-				QList<QJsonDocument> items;
+				QVector<QJsonDocument> items;
 				QJsonObject jsonitem;
 				jsonitem.insert("Value",item->text(1));
 				jsonitem.insert("Key",item->text(0));
@@ -346,9 +346,9 @@ void PermissionFieldUI::addAllowed()
 	//qDebug() << __FILE__ << __LINE__  << save();
 }
 
-void PermissionFieldUI::loadUsers(QList<QJsonDocument> users)
+void PermissionFieldUI::loadUsers(QVector<QJsonDocument> users)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(loadUsers(QList<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
 	usersforAllowedList->addJsonItems(users);
 	usersforDeniedList->addJsonItems(users);
 }

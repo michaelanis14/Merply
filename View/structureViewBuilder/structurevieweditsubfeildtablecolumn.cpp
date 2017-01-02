@@ -38,7 +38,7 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 
 	Source = new ERPComboBox(0);
 	layout->addRow(new QLabel(tr("Source ")), Source);
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(selectData(QList<QJsonDocument>)));
+	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(selectData(QVector<QJsonDocument>)));
 	Controller::Get()->getJsonList("ViewStructure","Title","`"+ QString(DATABASE).append("`.Type =\"Entity\""));
 
 	Select = new ERPComboBox(0);
@@ -283,9 +283,9 @@ void StructureVieweditSubFeildTableColumn::updateSelectData(QList<QString> field
 	Select->addItems(fields);
 }
 
-void StructureVieweditSubFeildTableColumn::selectData(QList<QJsonDocument> items)
+void StructureVieweditSubFeildTableColumn::selectData(QVector<QJsonDocument> items)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(selectData(QList<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(selectData(QVector<QJsonDocument>)));
 	Source->clear();
 	Source->addJsonItems(items);
 }
@@ -298,7 +298,7 @@ void StructureVieweditSubFeildTableColumn::filterOnChanged(int index)
 			}
 		else if(index == 1){
 
-			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QList<QJsonDocument> >)),this,SLOT(fillLocalFilter(QList<QList<QJsonDocument> >)));
+			QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QVector<QJsonDocument> >)),this,SLOT(fillLocalFilter(QList<QVector<QJsonDocument> >)));
 			StructureViewGroupsUI::GetUI()->getTableFields(Source);
 
 			//entityFilter->addItems(Select->getItemsText());
@@ -317,14 +317,14 @@ void StructureVieweditSubFeildTableColumn::filterOnChanged(int index)
 		}
 }
 
-void StructureVieweditSubFeildTableColumn::fillLocalFilter(QList<QList<QJsonDocument> > feilds)
+void StructureVieweditSubFeildTableColumn::fillLocalFilter(QList<QVector<QJsonDocument> > feilds)
 {
-	QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QList<QJsonDocument> >)),this,SLOT(fillLocalFilter(QList<QList<QJsonDocument> >)));
+	QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QVector<QJsonDocument> >)),this,SLOT(fillLocalFilter(QList<QVector<QJsonDocument> >)));
 
-	//QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QJsonDocument>)),this,SLOT(fillLocalFilter(QList<QJsonDocument>)));
+	//QObject::disconnect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QVector<QJsonDocument>)),this,SLOT(fillLocalFilter(QVector<QJsonDocument>)));
 	if(localFilterWidget){
 		localFilter->clear();
-		foreach(QList<QJsonDocument> table,feilds){
+		foreach(QVector<QJsonDocument> table,feilds){
 			localFilter->addJsonItems(table);
 			}
 		localFilterChanged(0);

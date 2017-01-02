@@ -26,7 +26,7 @@ ERPComboBox::ERPComboBox(QWidget *parent, bool indexedFill) :
 	this->installEventFilter(this);
 
 }
-void ERPComboBox::addJsonItems(QList<QJsonDocument> items){
+void ERPComboBox::addJsonItems(QVector<QJsonDocument> items){
 	int i = 0;
 	//qDebug() << __FILE__ << __LINE__  << items;
 	foreach (const QJsonDocument & value, items){

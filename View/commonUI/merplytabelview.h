@@ -9,10 +9,11 @@
 
 
 #include "merplyreporttablemodel.h"
-
+#include "mtabelcombobox.h"
 #include "qtrpt.h"
 
 #include "hcontrollers.h"
+#include "merplyqueryui.h"
 
 #include <QtGui>
 #include <QWidget>
@@ -40,8 +41,8 @@ public:
 	bool fill(QJsonObject columns,QString filter = "");
 	bool fillLocalSource(QJsonObject columns,QString filter = "");
 	bool fillText(QJsonObject data);
-	void indexTable(const QString document_id, const QList<QJsonDocument> items);
-	QList<QJsonDocument> items;
+	void indexTable(const QString document_id, const QVector<QJsonDocument> items);
+	QVector<QJsonDocument> items;
 	QJsonObject save();
 	MerplyReportTableModel* model;
 	MerplyReportTableModel* getModel() const;
@@ -51,6 +52,7 @@ private:
 	QHBoxLayout* lblLayout;
 	QLabel* print;
 	QTableView* tableView;
+	MerplyQueryUI* queryUI;
 
 	HControllers* controllers ;
 	QString currenctPrintID;
@@ -59,16 +61,17 @@ private:
 	bool edit;
 	void initHController(QJsonObject columns);
 	void initDelegateClmns(QJsonObject columns);
+	QVector<MTabelCombobox *> delegateItems;
 	//QStandardItemModel *model;
 	//QStringList headerLabels;
 signals:
-	void updateModel(QList<QJsonDocument> documents);
+	void updateModel(QVector<QJsonDocument> documents);
 
 
 public slots:
 	void printTabel();
 	void printEntity(const QString&id);
-	void gotReportData(QList<QJsonDocument> documents);
+	void gotReportData(QVector<QJsonDocument> documents);
 	void updateHeaderData(QList<QString> headerItems);
 	void setValue(const int, const QString paramName, QVariant &paramValue, const int);
 	void modelFinished();

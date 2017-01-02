@@ -126,14 +126,14 @@ void StructureVieweditSubFeildEquation::fill(QJsonObject data)
 		}
 }
 
-void StructureVieweditSubFeildEquation::gotclmnsData(QList<QList<QJsonDocument> > list)
+void StructureVieweditSubFeildEquation::gotclmnsData(QList<QVector<QJsonDocument> > list)
 {
 	QString oldClmnOneIndex = columnOne->currentText();
 	QString oldClmnTwoIndex = columnTwo->currentText();
 
 	columnOne->clear();
 	columnTwo->clear();
-	foreach(QList<QJsonDocument> table,list){
+	foreach(QVector<QJsonDocument> table,list){
 	int i = 0;
 	foreach (QJsonDocument doc, table) {
 		QString item = QString(tr("Column:")).append(QString::number(i)).append(" ").append(doc.object().value("clmnHeader").toString());

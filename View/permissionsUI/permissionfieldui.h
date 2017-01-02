@@ -32,7 +32,7 @@ private:
 	QStringList getDenied();
 	void addAllowed(QString title,QString key);
 	void addDenied(QString title,QString key);
-	QList<QJsonDocument> basicPermissonsKeys;
+	QVector<QJsonDocument> basicPermissonsKeys;
 	void loadUsersGroups();
 
 signals:
@@ -44,7 +44,7 @@ public slots:
 	void addDenied();
 	void addAllowed();
 
-	void loadUsers(QList<QJsonDocument> users);
+	void loadUsers(QVector<QJsonDocument> users);
 
 };
 

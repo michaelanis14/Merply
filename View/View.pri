@@ -46,7 +46,8 @@ SOURCES += View/maindisplay.cpp \
     $$PWD/commonUI/NavigationUI/widgetsstructureviewediteui.cpp \
     $$PWD/structureViewBuilder/strctvieweditsubftblclmneq.cpp \
     $$PWD/structureViewBuilder/structurevieweditsubfeildequation.cpp \
-    $$PWD/commonUI/MerplyTabel/mtabelcombobox.cpp
+    $$PWD/commonUI/MerplyTabel/mtabelcombobox.cpp \
+    $$PWD/commonUI/MerplyTabel/merplyqueryui.cpp
 
 HEADERS  += View/maindisplay.h \
     View/commonUI/rangevalidator.h \
@@ -88,7 +89,8 @@ HEADERS  += View/maindisplay.h \
     $$PWD/commonUI/NavigationUI/widgetsstructureviewediteui.h \
     $$PWD/structureViewBuilder/strctvieweditsubftblclmneq.h \
     $$PWD/structureViewBuilder/structurevieweditsubfeildequation.h \
-    $$PWD/commonUI/MerplyTabel/mtabelcombobox.h
+    $$PWD/commonUI/MerplyTabel/mtabelcombobox.h \
+    $$PWD/commonUI/MerplyTabel/merplyqueryui.h
 
 #FORMS    += View/mainwindow.ui
 

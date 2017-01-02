@@ -110,7 +110,7 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 
 	cardDetailsLayout->addWidget(btnRemoveCard);
 
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
+	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
 	Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 
 	//cardDetailsLayout->addRow(tr("View"),view);
@@ -173,7 +173,7 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 
 	this->structureView = structureView;
 
-	//QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
+	//QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
 	//Controller::Get()->getJsonList("ViewStructure","Title",QString(DATABASE).append(".Type =\"Entity\""));
 
 	//if(!structureView.value("Title").toString().isEmpty())
@@ -191,7 +191,7 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 			cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
 			if(cards->currentIndex() == -1){
 				cards->clear();
-				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
+				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
 				Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 				cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
 
@@ -370,9 +370,9 @@ void NavigationPageEditUI::pageToggled(bool state)
 		}
 }
 
-void NavigationPageEditUI::getCardData(QList<QJsonDocument> items)
+void NavigationPageEditUI::getCardData(QVector<QJsonDocument> items)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QList<QJsonDocument>)),this,SLOT(getCardData(QList<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
 	cards->clear();
 	cards->addJsonItems(items);
 }

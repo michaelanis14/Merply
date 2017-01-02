@@ -19,7 +19,7 @@ class ERPComboBox : public QComboBox
 	Q_OBJECT
 public:
 	explicit ERPComboBox(QWidget *parent = 0 ,bool indexedFill = false);
-	void addJsonItems(QList<QJsonDocument> items);
+	void addJsonItems(QVector<QJsonDocument> items);
 	QString getKey();
 	bool addedItems;
 	bool indexedFill;

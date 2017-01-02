@@ -63,7 +63,7 @@ StructureVieweditSubFeildTableColumnEquation::StructureVieweditSubFeildTableColu
 	equationElementLayout->addRow((tr("Number")), numbers);
 
 
-	QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QList<QJsonDocument> >)),this,SLOT(gotclmnsData(QList<QList<QJsonDocument> >)));
+	QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotSourcesJson(QList<QVector<QJsonDocument> >)),this,SLOT(gotclmnsData(QList<QVector<QJsonDocument> >)));
 	StructureViewGroupsUI::GetUI()->getTableFields(new ERPComboBox);
 	secondTerm->addItems(secondTermList);
 }
@@ -135,13 +135,13 @@ void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 
 }
 
-void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QList<QJsonDocument> > list)
+void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QVector<QJsonDocument> > list)
 {
 	int oldClmnOneIndex = columnOne->currentIndex();
 	int oldClmnTwoIndex = columnTwo->currentIndex();
 	columnOne->clear();
 	columnTwo->clear();
-	foreach(QList<QJsonDocument> table,list){
+	foreach(QVector<QJsonDocument> table,list){
 		int i = 0;
 		foreach (QJsonDocument doc, table) {
 			QString item = QString(tr("Column:")).append(QString::number(i)).append(" ").append(doc.object().value("clmnHeader").toString());

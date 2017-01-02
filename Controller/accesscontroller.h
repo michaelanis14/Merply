@@ -33,7 +33,7 @@ signals:
 	void successLogin();
 	void faildLogin();
 public slots:
-		void loginData(QList<QJsonDocument> user);
+		void loginData(QVector<QJsonDocument> user);
 };
 
 #endif // ACCESSCONTROLLER_H

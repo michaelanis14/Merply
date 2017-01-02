@@ -37,7 +37,7 @@ signals:
 public slots:
 		void indexedFillEvent(QString completion);
 		void linkPressed();
-		void refrenceData(QList<QJsonDocument> items);
+		void refrenceData(QVector<QJsonDocument> items);
 		void serialData(QString serial);
 		void updateFilter(QString filter);
 		void updateTable(QString);

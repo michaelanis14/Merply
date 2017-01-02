@@ -13,7 +13,7 @@ class StructureVieweditSubFeildTable : public QWidget
 public:
 	explicit StructureVieweditSubFeildTable(QWidget *parent = 0);
 	QJsonObject save();
-	QList<QJsonDocument> getClmnsSources(ERPComboBox* excludeSource);
+	QVector<QJsonDocument> getClmnsSources(ERPComboBox* excludeSource);
 	void fill(QJsonObject tblStractureView);
 	QStringList getHeaders();
 private:
@@ -23,6 +23,7 @@ private:
 	QCheckBox* addEnable;
 	QCheckBox* removeEnable;
 	QCheckBox* editEnable;
+	QTextEdit* queryBox;
 	QJsonObject tblStractureView;
 signals:
 

@@ -33,7 +33,7 @@ public:
 	bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex());
 	bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex());
 	Qt::ItemFlags flags(const QModelIndex & index) const;
-	QList<QJsonDocument> items;
+	QVector<QJsonDocument> items;
 	QString getRowKey(int row);
 	QJsonArray getJsonData();
 	void evalTotalRow();
@@ -66,10 +66,11 @@ public slots:
 	void fillEquationColumns();
 	double evalEquationCondition(int condition,double col1,double col2);
 	void setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage);
-	void fill(QList<QJsonDocument> documents);
+	void fill(QVector<QJsonDocument> documents);
+	void fillQuery(QVector<QJsonDocument> documents);
 	void fillText(QJsonArray data);
-	void fillIndexTabel(QList<QJsonDocument> items);
-	void fillLocalSource(QList<QJsonDocument> items);
+	void fillIndexTabel(QVector<QJsonDocument> items);
+	void fillLocalSource(QVector<QJsonDocument> items);
 
 };
 

@@ -273,7 +273,7 @@ void StructureViewGroupsUI::getFeildsNames()
 
 void StructureViewGroupsUI::getTableFields(ERPComboBox* excludeSource)
 {
-	QList<QList<QJsonDocument> > sourcesList;
+	QList<QVector<QJsonDocument> > sourcesList;
 	foreach(StructureViewsEditUI* vg,sVSFUIs){
 		foreach (StructureViewEdit* feild, vg->sVSFs) {
 			StructureVieweditSubFeild* svsf = feild->getTableFeild();

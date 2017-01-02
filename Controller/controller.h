@@ -58,10 +58,10 @@ public:
 	QString getDatabaseName();
 
 	QList<QString> select(const QString query);
-	QList<QJsonDocument> getAll(const QString entity, const QString condition);
+	QVector<QJsonDocument> getAll(const QString entity, const QString condition);
 	QString toString(QJsonValue value);
-	bool documentInList(QList<QJsonDocument> all, QString key);
-	QList<QJsonDocument> getEnities();
+	bool documentInList(QVector<QJsonDocument> all, QString key);
+	QVector<QJsonDocument> getEnities();
 	void getFields(QString Title);
 	void getIndexHeader(QString title);
 	void updateLayoutViewGroups(QString entityName, QList<StructureViewsEditUI*> sVEUIs);
@@ -135,16 +135,16 @@ public slots:
 	void showDisplayDataReturned(QJsonDocument document);
 	void loadNavigationData(QJsonDocument document);
 	void subNavPressedData(QJsonDocument documents);
-	void subNavPressedIndexData(QList<QJsonDocument> documents);
+	void subNavPressedIndexData(QVector<QJsonDocument> documents);
 	void subNavPressedPageData(QJsonDocument document);
-	void getFieldsData(QList<QJsonDocument> documents);
-	void getIndexHeaderData(QList<QJsonDocument> documents);
+	void getFieldsData(QVector<QJsonDocument> documents);
+	void getIndexHeaderData(QVector<QJsonDocument> documents);
 	void linkPressedData(QJsonDocument document);
 	void getDocData(QJsonDocument document);
-	void GetJsonListData(QList<QJsonDocument> items);
+	void GetJsonListData(QVector<QJsonDocument> items);
 	void getValueData(QString value);
 
-	void getReportData(QList<QJsonDocument> documents);
+	void getReportData(QVector<QJsonDocument> documents);
 	void getLastKeyData(QString key);
 
 	void showCreateEditeStrUICreateTrueData(QJsonDocument str);
@@ -154,12 +154,12 @@ public slots:
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void gotFieldsData(QList<QString> fields);
-	void gotReportData(QList<QJsonDocument> documents);
+	void gotReportData(QVector<QJsonDocument> documents);
 	void gotDocument(QJsonDocument docuemnt);
-	void gotDocuments(QList<QJsonDocument> array);
+	void gotDocuments(QVector<QJsonDocument> array);
 	void gotValue(QString value);
 	void gotLastKey(QString LastKeyID);
-	void gotJsonListData(QList<QJsonDocument> items);
+	void gotJsonListData(QVector<QJsonDocument> items);
 	void queryDatabase(QString q);
 
 };

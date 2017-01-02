@@ -37,7 +37,7 @@ private:
 signals:
 
 public slots:
-	void gotclmnsData(QList<QList<QJsonDocument> > list);
+	void gotclmnsData(QList<QVector<QJsonDocument> > list);
 	void updateColmnTwo(int index);
 	void updateConditionColmnOne(int index);
 	void updateConditionColmnTwo(int index);
