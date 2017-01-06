@@ -46,7 +46,7 @@ void Database::on_stored_status (lcb_t instance, const void *, lcb_storage_t ,
 		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
 
 		if(Database::Get()->cachedArrayDocuments.contains(query)){
-			qDebug() << "CONTAINNNNS THE Q";
+		//	qDebug() << "CONTAINNNNS THE Q";
 			Database::Get()->cachedArrayDocuments.remove(query);
 			}
 
@@ -69,7 +69,7 @@ void  Database::arithmatic_callback(lcb_t instance, const void *,
 bool Database::updateDoc(QJsonDocument document)
 {
 	if(Database::Get()->cachedDocuments.contains(document.object().value("document_id").toString())){
-		qDebug() << "contains update Document" << document.object().value("document_id").toString();
+	//	qDebug() << "contains update Document" << document.object().value("document_id").toString();
 		Database::Get()->cachedDocuments.remove(document.object().value("document_id").toString());
 		}
 	lcb_t instance = Database::InitDatabase();
@@ -267,7 +267,7 @@ bool Database::getDoc(QString key) {
 	//qDebug() << __FILE__ << __LINE__  << "hello";
 	//qDebug() << __FILE__ << __LINE__  <<"Key:"<< key;
 	if(Database::Get()->cachedDocuments.contains(key)){
-		qDebug() << "cached" << key;
+	//	qDebug() << "cached" << key;
 		emit (Database::Get()->gotDocument(Database::Get()->cachedDocuments.value(key)));
 		return true;
 		}
@@ -340,12 +340,12 @@ void Database::query(QString query,bool cached)
 {
 
 	if(cached && Database::Get()->cachedArrayDocuments.contains(query)){
-		qDebug() << "cachedQ:" << query;
+	//	qDebug() << "cachedQ:" << query;
 		emit (gotDocuments(Database::Get()->cachedArrayDocuments.value(query)));
 		return;
 		}
-
-	qDebug() << __FILE__ << __LINE__ <<"Query:: " << query;
+//
+//	qDebug() << __FILE__ << __LINE__ <<"Query:: " << query;
 	this->lastQuery = query;
 	lcb_t instance = Database::InitDatabase();
 	Database::Get()->array.clear();

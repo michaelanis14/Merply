@@ -448,6 +448,14 @@ void MerplyReportTableModel::fillIndexTabel( QVector<QJsonDocument> items)
 			//	qDebug() << __FILE__ << __LINE__  <<"valueString"<< valueString;
 
 				cells[(i * this->colmnsCount) + clmnIndex].setId(key);
+				QString dtoCompare = QString::fromUtf8("تاريخ");
+				//qDebug() << keyData << keyData.trimmed().compare(dtoCompare);
+				if(keyData.trimmed().compare(dtoCompare) == 0 || keyData.trimmed().contains("Date")){
+					QDateTimeEdit *date = new QDateTimeEdit;
+					date->setHidden(true);
+					date->setDateTime(QDateTime::fromString(valueString,Qt::ISODate));
+					valueString  =  date->dateTime().toString("dd/MM/yyyy");
+					}
 				cells[(i * this->colmnsCount) + clmnIndex].setData(valueString);
 				//	QModelIndex id=this->index(i,clmnIndex,QModelIndex());
 				//emit dataChanged(id, id);
