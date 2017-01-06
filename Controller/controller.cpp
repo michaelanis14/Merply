@@ -48,6 +48,7 @@ Controller::Controller(QObject *parent) :
 	//Worker* worker = new Worker();
 
 //	QObject::connect(this,SIGNAL(queryDatabase(QString)),Database::Get(),SLOT(query(QString)),Qt::QueuedConnection);
+	QObject::connect(Database::Get(),SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
 
 }
 
@@ -485,6 +486,7 @@ QStringList Controller::getLayoutViewGroups(QString entity)
 }
 bool Controller::storeDoc(QString key, QJsonDocument document)
 {
+
 	return Database::Get()->storeDoc(key,document);
 }
 
@@ -544,6 +546,8 @@ void Controller::showCreateEditeValueUIData(QJsonDocument value)
 		}
 
 }
+
+
 
 
 void Controller::linkPressed(QJsonObject link)
@@ -709,7 +713,8 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 	if(clmns.value("Query") != QJsonValue::Undefined){
 		qRegisterMetaType<QVector<QJsonDocument> >("MyStruct");
 		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getReportData(QVector<QJsonDocument>)),Qt::QueuedConnection);
-		Database::Get()->query(clmns.value("Query").toString());
+
+		Database::Get()->query(clmns.value("Query").toString(),false); //TODO: CACHED FLAGG
 	//	qDebug() << __FILE__ << __LINE__<<"getReport"  << clmns;
 		}
 	else if(clmns.value("Columns").isArray()){
@@ -953,6 +958,16 @@ bool Controller::runQRPTDesingerapp()
 	return true;
 }
 
+void Controller::query(QString query, bool cached)
+{
+	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(queryData(QVector<QJsonDocument>)));
+	Database::Get()->query(query,cached);
+}
+void Controller::queryData(QVector<QJsonDocument> items)
+{
+	//qDebug() << items <<"FSFSF";
+	emit gotReportData(items);
+}
 
 void Controller::setShowWarning(bool value)
 {

@@ -16,6 +16,7 @@
 #include "erpcombobox.h"
 #include "merplytabelview.h"
 
+
 class SubFieldUI : public QWidget
 {
 	Q_OBJECT

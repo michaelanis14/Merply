@@ -39,6 +39,18 @@ void Database::on_stored_status (lcb_t instance, const void *, lcb_storage_t ,
 		Database::Get()->LastKeyID = QString(keyByte);
 		emit Database::Get()->gotLastKey(QString(keyByte));
 		qDebug("Stored Key_on_stored_status:  %.*s\n",(int)resp->v.v0.nkey,resp->v.v0.key);
+
+
+		QString card = Database::Get()->LastKeyID.split("::")[0];
+		card.append("::%");
+		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
+
+		if(Database::Get()->cachedArrayDocuments.contains(query)){
+			qDebug() << "CONTAINNNNS THE Q";
+			Database::Get()->cachedArrayDocuments.remove(query);
+			}
+
+		emit Database::Get()->saved(Database::Get()->LastKeyID);
 		}
 }
 
@@ -56,6 +68,10 @@ void  Database::arithmatic_callback(lcb_t instance, const void *,
 
 bool Database::updateDoc(QJsonDocument document)
 {
+	if(Database::Get()->cachedDocuments.contains(document.object().value("document_id").toString())){
+		qDebug() << "contains update Document" << document.object().value("document_id").toString();
+		Database::Get()->cachedDocuments.remove(document.object().value("document_id").toString());
+		}
 	lcb_t instance = Database::InitDatabase();
 	//qDebug() << __FILE__ << __LINE__  << "UPDATE DOC" << document ;
 	//qDebug()  << document.object().value("document_id").toString().toLatin1();
@@ -132,15 +148,15 @@ lcb_t Database::InitDatabase(QString connStr)
 {
 	// initializing
 	//Database::Get()->document = QJsonDocument();
-	connStr = "couchbase://localhost/"+QString(DATABASE);
-//	this->instance;
-	if(Database::Get()->instance){
-		//qDebug() << "static";
-		return Database::Get()->instance;
-		}
+connStr = "couchbase://localhost/"+QString(DATABASE);
+	//	this->instance;
+	//if(Database::Get()->instance){
+	//qDebug() << "static";
+	//	return Database::Get()->instance;
+	//	}
 
 	//connStr = "couchbase://ec2-35-166-198-84.us-west-2.compute.amazonaws.com/"+QString(DATABASE);
-	//connStr = "couchbase://138.68.70.131/"+QString(DATABASE);
+	connStr = "couchbase://138.68.70.131/"+QString(DATABASE);
 
 
 	//Database::Get()->array.clear();
@@ -177,8 +193,8 @@ lcb_t Database::InitDatabase(QString connStr)
 
 bool Database::KillDatabase(lcb_t instance)
 {
-
-	//lcb_destroy(instance);
+	lcb_wait(instance);
+	lcb_destroy(instance);
 	return true;
 }
 
@@ -231,6 +247,7 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 			QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
 			objectwithCAS.insert("document_id",QString(keyByte));
 			emit (Database::Get()->gotDocument(QJsonDocument(objectwithCAS)));
+			Database::Get()->cachedDocuments.insert(QString(keyByte),QJsonDocument(objectwithCAS));
 			}
 		else{
 			emit Database::Get()->gotValue(QString(byteArray));
@@ -249,7 +266,13 @@ bool Database::getDoc(QString key) {
 	//Query("SELECT * from QString(DATABASE)  WHERE  \"id = Contact::* \"");
 	//qDebug() << __FILE__ << __LINE__  << "hello";
 	//qDebug() << __FILE__ << __LINE__  <<"Key:"<< key;
+	if(Database::Get()->cachedDocuments.contains(key)){
+		qDebug() << "cached" << key;
+		emit (Database::Get()->gotDocument(Database::Get()->cachedDocuments.value(key)));
+		return true;
+		}
 	Database::Get()->LastKeyID = "-1";
+
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){
 		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
@@ -286,11 +309,11 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 	if (! (resp->rflags & LCB_RESP_F_FINAL)) {
 		QJsonParseError parserError;
 		QByteArray byteArray(resp->row,resp->nrow);
-	//	QJsonDocument documentToArray =  QJsonDocument();
+		//	QJsonDocument documentToArray =  QJsonDocument();
 		//documentToArray=  QJsonDocument::fromJson(byteArray , &parserError);
 		QJsonDocument::fromJson(byteArray , &parserError);
 		if(parserError.error == QJsonParseError::NoError){
-		//	documentToArray.toJson(QJsonDocument::Compact);
+			//	documentToArray.toJson(QJsonDocument::Compact);
 			Database::Get()->array.append(QJsonDocument::fromJson(byteArray , &parserError));
 			}
 		else{
@@ -303,16 +326,27 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 		//	qDebug() << __FILE__ << __LINE__  << Database::Get()->array;
 
 		//Database::Get()->document = QJsonDocument(Database::Get()->array);
+		Database::Get()->cachedArrayDocuments.insert(Database::Get()->lastQuery,Database::Get()->array);
+
 		Database::Get()->emit gotDocuments(Database::Get()->array);
-		//qDebug() << __FILE__ << __LINE__  << Database::Get()->document.array();
+
+	//	qDebug() << __FILE__ << __LINE__ <<Database::Get()->lastQuery << Database::Get()->array;
 		//.toJson(QJsonDocument::Compact);
 		//	qDebug("Got metadata: %.*s\n", (int)resp->nrow, resp->row);
 		}
 
 }
-void Database::query(QString query)
+void Database::query(QString query,bool cached)
 {
-	//qDebug() << __FILE__ << __LINE__ <<"Query:: " << query;
+
+	if(cached && Database::Get()->cachedArrayDocuments.contains(query)){
+		qDebug() << "cachedQ:" << query;
+		emit (gotDocuments(Database::Get()->cachedArrayDocuments.value(query)));
+		return;
+		}
+
+	qDebug() << __FILE__ << __LINE__ <<"Query:: " << query;
+	this->lastQuery = query;
 	lcb_t instance = Database::InitDatabase();
 	Database::Get()->array.clear();
 	if(instance == NULL){
@@ -376,7 +410,7 @@ QString Database::getLastKeyID() const
  * @return
  */
 bool Database::storeDoc(QString key,QJsonDocument document) {
-//	qDebug() << __FILE__ << __LINE__  <<key << key.split("::").count() << key << document ;
+	//	qDebug() << __FILE__ << __LINE__  <<key << key.split("::").count() << key << document ;
 	if(key.split("::").count() <  2){
 		Database::IncrementKey(key);
 		int keyID = Database::GetKey(key);
@@ -440,6 +474,8 @@ Database::Database():
 	//	this->value = QString();
 	this->array = QVector<QJsonDocument>();
 	this->connIssue = false;
+	cachedDocuments =  QMap<QString,QJsonDocument>();
+	cachedArrayDocuments =  QMap<QString,QVector<QJsonDocument> >();
 	//IncrementKey("cont");
 	/*
 	// initializing

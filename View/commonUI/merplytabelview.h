@@ -62,6 +62,7 @@ private:
 	void initHController(QJsonObject columns);
 	void initDelegateClmns(QJsonObject columns);
 	QVector<MTabelCombobox *> delegateItems;
+	QString indexDocument_id;
 	//QStandardItemModel *model;
 	//QStringList headerLabels;
 signals:

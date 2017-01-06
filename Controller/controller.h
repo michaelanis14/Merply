@@ -122,6 +122,8 @@ public:
 
 
 	bool runQRPTDesingerapp();
+
+	void query(QString query,bool cached);
 private:
 	explicit Controller(QObject * parent = 0);
 	static Controller* p_instance;
@@ -150,6 +152,7 @@ public slots:
 	void showCreateEditeStrUICreateTrueData(QJsonDocument str);
 	void showCreateEditeStrUIData(QJsonDocument str);
 	void showCreateEditeValueUIData(QJsonDocument value);
+	void queryData(QVector<QJsonDocument> items);
 
 signals:
 	void getDocDataReturned(QJsonDocument document);
@@ -161,6 +164,7 @@ signals:
 	void gotLastKey(QString LastKeyID);
 	void gotJsonListData(QVector<QJsonDocument> items);
 	void queryDatabase(QString q);
+	void saved(QString document_id);
 
 };
 

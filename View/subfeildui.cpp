@@ -1,6 +1,8 @@
 #include "subfeildui.h"
 #include "controller.h"
 
+#include<QDateTimeEdit>
+
 SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView, QJsonValue data) : QWidget(parent)
 {
 
@@ -48,7 +50,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 				}
 			}
 		QJsonObject dataObj = data.toObject();
-	//	qDebug() << __FILE__ << __LINE__  << data;
+		//	qDebug() << __FILE__ << __LINE__  << data;
 		if(!dataObj.isEmpty()){
 			combox->setCurrentIndex(combox->findText(dataObj.value("Value").toString()));
 			}
@@ -180,10 +182,16 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		}
 	else if(type.compare("Date") == 0){
 		QDateTimeEdit *date = new QDateTimeEdit(this);
+
 		//qDebug() << data.toString();
 		if(data.toString().isEmpty())
 			date->setDateTime(QDateTime::currentDateTime());
-		else date->setDateTime(QDateTime::fromString(data.toString(),Qt::DefaultLocaleShortDate));
+		//else date->setDateTime(QDateTime::fromString(data.toString(),Qt::DefaultLocaleShortDate));
+		else date->setDateTime(QDateTime::fromString(data.toString(),Qt::ISODate));
+
+
+		//qDebug() << QDateTime::fromMSecsSinceEpoch(data.toString().toDouble());
+		date->setDisplayFormat("dd/MM/yyyy");
 		layout->addWidget(date);
 		field = date;
 		}
@@ -251,10 +259,12 @@ QJsonValue SubFieldUI::save()
 		//	save =" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QDateTimeEdit") == 0){
-		save =((QDateTimeEdit*)field)->dateTime().toString(Qt::DefaultLocaleShortDate);
+
+		//save =((QDateTimeEdit*)field)->dateTime().toString(Qt::DefaultLocaleShortDate);
+		save = QString(((QDateTimeEdit*)field)->dateTime().toString(Qt::ISODate));
 		//qDebug() << save;
 		}
-//qDebug() << save;
+	//qDebug() << save;
 	return save;
 }
 
@@ -311,11 +321,10 @@ void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
 
 	if(combox){
-
 		combox->clear();
 		combox->addJsonItems(items);
 		}
-	//qDebug() << __FILE__ << __LINE__  << items;
+	qDebug() << __FILE__ << __LINE__  << items;
 }
 
 void SubFieldUI::serialData(QString serial)

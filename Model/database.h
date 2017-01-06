@@ -58,14 +58,18 @@ public:
 	QString LastKeyID;
 	QString getLastKeyID() const;
 
-	void query(QString query);
+	void query(QString query, bool cached = true);
 
 private:
 	static Database* p_instance;
 	//QJsonDocument document;
+	QString lastQuery;
 	QJsonDocument documentToArray;
 	QVector<QJsonDocument> array;
 	bool connIssue;
+	QMap<QString,QJsonDocument> cachedDocuments;
+	QMap<QString,QVector<QJsonDocument> > cachedArrayDocuments;
+
 	//	QString value;
 
 public slots :
@@ -75,6 +79,7 @@ signals:
 	void gotDocuments(QVector<QJsonDocument> array);
 	void gotValue(QString value);
 	void gotLastKey(QString LastKeyID);
+	void saved(QString document_id);
 };
 
 #endif // DATABASE_H

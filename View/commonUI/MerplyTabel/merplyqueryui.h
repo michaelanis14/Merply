@@ -18,11 +18,13 @@ private:
 	QHBoxLayout *layout;
 	QVector<QWidget*> fields;
 	QString document_id;
+	void clear();
 signals:
-
+	void queryResults(QVector<QJsonDocument> items);
 public slots:
 	void fillData(QJsonDocument strct);
 	void generateQuery();
+	void gotData(QVector<QJsonDocument> items);
 };
 
 #endif // MERPLYQUERYUI_H

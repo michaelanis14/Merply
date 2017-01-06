@@ -150,7 +150,7 @@ bool merplyTabelView::fill(QJsonObject columns,QString filter)
 
 	//	qDebug() << __FILE__ << __LINE__ << "fill";
 	model = new MerplyReportTableModel(columns);
-	queryUI->fill(columns);
+	//	queryUI->fill(columns);
 	if(columns.value("Query") != QJsonValue::Undefined){
 		QObject::connect(this,SIGNAL(updateModel(QVector<QJsonDocument>)),model,SLOT(fillQuery(QVector<QJsonDocument>)));
 
@@ -158,7 +158,7 @@ bool merplyTabelView::fill(QJsonObject columns,QString filter)
 		QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 
 		}
- //TODO : Else normal fill
+	//TODO : Else normal fill
 
 
 
@@ -209,6 +209,7 @@ bool merplyTabelView::fillText(QJsonObject data)
 void merplyTabelView::indexTable(const QString document_id,const QVector<QJsonDocument> items)
 {
 	this->items = items;
+	this->indexDocument_id = document_id;
 	controllers->setEnabled(false);
 	//	if(model){
 	//		if(model->rowCount( )== items.count()
@@ -218,9 +219,13 @@ void merplyTabelView::indexTable(const QString document_id,const QVector<QJsonDo
 	//		}
 	//}
 	//qDebug() << __FILE__ << __LINE__  << "Not Lazy"  ;
-	queryUI->fillDocumentID(document_id);
+	//
+
+	//QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QVector<QJsonDocument>)),this,SLOT(fill(QVector<QJsonDocument>)));
+
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
 	Controller::Get()->getIndexHeader(document_id);
+
 
 	//	initHController(QJsonObject());
 
@@ -417,6 +422,15 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 	model = new MerplyReportTableModel(clmnObj);
 	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 	model->fillIndexTabel(items);
+
+	if(!indexDocument_id.isEmpty()){
+		QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
+		queryUI->fillDocumentID(indexDocument_id);
+		}
+
+
+
+
 }
 
 void merplyTabelView::setValue(const int , const QString paramName, QVariant& paramValue, const int )
@@ -430,7 +444,7 @@ void merplyTabelView::setValue(const int , const QString paramName, QVariant& pa
 
 void merplyTabelView::modelFinished()
 {
-//	qDebug() << __FILE__ << __LINE__  << "ModelDone" << model->getRowsCount();
+	//	qDebug() << __FILE__ << __LINE__  << "ModelDone" << model->getRowsCount();
 	QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 
 	tableView->setModel(model);

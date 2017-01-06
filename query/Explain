@@ -1,0 +1,7 @@
+EXPLAIN  SELECT *  FROM  `AM` d WHERE META(`d`).id LIKE 'Contact::%'  AND  `d`.`الأسم` LIKE 'ان%'
+
+SELECT code  FROM  `AM`  WHERE META(`AM`).id LIKE 'Contact::%' 
+AND `code` IS NOT NULL;
+
+
+date->setDateTime(QDateTime::fromMSecsSinceEpoch(data.toString().toDouble()));

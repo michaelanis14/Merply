@@ -148,12 +148,14 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 			QString errs = viewGroups->checkMandatory();
 			if(errs.isEmpty()){
 				//	qDebug() << __FILE__ << __LINE__ <<"Controller Clicked to save" << this->cas;
+
 				if(this->cas.isEmpty()){
 
 					QString key = this->viewStructure.value("document_id").toString().replace("ViewStructure::","");
 
 					QJsonObject vgsSave = viewGroups->save();
 					vgsSave.insert("cas_value",this->cas);
+					QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
 					Controller::Get()->storeDoc(key,QJsonDocument(vgsSave));
 
 					}
@@ -162,10 +164,11 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 					//qDebug() << vgsSave;
 					vgsSave.insert("cas_value",this->cas);
 					vgsSave.insert("document_id",this->data.value("document_id").toString());
+					QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
 					Controller::Get()->UpdateDoc(QJsonDocument(vgsSave));
 					}
 
-				Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
+
 				}
 			else{
 				foreach(QString err,errs.split(";")){
@@ -177,4 +180,10 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 		}
 
 
+}
+
+void CreateEditUI::saved()
+{
+	QObject::disconnect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
+	Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 }

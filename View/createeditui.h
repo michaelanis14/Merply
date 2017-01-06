@@ -36,6 +36,7 @@ protected:
 	void paintEvent(QPaintEvent*event);
 public slots:
 	void controller_Clicked(QString nameAction);
+	void saved();
 };
 
 #endif // CREATEEDITUI_H
