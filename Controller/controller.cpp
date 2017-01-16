@@ -87,7 +87,7 @@ void Controller::showDisplay()
 	//	navigationUI::Get()->setParent(MainWindow::GetMainDisplay());
 
 	//
-	//Prsistance::init();
+	Prsistance::init();
 	//QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
 	//Database::Get()->getDoc("ViewStructure::5");
 
@@ -148,7 +148,7 @@ void Controller::queryIndexView(QString vStrctKey)
 	//qDebug() << __FILE__ << __LINE__<< indexDocument_id;
 	QString card = vStrctKey.replace("ViewStructure::","");
 	card.append("::%");
-	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
+	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE '"+card+"' LIMIT 400");
 	//qDebug() << __FILE__ << __LINE__ <<"QINDEX : " << query;
 
 
@@ -369,6 +369,9 @@ QString Controller::toString(QJsonValue value)
 		}
 	else if(value.isDouble()){
 		data += QString::number(value.toDouble());
+		}
+	else {
+		qDebug()<< __FILE__ << __LINE__ << "ERROR TYPE IS NOT DEFIENED" << value;
 		}
 
 	return data;

@@ -1,6 +1,7 @@
 #include "prsistance.h"
 
 #include <QFile>
+#include <QDir>
 #include <QMessageBox>
 #include <model.h>
 
@@ -22,7 +23,8 @@ Prsistance*Prsistance::Get()
 
 bool Prsistance::init()
 {
-	qDebug() << __FILE__ << __LINE__  <<"Init" ;//<< Count("City::%\"");//<< Count("ViewStructure::Contact\"");
+	qDebug() << __FILE__ << __LINE__  <<"Init" << QCoreApplication::applicationDirPath()
+				;//<< Count("City::%\"");//<< Count("ViewStructure::Contact\"");
 	bool shipping = false;
 
 	/*
@@ -46,7 +48,7 @@ bool Prsistance::init()
 		Database::Get()->storeDoc("NavigationUI::1",doc);
 		}
 	else if(Count("NavigationUI::1\"") ==  0){
-		QString jsonFile = readFile(QDir::currentPath()+"/AM/NAV.json");
+		QString jsonFile = readFile(QCoreApplication::applicationDirPath()+"/AM/NAV.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		Database::Get()->storeDoc("NavigationUI::1",doc);
 		}
@@ -262,7 +264,7 @@ bool Prsistance::init()
 
 		}
 
-	if(Count("Contact::%\"") <10){
+	if(Count("Contact::%\"") ==10){
 		QStringList fileData = readCSVFile("/AM/Clients.csv");
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
@@ -309,137 +311,268 @@ bool Prsistance::init()
 				}
 			}
 		}
+
+
 	if(Count("Category1::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/C1.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/C1.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+
+			int id;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("Category1",QJsonDocument(c));
+				continue;
+				}
+
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("Name",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
+				}
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				c.insert("Name",  data.at(1));
 				}
 
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
 				Database::Get()->storeDoc("Category1",QJsonDocument(c));
+				idx++;
 				}
 			}
 		}
 	if(Count("Category2::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/C2.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/C2.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("Category2",QJsonDocument(c));
+				continue;
+				}
+
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("Name",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
+				}
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				c.insert("Name",  data.at(1));
 				}
 
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
 				Database::Get()->storeDoc("Category2",QJsonDocument(c));
+				idx++;
 				}
 			}
 		}
 	if(Count("Category3::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/C3.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/C3.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("Category3",QJsonDocument(c));
+				continue;
+				}
+
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("Name",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
+				}
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				c.insert("Name",  data.at(1));
 				}
 
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
 				Database::Get()->storeDoc("Category3",QJsonDocument(c));
+				idx++;
 				}
 			}
 		}
 	if(Count("Category4::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/C4.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/C4.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("Category4",QJsonDocument(c));
+				continue;
+				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("Name",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
+				}
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				c.insert("Name",  data.at(1));
 				}
 
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
 				Database::Get()->storeDoc("Category4",QJsonDocument(c));
+				idx++;
 				}
 			}
 		}
 	if(Count("Category5::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/C5.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/C5.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("Category5",QJsonDocument(c));
+				continue;
+				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("Name",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
+				}
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				c.insert("Name",  data.at(1));
 				}
 
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
 				Database::Get()->storeDoc("Category5",QJsonDocument(c));
+				idx++;
 				}
 			}
 		}
-	if(Count("Category6::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/C6.csv");
+	if(Count("Category6::%\"") == 0){
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/C6.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("Category6",QJsonDocument(c));
+				continue;
+				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("Name",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
+				}
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				c.insert("Name",  data.at(1));
 				}
 
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
 				Database::Get()->storeDoc("Category6",QJsonDocument(c));
+				idx++;
 				}
 			}
 		}
 	if(Count("Unit::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/unit.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/unit.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("Unit",QJsonDocument(c));
+				continue;
+				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("Name",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
+				}
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				c.insert("Name",  data.at(1));
+				idx++;
 				}
 
 			//qDebug() << __FILE__ << __LINE__ << c;
@@ -450,41 +583,77 @@ bool Prsistance::init()
 			}
 		}
 	if(Count("CountryArabic::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/Country.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/Country.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("CountryArabic",QJsonDocument(c));
+				continue;
+				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("Name",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
+				}
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				c.insert("Name",  data.at(1));
 				}
 
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
 				Database::Get()->storeDoc("CountryArabic",QJsonDocument(c));
+				idx++;
 				}
 			}
 		}
 
 	if(Count("Products::%\"") ==0){
 
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/products.csv");
-		QStringList pc1 = readCSVFile(QDir::currentPath()+"/AM/PC1.csv");
-		QStringList pc2 = readCSVFile(QDir::currentPath()+"/AM/PC2.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/products.csv");
+		QStringList pc1 = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/PC1.csv");
+		QStringList pc2 = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/PC2.csv");
 		QString key;
 
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData fileData.count();
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("Products",QJsonDocument(c));
+				continue;
+				}
+
+
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("رقم الصنف",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
 				key =  data.at(0);
 				}
 			if(0 < data.count() && !data.at(1).isEmpty()){
@@ -553,9 +722,10 @@ bool Prsistance::init()
 				QJsonArray rows;
 				foreach(QString s,pc1){
 					QStringList data = s.split(",");
-					if(QString(data.at(0)).compare(key) == 0){
+					if(QString(data.at(1)).compare(key) == 0){
 						QJsonObject row ;
-						row.insert("أسم التصنيف",data.at(3));
+						row.insert("ID",QString("Category1::").append(data.at(3)));
+						row.insert("أسم التصنيف",data.at(4));
 						rows.append(row);
 						}
 					}
@@ -569,9 +739,10 @@ bool Prsistance::init()
 				QJsonArray rows;
 				foreach(QString s,pc2){
 					QStringList data = s.split(",");
-					if(QString(data.at(0)).compare(key) == 0){
+					if(QString(data.at(1)).compare(key) == 0){
 						QJsonObject row ;
-						row.insert("أسم التصنيف",data.at(3));
+						row.insert("ID",QString("Category2::").append(data.at(3)));
+						row.insert("أسم التصنيف2",data.at(4));
 						rows.append(row);
 						}
 					}
@@ -585,21 +756,40 @@ bool Prsistance::init()
 			if(!c.isEmpty()){
 				//	qDebug() << __FILE__ << __LINE__ << c;
 				Database::Get()->storeDoc("Products",QJsonDocument(c));
+				idx++;
 				}
+			if (i % 100 == 0)
+				QThread::sleep(2);
 			}
 		}
 
 	if(Count("clients::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/clients.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/clients.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("clients",QJsonDocument(c));
+				continue;
+				}
+
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("رقم العميل",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
 				}
 			if(0 < data.count() && !data.at(16).isEmpty()){
 				c.insert("كود العميل",  data.at(16));
@@ -612,21 +802,37 @@ bool Prsistance::init()
 			if(!c.isEmpty()){
 				qDebug() << __FILE__ << __LINE__ << c;
 				Database::Get()->storeDoc("clients",QJsonDocument(c));
+				idx++;
 				}
 			}
 
 		}
 	if(Count("supplier::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/suppliers.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/suppliers.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("supplier",QJsonDocument(c));
+				continue;
+				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("رقم المورد",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
 				}
 			if(0 < data.count() && !data.at(14).isEmpty()){
 				c.insert("كود المورد",  data.at(14));
@@ -639,17 +845,19 @@ bool Prsistance::init()
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << c;
 				Database::Get()->storeDoc("supplier",QJsonDocument(c));
+				idx++;
 				}
 			}
 
 		}
 	if(Count("PaymentMethod::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/PaymentMethod.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/PaymentMethod.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
 			if(0 < data.count() && !data.at(0).isEmpty()){
@@ -659,35 +867,56 @@ bool Prsistance::init()
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << c;
 				Database::Get()->storeDoc("PaymentMethod",QJsonDocument(c));
+				idx++;
 				}
 			}
 		}
 	if(Count("Regions::%\"") == 0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/regions.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/regions.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("Regions",QJsonDocument(c));
+				continue;
+				}
+			if(0 < data.count() && !data.at(0).isEmpty()){
+				c.insert("رقم",  QString(data.at(0)).toInt());
+				}
 			if(0 < data.count() && !data.at(1).isEmpty()){
 				c.insert("المناطق",  data.at(1));
 				}
-				//qDebug() << __FILE__ << __LINE__ << data.at(1) << data.at(0);
+			//qDebug() << __FILE__ << __LINE__ << data.at(1) << data.at(0);
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << c;
 				Database::Get()->storeDoc("Regions",QJsonDocument(c));
+				idx++;
 				}
 			}
 		}
 	if(Count("Safe::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/safe.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/safe.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
 			if(0 < data.count() && !data.at(0).isEmpty()){
@@ -697,20 +926,37 @@ bool Prsistance::init()
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << c;
 				Database::Get()->storeDoc("Safe",QJsonDocument(c));
+				idx++;
 				}
 			}
 		}
 	if(Count("Stores::%\"") ==0){
-		QStringList fileData = readCSVFile(QDir::currentPath()+"/AM/stores.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/stores.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		//	qDebug() << __FILE__ << __LINE__ << fileData;
-		for(int i = 0; i < fileData.count();i++){
-			QStringList data = fileData.at(i).split(",");
+		int idx = 1;
+		for(int i = 0; idx < fileData.count();i++){
+			QStringList data = fileData.at(idx).split(",");
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
+			int id = -3;
+			if(!data.at(0).isEmpty()){
+				id = data.at(0).toInt();
+				}
+			else{
+				idx++;
+				continue;
+				}
+			if(i != id ){
+				QJsonObject c;
+				c.insert("Name","404");
+				Database::Get()->storeDoc("Stores",QJsonDocument(c));
+				continue;
+				}
+
 			if(0 < data.count() && !data.at(0).isEmpty()){
-				c.insert("كود المخزن",  data.at(0));
+				c.insert("رقم",  QString(data.at(0)).toInt());
 				}
 			if(0 < data.count() && !data.at(1).isEmpty()){
 				c.insert("أسم المخزن",  data.at(1));
@@ -719,8 +965,263 @@ bool Prsistance::init()
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << c;
 				Database::Get()->storeDoc("Stores",QJsonDocument(c));
+				idx++;
 				}
 			}
+		}
+
+
+	if(Count("OrederIn::%\"") == 0){
+
+
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/products.csv");
+
+		QJsonObject c;
+		QJsonObject tblProd;
+		QJsonArray rowsProd;
+
+		c.insert("تاريخ" ,"2006-10-10T00:00:00");
+		c.insert("رقم",0);
+		{
+		QJsonObject cc;
+		cc.insert("Key","Stores::1");
+		cc.insert("Value","مخزن عين شمس");
+		c.insert("المخزن",cc);
+		}
+		{
+		QJsonObject cc;
+		cc.insert("Key","supplier::0");
+		cc.insert("Value","غير محدد");
+		c.insert("المورد",cc);
+		}
+
+
+		for(int i = 0; i < fileData.count();i++){
+
+			QStringList data = fileData.at(i).split(",");
+			qDebug() << QString(data.at(15)) << QString(data.at(15)).toInt() << QString(data.at(15)).toDouble();
+			if(QString(data.at(15)).toDouble() > 0){
+				QJsonObject row ;
+				row.insert("ID",QString("Products::").append(data.at(0)));
+				row.insert("الأصناف",data.at(1));
+				row.insert("الكميه",QString(data.at(15)).toDouble());
+				rowsProd.append(row);
+				}
+
+
+			}
+		if(!rowsProd.isEmpty())
+			tblProd.insert("merplyTabel",rowsProd);
+		if(!tblProd.isEmpty())
+			c.insert("LL",tblProd);
+		if(!c.isEmpty()){
+			Database::Get()->storeDoc("OrederIn",QJsonDocument(c));
+			}
+
+
+		}
+
+
+
+
+	if(Count("OrederIn::%\"") == 0){
+
+		Database::Get()->query("SELECT `AM`.`أسم المخزن` AS `N`,to_number(`AM`.`رقم`) AS BB FROM `AM` WHERE meta(`AM`).id LIKE \"Stores::%\" ORDER BY `BB` ",false);
+		QVector<QJsonDocument> stores = Database::Get()->getArray();
+
+		Database::Get()->query("SELECT `AM`.`أسم العميل` AS `N`,to_number(`AM`.`رقم`) AS BB FROM `AM` WHERE meta(`AM`).id LIKE \"clients::%\" ORDER BY `BB` ",false);
+		QVector<QJsonDocument> clients = Database::Get()->getArray();
+
+		Database::Get()->query("SELECT `AM`.`أسم المورد` AS `N`,to_number(`AM`.`رقم`) AS BB FROM `AM` WHERE meta(`AM`).id LIKE \"supplier::%\" ORDER BY `BB`  ",false);
+		QVector<QJsonDocument> suppliers = Database::Get()->getArray();
+
+		Database::Get()->query("SELECT `AM`.`أسم الصنف` AS `N`,to_number(`AM`.`رقم`) AS `BB` FROM `AM` WHERE meta(`AM`).id LIKE \"Products::%\" ORDER BY `BB` ",false);
+		QVector<QJsonDocument> products = Database::Get()->getArray();
+
+
+
+
+
+
+
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+		//qDebug() << fileData;
+		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		//	qDebug() << __FILE__ << __LINE__ << fileData;
+		int currentID = -1;
+		QJsonObject c;
+		QJsonObject tblProd;
+		QJsonArray rowsProd;
+		bool sellToClient = false;
+		bool returns = false;
+		int idxOrderIn = 0;
+		int idxOrderOut = 0;
+		int idxReturns = 0;
+		qDebug() << fileData.count();
+		for(int i = 241700; i < fileData.count();i++){
+
+			QStringList data = fileData.at(i).split(",");
+			bool newSellToClient = false;
+			bool newReturn = false;
+			//qDebug() << __FILE__ << __LINE__ << data << data.count();
+
+			int newID;
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				newID =  data.at(1).toInt();
+				}
+			if(0 < data.count() && data.at(4).trimmed().isEmpty()){
+				newSellToClient = true;
+				newReturn = false;
+				if(0 < data.count() && !data.at(7).trimmed().isEmpty()){
+					bool ok = false;
+					double num = QString(data.at(7).trimmed()).toDouble(&ok);
+					if(num > 0){
+						newReturn = true;
+						}
+					}
+				}
+			else {
+				newSellToClient = false;
+				newReturn = false;
+				}
+
+
+
+			if(newID == currentID){
+				if(newSellToClient == sellToClient){
+					QJsonObject row ;
+					row.insert("ID",QString("Products::").append(data.at(3)));
+					row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
+					if(!sellToClient || returns){
+						row.insert("الكميه",QString(data.at(7)).toDouble());
+						}
+					else {
+
+						row.insert("الكميه",QString(data.at(11)).toDouble());
+						}
+					rowsProd.append(row);
+					}
+				if(!rowsProd.isEmpty())
+					tblProd.insert("merplyTabel",rowsProd);
+				}
+
+
+			else {
+				if(true){
+					if(!tblProd.isEmpty())
+						c.insert("LL",tblProd);
+					if(!c.isEmpty()){
+						if(sellToClient){
+							if(returns){
+								/*
+								if(currentID != -1)
+									while(idxReturns != currentID  && idxReturns < currentID){
+										QJsonObject c;
+										c.insert("Name","404");
+										Database::Get()->storeDoc("Returns",QJsonDocument(c));
+										idxReturns++;
+										}
+										*/
+								Database::Get()->storeDoc("Returns",QJsonDocument(c));
+
+								idxReturns++;
+								}
+							else{
+								/*
+								if(currentID != -1)
+
+									while(idxOrderOut != currentID  && idxOrderOut < currentID){
+										QJsonObject c;
+										c.insert("Name","404");
+										Database::Get()->storeDoc("OrderOut",QJsonDocument(c));
+										idxOrderOut++;
+										}
+										*/
+								Database::Get()->storeDoc("OrderOut",QJsonDocument(c));
+								idxOrderOut++;
+								}
+
+
+
+							}
+						else {/*
+							if(currentID != -1)
+							while(idxOrderIn != currentID  && idxOrderIn < currentID){
+								QJsonObject c;
+								c.insert("Name","404");
+								Database::Get()->storeDoc("OrederIn",QJsonDocument(c));
+								idxOrderIn++;
+								}
+								*/
+							Database::Get()->storeDoc("OrederIn",QJsonDocument(c));
+							idxOrderIn++;
+
+							}
+						}
+					currentID = newID;
+					sellToClient = newSellToClient;
+					returns = newReturn;
+
+					foreach(QString k,tblProd.keys())
+						tblProd.remove(k);
+					foreach(QString k,c.keys())
+						c.remove(k);
+					for(int i = 0; i < rowsProd.count(); i++)
+						rowsProd.removeAt(i);
+
+					QDateTime d = QDateTime::fromString(data.at(2),"yyyy-MM-dd hh:mm:ss");
+					//qDebug() <<data.at(2)<< d.toString(Qt::ISODate);
+					c.insert("تاريخ" ,d.toString(Qt::ISODate));
+					c.insert("رقم",currentID);
+					{
+					QJsonObject cc;
+					cc.insert("Key","Stores::"+data.at(23));
+					cc.insert("Value",stores.at(data.at(23).toInt()).object().value("N").toString());
+					c.insert("المخزن",cc);
+					}
+					if(!sellToClient){
+						if(data.at(4).toInt() > suppliers.count())
+							{
+							qDebug()<< __FILE__ << __LINE__ <<"ERROR";
+							qDebug()<< __FILE__ << __LINE__ << data;
+							qDebug()<< __FILE__ << __LINE__ << data.at(4).toInt();
+							qDebug()<< __FILE__ << __LINE__ << sellToClient << returns << currentID << newID;
+							break;
+							}
+						QJsonObject cc;
+						qDebug()<< __FILE__ << __LINE__ << data.at(4).toInt() ;
+						cc.insert("Key","supplier::"+data.at(4));
+						cc.insert("Value",suppliers.at(data.at(4).toInt()).object().value("N").toString());
+						c.insert("المورد",cc);
+						}
+					else{
+						if(data.at(5).toInt() > clients.count())
+							{
+							qDebug()<< __FILE__ << __LINE__ <<"ERROR";
+							qDebug()<< __FILE__ << __LINE__ << data;
+							qDebug()<< __FILE__ << __LINE__ << data.at(5).toInt();
+							qDebug()<< __FILE__ << __LINE__ << sellToClient << returns << currentID << newID;
+							break;
+							}
+						QJsonObject cc;
+						cc.insert("Key","clients::"+data.at(5));
+						cc.insert("Value",clients.at(data.at(5).toInt()).object().value("N").toString());
+						c.insert("العميل",cc);
+						}
+
+					}
+				//	qDebug() << __FILE__ << __LINE__ << data.at(14);
+
+				//qDebug() << __FILE__ << __LINE__ << c;
+				//Database::Get()->storeDoc("Safe",QJsonDocument(c));
+				i--;
+				}
+			if (i % 100 == 0){
+				qDebug() << __FILE__ << __LINE__ << i <<"OrderIn:"<<idxOrderIn <<" OrderOut:"<<idxOrderOut<<" Returns:"<<idxReturns;
+				QThread::sleep(2);
+				}
+			}
+
 		}
 	//if()
 	return true;

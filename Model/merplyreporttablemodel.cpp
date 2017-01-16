@@ -406,7 +406,7 @@ void MerplyReportTableModel::fillText(QJsonArray data)
 	for(int i = 0; i < data.count(); i++){
 		QJsonObject row =  data.at(i).toObject();
 		for(int j = 0; j <clmnsHeader.count(); j++){
-			QString value = row.value(clmnsHeader.at(j)).toString();
+			QString value = Controller::Get()->toString(row.value(clmnsHeader.at(j)));
 			//qDebug() << value;
 			if(!value.isEmpty() && value.split("$").count() > 1){
 				cells[i * this->colmnsCount + j].setId(QString(value.split("$")[1]));
@@ -415,6 +415,7 @@ void MerplyReportTableModel::fillText(QJsonArray data)
 			else if(!value.isEmpty()){
 				if(row.value("ID") != QJsonValue::Undefined)
 					cells[i * this->colmnsCount + j].setId(row.value("ID").toString());
+
 				cells[i * this->colmnsCount + j].setData(value);
 				}
 			}

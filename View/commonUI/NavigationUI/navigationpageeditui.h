@@ -44,6 +44,7 @@ private:
 	QRadioButton *card ;
 	QRadioButton *page;
 	ERPComboBox* cards;
+	ERPComboBox* views;
 	ERPComboBox* view;
 	PermissionsUI* permissions;
 	QString currentCardKey;

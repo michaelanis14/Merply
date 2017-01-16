@@ -2,6 +2,8 @@
 
 //#include "model.h"
 
+#include "accesscontroller.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <string.h>
@@ -12,6 +14,7 @@
 #include <QJsonValue>
 #include <QDebug>
 #include <QMessageBox>
+#include <QDateTime>
 
 
 void Database::storage_callback(lcb_t, const void *, lcb_storage_t,
@@ -77,6 +80,15 @@ bool Database::updateDoc(QJsonDocument document)
 	//qDebug()  << document.object().value("document_id").toString().toLatin1();
 
 	//lcb_set_store_callback(instance, on_stored_status);
+
+	QJsonObject objWithKey = document.object();
+	//objWithKey.insert("document_id",key);
+	objWithKey.insert("ed",QDateTime::currentDateTime().currentMSecsSinceEpoch());
+	objWithKey.insert("edited_at",QDateTime::currentDateTime().toString(Qt::ISODate));
+	objWithKey.insert("edited_byID",AccessController::Get()->getUserID());
+	objWithKey.insert("edited_byName",AccessController::Get()->getUserName());
+	document = QJsonDocument(objWithKey);
+
 	struct lcb_store_cmd_st cmd;// = { 0 };
 	lcb_store_cmd_t *cmdlist = &cmd;
 	QByteArray bKey = document.object().value("document_id").toString().toLatin1();
@@ -156,7 +168,11 @@ connStr = "couchbase://localhost/"+QString(DATABASE);
 	//	}
 
 	//connStr = "couchbase://ec2-35-166-198-84.us-west-2.compute.amazonaws.com/"+QString(DATABASE);
-	connStr = "couchbase://138.68.70.131/"+QString(DATABASE);
+
+///	connStr = "couchbase://138.68.70.131/"+QString(DATABASE);
+
+
+
 
 
 	//Database::Get()->array.clear();
@@ -217,7 +233,7 @@ bool Database::IncrementKey(QString key)
 	cmdd.v.v0.key = docbKey;
 	cmdd.v.v0.nkey = strlen(docbKey);
 	cmdd.v.v0.delta = 1; // Increment by one
-	cmdd.v.v0.initial = 1; // Set to 1 if it does not exist
+	cmdd.v.v0.initial = 0; // Set to 1 if it does not exist
 	cmdd.v.v0.create = 1; // Create item if it does not exist
 	lcb_arithmetic(instance, NULL, 1, &cmdlistt);
 	lcb_set_arithmetic_callback(instance, arithmatic_callback);
@@ -233,6 +249,7 @@ int Database::GetKey(QString key)
 		return Database::Get()->LastKeyID.toInt();
 	return -1;
 }
+
 void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 							const lcb_get_resp_t *resp)
 {
@@ -247,7 +264,7 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 			QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
 			objectwithCAS.insert("document_id",QString(keyByte));
 			emit (Database::Get()->gotDocument(QJsonDocument(objectwithCAS)));
-			Database::Get()->cachedDocuments.insert(QString(keyByte),QJsonDocument(objectwithCAS));
+		//	Database::Get()->cachedDocuments.insert(QString(keyByte),QJsonDocument(objectwithCAS));
 			}
 		else{
 			emit Database::Get()->gotValue(QString(byteArray));
@@ -302,7 +319,6 @@ bool Database::getDoc(QString key) {
 
 }
 
-
 void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 
 	//qDebug() << "rowCallback" << (resp->rflags & LCB_RESP_F_FINAL);
@@ -345,7 +361,7 @@ void Database::query(QString query,bool cached)
 		return;
 		}
 //
-//	qDebug() << __FILE__ << __LINE__ <<"Query:: " << query;
+	qDebug() << __FILE__ << __LINE__ <<"Query:: " << query;
 	this->lastQuery = query;
 	lcb_t instance = Database::InitDatabase();
 	Database::Get()->array.clear();
@@ -424,6 +440,10 @@ bool Database::storeDoc(QString key,QJsonDocument document) {
 	//qDebug ()<<"key" << key;
 	QJsonObject objWithKey = document.object();
 	objWithKey.insert("document_id",key);
+	objWithKey.insert("cr",QDateTime::currentDateTime().currentMSecsSinceEpoch());
+	objWithKey.insert("created_at",QDateTime::currentDateTime().toString(Qt::ISODate));
+	objWithKey.insert("created_byID",AccessController::Get()->getUserID());
+	objWithKey.insert("created_byName",AccessController::Get()->getUserName());
 	document = QJsonDocument(objWithKey);
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){

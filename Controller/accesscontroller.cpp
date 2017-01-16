@@ -166,6 +166,11 @@ QString AccessController::getUserName()
 	return Model::Get()->getUserName();
 }
 
+QString AccessController::getUserID()
+{
+	return Model::Get()->getUserID();
+}
+
 void AccessController::logout()
 {
 	Model::Get()->logout();

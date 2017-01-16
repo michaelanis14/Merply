@@ -22,6 +22,7 @@ public:
 	bool hasReadAccess(QJsonObject permissions);
 	bool hasWriteAccess(QJsonObject permissions);
 	QString getUserName();
+	QString getUserID();
 	void logout();
 
 private:

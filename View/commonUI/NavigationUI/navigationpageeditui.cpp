@@ -110,13 +110,16 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 
 	cardDetailsLayout->addWidget(btnRemoveCard);
 
+	views = new ERPComboBox(this,false);
+	views->clear();
+
 	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
 	Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 
 	//cardDetailsLayout->addRow(tr("View"),view);
 	layout->addWidget(cardDetails);
 
-
+	layout->addWidget(views);
 
 	pageDetails = new QGroupBox(tr("Page Details"));
 	QHBoxLayout* pageDetailsLayout = new QHBoxLayout;
@@ -152,7 +155,7 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	//connect(newCard,SIGNAL(toggled(bool)),this,SLOT(updatePreview()));
 
 	QObject::connect(cards,SIGNAL(currentIndexChanged(int)),this,SLOT(updateCardPreview()));
-
+	//QObject::connect(views,SIGNAL(currentIndexChanged(int)),this,SLOT(updateCardPreview()));
 
 }
 

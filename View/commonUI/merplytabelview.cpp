@@ -460,8 +460,8 @@ void merplyTabelView::modelFinished()
 				SLOT(selectionChanged(const QItemSelection &, const QItemSelection &))
 				);
 
-	if(this->model->getColmnsCount() < 100)
-		this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
+//	if(this->model->getColmnsCount() < 100)
+	//	this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
 
 	//this->repaint();
 }

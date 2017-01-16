@@ -19,8 +19,8 @@ QWidget* MTabelCombobox::createEditor(QWidget* parent, const QStyleOptionViewIte
 	//qDebug() << "createEditor";
 	ERPComboBox* cb = new ERPComboBox(parent);
 
-	//cb->removeEventFilter(parent);
-	//	cb->installEventFilter(parent);
+	cb->removeEventFilter(parent);
+	cb->installEventFilter(parent);
 	if(!this->items.isEmpty())
 		cb->addJsonItems(this->items);
 	//setEditorData(cb, index);
@@ -68,24 +68,17 @@ bool MTabelCombobox::eventFilter(QObject* object, QEvent* event) {
 
 	ERPComboBox* cb = qobject_cast<ERPComboBox*>(object);
 	if(cb) {
-		//qDebug() << "INNNN" << event->type();
-		//if (event->type() == QEvent::MouseButtonRelease)
-		return QStyledItemDelegate::eventFilter(object, event);
+		if (event->type() == QEvent::MouseButtonRelease)
+			{
+			(cb)->showPopup();
+			return true;
+			}
 		}
-
-	//else
-	//	{
-	//	return QStyledItemDelegate::eventFilter( object, event );
-	//	}
-	//	cb->removeEventFilter(this);
-	//cb->showPopup();
-	//important to handle it only the first time, otherwise will result in
-	//focus glitches
-	//	cb->conn(this);
-	//cb->installEventFilter(this);
-
-
-	return QStyledItemDelegate::eventFilter(object, event);
+	else
+		{
+		return QStyledItemDelegate::eventFilter( object, event );
+		}
+	return false;
 }
 
 

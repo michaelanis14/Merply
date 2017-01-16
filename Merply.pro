@@ -55,10 +55,12 @@ QMAKE_CXXFLAGS_RELEASE -= -O2
 LIBS += -L$${DESTDIR}/lib -lQtZint
 }
 
-unix: LIBS += -L$$PWD/../../../../../../usr/local/Cellar/libcouchbase/2.5.4/lib/ -lcouchbase
 
-INCLUDEPATH += $$PWD/../../../../../../usr/local/Cellar/libcouchbase/2.5.4/include
-DEPENDPATH += $$PWD/../../../../../../usr/local/Cellar/libcouchbase/2.5.4/include
 
 RESOURCES += \
     resources/resources.qrc
+
+macx: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/lib/ -lcouchbase
+
+INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/include
+DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/include

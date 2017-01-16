@@ -17,6 +17,8 @@
 #ifdef Q_OS_WIN32
 #include <Windows.h>
 #endif
+
+#include <QTextCodec>
 class Merply_Application : public QApplication {
 public:
 	Merply_Application(int& argc, char** argv) : QApplication(argc, argv) {}
@@ -37,6 +39,19 @@ int main(int argc, char *argv[])
 	QApplication::setOrganizationName("Merply - Michael Bishara e.U.");
 	QApplication::setOrganizationDomain("www.merply.com");
 	QApplication::setApplicationName("Merply");
+	//QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+//	QTextCodec::s
+	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+
+	int id = QFontDatabase::addApplicationFont(":/fonts/artro.ttf");
+	QString family = QFontDatabase::applicationFontFamilies(id).at(0);
+	QFont BDavat(family);
+
+
+	QApplication::setFont(BDavat);
+	//QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+
+
 	//QApplication::setLayoutDirection(Qt::RightToLeft);
 
 #ifdef Q_OS_WIN32

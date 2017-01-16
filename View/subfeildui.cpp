@@ -234,8 +234,14 @@ QJsonValue SubFieldUI::save()
 		}
 	else if(QString(field->metaObject()->className()).compare("QLineEdit") == 0 ){
 		//	save += component.name;
-		if(!((QLineEdit*)field)->text().trimmed().isEmpty())
-			save =((QLineEdit*)field)->text().trimmed();
+		if(!((QLineEdit*)field)->text().trimmed().isEmpty()){
+			bool tonum = false ;
+			int number = ((QLineEdit*)field)->text().trimmed().toInt(&tonum);
+			if(tonum)
+				save = number;
+			else save =((QLineEdit*)field)->text().trimmed();
+
+			}
 		else save = QJsonValue::Null;
 		//	save =" ";
 		}
@@ -264,7 +270,7 @@ QJsonValue SubFieldUI::save()
 		save = QString(((QDateTimeEdit*)field)->dateTime().toString(Qt::ISODate));
 		//qDebug() << save;
 		}
-	//qDebug() << save;
+	qDebug() << __FILE__ << __LINE__<< save;
 	return save;
 }
 
@@ -324,7 +330,7 @@ void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 		combox->clear();
 		combox->addJsonItems(items);
 		}
-	qDebug() << __FILE__ << __LINE__  << items;
+	//qDebug() << __FILE__ << __LINE__  << items;
 }
 
 void SubFieldUI::serialData(QString serial)

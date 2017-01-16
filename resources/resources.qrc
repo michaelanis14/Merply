@@ -57,6 +57,9 @@
     </qresource>
     <qresource prefix="/">
         <file>example4.xml</file>
+        <file>fonts/BDavat.ttf</file>
+        <file>fonts/arabtype.ttf</file>
+        <file>fonts/artro.ttf</file>
     </qresource>
     <qresource prefix="/initData">
         <file>initData/Countries.Json</file>
