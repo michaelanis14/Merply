@@ -1,6 +1,8 @@
 #include "merplyqueryui.h"
 #include "controller.h"
 #include "datefilterui.h"
+#include "merplyquerysubfield.h"
+
 
 #include <QDebug>
 
@@ -56,6 +58,20 @@ void MerplyQueryUI::fill(QJsonObject strct)
 
 }
 
+void MerplyQueryUI::fillEntityQuery(QJsonObject strct)
+{
+	this->strct = strct;
+	foreach(QJsonValue clmn,strct.value("ColumnsQuery").toArray()){
+		MerplyQuerySubField* qSubField = new MerplyQuerySubField(clmn.toObject(),0);
+		layout->addWidget(qSubField);
+
+		fields << qSubField;
+		}
+	QPushButton* btnFilter  = new QPushButton("Filter",this);
+	QObject::connect(btnFilter,SIGNAL(pressed()),this,SLOT(generateQuery()));
+	this->layout->addWidget(btnFilter);
+}
+
 void MerplyQueryUI::fillDocumentID(QString document_id)
 {
 
@@ -93,7 +109,16 @@ void MerplyQueryUI::generateQuery()
 	QString query="";
 	foreach(QWidget* field,fields){
 
-		if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
+		if(QString(field->metaObject()->className()).compare("MerplyQuerySubField") == 0 ){
+			QString where = ((MerplyQuerySubField*)field)->getValue();
+			if(!save.trimmed().isEmpty())
+				save.append(" AND ");
+
+
+			if(!where.isEmpty())
+				save += where;
+			}
+		else if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
 			//	save += component.name;
 			QString value = ((QComboBox*)field)->currentText();
 			if(!value.trimmed().isEmpty()){
@@ -135,7 +160,7 @@ void MerplyQueryUI::generateQuery()
 				save.append(" AND ");
 
 			//qDebug() << ((DateFilterUI*)field)->to->dateTime().toMSecsSinceEpoch()  <<((DateFilterUI*)field)->from->dateTime().toMSecsSinceEpoch() ;
-		//	save += "STR_TO_MILLIS(`d`.`"+((DateFilterUI*)field)->objectName() +"`) BETWEEN STR_TO_MILLIS('"+QString::number(((DateFilterUI*)field)->from->dateTime().toMSecsSinceEpoch())+"') AND STR_TO_MILLIS('"+QString::number(((DateFilterUI*)field)->to->dateTime().toMSecsSinceEpoch())+"')";
+			//	save += "STR_TO_MILLIS(`d`.`"+((DateFilterUI*)field)->objectName() +"`) BETWEEN STR_TO_MILLIS('"+QString::number(((DateFilterUI*)field)->from->dateTime().toMSecsSinceEpoch())+"') AND STR_TO_MILLIS('"+QString::number(((DateFilterUI*)field)->to->dateTime().toMSecsSinceEpoch())+"')";
 			//save =((DateFilterUI*)field)->dateTime().toString(Qt::DefaultLocaleShortDate);
 			//qDebug() << save;
 
@@ -143,13 +168,21 @@ void MerplyQueryUI::generateQuery()
 
 			}
 		}
-	query += "SELECT `d`.*  FROM  `"+QString(DATABASE)+"` d WHERE META(`d`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
+	//qDebug() << __FILE__ << __LINE__  <<  this->strct.value("Query");
+	if(this->strct.value("Query") != QJsonValue::Undefined){
+		QString q = this->strct.value("Query").toString();
+		 q.replace("#QUERYMERPLY",save);
+		query += q;
+		}
+	else if(!save.isEmpty()){
+		query += "SELECT `d`.*  FROM  `"+QString(DATABASE)+"` d WHERE META(`d`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
+		}
+	if(!query.isEmpty()){
+		qDebug() << query;
 
-
-	//qDebug() << query;
-
-	QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotData(QVector<QJsonDocument>)));
-	Controller::Get()->query(query,false);
+		QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotData(QVector<QJsonDocument>)));
+		Controller::Get()->query(query,false);
+		}
 	//qDebug() << "SELECT *  FROM "<<QString(DATABASE) << "WHERE META('"<<QString(DATABASE)<<"').id LIKE"<<document_id<<" AND "<<save;
 	//return save;
 }

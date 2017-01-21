@@ -1026,16 +1026,16 @@ bool Prsistance::init()
 
 	if(Count("OrederIn::%\"") == 0){
 
-		Database::Get()->query("SELECT `AM`.`أسم المخزن` AS `N`,to_number(`AM`.`رقم`) AS BB FROM `AM` WHERE meta(`AM`).id LIKE \"Stores::%\" ORDER BY `BB` ",false);
+		Database::Get()->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> stores = Database::Get()->getArray();
 
-		Database::Get()->query("SELECT `AM`.`أسم العميل` AS `N`,to_number(`AM`.`رقم`) AS BB FROM `AM` WHERE meta(`AM`).id LIKE \"clients::%\" ORDER BY `BB` ",false);
+		Database::Get()->query("SELECT `d`.`أسم العميل` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `AM` d WHERE meta(`d`).id LIKE 'clients::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> clients = Database::Get()->getArray();
 
-		Database::Get()->query("SELECT `AM`.`أسم المورد` AS `N`,to_number(`AM`.`رقم`) AS BB FROM `AM` WHERE meta(`AM`).id LIKE \"supplier::%\" ORDER BY `BB`  ",false);
+		Database::Get()->query("SELECT `d`.`أسم المورد` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `AM` d WHERE meta(`d`).id LIKE 'supplier::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> suppliers = Database::Get()->getArray();
 
-		Database::Get()->query("SELECT `AM`.`أسم الصنف` AS `N`,to_number(`AM`.`رقم`) AS `BB` FROM `AM` WHERE meta(`AM`).id LIKE \"Products::%\" ORDER BY `BB` ",false);
+		Database::Get()->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = Database::Get()->getArray();
 
 
@@ -1054,11 +1054,12 @@ bool Prsistance::init()
 		QJsonArray rowsProd;
 		bool sellToClient = false;
 		bool returns = false;
+		bool transfer = false;
 		int idxOrderIn = 0;
 		int idxOrderOut = 0;
 		int idxReturns = 0;
 		qDebug() << fileData.count();
-		for(int i = 241700; i < fileData.count();i++){
+		for(int i = 0; i < fileData.count();i++){
 
 			QStringList data = fileData.at(i).split(",");
 			bool newSellToClient = false;
@@ -1069,7 +1070,11 @@ bool Prsistance::init()
 			if(0 < data.count() && !data.at(1).isEmpty()){
 				newID =  data.at(1).toInt();
 				}
-			if(0 < data.count() && data.at(4).trimmed().isEmpty()){
+			if(0 < data.count() && !data.at(6).trimmed().isEmpty()){
+				transfer = true;
+				////////////////////
+				}
+			else if(0 < data.count() && data.at(4).trimmed().isEmpty()){
 				newSellToClient = true;
 				newReturn = false;
 				if(0 < data.count() && !data.at(7).trimmed().isEmpty()){
@@ -1091,7 +1096,9 @@ bool Prsistance::init()
 				if(newSellToClient == sellToClient){
 					QJsonObject row ;
 					row.insert("ID",QString("Products::").append(data.at(3)));
-					row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
+					if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+						row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
+					else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
 					if(!sellToClient || returns){
 						row.insert("الكميه",QString(data.at(7)).toDouble());
 						}
@@ -1176,7 +1183,9 @@ bool Prsistance::init()
 					{
 					QJsonObject cc;
 					cc.insert("Key","Stores::"+data.at(23));
-					cc.insert("Value",stores.at(data.at(23).toInt()).object().value("N").toString());
+					if(stores.at(data.at(23).toInt()).object().value("N") != QJsonValue::Undefined)
+						cc.insert("Value",stores.at(data.at(23).toInt()).object().value("N").toString());
+					else cc.insert("Value",QString("S").append(QString::number(stores.at(data.at(23).toInt()).object().value("BB").toInt())));
 					c.insert("المخزن",cc);
 					}
 					if(!sellToClient){
@@ -1189,9 +1198,14 @@ bool Prsistance::init()
 							break;
 							}
 						QJsonObject cc;
+						if(data.at(4).toInt() > suppliers.count() -1 )
+							continue;
 						qDebug()<< __FILE__ << __LINE__ << data.at(4).toInt() ;
 						cc.insert("Key","supplier::"+data.at(4));
-						cc.insert("Value",suppliers.at(data.at(4).toInt()).object().value("N").toString());
+						if(suppliers.at(data.at(4).toInt()).object().value("N") != QJsonValue::Undefined)
+							cc.insert("Value",suppliers.at(data.at(4).toInt()).object().value("N").toString());
+						else cc.insert("Value",QString("S").append(QString::number(suppliers.at(data.at(4).toInt()).object().value("BB").toInt())));
+
 						c.insert("المورد",cc);
 						}
 					else{
@@ -1205,7 +1219,10 @@ bool Prsistance::init()
 							}
 						QJsonObject cc;
 						cc.insert("Key","clients::"+data.at(5));
-						cc.insert("Value",clients.at(data.at(5).toInt()).object().value("N").toString());
+						if(clients.at(data.at(4).toInt()).object().value("N") != QJsonValue::Undefined)
+							cc.insert("Value",clients.at(data.at(5).toInt()).object().value("N").toString());
+						else cc.insert("Value",QString("S").append(QString::number(clients.at(data.at(5).toInt()).object().value("BB").toInt())));
+
 						c.insert("العميل",cc);
 						}
 
@@ -1305,7 +1322,7 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 	//QString query ="SELECT Array item.`"+select.trimmed()+"` FOR item IN f END As `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f WHERE  META(d).id LIKE '"+entities+"::%' "+where;
 
 
-	QString query = "SELECT  d.`"+select.trimmed()+"` AS `Value`,META(d).id AS `Key` FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where;
+	QString query = "SELECT  d.`"+select.trimmed()+"` AS `Value`,META(d).id AS `Key`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where+" ORDER BY `BB` ";
 	qDebug() << __FILE__ << __LINE__ << query;
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QVector<QJsonDocument>)));
 	Database::Get()->query(query);

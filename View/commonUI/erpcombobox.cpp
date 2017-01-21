@@ -34,47 +34,60 @@ void ERPComboBox::addJsonItems(QVector<QJsonDocument> items){
 		//QString valueString = value.object().value("Value").toString();
 		QString keyString = value.object().value("Key").toString();
 		QString valueString;
-		QJsonValue Val = value.object().value("Value");
+		if(value.object().value("Value") != QJsonValue::Undefined){
+			QJsonValue Val = value.object().value("Value");
 			//	qDebug() << __FILE__ << __LINE__ <<"VAL" << Val << keyString;
-				if(Val.isObject()){
-					//qDebug() << __FILE__ << __LINE__  << "isObJect" << Val;
-					if(Val.toObject().value("Key") != QJsonValue::Undefined)
-						keyString = Val.toObject().value("Key").toString();
-					if(Val.toObject().value("Value") != QJsonValue::Undefined)
-						valueString = Val.toObject().value("Value").toString();
+			if(Val.isObject()){
+			//	qDebug() << __FILE__ << __LINE__  << i << "isObJect" << Val.toString();
+				if(Val.toObject().value("Key") != QJsonValue::Undefined)
+					keyString = Val.toObject().value("Key").toString();
+				if(Val.toObject().value("Value") != QJsonValue::Undefined)
+					valueString = Val.toObject().value("Value").toString();
+
+				QComboBox::insertItem(i,valueString);
+				keys.insert(i,keyString);
+				i++;
+				}
+			else if(Val.isArray()){
+				foreach(QJsonValue subVal,Val.toArray()){
+
+					//qDebug() << __FILE__ << __LINE__  << "chechkkk" << subVal <<Controller::Get()->toString(subVal);
+
+					valueString = Controller::Get()->toString(subVal);
 
 					QComboBox::insertItem(i,valueString);
 					keys.insert(i,keyString);
 					i++;
 					}
-				else if(Val.isArray()){
-					foreach(QJsonValue subVal,Val.toArray()){
+				}
+			else{
 
-						//qDebug() << __FILE__ << __LINE__  << "chechkkk" << subVal <<Controller::Get()->toString(subVal);
-
-						valueString = Controller::Get()->toString(subVal);
-
-						QComboBox::insertItem(i,valueString);
-						keys.insert(i,keyString);
-						i++;
-						}
+				QString valueString = Val.toString().trimmed();
+				if(valueString.isNull() || valueString.isEmpty()){
+					//	qDebug() << __FILE__ << __LINE__ <<"NULLLL"<<i << Val;
+					continue;
 					}
 				else{
-					QString valueString = Val.toString().trimmed();
-					if(valueString.isNull() || valueString.isEmpty()){
-						//		qDebug() << __FILE__ << __LINE__ <<"EMPTY"<<i << valueString;
-						continue;
-						}
-					else{
-						QComboBox::insertItem(i,valueString);
-						//	qDebug() << __FILE__ << __LINE__ <<"NOT ARRY"<<i << valueString;
-						keys.insert(i,keyString);
-						i++;
-						}
+					QComboBox::insertItem(i,valueString);
+					//	qDebug() << __FILE__ << __LINE__ <<"NOT ARRY"<<i << valueString;
+					keys.insert(i,keyString);
+					i++;
 					}
-				this->addedItems = true;
-
+				}
+			this->addedItems = true;
+			}
+		else{
+			//qDebug() << __FILE__ << __LINE__  << keyString;
+			if(value.object().value("BB") != QJsonValue::Undefined){
+				QComboBox::insertItem(i,QString::number(value.object().value("BB").toInt()));
+				//	qDebug() << __FILE__ << __LINE__ <<"BB"<<i << QString::number(value.object().value("BB").toInt());
+				keys.insert(i,keyString);
+				i++;
+				}
+			else continue;
+			}
 		}
+	if(count() < 100)
 	this->adjustSize();
 	if(count() > 0)
 		this->setEnabled(true);
@@ -91,7 +104,7 @@ void ERPComboBox::focusOutEvent(QFocusEvent *e)
 			this->setCurrentText(this->itemText(this->currentIndex()));
 			}
 		else if (re.exactMatch(this->currentText())){
-			int index = this->currentText().toInt()-1;
+			int index = this->currentText().toInt();
 
 			if(index > -1 && index < this->count() )
 				this->setCurrentIndex(index);
@@ -155,8 +168,6 @@ void ERPComboBox::removeList(QStringList list)
 	if(count() <= 0)
 		this->setEnabled(false);
 }
-
-
 
 bool ERPComboBox::eventFilter(QObject *obj, QEvent *event)
 {

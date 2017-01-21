@@ -269,7 +269,7 @@ int MerplyReportTableModel::getColmnsCount() const
 void MerplyReportTableModel::fill(QVector<QJsonDocument> documents)
 {
 
-	qDebug() << documents;
+	//qDebug() << documents;
 	rowsCount = 0;
 	cells =  QVector<TableCell>(colmnsCount * documents.count());
 	foreach(QJsonDocument doc, documents){
@@ -359,6 +359,7 @@ void MerplyReportTableModel::fill(QVector<QJsonDocument> documents)
 
 void MerplyReportTableModel::fillQuery(QVector<QJsonDocument> documents)
 {
+	beginResetModel();
 	//qDebug() << __FILE__ << __LINE__  <<documents;
 	cells =  QVector<TableCell>(colmnsCount * documents.count());
 	QHash<QString,int> rowsKeyed;
@@ -382,6 +383,8 @@ void MerplyReportTableModel::fillQuery(QVector<QJsonDocument> documents)
 			foreach(QString key,keys){
 				int j = clmnsHeader.indexOf(key);
 				if(j > -1){
+				//	qDebug() << __FILE__ << __LINE__  <<i * this->colmnsCount + j << Controller::Get()->toString(row.object().value(key)) ;
+					cells[i * this->colmnsCount + j].setId(row.object().value("ID").toString());
 					cells[i * this->colmnsCount + j].setData(Controller::Get()->toString(row.object().value(key)));
 					}
 				}
@@ -392,9 +395,12 @@ void MerplyReportTableModel::fillQuery(QVector<QJsonDocument> documents)
 
 
 	rowsCount = rowIndex ;
+	endResetModel();
+
 	if(this->equationColumns.count() > 0)
 		emit equationColumnsSignal();
 	emit done();
+
 }
 
 void MerplyReportTableModel::fillText(QJsonArray data)
@@ -553,6 +559,7 @@ void MerplyReportTableModel::fillLocalSource(QVector<QJsonDocument> items)
 void MerplyReportTableModel::fillEquationColumns()
 {
 	//qDebug() << __FILE__ << __LINE__  << "fillEquationColumns";
+	beginResetModel();
 	QHashIterator<QString, QJsonArray> i(equationColumns);
 	while (i.hasNext()) {
 		i.next();
@@ -638,10 +645,20 @@ void MerplyReportTableModel::fillEquationColumns()
 				cells[j * this->colmnsCount + clmnsHeader.indexOf(i.key())] =cell;
 			}
 		}
-
+	endResetModel();
 	if(totalColmns.count() > 0 && !addedTotalRow)
 		evalTotalRow();
+
+	//qDebug() << __FILE__ << __LINE__  << "ALMOST";
 	emit done();
+
+	//int r=this->rowsCount-1;
+	//int c=this->colmnsCount-1;
+	//QModelIndex id=this->index(r,c,QModelIndex());
+	//QModelIndex id0=this->index(0,0,QModelIndex());
+
+	//emit dataChanged(id0,id);
+
 }
 
 double MerplyReportTableModel::evalEquationCondition(int condition, double col1, double col2)

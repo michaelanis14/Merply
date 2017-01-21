@@ -1,4 +1,7 @@
 #include "structurevieweditsubfeildtable.h"
+
+
+
 #include "QPushButton"
 #include "removebtn.h"
 
@@ -15,7 +18,14 @@ StructureVieweditSubFeildTable::StructureVieweditSubFeildTable(QWidget *parent) 
 	layout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
 	layout->setLabelAlignment(Qt::AlignLeft);
 */
-	layout = new QHBoxLayout(this);
+
+	mainLayout = new QVBoxLayout(this);
+	mainLayout->setContentsMargins(0,0,0,0);
+	mainLayout->setSpacing(0);
+	mainLayout->setMargin(0);
+
+	QWidget* subFieldTableWidget = new QWidget(this);
+	layout = new QHBoxLayout(subFieldTableWidget);
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
 	layout->setMargin(0);
@@ -30,16 +40,14 @@ StructureVieweditSubFeildTable::StructureVieweditSubFeildTable(QWidget *parent) 
 	layout->addWidget(new QLabel(tr("Edit ")));
 	layout->addWidget( editEnable);
 
-	queryBox = new QTextEdit();
-	layout->addWidget(new QLabel(tr("Query ")));
-	layout->addWidget( queryBox);
-	//layout->addRow();
+	queryUI = new StructureVieweditSubFeildTableColumnQueryUI(this);
 
+	mainLayout->addWidget(subFieldTableWidget);
+	mainLayout->addWidget(queryUI);
 
-
-
-
-
+	//////
+	///
+	/// //layout->addRow();
 }
 
 QJsonObject StructureVieweditSubFeildTable::save()
@@ -50,10 +58,10 @@ QJsonObject StructureVieweditSubFeildTable::save()
 	saveTable.insert("Edit",editEnable->isChecked());
 	saveTable.insert("Remove",removeEnable->isChecked());
 
-	if(!(queryBox->toPlainText().trimmed().isEmpty())){
-		qDebug() << queryBox->toPlainText();
-		saveTable.insert("Query",queryBox->toPlainText());
-}
+	QJsonObject querySave = queryUI->save();
+	if(!querySave.isEmpty())
+		saveTable.insert("QueryUI",querySave);
+	//
 	QJsonArray clmnsArray;
 	if(!clmns.isEmpty()){
 		foreach(StructureVieweditSubFeildTableColumn* clmn,clmns){
@@ -93,8 +101,9 @@ void StructureVieweditSubFeildTable::fill(QJsonObject tblStractureView)
 		this->removeEnable->setChecked(true);
 	else this->removeEnable->setChecked(tblStractureView.value("Remove").toBool());
 
-	if(tblStractureView.value("Query") != QJsonValue::Undefined)
-		this->queryBox->setText(tblStractureView.value("Query").toString());
+	if(tblStractureView.value("QueryUI") != QJsonValue::Undefined)
+		queryUI->fill(tblStractureView.value("QueryUI").toObject());
+	//
 	clmns.clear();
 	StructureVieweditSubFeildTableColumn * clmnWidget;
 	if(!tblStractureView.isEmpty() && tblStractureView.value("Columns").isArray()){

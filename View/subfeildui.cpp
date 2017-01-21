@@ -270,7 +270,7 @@ QJsonValue SubFieldUI::save()
 		save = QString(((QDateTimeEdit*)field)->dateTime().toString(Qt::ISODate));
 		//qDebug() << save;
 		}
-	qDebug() << __FILE__ << __LINE__<< save;
+//	qDebug() << __FILE__ << __LINE__<< save;
 	return save;
 }
 

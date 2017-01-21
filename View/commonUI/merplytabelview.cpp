@@ -145,26 +145,30 @@ void merplyTabelView::selectionChanged(const QItemSelection& , const QItemSelect
 
 bool merplyTabelView::fill(QJsonObject columns,QString filter)
 {
-
 	//TODO: Better connect to Signals
-
 	//	qDebug() << __FILE__ << __LINE__ << "fill";
 	model = new MerplyReportTableModel(columns);
 	//	queryUI->fill(columns);
-	if(columns.value("Query") != QJsonValue::Undefined){
-		QObject::connect(this,SIGNAL(updateModel(QVector<QJsonDocument>)),model,SLOT(fillQuery(QVector<QJsonDocument>)));
+	if(columns.value("QueryUI") != QJsonValue::Undefined){
+	//	QObject::connect(this,SIGNAL(updateModel(QVector<QJsonDocument>)),model,SLOT(fillQuery(QVector<QJsonDocument>)));
+		//
 
-		QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+	//	QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 		QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 
+		queryUI->fillEntityQuery(columns.value("QueryUI").toObject());
+		QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillQuery(QVector<QJsonDocument>)));
+		QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillQuery(QVector<QJsonDocument>)));
+
+		//	}
+
 		}
-	//TODO : Else normal fill
-
-
-
-	QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotReportData(QVector<QJsonDocument>)));
-	Controller::Get()->getReport(columns,filter);
-
+	else {
+		//TODO : Else normal fill
+		QObject::disconnect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotReportData(QVector<QJsonDocument>)));
+		QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotReportData(QVector<QJsonDocument>)));
+		Controller::Get()->getReport(columns,filter);
+		}
 	initHController(columns);
 	initDelegateClmns(columns);
 	return true;
@@ -424,6 +428,7 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 	model->fillIndexTabel(items);
 
 	if(!indexDocument_id.isEmpty()){
+		QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
 		QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
 		queryUI->fillDocumentID(indexDocument_id);
 		}
@@ -444,7 +449,7 @@ void merplyTabelView::setValue(const int , const QString paramName, QVariant& pa
 
 void merplyTabelView::modelFinished()
 {
-	//	qDebug() << __FILE__ << __LINE__  << "ModelDone" << model->getRowsCount();
+	//qDebug() << __FILE__ << __LINE__  << "ModelDone" <<model << model->getRowsCount();
 	QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 
 	tableView->setModel(model);
@@ -460,7 +465,7 @@ void merplyTabelView::modelFinished()
 				SLOT(selectionChanged(const QItemSelection &, const QItemSelection &))
 				);
 
-//	if(this->model->getColmnsCount() < 100)
+	//	if(this->model->getColmnsCount() < 100)
 	//	this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
 
 	//this->repaint();

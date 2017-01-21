@@ -169,7 +169,7 @@ connStr = "couchbase://localhost/"+QString(DATABASE);
 
 	//connStr = "couchbase://ec2-35-166-198-84.us-west-2.compute.amazonaws.com/"+QString(DATABASE);
 
-///	connStr = "couchbase://138.68.70.131/"+QString(DATABASE);
+//	connStr = "couchbase://138.68.70.131/"+QString(DATABASE);
 
 
 

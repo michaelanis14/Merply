@@ -18,11 +18,9 @@ TEMPLATE = app
 
 include(../CommonFiles/CommonFiles_QtRptDesigner.pri)
 include(../QtRPT/QtRPT.pri)
-#include(SQLDiagram/SQLDiagram.pri)
-unix: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.5.4/lib/ -lcouchbase
 
-INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.5.4/include
-DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.5.4/include
+#include(SQLDiagram/SQLDiagram.pri)
+
 
 #DESTDIR = $${DEST_DIRECTORY}
 CONFIG(release, debug|release) {
@@ -45,6 +43,17 @@ debug:UI_DIR = debug/.ui
 LIBS += -L$${DESTDIR}/lib -lQtZint
 }
 
+INCLUDEPATH +=  ../Model\
+		../Controller \
+		../View \
+		../View/structureViewBuilder\
+		../View/commonUI \
+		../View/commonUI/NavigationUI \
+		../View/VisualDesign \
+		../View/structureViewBuilder\
+		../View/permissionsUI \
+		../View/commonUI/MerplyTabel
+
 SOURCES += main.cpp\
     mainwindow.cpp \
     PageSettingDlg.cpp \
@@ -60,7 +69,60 @@ SOURCES += main.cpp\
     TContainerField.cpp \
     UndoCommands.cpp \
     XmlViewModel.cpp \
-    ../Model/database.cpp
+    ../Model/database.cpp \
+    ../Controller/accesscontroller.cpp \
+    ../Controller/controller.cpp \
+    ../Controller/printcontroller.cpp \
+    ../View/commonUI/MerplyTabel/merplyquerysubfield.cpp \
+    ../View/commonUI/MerplyTabel/merplyqueryui.cpp \
+    ../View/commonUI/MerplyTabel/mtabelcombobox.cpp \
+    ../View/commonUI/NavigationUI/navigationbtn.cpp \
+    ../View/commonUI/NavigationUI/navigationeditui.cpp \
+    ../View/commonUI/NavigationUI/navigationpageeditui.cpp \
+    ../View/commonUI/NavigationUI/navigationui.cpp \
+    ../View/commonUI/NavigationUI/pagestructureviewediteui.cpp \
+    ../View/commonUI/NavigationUI/widgetsstructureviewediteui.cpp \
+    ../View/commonUI/datefilterui.cpp \
+    ../View/commonUI/erpcombobox.cpp \
+    ../View/commonUI/expandbutton.cpp \
+    ../View/commonUI/filepathui.cpp \
+    ../View/commonUI/hcontrollers.cpp \
+    ../View/commonUI/headerlabel.cpp \
+    ../View/commonUI/hnavigationui.cpp \
+    ../View/commonUI/logintabui.cpp \
+    ../View/commonUI/merplytabelview.cpp \
+    ../View/commonUI/merplytablecontrollers.cpp \
+    ../View/commonUI/printview.cpp \
+    ../View/commonUI/removebtn.cpp \
+    ../View/commonUI/settingsctrlsui.cpp \
+    ../View/commonUI/timelineui.cpp \
+    ../View/permissionsUI/permissionfieldui.cpp \
+    ../View/permissionsUI/permissionsui.cpp \
+    ../View/structureViewBuilder/strctvieweditsubftblclmneq.cpp \
+    ../View/structureViewBuilder/structureviewedit.cpp \
+    ../View/structureViewBuilder/structurevieweditsubfeild.cpp \
+    ../View/structureViewBuilder/structurevieweditsubfeildequation.cpp \
+    ../View/structureViewBuilder/structurevieweditsubfeildtable.cpp \
+    ../View/structureViewBuilder/structurevieweditsubfeildtablecolumn.cpp \
+    ../View/structureViewBuilder/structurevieweditsubfeildtablecolumnquery.cpp \
+    ../View/structureViewBuilder/structurevieweditsubfeildtablecolumnqueryui.cpp \
+    ../View/structureViewBuilder/structureviewgroupsui.cpp \
+    ../View/structureViewBuilder/structureviewseditui.cpp \
+    ../View/createeditui.cpp \
+    ../View/feildui.cpp \
+    ../View/indexui.cpp \
+    ../View/loginui.cpp \
+    ../View/maindisplay.cpp \
+    ../View/mainform.cpp \
+    ../View/pageui.cpp \
+    ../View/subfeildui.cpp \
+    ../View/viewgroup.cpp \
+    ../View/viewgroups.cpp \
+    ../Model/database3.cpp \
+    ../Model/merplyreporttablemodel.cpp \
+    ../Model/model.cpp \
+    ../Model/prsistance.cpp \
+    ../Model/user.cpp
 
 HEADERS  += mainwindow.h \
     PageSettingDlg.h \
@@ -76,7 +138,61 @@ HEADERS  += mainwindow.h \
     TContainerField.h \
     UndoCommands.h \
     XmlViewModel.h \
-    ../Model/database.h
+    ../Model/database.h \
+    ../Controller/accesscontroller.h \
+    ../Controller/controller.h \
+    ../Controller/printcontroller.h \
+    ../View/commonUI/MerplyTabel/merplyquerysubfield.h \
+    ../View/commonUI/MerplyTabel/merplyqueryui.h \
+    ../View/commonUI/MerplyTabel/mtabelcombobox.h \
+    ../View/commonUI/NavigationUI/navigationbtn.h \
+    ../View/commonUI/NavigationUI/navigationeditui.h \
+    ../View/commonUI/NavigationUI/navigationpageeditui.h \
+    ../View/commonUI/NavigationUI/navigationui.h \
+    ../View/commonUI/NavigationUI/pagestructureviewediteui.h \
+    ../View/commonUI/NavigationUI/widgetsstructureviewediteui.h \
+    ../View/commonUI/datefilterui.h \
+    ../View/commonUI/erpcombobox.h \
+    ../View/commonUI/expandbutton.h \
+    ../View/commonUI/filepathui.h \
+    ../View/commonUI/hcontrollers.h \
+    ../View/commonUI/headerlabel.h \
+    ../View/commonUI/hnavigationui.h \
+    ../View/commonUI/logintabui.h \
+    ../View/commonUI/merplytabelview.h \
+    ../View/commonUI/merplytablecontrollers.h \
+    ../View/commonUI/printview.h \
+    ../View/commonUI/rangevalidator.h \
+    ../View/commonUI/removebtn.h \
+    ../View/commonUI/settingsctrlsui.h \
+    ../View/commonUI/timelineui.h \
+    ../View/permissionsUI/permissionfieldui.h \
+    ../View/permissionsUI/permissionsui.h \
+    ../View/structureViewBuilder/strctvieweditsubftblclmneq.h \
+    ../View/structureViewBuilder/structureviewedit.h \
+    ../View/structureViewBuilder/structurevieweditsubfeild.h \
+    ../View/structureViewBuilder/structurevieweditsubfeildequation.h \
+    ../View/structureViewBuilder/structurevieweditsubfeildtable.h \
+    ../View/structureViewBuilder/structurevieweditsubfeildtablecolumn.h \
+    ../View/structureViewBuilder/structurevieweditsubfeildtablecolumnquery.h \
+    ../View/structureViewBuilder/structurevieweditsubfeildtablecolumnqueryui.h \
+    ../View/structureViewBuilder/structureviewgroupsui.h \
+    ../View/structureViewBuilder/structureviewseditui.h \
+    ../View/createeditui.h \
+    ../View/feildui.h \
+    ../View/indexui.h \
+    ../View/loginui.h \
+    ../View/maindisplay.h \
+    ../View/mainform.h \
+    ../View/pageui.h \
+    ../View/subfeildui.h \
+    ../View/viewgroup.h \
+    ../View/viewgroups.h \
+    ../Model/database3.h \
+    ../Model/merplyreporttablemodel.h \
+    ../Model/model.h \
+    ../Model/prsistance.h \
+    ../Model/user.h
 
 FORMS    += mainwindow.ui \
     PageSettingDlg.ui \
@@ -131,18 +247,8 @@ unix {
 
 
 
-# Automatically build required translation files (*.qm)
-all.depends = locale
-#QMAKE_EXTRA_TARGETS += all
 
-QMAKE_CXXFLAGS += -std=c++0x
+macx: LIBS += -L$$PWD/../../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/lib/ -lcouchbase
 
-TRANSLATION_TARGETS = $$replace(TRANSLATIONS, ".ts", ".qm")
-locale.depends = $$TRANSLATION_TARGETS
-QMAKE_EXTRA_TARGETS += locale
-
-"%.qm".commands = lrelease -qm $@ $<
-"%.qm".depends = "%.ts"
-QMAKE_EXTRA_TARGETS += "%.qm"
-
-PRE_TARGETDEPS += locale
+INCLUDEPATH += $$PWD/../../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/include
+DEPENDPATH += $$PWD/../../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/include

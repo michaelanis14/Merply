@@ -1,5 +1,7 @@
 #include "pageui.h"
 #include "mainform.h"
+#include "controller.h"
+#include "printcontroller.h"
 
 PageUI::PageUI(QWidget *parent, QJsonObject viewStructure) : MainDisplay(parent)
 {
@@ -8,10 +10,17 @@ PageUI::PageUI(QWidget *parent, QJsonObject viewStructure) : MainDisplay(parent)
 	this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	this->layout->setContentsMargins(0,0,0,0);
 	this->layout->setSpacing(0);
+	controllers = new HControllers;
+	controllers->setObjectName("controllers");
+	controllers->clear();
+	QStringList btns;
+	btns << "Print->Print";
+	controllers->fill(btns);
+	layout->addWidget(controllers);
 	this->headerlbl = new HeaderLabel();
 	this->headerlbl->setTitle("Page");
 	layout->addWidget(headerlbl);
-
+	connect(controllers, SIGNAL(btnClicked(const QString&)), this, SLOT(controller_Clicked(QString)));
 	fill(viewStructure);
 }
 
@@ -32,6 +41,8 @@ void PageUI::ShowUI(QJsonObject viewStructure) {
 }
 void PageUI::fill(QJsonObject viewStructure)
 {
+	//qDebug() << __FILE__ << __LINE__<< viewStructure;
+	this->document_id = viewStructure.value("document_id").toString();
 	headerlbl->setTitle(viewStructure.value("Title").toString());
 	viewGroups = ViewGroups::Create(viewStructure,QJsonObject()) ;
 	viewGroups->setHidden(false);
@@ -41,11 +52,23 @@ void PageUI::fill(QJsonObject viewStructure)
 
 void PageUI::clear()
 {
-
 	layout->removeWidget(viewGroups);
 	viewGroups->setHidden(true);
 	//child->setParent(0);
 	viewGroups->deleteLater();
+}
 
-
+void PageUI::controller_Clicked(QString nameAction)
+{
+		QStringList nActon = nameAction.split("->");
+		if(nActon.count() > 1){
+			if(nActon.at(1).compare("Print") == 0){
+				QJsonObject toPrint = viewGroups->save();
+				qDebug() << toPrint;
+				toPrint.insert("document_id",document_id);
+				PrintController::Get()->gotPrintEntity(QJsonDocument(toPrint));
+			//	PrintController::Get()->printEntity("id");
+				//////////////				Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
+				}
+}
 }

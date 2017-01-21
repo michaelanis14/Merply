@@ -372,6 +372,7 @@ void StructureVieweditSubFeild::updateFields(QString type)
 
 void StructureVieweditSubFeild::updateSelect(QString)
 {
+	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	Controller::Get()->getFields(Source->getKey());
 
@@ -397,8 +398,12 @@ void StructureVieweditSubFeild::gotSourceData(QVector<QJsonDocument> items)
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
 	Source->clear();
 	Source->addJsonItems(items);
+
+	QObject::disconnect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
+	QObject::disconnect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
 	QObject::connect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
 	QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
+
 	if(fieldVS.toObject().value("Source") != QJsonValue::Undefined){
 		QString source = fieldVS.toObject().value("Source").toString().split("::").count() > 1 ?fieldVS.toObject().value("Source").toString().split("::")[1]:fieldVS.toObject().value("Source").toString();
 		Source->setCurrentIndex(Source->keys.indexOf(QString("ViewStructure::"+source)));

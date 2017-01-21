@@ -18,6 +18,7 @@
 #include <libcouchbase/n1ql.h>
 
 #define DATABASE "AM"
+#define ORDERBY "رقم"
 
 class Database: public QObject
 {

@@ -36,15 +36,15 @@ private:
 signals:
 
 public slots:
-		void indexedFillEvent(QString completion);
-		void linkPressed();
-		void refrenceData(QVector<QJsonDocument> items);
-		void serialData(QString serial);
-		void updateFilter(QString filter);
-		void updateTable(QString);
-		void updateEquationField();
-		double getClmnDataCount(QString strct);
-		double evalEquationCondition(int condition,double col1,double col2);
+	void indexedFillEvent(QString completion);
+	void linkPressed();
+	void refrenceData(QVector<QJsonDocument> items);
+	void serialData(QString serial);
+	void updateFilter(QString filter);
+	void updateTable(QString);
+	void updateEquationField();
+	double getClmnDataCount(QString strct);
+	double evalEquationCondition(int condition,double col1,double col2);
 
 
 };

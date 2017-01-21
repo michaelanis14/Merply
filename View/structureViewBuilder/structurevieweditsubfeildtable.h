@@ -3,6 +3,7 @@
 
 #include "feildui.h"
 #include "structurevieweditsubfeildtablecolumn.h"
+#include "structurevieweditsubfeildtablecolumnqueryui.h"
 
 #include <QObject>
 #include <QWidget>
@@ -17,13 +18,14 @@ public:
 	void fill(QJsonObject tblStractureView);
 	QStringList getHeaders();
 private:
+	QVBoxLayout *mainLayout;
 	QHBoxLayout *layout;
 	QHBoxLayout *clmnsLayout;
 	QList<StructureVieweditSubFeildTableColumn*> clmns;
 	QCheckBox* addEnable;
 	QCheckBox* removeEnable;
 	QCheckBox* editEnable;
-	QTextEdit* queryBox;
+	StructureVieweditSubFeildTableColumnQueryUI* queryUI;
 	QJsonObject tblStractureView;
 signals:
 

@@ -28,7 +28,7 @@
 #define NAVIGATION_MAIN_HEIGHT 150
 #define NAVIGATION_SUB_HEIGHT 100
 
-#include  <View/createeditui.h>
+#include  <createeditui.h>
 
 class Model:public QObject
 {

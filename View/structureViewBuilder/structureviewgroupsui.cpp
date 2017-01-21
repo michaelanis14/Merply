@@ -82,7 +82,6 @@ QJsonObject StructureViewGroupsUI::save()
 	if(!init)
 		return saveObject;
 	saveObject.insert("Title",headerlbl->getTitle());
-	qDebug() <<"TitleTitleTitleTitleTitle   :   "<< saveObject.value("Title").toString();
 	saveObject.insert("Type","Entity");
 	QJsonArray ViewGroups;
 	foreach(StructureViewsEditUI * strcViewUI,sVSFUIs){

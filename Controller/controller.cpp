@@ -713,11 +713,12 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 {
 	bool addedSelectItems = false;
 
-	if(clmns.value("Query") != QJsonValue::Undefined){
+	if(clmns.value("QueryUI") != QJsonValue::Undefined){
 		qRegisterMetaType<QVector<QJsonDocument> >("MyStruct");
+
 		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getReportData(QVector<QJsonDocument>)),Qt::QueuedConnection);
 
-		Database::Get()->query(clmns.value("Query").toString(),false); //TODO: CACHED FLAGG
+		Database::Get()->query(clmns.value("QueryUI").toObject().value("Query").toString().replace("#QUERYMERPLY",""),false); //TODO: CACHED FLAGG
 	//	qDebug() << __FILE__ << __LINE__<<"getReport"  << clmns;
 		}
 	else if(clmns.value("Columns").isArray()){
