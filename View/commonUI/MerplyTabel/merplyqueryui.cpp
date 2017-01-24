@@ -6,8 +6,9 @@
 
 #include <QDebug>
 
-MerplyQueryUI::MerplyQueryUI(QWidget *parent) : QWidget(parent)
+MerplyQueryUI::MerplyQueryUI(QWidget *parent,bool btnFilter) : QWidget(parent)
 {
+	this->btnFilter = btnFilter;
 	this->setContentsMargins(0,0,0,0);
 	layout = new QHBoxLayout(this);
 	//this->layout->setSizeConstraint(QLayout::SetMaximumSize);
@@ -52,9 +53,11 @@ void MerplyQueryUI::fill(QJsonObject strct)
 				}
 			}
 		}
-	QPushButton* btnFilter  = new QPushButton("Filter",this);
-	QObject::connect(btnFilter,SIGNAL(pressed()),this,SLOT(generateQuery()));
-	this->layout->addWidget(btnFilter);
+	if(btnFilter){
+		QPushButton* btnFilter  = new QPushButton("Filter",this);
+		QObject::connect(btnFilter,SIGNAL(pressed()),this,SLOT(generateQuery()));
+		this->layout->addWidget(btnFilter);
+		}
 
 }
 
@@ -67,9 +70,11 @@ void MerplyQueryUI::fillEntityQuery(QJsonObject strct)
 
 		fields << qSubField;
 		}
-	QPushButton* btnFilter  = new QPushButton("Filter",this);
-	QObject::connect(btnFilter,SIGNAL(pressed()),this,SLOT(generateQuery()));
-	this->layout->addWidget(btnFilter);
+	if(btnFilter){
+		QPushButton* btnFilter  = new QPushButton("Filter",this);
+		QObject::connect(btnFilter,SIGNAL(pressed()),this,SLOT(generateQuery()));
+		this->layout->addWidget(btnFilter);
+		}
 }
 
 void MerplyQueryUI::fillDocumentID(QString document_id)
@@ -111,12 +116,12 @@ void MerplyQueryUI::generateQuery()
 
 		if(QString(field->metaObject()->className()).compare("MerplyQuerySubField") == 0 ){
 			QString where = ((MerplyQuerySubField*)field)->getValue();
-			if(!save.trimmed().isEmpty())
-				save.append(" AND ");
 
-
-			if(!where.isEmpty())
+			if(!where.trimmed().isEmpty()){
+				if(!save.trimmed().isEmpty())
+					save.append(" AND ");
 				save += where;
+				}
 			}
 		else if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
 			//	save += component.name;
@@ -171,7 +176,7 @@ void MerplyQueryUI::generateQuery()
 	//qDebug() << __FILE__ << __LINE__  <<  this->strct.value("Query");
 	if(this->strct.value("Query") != QJsonValue::Undefined){
 		QString q = this->strct.value("Query").toString();
-		 q.replace("#QUERYMERPLY",save);
+		q.replace("#QUERYMERPLY",save);
 		query += q;
 		}
 	else if(!save.isEmpty()){

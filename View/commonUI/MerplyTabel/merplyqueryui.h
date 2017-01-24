@@ -11,11 +11,12 @@ class MerplyQueryUI : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit MerplyQueryUI(QWidget *parent = 0);
+	explicit MerplyQueryUI(QWidget *parent = 0, bool btnFilter = false);
 	void fill(QJsonObject strct);
 	void fillEntityQuery(QJsonObject strct);
 	void fillDocumentID(QString document_id);
 private:
+	 bool btnFilter;
 	QHBoxLayout *layout;
 	QVector<QWidget*> fields;
 	QString document_id;
@@ -31,3 +32,4 @@ public slots:
 };
 
 #endif // MERPLYQUERYUI_H
+

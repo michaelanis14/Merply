@@ -13,15 +13,25 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 	this->setLayout(layout);
 
 	if(!strct.value("Source").toString().isEmpty() && strct.value("Source").toString().compare("_") != 0){
-		combox = new ERPComboBox(this,false);
-		layout->addRow(tr("Search"),combox);
-		field = combox;
+		if(!strct.value("Select").toString().isEmpty() && strct.value("Select").toString().compare("ALL") == 0){
+			MerplyQueryUI* q= new MerplyQueryUI(this);
+			q->fillDocumentID(strct.value("Source").toString());
+			layout->addRow(tr("Search"),q);
+			field = q;
+			}
 
-		if(strct.value("Editable").toString().compare("false") == 0)
-			combox->setEditable(false);
+		else{
 
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
-		Controller::Get()->getJsonEntityFieldsList(strct.value("Source").toString(),strct.value("Select").toString(),strct.value("Condition").toString());
+			combox = new ERPComboBox(this,false);
+			layout->addRow(tr("Search"),combox);
+			field = combox;
+
+			if(strct.value("Editable").toString().compare("false") == 0)
+				combox->setEditable(false);
+
+			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
+			Controller::Get()->getJsonEntityFieldsList(strct.value("Source").toString(),strct.value("Select").toString(),strct.value("Condition").toString());
+			}
 		}
 }
 
@@ -41,6 +51,9 @@ QString MerplyQuerySubField::getValue()
 				where += this->strct.value("AfterFilter").toString();
 			//qDebug() << __FILE__ << __LINE__  << where;
 			}
+		}
+	else if(QString(field->metaObject()->className()).compare("MerplyQueryUI") == 0 ){
+		qDebug() << __FILE__ << __LINE__  << "TODO";
 		}
 	return where;
 }

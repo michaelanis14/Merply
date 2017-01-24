@@ -86,6 +86,7 @@ void StructureVieweditSubFeildTableColumnQuery::updateSelectData(QList<QString> 
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	select->clear();
+	select->addItem("ALL");
 	select->addItem("ID");
 	select->addItems(fields);
 

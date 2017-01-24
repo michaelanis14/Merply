@@ -25,7 +25,8 @@ bool Prsistance::init()
 {
 	qDebug() << __FILE__ << __LINE__  <<"Init" << QCoreApplication::applicationDirPath()
 				;//<< Count("City::%\"");//<< Count("ViewStructure::Contact\"");
-	bool shipping = false;
+	//bool shipping = false;
+	bool shipping = true;
 
 	/*
 	if(Count("ContactType") == -1){

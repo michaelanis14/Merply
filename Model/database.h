@@ -17,6 +17,7 @@
 #include <libcouchbase/couchbase.h>
 #include <libcouchbase/n1ql.h>
 
+//#define DATABASE "default"
 #define DATABASE "AM"
 #define ORDERBY "رقم"
 

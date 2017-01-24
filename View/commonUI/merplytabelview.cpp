@@ -59,7 +59,7 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 
 	layout->addWidget(controllers);
 
-	queryUI = new MerplyQueryUI(this);
+	queryUI = new MerplyQueryUI(this,true);
 	layout->addWidget(queryUI);
 
 	tableView= new QTableView;
