@@ -16,14 +16,14 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 		if(!strct.value("Select").toString().isEmpty() && strct.value("Select").toString().compare("ALL") == 0){
 			MerplyQueryUI* q= new MerplyQueryUI(this);
 			q->fillDocumentID(strct.value("Source").toString());
-			layout->addRow(tr("Search"),q);
+			layout->addRow((strct.value("Label").toString()),q);
 			field = q;
 			}
 
 		else{
 
 			combox = new ERPComboBox(this,false);
-			layout->addRow(tr("Search"),combox);
+			layout->addRow((strct.value("Label").toString()),combox);
 			field = combox;
 
 			if(strct.value("Editable").toString().compare("false") == 0)

@@ -63,7 +63,7 @@ void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data,bool creat
 	QString key = viewStructure.value("document_id").toString().split("::").count() > 1?viewStructure.value("document_id").toString().split("::")[1]:"";
 	if(!key.isEmpty())
 		{
-
+		//this->viewStructure = viewStructure;
 		if( create || !Controller::Get()->isCachedCreateEditUI(key)){
 			CreateEditUI* p =  new CreateEditUI(0,viewStructure, data);
 			//qDebug() << __FILE__ << __LINE__ << "insertCachedCreateEditUI"<<key<< &p_instance;
@@ -76,8 +76,20 @@ void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data,bool creat
 			}
 		}
 	else if(!data.isEmpty()){
-		p_instance->clear();
-		p_instance->fill(QJsonObject(), data);
+		QStringList tbls =p_instance->getTabelsFieldNames(p_instance->viewStructure);
+		if(tbls.count() == 0){
+			p_instance->clear();
+			p_instance->fill(QJsonObject(), data);
+			}
+		else{
+
+			p_instance->data = data;
+			//qDebug()<<"INITTT" << p_instance->data;
+			QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),p_instance,SLOT(gotTabelsData(QVector<QJsonDocument>)));
+			Controller::Get()->getTabelsData(data.value("document_id").toString(),tbls);
+			return;
+			}
+		//	return; //TODO: PREVENT MULITPE LOADS with fill
 		}
 	else {
 		qDebug() << __FILE__ << __LINE__ << __FILE__ << __LINE__ << "ERRLOG" << viewStructure.value("document_id").toString() << "SPLIT COUNT";
@@ -128,6 +140,21 @@ void CreateEditUI::clearErrorsWidget()
 		child->deleteLater();  // TODO : check the stability of the app
 		}
 }
+
+QStringList CreateEditUI::getTabelsFieldNames(QJsonObject viewStructure)
+{
+	QStringList tbls;
+	foreach (QJsonValue vg, viewStructure.value("Viewgroups").toArray()) {
+		foreach (QJsonValue fields, vg.toObject().value("Viewgroup").toObject().value("Fields").toArray()) {
+			foreach (QJsonValue subfields, fields.toObject().value("SubFields").toArray()) {
+				if(subfields.toObject().value("Type").toString().compare("Table") == 0)
+					tbls.append(fields.toObject().value("Label").toString());
+				}
+			}
+		}
+	return tbls;
+}
+
 void CreateEditUI::paintEvent(QPaintEvent *)
 {
 	QStyleOption opt;
@@ -154,9 +181,12 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 					QString key = this->viewStructure.value("document_id").toString().replace("ViewStructure::","");
 
 					QJsonObject vgsSave = viewGroups->save();
-					vgsSave.insert("cas_value",this->cas);
-					QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
-					Controller::Get()->storeDoc(key,QJsonDocument(vgsSave));
+					//vgsSave.insert("cas_value",this->cas);
+					vgsSave.insert("document_id",key);
+					QObject::connect(Controller::Get(),SIGNAL(savedItems(bool)),this,SLOT(saved()));
+
+					Controller::Get()->createEditStore(vgsSave);
+					//	//Controller::Get()->storeDoc(key,QJsonDocument(vgsSave));
 
 					}
 				else{
@@ -164,8 +194,12 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 					//qDebug() << vgsSave;
 					vgsSave.insert("cas_value",this->cas);
 					vgsSave.insert("document_id",this->data.value("document_id").toString());
-					QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
-					Controller::Get()->UpdateDoc(QJsonDocument(vgsSave));
+					QObject::connect(Controller::Get(),SIGNAL(savedItems(bool)),this,SLOT(saved()));
+					Controller::Get()->createEditStore(vgsSave);
+
+
+					//QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
+					//Controller::Get()->UpdateDoc(QJsonDocument(vgsSave));
 					}
 
 
@@ -180,6 +214,24 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 		}
 
 
+}
+
+void CreateEditUI::gotTabelsData(QVector<QJsonDocument> tblsData)
+{
+	QObject::disconnect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),p_instance,SLOT(gotTabelsData(QVector<QJsonDocument>)));
+
+	//qDebug() <<"gotTabelsData"<< tblsData.first();
+//qDebug()<<"BEFOREEEE" << p_instance->data;
+	QStringList keys = tblsData.first().object().keys();
+	foreach(QString key,keys){
+		QJsonObject row;
+		row.insert("merplyTabel",tblsData.first().object().value(key).toArray());
+		p_instance->data.insert(key,row);
+		}
+	p_instance->clear();
+	//qDebug() << p_instance->data;
+	p_instance->fill(QJsonObject(), p_instance->data);
+	MainForm::Get()->ShowDisplay(p_instance);
 }
 
 void CreateEditUI::saved()

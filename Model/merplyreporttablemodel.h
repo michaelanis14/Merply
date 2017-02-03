@@ -58,6 +58,7 @@ private:
 	QJsonArray clmns;
 	QStringList clmnsHeader;
 	bool addedTotalRow;
+	QJsonArray dataArray;
 signals:
 	void equationColumnsSignal();
 	void done();

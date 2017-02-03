@@ -39,7 +39,7 @@ void StructureVieweditSubFeildTableColumnQuery::fill(QJsonObject strct)
 	//if(strct.value("FirstOP") != QJsonValue::Undefined)
 	//	firstOperation->setCurrentText(strct.value("FirstOP").toString());
 	if(strct.value("Label") != QJsonValue::Undefined)
-		label->setText(strct.value("BeforFilter").toString());
+		label->setText(strct.value("Label").toString());
 	else label->setText("Search");
 	if(strct.value("BeforFilter") != QJsonValue::Undefined)
 		beforeCondition->setText(strct.value("BeforFilter").toString());

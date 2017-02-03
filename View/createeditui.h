@@ -30,12 +30,14 @@ private:
 	QString cas;
 	QJsonObject data;
 	void clearErrorsWidget();
+	QStringList getTabelsFieldNames(QJsonObject viewStructure);
 signals:
 protected:
 	//void showEvent(QShowEvent *);
 	void paintEvent(QPaintEvent*event);
 public slots:
 	void controller_Clicked(QString nameAction);
+	void gotTabelsData(QVector<QJsonDocument> tblsData);
 	void saved();
 };
 

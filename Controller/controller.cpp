@@ -47,7 +47,7 @@ Controller::Controller(QObject *parent) :
 
 	//Worker* worker = new Worker();
 
-//	QObject::connect(this,SIGNAL(queryDatabase(QString)),Database::Get(),SLOT(query(QString)),Qt::QueuedConnection);
+	//	QObject::connect(this,SIGNAL(queryDatabase(QString)),Database::Get(),SLOT(query(QString)),Qt::QueuedConnection);
 	QObject::connect(Database::Get(),SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
 
 }
@@ -87,7 +87,7 @@ void Controller::showDisplay()
 	//	navigationUI::Get()->setParent(MainWindow::GetMainDisplay());
 
 	//
-//	Prsistance::init();
+	Prsistance::init();
 	//QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
 	//Database::Get()->getDoc("ViewStructure::5");
 
@@ -719,7 +719,7 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getReportData(QVector<QJsonDocument>)),Qt::QueuedConnection);
 
 		Database::Get()->query(clmns.value("QueryUI").toObject().value("Query").toString().replace("#QUERYMERPLY",""),false); //TODO: CACHED FLAGG
-	//	qDebug() << __FILE__ << __LINE__<<"getReport"  << clmns;
+		//	qDebug() << __FILE__ << __LINE__<<"getReport"  << clmns;
 		}
 	else if(clmns.value("Columns").isArray()){
 		//QJsonArray arr = (columns.value("Columns").toArray());
@@ -967,11 +967,95 @@ void Controller::query(QString query, bool cached)
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(queryData(QVector<QJsonDocument>)));
 	Database::Get()->query(query,cached);
 }
+
+bool Controller::createEditStore(QJsonObject document)
+{
+	if(!creatEditeItems.isEmpty())
+		creatEditeItems.clear();
+
+	QStringList keys = document.keys();
+	foreach(QString key,keys){
+		if(document.value(key).isObject())
+			if(document.value(key).toObject().value("merplyTabel") != QJsonValue::Undefined){
+				QJsonObject tbl  = document.value(key).toObject();
+				tbl.insert("FieldKey",key);
+				creatEditeItems.append(tbl);
+				document.remove(key);
+				//qDebug() << __FILE__ << __LINE__ << document.value(key).toObject().value("merplyTabel");
+				}
+		}
+	if(creatEditeItems.count() >  0){
+		QObject::disconnect(this,SIGNAL(saved(QString)),this,SLOT(createEditStoreItems(QString)));
+		QObject::connect(this,SIGNAL(saved(QString)),this,SLOT(createEditStoreItems(QString)));
+		//Controller::Get()->storeDoc(key,QJsonDocument(vgsSave));
+		}
+	else {
+		QObject::connect(this,SIGNAL(saved(QString)),this,SIGNAL(savedItems(bool)));
+		}
+
+	//qDebug() << __FILE__ << __LINE__ <<document.value("document_id").toString()<< document;
+
+	if(document.value("cas_value") != QJsonValue::Undefined)
+		Controller::Get()->UpdateDoc(QJsonDocument(document));
+	else
+		Controller::Get()->storeDoc(document.value("document_id").toString(),QJsonDocument(document));
+
+	QObject::disconnect(this,SIGNAL(saved(QString)),this,SIGNAL(savedItems(bool)));
+
+	return true;
+}
+void Controller::createEditStoreItems(QString key)
+{
+	QObject::disconnect(this,SIGNAL(saved(QString)),this,SLOT(createEditStoreItems(QString)));
+	bool success = true;
+	foreach(QJsonObject tbl,creatEditeItems){
+		QString id = QString(key.split("::")[0]).append(":").append(tbl.value("FieldKey").toString());
+		//qDebug() << __FILE__ << __LINE__ << id << key;
+		foreach(QJsonValue v,tbl.value("merplyTabel").toArray()){
+			QJsonObject row = v.toObject();
+			if(row.value(QString(key.split("::")[0])) == QJsonValue::Undefined){
+				row.insert(QString(key.split("::")[0]),key);
+				//qDebug() << __FILE__ << __LINE__ << "New Row" << row;
+				success = Controller::Get()->storeDoc(id,QJsonDocument(row));
+				}
+			else {
+				//qDebug() << __FILE__ << __LINE__ << "Update Row" << row;
+				success = Controller::Get()->UpdateDoc(QJsonDocument(row));
+				}
+			}
+		}
+	emit savedItems(success);
+}
+
+void Controller::getTabelsData(QString entity, QStringList tbls)
+{
+	int i = 0;
+	QString query;
+	query += "SELECT ";
+	QString strctID = entity.split("::")[0];
+	foreach(QString tbl,tbls){
+		if(i > 0)
+			query += " , ";
+
+		QString subQuery = "(SELECT `"+QString(DATABASE)+"`.*,meta(`"+QString(DATABASE)+"`).cas AS cas ,meta(`"+QString(DATABASE)+"`).id AS documentID "
+																																  "FROM `"+QString(DATABASE)+"` "
+																																							 "WHERE Meta(`"+QString(DATABASE)+"`).id LIKE '"+strctID+":"+tbl+"::%' AND `"+QString(DATABASE)+"`."+strctID+" LIKE '"+entity+"') AS `"+tbl+"` ";
+		query += subQuery;
+		i++;
+		}
+	//qDebug() << query;
+	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(queryData(QVector<QJsonDocument>)));
+	Database::Get()->query(query,false);
+}
+
+
 void Controller::queryData(QVector<QJsonDocument> items)
 {
 	//qDebug() << items <<"FSFSF";
 	emit gotReportData(items);
 }
+
+
 
 void Controller::setShowWarning(bool value)
 {

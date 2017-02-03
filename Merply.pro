@@ -60,7 +60,7 @@ LIBS += -L$${DESTDIR}/lib -lQtZint
 RESOURCES += \
     resources/resources.qrc
 
-macx: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/lib/ -lcouchbase
+macx: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/lib/ -lcouchbase
 
-INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/include
-DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/include
+INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
+DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include

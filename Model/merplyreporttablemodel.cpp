@@ -121,6 +121,7 @@ bool MerplyReportTableModel::insertRows(int row, int count, const QModelIndex& p
 		}
 	bool state = false;
 	beginInsertRows(parent, row, row+count-1);
+	dataArray.append(QJsonValue());
 	rowsCount = row +count;
 	cells.resize(colmnsCount * rowsCount);
 
@@ -141,6 +142,7 @@ bool MerplyReportTableModel::removeRows(int row, int count, const QModelIndex& p
 	//	qDebug() << __FILE__ << __LINE__  << cells.size() << row << row * this->colmnsCount;
 	for(int j = 0; j< colmnsCount; j++){
 		cells.removeAt(row * this->colmnsCount );
+		dataArray.removeAt(row);
 		}
 	//qDebug() << __FILE__ << __LINE__  << cells.count();
 	//cells.resize(colmnsCount * rowsCount);
@@ -173,7 +175,7 @@ QJsonArray MerplyReportTableModel::getJsonData()
 {
 	QJsonArray tabel;
 	for(int i = 0;i < rowsCount; i++){
-		QJsonObject row;
+		QJsonObject row = dataArray.at(i).toObject();
 		for(int j = 0; j< colmnsCount; j++){
 			QString data = cells[i * this->colmnsCount + j].getData();
 			if(!data.isEmpty()){
@@ -405,7 +407,7 @@ void MerplyReportTableModel::fillQuery(QVector<QJsonDocument> documents)
 
 void MerplyReportTableModel::fillText(QJsonArray data)
 {
-
+	this->dataArray = data;
 	cells =  QVector<TableCell>(colmnsCount * data.count());
 	rowsCount = data.count();
 	//qDebug() << rowCount();

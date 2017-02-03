@@ -124,6 +124,9 @@ public:
 	bool runQRPTDesingerapp();
 
 	void query(QString query,bool cached);
+
+	bool createEditStore(QJsonObject document);
+	QVector<QJsonObject> creatEditeItems;
 private:
 	explicit Controller(QObject * parent = 0);
 	static Controller* p_instance;
@@ -154,6 +157,9 @@ public slots:
 	void showCreateEditeValueUIData(QJsonDocument value);
 	void queryData(QVector<QJsonDocument> items);
 
+	void createEditStoreItems(QString key);
+	void getTabelsData(QString entity,QStringList tbls);
+
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void gotFieldsData(QList<QString> fields);
@@ -165,6 +171,7 @@ signals:
 	void gotJsonListData(QVector<QJsonDocument> items);
 	void queryDatabase(QString q);
 	void saved(QString document_id);
+	void savedItems(bool success);
 
 };
 

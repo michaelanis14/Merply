@@ -1,0 +1,109 @@
+SELECT `OrderIn`.`ID`,to_number(SPLIT(META(`Product`).id,'::')[1]) AS `رقم`,`Product`.`أسم الصنف`  AS `الصنف` ,`Product`.`كود الصنف` ,
+IFNULL(SUM(TONUMBER(`OrderIn`.`الكميه`)),0) AS `وارد`
+FROM `AM` `Product` 
+JOIN `AM` `OrderIn` ON KEY `OrderIn`.`ID` FOR  `Product`
+WHERE  Meta(`Product`).id LIKE 'Products::%'
+AND   Meta(`Product`).id LIKE 'Products::1423'
+AND Meta(`OrderIn`).id LIKE 'OrederIn:products::%'
+GROUP BY `OrderIn`.`ID`,to_number(SPLIT(META(`Product`).id,'::')[1]),`Product`.`كود الصنف`,`Product`.`أسم الصنف`
+
+
+UNION ALL
+
+SELECT `OrderOut`.`ID`,to_number(SPLIT(META(`Product`).id,'::')[1]) AS `رقم`,`Product`.`أسم الصنف`  AS `الصنف` ,`Product`.`كود الصنف` , IFNULL(SUM(TONUMBER(`OrderOut`.`الكميه`)),0) AS `منصرف` 
+FROM `AM` `Product` 
+JOIN `AM` `OrderOut` ON KEY `OrderOut`.`ID` FOR  `Product`
+WHERE  Meta(`Product`).id LIKE 'Products::%'
+AND   Meta(`Product`).id LIKE 'Products::1423'
+AND Meta(`OrderOut`).id LIKE 'OrderOut:products::%'
+GROUP BY `OrderOut`.`ID`,to_number(SPLIT(META(`Product`).id,'::')[1]),`Product`.`كود الصنف`,`Product`.`أسم الصنف`
+
+UNION ALL
+
+SELECT `Returns`.`ID`,to_number(SPLIT(META(`Product`).id,'::')[1]) AS `رقم`,`Product`.`أسم الصنف`  AS `الصنف` ,`Product`.`كود الصنف` , IFNULL(SUM(TONUMBER(`Returns`.`الكميه`)),0) AS `مرتجع` 
+FROM `AM` `Product` 
+JOIN `AM` `Returns` ON KEY `Returns`.`ID` FOR  `Product`
+WHERE  Meta(`Product`).id LIKE 'Products::%'
+AND   Meta(`Product`).id LIKE 'Products::1423'
+AND Meta(`Returns`).id LIKE 'Returns:products::%'
+GROUP BY `Returns`.`ID`,to_number(SPLIT(META(`Product`).id,'::')[1]),`Product`.`كود الصنف`,`Product`.`أسم الصنف`
+
+
+UNION ALL
+
+(
+SELECT `TrnsfrTo`.`ID`,to_number(SPLIT(META(`Product`).id,'::')[1]) AS `رقم`,`Product`.`أسم الصنف`  AS `الصنف` ,`Product`.`كود الصنف` , IFNULL(SUM(TONUMBER(`TrnsfrTo`.`الكميه`)),0) AS `تحويلات الى` 
+FROM `AM` `Product` 
+JOIN `AM` `TrnsfrTo` ON KEY `TrnsfrTo`.`ID` FOR  `Product`
+WHERE  Meta(`Product`).id LIKE 'Products::%'
+
+AND   Meta(`Product`).id LIKE 'Products::1423'
+
+AND Meta(`TrnsfrTo`).id LIKE 'TransferTo:products::%'
+GROUP BY `TrnsfrTo`.`ID`,to_number(SPLIT(META(`Product`).id,'::')[1]),`Product`.`كود الصنف`,`Product`.`أسم الصنف`
+
+)
+UNION ALL
+(
+SELECT `TransferFrm`.`ID`,to_number(SPLIT(META(`Product`).id,'::')[1]) AS `رقم`,`Product`.`أسم الصنف`  AS `الصنف` ,`Product`.`كود الصنف` , IFNULL(SUM(TONUMBER(`TransferFrm`.`الكميه`)),0) AS `تحويلات من` 
+FROM `AM` `Product` 
+JOIN `AM` `TransferFrm` ON KEY `TransferFrm`.`ID` FOR  `Product`
+WHERE  Meta(`Product`).id LIKE 'Products::%'
+
+AND   Meta(`Product`).id LIKE 'Products::1423'
+
+AND Meta(`TransferFrm`).id LIKE 'TransferFrom:products::%'
+GROUP BY `TransferFrm`.`ID`,to_number(SPLIT(META(`Product`).id,'::')[1]),`Product`.`كود الصنف`,`Product`.`أسم الصنف`
+
+)
+
+UNION ALL 
+
+ 
+SELECT (
+
+SELECT IFNULL(SUM(TONUMBER(`OrderIn`.`الكميه`)),0) AS AA
+
+FROM `AM` `Product` 
+JOIN `AM` `OrderIn` ON KEY `OrderIn`.`ID` FOR  `Product`
+WHERE  Meta(`Product`).id LIKE 'Products::%'
+AND   Meta(`Product`).id LIKE 'Products::1423'
+AND Meta(`OrderIn`).id LIKE 'OrederIn:products::%'
+)[0].AA-
+
+(
+SELECT  IFNULL(SUM(TONUMBER(`OrderOut`.`الكميه`)),0) AS AB
+FROM `AM` `Product` 
+JOIN `AM` `OrderOut` ON KEY `OrderOut`.`ID` FOR  `Product`
+WHERE  Meta(`Product`).id LIKE 'Products::%'
+AND   Meta(`Product`).id LIKE 'Products::1423'
+AND Meta(`OrderOut`).id LIKE 'OrderOut:products::%'
+)[0].AB
++
+(
+SELECT IFNULL(SUM(TONUMBER(`Returns`.`الكميه`)),0) AS AC
+FROM `AM` `Product` 
+JOIN `AM` `Returns` ON KEY `Returns`.`ID` FOR  `Product`
+WHERE  Meta(`Product`).id LIKE 'Products::%'
+AND   Meta(`Product`).id LIKE 'Products::1423'
+AND Meta(`Returns`).id LIKE 'Returns:products::%' 
+)[0].AC
++
+(
+SELECT IFNULL(SUM(TONUMBER(`TrnsfrTo`.`الكميه`)),0) AS AD
+FROM `AM` `Product` 
+JOIN `AM` `TrnsfrTo` ON KEY `TrnsfrTo`.`ID` FOR  `Product`
+WHERE  Meta(`Product`).id LIKE 'Products::%'
+AND   Meta(`Product`).id LIKE 'Products::1423'
+AND Meta(`TrnsfrTo`).id LIKE 'TransferTo:products::%'
+)[0].AD
+
+-
+(
+SELECT IFNULL(SUM(TONUMBER(`TransferFrm`.`الكميه`)),0) AS AE
+FROM `AM` `Product` 
+JOIN `AM` `TransferFrm` ON KEY `TransferFrm`.`ID` FOR  `Product`
+WHERE  Meta(`Product`).id LIKE 'Products::%'
+AND   Meta(`Product`).id LIKE 'Products::1423'
+AND Meta(`TransferFrm`).id LIKE 'TransferFrom:products::%'
+)[0].AE AS total
