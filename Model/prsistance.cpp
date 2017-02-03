@@ -971,7 +971,6 @@ bool Prsistance::init()
 			}
 		}
 
-/*
 	if(Count("OrederIn::%\"") == 0){
 
 
@@ -1000,7 +999,7 @@ bool Prsistance::init()
 		for(int i = 0; i < fileData.count();i++){
 
 			QStringList data = fileData.at(i).split(",");
-			qDebug() << QString(data.at(15)) << QString(data.at(15)).toInt() << QString(data.at(15)).toDouble();
+		//	qDebug() << QString(data.at(15)) << QString(data.at(15)).toInt() << QString(data.at(15)).toDouble();
 			if(QString(data.at(15)).toDouble() > 0){
 				QJsonObject row ;
 				row.insert("ID",QString("Products::").append(data.at(0)));
@@ -1016,16 +1015,17 @@ bool Prsistance::init()
 		if(!tblProd.isEmpty())
 			c.insert("products",tblProd);
 		if(!c.isEmpty()){
-			Database::Get()->storeDoc("OrederIn",QJsonDocument(c));
+			c.insert("document_id","OrederIn");
+			Controller::Get()->createEditStore(c);
 			}
 
 
 		}
 
 
-*/
 
-	if(Count("OrederIn::%\"") == 0){
+
+	if(Count("OrederIn::%\"") < 10){
 
 		Database::Get()->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> stores = Database::Get()->getArray();
