@@ -1,4 +1,4 @@
-#include "Viewgroups.h"
+#include "viewgroups.h"
 #include "controller.h"
 
 #include "structureviewgroupsui.h"
