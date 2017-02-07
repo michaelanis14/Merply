@@ -168,7 +168,8 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 	if(nActon.count() > 1){
 
 		if(nActon.at(1).compare("Cancel") == 0){
-			Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
+			IndexUI::ShowUI(this->viewStructure.value("document_id").toString(),QVector<QJsonDocument>());
+			//Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 			}
 		else if(nActon.at(1).compare("Save") == 0){
 			this->clearErrorsWidget();

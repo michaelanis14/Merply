@@ -441,6 +441,7 @@ void MerplyReportTableModel::fillIndexTabel( QVector<QJsonDocument> items)
 	int i = 0;
 
 	cells = QVector<TableCell>(colmnsCount * items.count());
+	beginResetModel();
 	foreach(QJsonDocument item,items){
 		QString  key = item.object().value("document_id").toString();
 		int j = 0;
@@ -449,12 +450,12 @@ void MerplyReportTableModel::fillIndexTabel( QVector<QJsonDocument> items)
 			cells[i * this->colmnsCount + j].setId(key);
 
 		foreach(QString keyData,item.object().keys()){
-			//qDebug() << __FILE__ << __LINE__  <<"Filllll"<< keyData << clmnsHeader.indexOf(keyData);
+			qDebug() << __FILE__ << __LINE__  <<"Filllll"<< keyData << clmnsHeader.indexOf(keyData);
 			int clmnIndex = clmnsHeader.indexOf(keyData);
 			if(clmnIndex > -1){
 				QString valueString;
 				valueString = Controller::Get()->toString(item.object().value(keyData));
-			//	qDebug() << __FILE__ << __LINE__  <<"valueString"<< valueString;
+		//		qDebug() << __FILE__ << __LINE__  <<"valueString"<< valueString;
 
 				cells[(i * this->colmnsCount) + clmnIndex].setId(key);
 				QString dtoCompare = QString::fromUtf8("تاريخ");
@@ -495,6 +496,9 @@ void MerplyReportTableModel::fillIndexTabel( QVector<QJsonDocument> items)
 		i++;
 		}
 	rowsCount = i;
+endResetModel();
+//	if(this->rowsCount == 0)
+//		this->rowsCount = 1;
 
 	int r=this->rowsCount-1;
 	int c=this->colmnsCount-1;

@@ -2,10 +2,12 @@
 #define MERPLYQUERYUI_H
 
 #include "erpcombobox.h"
+#include "merplyquerysubfield.h"
 
 #include <QHBoxLayout>
 #include <QObject>
 #include <QWidget>
+#include <QPushButton>
 
 class MerplyQueryUI : public QWidget
 {
@@ -15,10 +17,12 @@ public:
 	void fill(QJsonObject strct);
 	void fillEntityQuery(QJsonObject strct);
 	void fillDocumentID(QString document_id);
+	QString getFields(QString entity);
 private:
-	 bool btnFilter;
+	bool btnFilterFlag;
+	QPushButton* btnFilter;
 	QHBoxLayout *layout;
-	QVector<QWidget*> fields;
+	QVector<MerplyQuerySubField*> fields;
 	QString document_id;
 	QJsonObject strct;
 	void clear();
@@ -28,6 +32,7 @@ public slots:
 	void fillData(QJsonDocument strct);
 	void generateQuery();
 	void gotData(QVector<QJsonDocument> items);
+	void disablebutton();
 
 };
 

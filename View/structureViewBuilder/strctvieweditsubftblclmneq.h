@@ -34,6 +34,7 @@ private:
 	bool firstOperand;
 	QStringList ops ;
 	QStringList conditions ;
+	QJsonObject data;
 signals:
 
 public slots:

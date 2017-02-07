@@ -48,10 +48,10 @@ void Database::on_stored_status (lcb_t instance, const void *, lcb_storage_t ,
 		card.append("::%");
 		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
 
-		if(Database::Get()->cachedArrayDocuments.contains(query)){
+		//if(Database::Get()->cachedArrayDocuments.contains(query)){
 		//	qDebug() << "CONTAINNNNS THE Q";
-			Database::Get()->cachedArrayDocuments.remove(query);
-			}
+		//	Database::Get()->cachedArrayDocuments.remove(query);
+		//	}
 
 		emit Database::Get()->saved(Database::Get()->LastKeyID);
 		}
@@ -110,7 +110,7 @@ bool Database::updateDoc(QJsonDocument document)
 
 	lcb_error_t err = lcb_store(instance, NULL, 1, &cmdlist);
 	if (err == LCB_SUCCESS) {
-		lcb_wait(instance);
+		//lcb_wait(instance);
 		} else {
 		fprintf(stderr, "Couldn’t schedule operation: %s\n", lcb_strerror(instance, err));
 		qDebug() << __FILE__ << __LINE__ << __FILE__ << __LINE__ << "ERRLOG" << document;
@@ -149,7 +149,7 @@ bool Database::deleteDoc(QString documentid)
 		printf("Couldn't schedule remove operation: %s\n", lcb_strerror(instance, err));
 		return false;
 		} else {
-		lcb_wait(instance);
+		//lcb_wait(instance);
 		Database::KillDatabase(instance);
 		return true;
 		}
@@ -169,9 +169,8 @@ connStr = "couchbase://localhost/"+QString(DATABASE);
 
 	//connStr = "couchbase://ec2-35-166-198-84.us-west-2.compute.amazonaws.com/"+QString(DATABASE);
 
-//	connStr = "couchbase://138.68.70.131/"+QString(DATABASE);
 
-
+connStr = "couchbase://139.59.149.28/"+QString(DATABASE);
 
 
 
@@ -306,7 +305,7 @@ bool Database::getDoc(QString key) {
 
 	lcb_error_t err = lcb_get(instance, NULL, 1, cmdlist);
 	if (err == LCB_SUCCESS) {
-		lcb_wait(instance);
+		//lcb_wait(instance);
 		Database::KillDatabase(instance);
 		return true;
 		}
@@ -342,7 +341,7 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 		//	qDebug() << __FILE__ << __LINE__  << Database::Get()->array;
 
 		//Database::Get()->document = QJsonDocument(Database::Get()->array);
-		Database::Get()->cachedArrayDocuments.insert(Database::Get()->lastQuery,Database::Get()->array);
+//		Database::Get()->cachedArrayDocuments.insert(Database::Get()->lastQuery,Database::Get()->array);
 
 		Database::Get()->emit gotDocuments(Database::Get()->array);
 
@@ -355,11 +354,11 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 void Database::query(QString query,bool cached)
 {
 
-	if(cached && Database::Get()->cachedArrayDocuments.contains(query)){
+	//if(cached && Database::Get()->cachedArrayDocuments.contains(query)){
 	//	qDebug() << "cachedQ:" << query;
-		emit (gotDocuments(Database::Get()->cachedArrayDocuments.value(query)));
-		return;
-		}
+	//	emit (gotDocuments(Database::Get()->cachedArrayDocuments.value(query)));
+	//	return;
+	//	}
 //
 	qDebug() << __FILE__ << __LINE__ <<"Query:: " << query;
 	this->lastQuery = query;
@@ -383,7 +382,7 @@ void Database::query(QString query,bool cached)
 	lcb_error_t rc = lcb_n1ql_query(instance, NULL, &cmd);
 	if(rc == LCB_SUCCESS){
 		lcb_n1p_free(nparams);
-		lcb_wait(instance);
+		//lcb_wait(instance);
 
 		//qDebug() << __FILE__ << __LINE__  << "sucess q" << query;
 		Database::KillDatabase(instance);
@@ -393,7 +392,7 @@ void Database::query(QString query,bool cached)
 	else{
 		qDebug() << __FILE__ << __LINE__  << "FAIL query" << query;
 		lcb_n1p_free(nparams);
-		lcb_wait(instance);
+		//lcb_wait(instance);
 		Database::KillDatabase(instance);
 		//return false;
 		}
@@ -471,7 +470,7 @@ bool Database::storeDoc(QString key,QJsonDocument document) {
 
 	lcb_error_t err = lcb_store(instance, NULL, 1, &cmdlist);
 	if (err == LCB_SUCCESS) {
-		lcb_wait(instance);
+		//lcb_wait(instance);
 		return Database::KillDatabase(instance);
 		}
 	else {
@@ -495,7 +494,7 @@ Database::Database():
 	this->array = QVector<QJsonDocument>();
 	this->connIssue = false;
 	cachedDocuments =  QMap<QString,QJsonDocument>();
-	cachedArrayDocuments =  QMap<QString,QVector<QJsonDocument> >();
+	//cachedArrayDocuments =  QMap<QString,QVector<QJsonDocument> >();
 	//IncrementKey("cont");
 	/*
 	// initializing

@@ -70,8 +70,8 @@ private:
 	QVector<QJsonDocument> array;
 	bool connIssue;
 	QMap<QString,QJsonDocument> cachedDocuments;
-	QMap<QString,QVector<QJsonDocument> > cachedArrayDocuments;
-
+	//QMap<QString,QVector<QJsonDocument> > cachedArrayDocuments;
+	int waitCounter;
 	//	QString value;
 
 public slots :

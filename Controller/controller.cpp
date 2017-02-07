@@ -87,7 +87,7 @@ void Controller::showDisplay()
 	//	navigationUI::Get()->setParent(MainWindow::GetMainDisplay());
 
 	//
-	Prsistance::init();
+	//Prsistance::init();
 	//QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
 	//Database::Get()->getDoc("ViewStructure::5");
 
@@ -123,8 +123,8 @@ void Controller::subNavPressed(QJsonObject view)
 			if(view.value("Select").toString().contains("Index")){
 				QString card = view.value("Card").toString();
 				//qDebug() << __FILE__ << __LINE__  <<"Cards"<< card;
-				queryIndexView(card);
-
+				//queryIndexView(card);
+				IndexUI::ShowUI(card,QVector<QJsonDocument>());
 				}
 			else{
 				QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedData(QJsonDocument)));

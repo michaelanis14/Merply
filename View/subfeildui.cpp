@@ -160,7 +160,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		QLineEdit* lineEdit = new QLineEdit();
 		field = lineEdit;
 		lineEdit->setContentsMargins(0,0,0,0);
-		lineEdit->setEnabled(false);
+		//lineEdit->setEnabled(false);
 		QString dataString = data.toString();
 		if(!dataString.isEmpty()){
 			lineEdit->setText(dataString);

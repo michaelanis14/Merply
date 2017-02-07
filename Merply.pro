@@ -12,8 +12,8 @@ TARGET = MERPLY
 TEMPLATE = app
 
 INCLUDEPATH +=  View\
-		Model\
-		Controller \
+                Model\
+                Controller \
 
 SOURCES += main.cpp
 
@@ -64,3 +64,9 @@ macx: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/l
 
 INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
 DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
+
+win32:CONFIG(release, debug|release): LIBS += -LC:/libcouchbase/lib/ -llibcouchbase
+else:win32:CONFIG(debug, debug|release): LIBS += -LC:/libcouchbase/lib/ -llibcouchbase_d
+
+INCLUDEPATH += C:/libcouchbase/include
+DEPENDPATH += C:/libcouchbase/include

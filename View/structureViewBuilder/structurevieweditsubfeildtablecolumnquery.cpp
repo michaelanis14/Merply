@@ -10,6 +10,7 @@ StructureVieweditSubFeildTableColumnQuery::StructureVieweditSubFeildTableColumnQ
 	layout->setSpacing(1);
 
 	label = new QLineEdit;
+	entity = new QLineEdit;
 	beforeCondition = new QTextEdit;
 	source = new ERPComboBox;
 	select = new ERPComboBox;
@@ -25,6 +26,7 @@ StructureVieweditSubFeildTableColumnQuery::StructureVieweditSubFeildTableColumnQ
 	//		layout->addRow(tr("First OP"),firstOperation);
 	//		}
 	layout->addRow(tr("Label"),label);
+	layout->addRow(tr("Entity"),entity);
 	layout->addRow(tr("Before Filter"),beforeCondition);
 	layout->addRow(tr("Source"),source);
 	layout->addRow(tr("Select"),select);
@@ -43,6 +45,8 @@ void StructureVieweditSubFeildTableColumnQuery::fill(QJsonObject strct)
 	else label->setText("Search");
 	if(strct.value("BeforFilter") != QJsonValue::Undefined)
 		beforeCondition->setText(strct.value("BeforFilter").toString());
+	if(strct.value("Entity") != QJsonValue::Undefined)
+		entity->setText(strct.value("Entity").toString());
 	if(strct.value("Source") != QJsonValue::Undefined){
 		QString sour = strct.value("Source").toString().split("::").count() > 1 ?strct.value("Source").toString().split("::")[1]:strct.value("Source").toString();
 		source->setCurrentIndex(source->keys.indexOf(QString("ViewStructure::"+sour)));
@@ -61,6 +65,8 @@ QJsonObject StructureVieweditSubFeildTableColumnQuery::save()
 {
 	QJsonObject save;
 	save.insert("Label",label->text());
+	if(!entity->text().isEmpty())
+		save.insert("Entity",entity->text());
 	if(!beforeCondition->toPlainText().trimmed().isEmpty())
 		save.insert("BeforFilter",beforeCondition->toPlainText().trimmed());
 	save.insert("Source",source->getKey());
@@ -87,7 +93,7 @@ void StructureVieweditSubFeildTableColumnQuery::updateSelectData(QList<QString> 
 	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	select->clear();
 	select->addItem("ALL");
-	select->addItem("ID");
+	//select->addItem("ID");
 	select->addItems(fields);
 
 	if(strct.value("Select") != QJsonValue::Undefined){

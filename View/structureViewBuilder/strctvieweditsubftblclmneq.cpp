@@ -102,43 +102,45 @@ void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 {
 	//qDebug() << __FILE__ << __LINE__  << data;
 	//if(data.value("SecondColmn") != QJsonValue::Undefined){
-	if(firstOperand)
-		firstOperation->setCurrentIndex(data.value("FirstOperation").toInt());
-	if(data.value("FirstColumn") != QJsonValue::Undefined){
-		columnOne->setCurrentIndex(data.value("FirstColumn").toInt());
-		if(columnOne->currentIndex() == -1)
-			columnOne->setCurrentIndex(0);
+	this->data = data;
+	if(columnOne->count() > 0 ){
+		if(firstOperand)
+			firstOperation->setCurrentIndex(data.value("FirstOperation").toInt());
+		if(data.value("FirstColumn") != QJsonValue::Undefined){
+			columnOne->setCurrentIndex(data.value("FirstColumn").toInt());
+			if(columnOne->currentIndex() == -1)
+				columnOne->setCurrentIndex(0);
+			}
+		if(data.value("Operation") != QJsonValue::Undefined)
+			operation->setCurrentIndex(data.value("Operation").toInt());
+		if(data.value("SecondColmn") != QJsonValue::Undefined){
+			secondTerm->setCurrentIndex(0);
+			//qDebug() << __FILE__ << __LINE__  << data.value("SecondColmn").toInt();
+			columnTwo->setCurrentIndex(data.value("SecondColmn").toInt());
+			if(columnTwo->currentIndex() == -1)
+				columnTwo->setCurrentIndex(0);
+			}
+		else {
+			secondTerm->setCurrentIndex(1);
+			if(data.value("Number") != QJsonValue::Undefined)
+				numbers->setText(data.value("Number").toString().trimmed());
+			}
+		if(data.value("ConditionColumnOne") != QJsonValue::Undefined){
+			conditionOnOne->setCurrentIndex(data.value("ConditionOnOne").toInt());
+			conditionColumnOne->setCurrentIndex(data.value("ConditionColumnOne").toInt());
+			}
+		if(data.value("ConditionColumnTwo") != QJsonValue::Undefined){
+			conditionOnTwo->setCurrentIndex(data.value("ConditionOnTwo").toInt());
+			conditionColumnTwo->setCurrentIndex(data.value("ConditionColumnTwo").toInt());
+			}
 		}
-	if(data.value("Operation") != QJsonValue::Undefined)
-		operation->setCurrentIndex(data.value("Operation").toInt());
-	if(data.value("SecondColmn") != QJsonValue::Undefined){
-		secondTerm->setCurrentIndex(0);
-		//qDebug() << __FILE__ << __LINE__  << data.value("SecondColmn").toInt();
-		columnTwo->setCurrentIndex(data.value("SecondColmn").toInt());
-		if(columnTwo->currentIndex() == -1)
-			columnTwo->setCurrentIndex(0);
-		}
-	else {
-		secondTerm->setCurrentIndex(1);
-		if(data.value("Number") != QJsonValue::Undefined)
-			numbers->setText(data.value("Number").toString().trimmed());
-		}
-	if(data.value("ConditionColumnOne") != QJsonValue::Undefined){
-		conditionOnOne->setCurrentIndex(data.value("ConditionOnOne").toInt());
-		conditionColumnOne->setCurrentIndex(data.value("ConditionColumnOne").toInt());
-		}
-	if(data.value("ConditionColumnTwo") != QJsonValue::Undefined){
-		conditionOnTwo->setCurrentIndex(data.value("ConditionOnTwo").toInt());
-		conditionColumnTwo->setCurrentIndex(data.value("ConditionColumnTwo").toInt());
-		}
-
 
 }
 
 void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QVector<QJsonDocument> > list)
 {
-	int oldClmnOneIndex = columnOne->currentIndex();
-	int oldClmnTwoIndex = columnTwo->currentIndex();
+	//int oldClmnOneIndex = columnOne->currentIndex();
+	//int oldClmnTwoIndex = columnTwo->currentIndex();
 	columnOne->clear();
 	columnTwo->clear();
 	foreach(QVector<QJsonDocument> table,list){
@@ -152,8 +154,10 @@ void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QVector<QJ
 			i++;
 			}
 		}
-	columnOne->setCurrentIndex(oldClmnOneIndex);
-	columnTwo->setCurrentIndex(oldClmnTwoIndex);
+	fill(this->data);
+	//columnOne->setCurrentIndex(oldClmnOneIndex);
+	//columnTwo->setCurrentIndex(oldClmnTwoIndex);
+
 }
 
 void StructureVieweditSubFeildTableColumnEquation::updateColmnTwo(int index)

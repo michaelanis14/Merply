@@ -13,13 +13,14 @@ DateFilterUI::DateFilterUI(QWidget *parent) : QWidget(parent)
 
 	from = new QDateTimeEdit();
 	//from->setDateTime(QDateTime::currentDateTime());
-	from->setDateTime(QDateTime::fromString("1990-1-1",Qt::ISODate));
+	//from->setDateTime(QDateTime::fromString("1990-1-1",Qt::ISODate));
+	from->setDateTime(QDateTime::currentDateTime().addDays(-1));
 	from->setDisplayFormat("dd/MM/yyyy");
 	layout->addRow(tr("From :"),from);
 
 
 	to = new QDateTimeEdit();
-	to->setDateTime(QDateTime::currentDateTime().addDays(1));
+	to->setDateTime(QDateTime::currentDateTime());
 	to->setDisplayFormat("dd/MM/yyyy");
 	layout->addRow(tr("To :"),to);
 

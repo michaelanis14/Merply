@@ -759,8 +759,8 @@ bool Prsistance::init()
 				Database::Get()->storeDoc("Products",QJsonDocument(c));
 				idx++;
 				}
-			if (i % 100 == 0)
-				QThread::sleep(2);
+			//if (i % 100 == 0)
+				//QThread::sleep(2);
 			}
 		}
 
@@ -1429,7 +1429,7 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 	//QString query ="SELECT Array item.`"+select.trimmed()+"` FOR item IN f END As `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f WHERE  META(d).id LIKE '"+entities+"::%' "+where;
 
 
-	QString query = "SELECT  d.`"+select.trimmed()+"` AS `Value`,META(d).id AS `Key`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where+" ORDER BY `BB` ";
+	QString query = "SELECT  d.`"+select.trimmed()+"` AS `Value`,META(d).id AS `Key`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where+" AND  `d`.`"+select.trimmed()+"` IS NOT NULL ORDER BY `BB` ";
 	qDebug() << __FILE__ << __LINE__ << query;
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QVector<QJsonDocument>)));
 	Database::Get()->query(query,true);

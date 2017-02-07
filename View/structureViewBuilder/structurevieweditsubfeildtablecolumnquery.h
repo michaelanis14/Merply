@@ -20,6 +20,7 @@ private:
 	QFormLayout *layout;
 	//ERPComboBox* firstOperation;
 	QLineEdit* label;
+	QLineEdit* entity;
 	QTextEdit* beforeCondition;
 	ERPComboBox* source;
 	ERPComboBox* select;

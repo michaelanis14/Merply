@@ -11,12 +11,13 @@ class MerplyQuerySubField : public QWidget
 	Q_OBJECT
 public:
 	explicit MerplyQuerySubField(QJsonObject strct,QWidget *parent = 0);
-	QString getValue();
+	QString getValue(QString entity);
 private:
 	QFormLayout * layout;
 	ERPComboBox* combox;
 	QWidget* field;
 	QJsonObject strct;
+
 signals:
 
 public slots:
