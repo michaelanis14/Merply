@@ -139,8 +139,8 @@ void StructureVieweditSubFeildTableColumnEquation::fill(QJsonObject data)
 
 void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QVector<QJsonDocument> > list)
 {
-	//int oldClmnOneIndex = columnOne->currentIndex();
-	//int oldClmnTwoIndex = columnTwo->currentIndex();
+	int oldClmnOneIndex = columnOne->currentIndex();
+	int oldClmnTwoIndex = columnTwo->currentIndex();
 	columnOne->clear();
 	columnTwo->clear();
 	foreach(QVector<QJsonDocument> table,list){
@@ -154,9 +154,9 @@ void StructureVieweditSubFeildTableColumnEquation::gotclmnsData(QList<QVector<QJ
 			i++;
 			}
 		}
-	fill(this->data);
-	//columnOne->setCurrentIndex(oldClmnOneIndex);
-	//columnTwo->setCurrentIndex(oldClmnTwoIndex);
+	//fill(this->data);
+	columnOne->setCurrentIndex(oldClmnOneIndex);
+	columnTwo->setCurrentIndex(oldClmnTwoIndex);
 
 }
 

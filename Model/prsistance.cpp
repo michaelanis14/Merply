@@ -760,7 +760,7 @@ bool Prsistance::init()
 				idx++;
 				}
 			//if (i % 100 == 0)
-				//QThread::sleep(2);
+			//QThread::sleep(2);
 			}
 		}
 
@@ -999,7 +999,7 @@ bool Prsistance::init()
 		for(int i = 0; i < fileData.count();i++){
 
 			QStringList data = fileData.at(i).split(",");
-		//	qDebug() << QString(data.at(15)) << QString(data.at(15)).toInt() << QString(data.at(15)).toDouble();
+			//	qDebug() << QString(data.at(15)) << QString(data.at(15)).toInt() << QString(data.at(15)).toDouble();
 			if(QString(data.at(15)).toDouble() > 0){
 				QJsonObject row ;
 				row.insert("ID",QString("Products::").append(data.at(0)));
@@ -1025,7 +1025,7 @@ bool Prsistance::init()
 
 
 
-	if(Count("OrederIn::%\"") < 10){
+	if(Count("OrederIn::%\"") < 0){
 
 		Database::Get()->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> stores = Database::Get()->getArray();
@@ -1085,7 +1085,7 @@ bool Prsistance::init()
 						newReturn = false;
 						}
 					}
-					if(0 < data.count() && !data.at(11).trimmed().isEmpty()){
+				if(0 < data.count() && !data.at(11).trimmed().isEmpty()){
 					bool ok = false;
 					double num = QString(data.at(11).trimmed()).toDouble(&ok);
 					if(num > 0){
@@ -1341,13 +1341,570 @@ save:
 				}
 			if (i % 100 == 0){
 				qDebug() << __FILE__ << __LINE__ << i <<"OrderIn:"<<idxOrderIn <<" OrderOut:"<<idxOrderOut<<" Returns:"<<idxReturns;
-			//	QThread::sleep(2);
+				//	QThread::sleep(2);
 				}
 			qDebug() << i;
 			}
 
 		}
 	//if()
+
+
+
+
+
+
+	if(Count("OrderOut::%\"") < 10){
+
+		Database::Get()->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
+		QVector<QJsonDocument> stores = Database::Get()->getArray();
+
+		Database::Get()->query("SELECT `d`.`أسم العميل` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `AM` d WHERE meta(`d`).id LIKE 'clients::%' ORDER BY `BB` ",false);
+		QVector<QJsonDocument> clients = Database::Get()->getArray();
+
+		Database::Get()->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
+		QVector<QJsonDocument> products = Database::Get()->getArray();
+
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+		//qDebug() << fileData;
+		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		int currentID = -1;
+		QJsonObject c;
+		QJsonObject tblProd;
+		QJsonArray rowsProd;
+		int idxOrderOut = 0;
+
+		for(int i = 1; i < fileData.count();i++){
+
+			QStringList data = fileData.at(i).split(",");
+			int newID;
+			//	qDebug() << __FILE__ << __LINE__ << "fileDataOrderOut"<<fileData.count() << QString(data.at(11)).toDouble();
+
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				newID =  data.at(1).toInt();
+				}
+
+			if(0 < data.count() && !data.at(5).trimmed().isEmpty()
+					&& QString(data.at(11)).toDouble() > 0
+					&& newID == currentID){
+
+				QJsonObject row ;
+				row.insert("ID",QString("Products::").append(data.at(3)));
+				if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+					row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
+				else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+				row.insert("الكميه",QString(data.at(11)).toDouble());
+				rowsProd.append(row);
+				if(!rowsProd.isEmpty())
+					tblProd.insert("merplyTabel",rowsProd);
+				}
+			else {
+
+				if(!tblProd.isEmpty())
+					c.insert("products",tblProd);
+				if(!c.isEmpty()){
+					c.insert("document_id","OrderOut");
+					Controller::Get()->createEditStore(c);
+					//Database::Get()->storeDoc("OrderOut",QJsonDocument(c));
+					idxOrderOut++;
+					}
+				foreach(QString k,tblProd.keys())
+					tblProd.remove(k);
+				foreach(QString k,c.keys())
+					c.remove(k);
+
+				int rowsProdSize = rowsProd.size();
+				for(int kk = 0; kk <rowsProdSize; kk++){
+					//qDebug()<<rowsProd.size()  << kk;
+					rowsProd.removeFirst();
+					//	qDebug()<<rowsProd.size() << kk;
+					}
+
+				if(0 < data.count() && !data.at(5).trimmed().isEmpty()
+						&& QString(data.at(11)).toDouble() > 0){
+					currentID = newID;
+
+
+
+					QDateTime d = QDateTime::fromString(data.at(2),"yyyy-MM-dd hh:mm:ss");
+					//qDebug() <<data.at(2)<< d.toString(Qt::ISODate);
+					c.insert("تاريخ" ,d.toString(Qt::ISODate));
+					c.insert("رقم",currentID);
+					{
+					QJsonObject cc;
+					cc.insert("Key","Stores::"+data.at(23));
+					if(stores.at(data.at(23).toInt()).object().value("N") != QJsonValue::Undefined)
+						cc.insert("Value",stores.at(data.at(23).toInt()).object().value("N").toString());
+					else cc.insert("Value",QString("S").append(QString::number(stores.at(data.at(23).toInt()).object().value("BB").toInt())));
+					c.insert("المخزن",cc);
+					}
+
+					QJsonObject cc;
+					cc.insert("Key","clients::"+data.at(5));
+					cc.insert("Value",clients.at(data.at(5).toInt()).object().value("N").toString());
+					c.insert("العميل",cc);
+
+
+					i--;
+					}
+
+				else {
+					currentID = -1;
+					}
+
+				}
+
+			if (i % 100 == 0){
+				//	qDebug() << __FILE__ << __LINE__ << i <<"OrderIn:"<<idxOrderIn <<" OrderOut:"<<idxOrderOut<<" Returns:"<<idxReturns;
+				//	QThread::sleep(2);
+				}
+			//	qDebug() << i;
+			}
+
+		}
+	//if()
+
+
+	if(Count("Returns::%\"") < 10){
+
+		Database::Get()->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
+		QVector<QJsonDocument> stores = Database::Get()->getArray();
+
+		Database::Get()->query("SELECT `d`.`أسم العميل` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `AM` d WHERE meta(`d`).id LIKE 'clients::%' ORDER BY `BB` ",false);
+		QVector<QJsonDocument> clients = Database::Get()->getArray();
+
+		Database::Get()->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
+		QVector<QJsonDocument> products = Database::Get()->getArray();
+
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+		//qDebug() << fileData;
+		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		int currentID = -1;
+		QJsonObject c;
+		QJsonObject tblProd;
+		QJsonArray rowsProd;
+		int idxOrderOut = 0;
+
+		for(int i = 1; i < fileData.count();i++){
+
+			QStringList data = fileData.at(i).split(",");
+			int newID;
+			//	qDebug() << __FILE__ << __LINE__ << "fileDataOrderOut"<<fileData.count() << QString(data.at(11)).toDouble();
+
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				newID =  data.at(1).toInt();
+				}
+
+			if(0 < data.count() && !data.at(5).trimmed().isEmpty()
+					&& QString(data.at(7)).toDouble() > 0
+					&& newID == currentID){
+
+				QJsonObject row ;
+				row.insert("ID",QString("Products::").append(data.at(3)));
+				if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+					row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
+				else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+				row.insert("الكميه",QString(data.at(7)).toDouble());
+				rowsProd.append(row);
+				if(!rowsProd.isEmpty())
+					tblProd.insert("merplyTabel",rowsProd);
+				}
+			else {
+
+				if(!tblProd.isEmpty())
+					c.insert("products",tblProd);
+				if(!c.isEmpty()){
+					c.insert("document_id","Returns");
+					Controller::Get()->createEditStore(c);
+					//Database::Get()->storeDoc("OrderOut",QJsonDocument(c));
+					idxOrderOut++;
+					}
+				foreach(QString k,tblProd.keys())
+					tblProd.remove(k);
+				foreach(QString k,c.keys())
+					c.remove(k);
+
+				int rowsProdSize = rowsProd.size();
+				for(int kk = 0; kk <rowsProdSize; kk++){
+					//qDebug()<<rowsProd.size()  << kk;
+					rowsProd.removeFirst();
+					//	qDebug()<<rowsProd.size() << kk;
+					}
+
+				if(0 < data.count() && !data.at(5).trimmed().isEmpty()
+						&& QString(data.at(7)).toDouble() > 0){
+					currentID = newID;
+
+
+
+					QDateTime d = QDateTime::fromString(data.at(2),"yyyy-MM-dd hh:mm:ss");
+					//qDebug() <<data.at(2)<< d.toString(Qt::ISODate);
+					c.insert("تاريخ" ,d.toString(Qt::ISODate));
+					c.insert("رقم",currentID);
+					{
+					QJsonObject cc;
+					cc.insert("Key","Stores::"+data.at(23));
+					if(stores.at(data.at(23).toInt()).object().value("N") != QJsonValue::Undefined)
+						cc.insert("Value",stores.at(data.at(23).toInt()).object().value("N").toString());
+					else cc.insert("Value",QString("S").append(QString::number(stores.at(data.at(23).toInt()).object().value("BB").toInt())));
+					c.insert("المخزن",cc);
+					}
+
+					QJsonObject cc;
+					cc.insert("Key","clients::"+data.at(5));
+					cc.insert("Value",clients.at(data.at(5).toInt()).object().value("N").toString());
+
+					c.insert("العميل",cc);
+
+
+					i--;
+					}
+
+				else {
+					currentID = -1;
+					}
+
+				}
+
+			if (i % 100 == 0){
+				//	qDebug() << __FILE__ << __LINE__ << i <<"OrderIn:"<<idxOrderIn <<" OrderOut:"<<idxOrderOut<<" Returns:"<<idxReturns;
+				//	QThread::sleep(2);
+				}
+			//	qDebug() << i;
+			}
+
+		}
+	//if()
+
+	if(Count("OrederIn::%\"") < 10){
+
+		Database::Get()->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
+		QVector<QJsonDocument> stores = Database::Get()->getArray();
+
+		Database::Get()->query("SELECT `d`.`أسم المورد` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `AM` d WHERE meta(`d`).id LIKE 'supplier::%' ORDER BY `BB`",false);
+		QVector<QJsonDocument> suppliers = Database::Get()->getArray();
+
+		Database::Get()->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
+		QVector<QJsonDocument> products = Database::Get()->getArray();
+
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+		//qDebug() << fileData;
+		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+		int currentID = -1;
+		QJsonObject c;
+		QJsonObject tblProd;
+		QJsonArray rowsProd;
+		int idxOrderOut = 0;
+
+		for(int i = 1; i < fileData.count();i++){
+
+			QStringList data = fileData.at(i).split(",");
+			int newID;
+			//	qDebug() << __FILE__ << __LINE__ << "fileDataOrderOut"<<fileData.count() << QString(data.at(11)).toDouble();
+
+			if(0 < data.count() && !data.at(1).isEmpty()){
+				newID =  data.at(1).toInt();
+				}
+
+			if(0 < data.count() && !data.at(4).trimmed().isEmpty()
+					&& QString(data.at(7)).toDouble() > 0
+					&& newID == currentID){
+
+				QJsonObject row ;
+				row.insert("ID",QString("Products::").append(data.at(3)));
+				if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+					row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
+				else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+				row.insert("الكميه",QString(data.at(7)).toDouble());
+				rowsProd.append(row);
+				if(!rowsProd.isEmpty())
+					tblProd.insert("merplyTabel",rowsProd);
+				}
+			else {
+
+				if(!tblProd.isEmpty())
+					c.insert("products",tblProd);
+				if(!c.isEmpty()){
+					c.insert("document_id","OrederIn");
+					Controller::Get()->createEditStore(c);
+					//Database::Get()->storeDoc("OrderOut",QJsonDocument(c));
+					idxOrderOut++;
+					}
+				foreach(QString k,tblProd.keys())
+					tblProd.remove(k);
+				foreach(QString k,c.keys())
+					c.remove(k);
+
+				int rowsProdSize = rowsProd.size();
+				for(int kk = 0; kk <rowsProdSize; kk++){
+					//qDebug()<<rowsProd.size()  << kk;
+					rowsProd.removeFirst();
+					//	qDebug()<<rowsProd.size() << kk;
+					}
+
+				if(0 < data.count() && !data.at(4).trimmed().isEmpty()
+						&& QString(data.at(7)).toDouble() > 0){
+					currentID = newID;
+
+
+
+					QDateTime d = QDateTime::fromString(data.at(2),"yyyy-MM-dd hh:mm:ss");
+					//qDebug() <<data.at(2)<< d.toString(Qt::ISODate);
+					c.insert("تاريخ" ,d.toString(Qt::ISODate));
+					c.insert("رقم",currentID);
+					{
+					QJsonObject cc;
+					cc.insert("Key","Stores::"+data.at(23));
+					if(stores.at(data.at(23).toInt()).object().value("N") != QJsonValue::Undefined)
+						cc.insert("Value",stores.at(data.at(23).toInt()).object().value("N").toString());
+					else cc.insert("Value",QString("S").append(QString::number(stores.at(data.at(23).toInt()).object().value("BB").toInt())));
+					c.insert("المخزن",cc);
+					}
+
+					QJsonObject cc;
+					cc.insert("Key","supplier::"+data.at(4));
+					cc.insert("Value",suppliers.at(data.at(4).toInt()).object().value("N").toString());
+
+					c.insert("العميل",cc);
+
+
+					i--;
+					}
+
+				else {
+					currentID = -1;
+					}
+
+				}
+
+			if (i % 100 == 0){
+				//	qDebug() << __FILE__ << __LINE__ << i <<"OrderIn:"<<idxOrderIn <<" OrderOut:"<<idxOrderOut<<" Returns:"<<idxReturns;
+				//	QThread::sleep(2);
+				}
+			//	qDebug() << i;
+			}
+
+		}
+	//if()
+
+
+	if(Count("TransferTo::%\"") < 10){
+
+			Database::Get()->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
+			QVector<QJsonDocument> stores = Database::Get()->getArray();
+
+			Database::Get()->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
+			QVector<QJsonDocument> products = Database::Get()->getArray();
+
+			QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+			//qDebug() << fileData;
+			//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+			int currentID = -1;
+			QJsonObject c;
+			QJsonObject tblProd;
+			QJsonArray rowsProd;
+			int idxOrderOut = 0;
+
+			for(int i = 1; i < fileData.count();i++){
+
+				QStringList data = fileData.at(i).split(",");
+				int newID;
+				//	qDebug() << __FILE__ << __LINE__ << "fileDataOrderOut"<<fileData.count() << QString(data.at(11)).toDouble();
+
+				if(0 < data.count() && !data.at(1).isEmpty()){
+					newID =  data.at(1).toInt();
+					}
+
+				if(0 < data.count() && !data.at(6).trimmed().isEmpty()
+						&& QString(data.at(7)).toDouble() > 0
+						&& newID == currentID){
+
+					QJsonObject row ;
+					row.insert("ID",QString("Products::").append(data.at(3)));
+					if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+						row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
+					else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					row.insert("الكميه",QString(data.at(7)).toDouble());
+					rowsProd.append(row);
+					if(!rowsProd.isEmpty())
+						tblProd.insert("merplyTabel",rowsProd);
+					}
+				else {
+
+					if(!tblProd.isEmpty())
+						c.insert("products",tblProd);
+					if(!c.isEmpty()){
+						c.insert("document_id","TransferTo");
+						Controller::Get()->createEditStore(c);
+
+						idxOrderOut++;
+						}
+					foreach(QString k,tblProd.keys())
+						tblProd.remove(k);
+					foreach(QString k,c.keys())
+						c.remove(k);
+
+					int rowsProdSize = rowsProd.size();
+					for(int kk = 0; kk <rowsProdSize; kk++){
+						//qDebug()<<rowsProd.size()  << kk;
+						rowsProd.removeFirst();
+						//	qDebug()<<rowsProd.size() << kk;
+						}
+
+					if(0 < data.count() && !data.at(6).trimmed().isEmpty()
+							&& QString(data.at(7)).toDouble() > 0){
+						currentID = newID;
+
+
+
+						QDateTime d = QDateTime::fromString(data.at(2),"yyyy-MM-dd hh:mm:ss");
+						//qDebug() <<data.at(2)<< d.toString(Qt::ISODate);
+						c.insert("تاريخ" ,d.toString(Qt::ISODate));
+						c.insert("رقم",currentID);
+						{
+						QJsonObject cc;
+						cc.insert("Key","Stores::"+data.at(23));
+						if(stores.at(data.at(23).toInt()).object().value("N") != QJsonValue::Undefined)
+							cc.insert("Value",stores.at(data.at(23).toInt()).object().value("N").toString());
+						else cc.insert("Value",QString("S").append(QString::number(stores.at(data.at(23).toInt()).object().value("BB").toInt())));
+						c.insert("المخزن",cc);
+						}
+						{
+						QJsonObject cc;
+						cc.insert("Key","Stores::"+data.at(6));
+						if(stores.at(data.at(6).toInt()).object().value("N") != QJsonValue::Undefined)
+							cc.insert("Value",stores.at(data.at(6).toInt()).object().value("N").toString());
+						else cc.insert("Value",QString("S").append(QString::number(stores.at(data.at(6).toInt()).object().value("BB").toInt())));
+						c.insert("من المخزن",cc);
+						}
+
+						i--;
+						}
+
+					else {
+						currentID = -1;
+						}
+
+					}
+
+				if (i % 100 == 0){
+					//	qDebug() << __FILE__ << __LINE__ << i <<"OrderIn:"<<idxOrderIn <<" OrderOut:"<<idxOrderOut<<" Returns:"<<idxReturns;
+					//	QThread::sleep(2);
+					}
+				//	qDebug() << i;
+				}
+
+			}
+		//if()
+	if(Count("TransferFrom::%\"") < 10){
+
+			Database::Get()->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
+			QVector<QJsonDocument> stores = Database::Get()->getArray();
+
+			Database::Get()->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
+			QVector<QJsonDocument> products = Database::Get()->getArray();
+
+			QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+			//qDebug() << fileData;
+			//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
+			int currentID = -1;
+			QJsonObject c;
+			QJsonObject tblProd;
+			QJsonArray rowsProd;
+			int idxOrderOut = 0;
+
+			for(int i = 1; i < fileData.count();i++){
+
+				QStringList data = fileData.at(i).split(",");
+				int newID;
+				//	qDebug() << __FILE__ << __LINE__ << "fileDataOrderOut"<<fileData.count() << QString(data.at(11)).toDouble();
+
+				if(0 < data.count() && !data.at(1).isEmpty()){
+					newID =  data.at(1).toInt();
+					}
+
+				if(0 < data.count() && !data.at(6).trimmed().isEmpty()
+						&& QString(data.at(11)).toDouble() > 0
+						&& newID == currentID){
+
+					QJsonObject row ;
+					row.insert("ID",QString("Products::").append(data.at(3)));
+					if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+						row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
+					else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					row.insert("الكميه",QString(data.at(11)).toDouble());
+					rowsProd.append(row);
+					if(!rowsProd.isEmpty())
+						tblProd.insert("merplyTabel",rowsProd);
+					}
+				else {
+
+					if(!tblProd.isEmpty())
+						c.insert("products",tblProd);
+					if(!c.isEmpty()){
+						c.insert("document_id","TransferFrom");
+						Controller::Get()->createEditStore(c);
+
+						idxOrderOut++;
+						}
+					foreach(QString k,tblProd.keys())
+						tblProd.remove(k);
+					foreach(QString k,c.keys())
+						c.remove(k);
+
+					int rowsProdSize = rowsProd.size();
+					for(int kk = 0; kk <rowsProdSize; kk++){
+						//qDebug()<<rowsProd.size()  << kk;
+						rowsProd.removeFirst();
+						//	qDebug()<<rowsProd.size() << kk;
+						}
+
+					if(0 < data.count() && !data.at(6).trimmed().isEmpty()
+							&& QString(data.at(11)).toDouble() > 0){
+						currentID = newID;
+
+
+
+						QDateTime d = QDateTime::fromString(data.at(2),"yyyy-MM-dd hh:mm:ss");
+						//qDebug() <<data.at(2)<< d.toString(Qt::ISODate);
+						c.insert("تاريخ" ,d.toString(Qt::ISODate));
+						c.insert("رقم",currentID);
+						{
+						QJsonObject cc;
+						cc.insert("Key","Stores::"+data.at(23));
+						if(stores.at(data.at(23).toInt()).object().value("N") != QJsonValue::Undefined)
+							cc.insert("Value",stores.at(data.at(23).toInt()).object().value("N").toString());
+						else cc.insert("Value",QString("S").append(QString::number(stores.at(data.at(23).toInt()).object().value("BB").toInt())));
+						c.insert("المخزن",cc);
+						}
+						{
+						QJsonObject cc;
+						cc.insert("Key","Stores::"+data.at(6));
+						if(stores.at(data.at(6).toInt()).object().value("N") != QJsonValue::Undefined)
+							cc.insert("Value",stores.at(data.at(6).toInt()).object().value("N").toString());
+						else cc.insert("Value",QString("S").append(QString::number(stores.at(data.at(6).toInt()).object().value("BB").toInt())));
+						c.insert("الى المخزن",cc);
+						}
+
+						i--;
+						}
+
+					else {
+						currentID = -1;
+						}
+
+					}
+
+				if (i % 100 == 0){
+					//	qDebug() << __FILE__ << __LINE__ << i <<"OrderIn:"<<idxOrderIn <<" OrderOut:"<<idxOrderOut<<" Returns:"<<idxReturns;
+					//	QThread::sleep(2);
+					}
+				//	qDebug() << i;
+				}
+
+			}
+		//if()
+
 	return true;
 }
 

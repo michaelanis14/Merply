@@ -87,7 +87,7 @@ void Controller::showDisplay()
 	//	navigationUI::Get()->setParent(MainWindow::GetMainDisplay());
 
 	//
-	//Prsistance::init();
+	Prsistance::init();
 	//QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
 	//Database::Get()->getDoc("ViewStructure::5");
 

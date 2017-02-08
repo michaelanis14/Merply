@@ -155,7 +155,7 @@ void MerplyQuerySubField::refrenceData(QVector<QJsonDocument> items)
 		v.insert("Value",0);
 		QJsonObject vv;
 		vv.insert("Value",v);
-		items.insert(0,QJsonDocument(vv));
+		//items.insert(0,QJsonDocument(vv));
 		combox->addJsonItems(items);
 
 		}
