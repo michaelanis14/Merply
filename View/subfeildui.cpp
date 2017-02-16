@@ -161,10 +161,12 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		field = lineEdit;
 		lineEdit->setContentsMargins(0,0,0,0);
 		//lineEdit->setEnabled(false);
-		QString dataString = data.toString();
+
+		QString dataString = Controller::Get()->toString(data);
 		if(!dataString.isEmpty()){
 			lineEdit->setText(dataString);
 			}
+		/* ///TODO: INCREMENT BASED ON YEAR !!!!
 		else{
 			if(structureView.value("startNum") != QJsonValue::Undefined){
 				lineEdit->setText(QString::number(structureView.value("startNum").toInt()));
@@ -177,6 +179,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 				}
 			}
 		//lineEdit->setText(data.toString());
+		*/
 		layout->addWidget(lineEdit);
 
 		}

@@ -126,7 +126,9 @@ public:
 	void query(QString query,bool cached);
 
 	bool createEditStore(QJsonObject document);
+	bool createEditRemoveRowItems(QJsonArray rowsItems);
 	QVector<QJsonObject> creatEditeItems;
+	void deleteEntity(QString documentID);
 private:
 	explicit Controller(QObject * parent = 0);
 	static Controller* p_instance;
@@ -159,7 +161,7 @@ public slots:
 
 	void createEditStoreItems(QString key);
 	void getTabelsData(QString entity,QStringList tbls);
-
+	void deleteEntityData(QJsonDocument document);
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void gotFieldsData(QList<QString> fields);

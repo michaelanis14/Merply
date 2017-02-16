@@ -114,7 +114,7 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 		QItemSelectionModel *select = tableView->selectionModel();
 		if(select && select->hasSelection()){
 			QString id = 	model->getRowKey(select->currentIndex().row());
-			qDebug() << __FILE__ << __LINE__  << id;
+			//qDebug() << __FILE__ << __LINE__  << id;
 			if(nActon.count() > 1){
 				if(nActon.at(1).compare("Print") == 0){
 					PrintController::Get()->printEntity(id);
@@ -150,10 +150,10 @@ bool merplyTabelView::fill(QJsonObject columns,QString filter)
 	model = new MerplyReportTableModel(columns);
 	//	queryUI->fill(columns);
 	if(columns.value("QueryUI") != QJsonValue::Undefined){
-	//	QObject::connect(this,SIGNAL(updateModel(QVector<QJsonDocument>)),model,SLOT(fillQuery(QVector<QJsonDocument>)));
+		//	QObject::connect(this,SIGNAL(updateModel(QVector<QJsonDocument>)),model,SLOT(fillQuery(QVector<QJsonDocument>)));
 		//
 
-	//	QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+		//	QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 		QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 
 		queryUI->fillEntityQuery(columns.value("QueryUI").toObject());
@@ -238,11 +238,10 @@ void merplyTabelView::indexTable(const QString document_id,const QVector<QJsonDo
 QJsonObject merplyTabelView::save()
 {
 	tableView->setDisabled(true);
-
-
-
 	QJsonObject table;
 	table.insert("merplyTabel",this->model->getJsonData());
+	if(this->model->getRemovedRows().count() > 0)
+		table.insert("RemovedRows",this->model->getRemovedRows());
 	//qDebug() << __FILE__ << __LINE__  << this->model->getJsonData();
 	return table;
 }

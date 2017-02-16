@@ -975,14 +975,18 @@ bool Controller::createEditStore(QJsonObject document)
 
 	QStringList keys = document.keys();
 	foreach(QString key,keys){
-		if(document.value(key).isObject())
+		if(document.value(key).isObject()){
+			if(document.value(key).toObject().value("RemovedRows") != QJsonValue::Undefined){
+				createEditRemoveRowItems(document.value(key).toObject().value("RemovedRows").toArray());
+				document.value(key).toObject().remove("RemovedRows");
+				}
 			if(document.value(key).toObject().value("merplyTabel") != QJsonValue::Undefined){
 				QJsonObject tbl  = document.value(key).toObject();
 				tbl.insert("FieldKey",key);
 				creatEditeItems.append(tbl);
 				document.remove(key);
-				//qDebug() << __FILE__ << __LINE__ << document.value(key).toObject().value("merplyTabel");
 				}
+			}
 		}
 	if(creatEditeItems.count() >  0){
 		QObject::disconnect(this,SIGNAL(saved(QString)),this,SLOT(createEditStoreItems(QString)));
@@ -999,10 +1003,22 @@ bool Controller::createEditStore(QJsonObject document)
 		Controller::Get()->UpdateDoc(QJsonDocument(document));
 	else
 		Controller::Get()->storeDoc(document.value("document_id").toString(),QJsonDocument(document));
-
 	QObject::disconnect(this,SIGNAL(saved(QString)),this,SIGNAL(savedItems(bool)));
 
 	return true;
+}
+
+bool Controller::createEditRemoveRowItems(QJsonArray rowsItems)
+{
+	foreach (QJsonValue row, rowsItems) {
+		if(row.toObject().value("documentID") != QJsonValue::Undefined)
+			deleteDocument(row.toObject().value("documentID").toString());
+		}
+}
+
+void Controller::deleteEntity(QString documentID)
+{
+
 }
 void Controller::createEditStoreItems(QString key)
 {
@@ -1038,24 +1054,26 @@ void Controller::getTabelsData(QString entity, QStringList tbls)
 			query += " , ";
 
 		QString subQuery = "(SELECT `"+QString(DATABASE)+"`.*,meta(`"+QString(DATABASE)+"`).cas AS cas ,meta(`"+QString(DATABASE)+"`).id AS documentID "
-																																  "FROM `"+QString(DATABASE)+"` "
-																																							 "WHERE Meta(`"+QString(DATABASE)+"`).id LIKE '"+strctID+":"+tbl+"::%' AND `"+QString(DATABASE)+"`."+strctID+" LIKE '"+entity+"') AS `"+tbl+"` ";
+																																  "FROM `"+QString(DATABASE)+"`  USE INDEX("+strctID+""+tbl+"_idx) "
+																																															"WHERE Meta(`"+QString(DATABASE)+"`).id LIKE '"+strctID+":"+tbl+"::%' AND  `"+strctID+"` LIKE '"+entity+"' AND `"+strctID+"` IS NOT MISSING) AS `"+tbl+"` ";
 		query += subQuery;
 		i++;
 		}
-	//qDebug() << query;
+	qDebug() << query;
 	QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(queryData(QVector<QJsonDocument>)));
 	Database::Get()->query(query,false);
 }
 
+void Controller::deleteEntityData(QJsonDocument document)
+{
+
+}
 
 void Controller::queryData(QVector<QJsonDocument> items)
 {
 	//qDebug() << items <<"FSFSF";
 	emit gotReportData(items);
 }
-
-
 
 void Controller::setShowWarning(bool value)
 {
@@ -1094,6 +1112,8 @@ bool Controller::ShowQuestion(QString question)
 		return false;
 		}
 }
+
+
 /*
 void Controller::showWarning(QString warning)
 {
@@ -1104,6 +1124,7 @@ void Controller::showWarning(QString warning)
 	showWarning("Tab : "+tabName+"\n"+"Group: "+commandGroup+"\n"+"Entity: "+commandName+"\n"+"\n"+warning);
 
 }*/
+
 void Controller::Log(QStringList log){
 	Model::Get()->Log(log);
 }

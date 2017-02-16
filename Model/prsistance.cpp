@@ -48,7 +48,7 @@ bool Prsistance::init()
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		Database::Get()->storeDoc("NavigationUI::1",doc);
 		}
-	else if(Count("NavigationUI::1\"") ==  0){
+	else if(shipping&&Count("NavigationUI::1\"") ==  0){
 		QString jsonFile = readFile(QCoreApplication::applicationDirPath()+"/AM/NAV.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		Database::Get()->storeDoc("NavigationUI::1",doc);

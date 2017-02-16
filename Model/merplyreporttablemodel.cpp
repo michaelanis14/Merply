@@ -10,6 +10,7 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 	this->clmnsHeader = QStringList();
 	this->equationColumns.clear();
 	this->addedTotalRow = false;
+	this->removedRowsArray = QJsonArray();
 	//colmnsCount = 1;
 	if(strct.value("Columns").isArray()){
 		this->clmns = (strct.value("Columns").toArray());
@@ -142,6 +143,8 @@ bool MerplyReportTableModel::removeRows(int row, int count, const QModelIndex& p
 	//	qDebug() << __FILE__ << __LINE__  << cells.size() << row << row * this->colmnsCount;
 	for(int j = 0; j< colmnsCount; j++){
 		cells.removeAt(row * this->colmnsCount );
+		if(dataArray.at(row).toObject().value("documentID") != QJsonValue::Undefined)
+			removedRowsArray.append(dataArray.at(row));
 		dataArray.removeAt(row);
 		}
 	//qDebug() << __FILE__ << __LINE__  << cells.count();
@@ -197,6 +200,7 @@ QJsonArray MerplyReportTableModel::getJsonData()
 		if(!row.isEmpty())
 			tabel.append(row);
 		}
+
 	//qDebug() << tabel;
 	return tabel;
 }
@@ -261,6 +265,11 @@ double MerplyReportTableModel::getTotalClmn(QString clmn)
 int MerplyReportTableModel::getRowsCount() const
 {
 	return rowsCount;
+}
+
+QJsonArray MerplyReportTableModel::getRemovedRows()
+{
+	return removedRowsArray;
 }
 
 int MerplyReportTableModel::getColmnsCount() const
@@ -385,7 +394,7 @@ void MerplyReportTableModel::fillQuery(QVector<QJsonDocument> documents)
 			foreach(QString key,keys){
 				int j = clmnsHeader.indexOf(key);
 				if(j > -1){
-				//	qDebug() << __FILE__ << __LINE__  <<i * this->colmnsCount + j << Controller::Get()->toString(row.object().value(key)) ;
+					//	qDebug() << __FILE__ << __LINE__  <<i * this->colmnsCount + j << Controller::Get()->toString(row.object().value(key)) ;
 					cells[i * this->colmnsCount + j].setId(row.object().value("ID").toString());
 					cells[i * this->colmnsCount + j].setData(Controller::Get()->toString(row.object().value(key)));
 					}
@@ -450,12 +459,12 @@ void MerplyReportTableModel::fillIndexTabel( QVector<QJsonDocument> items)
 			cells[i * this->colmnsCount + j].setId(key);
 
 		foreach(QString keyData,item.object().keys()){
-			qDebug() << __FILE__ << __LINE__  <<"Filllll"<< keyData << clmnsHeader.indexOf(keyData);
+			//	qDebug() << __FILE__ << __LINE__  <<"Filllll"<< keyData << clmnsHeader.indexOf(keyData);
 			int clmnIndex = clmnsHeader.indexOf(keyData);
 			if(clmnIndex > -1){
 				QString valueString;
 				valueString = Controller::Get()->toString(item.object().value(keyData));
-		//		qDebug() << __FILE__ << __LINE__  <<"valueString"<< valueString;
+				//		qDebug() << __FILE__ << __LINE__  <<"valueString"<< valueString;
 
 				cells[(i * this->colmnsCount) + clmnIndex].setId(key);
 				QString dtoCompare = QString::fromUtf8("تاريخ");
@@ -473,14 +482,14 @@ void MerplyReportTableModel::fillIndexTabel( QVector<QJsonDocument> items)
 				}
 			else if(item.object().value(keyData) != QJsonValue::Undefined){
 				foreach(QJsonValue row, item.object().value(keyData).toObject().value("merplyTabel").toArray()){
-				//	qDebug() << __FILE__ << __LINE__  <<"ROwww"<< row;
+					//	qDebug() << __FILE__ << __LINE__  <<"ROwww"<< row;
 					foreach(QString keyDataRow,row.toObject().keys()){
-				//		qDebug() << __FILE__ << __LINE__  <<"Filllll"<< keyData << clmnsHeader.indexOf(keyData);
+						//		qDebug() << __FILE__ << __LINE__  <<"Filllll"<< keyData << clmnsHeader.indexOf(keyData);
 						int clmnIndexRow = clmnsHeader.indexOf(keyDataRow);
 						if(clmnIndexRow > -1){
 							QString valueString;
 							valueString = Controller::Get()->toString(row.toObject().value(keyDataRow));
-						//	qDebug() << __FILE__ << __LINE__  <<"valueStringROWW"<< valueString;
+							//	qDebug() << __FILE__ << __LINE__  <<"valueStringROWW"<< valueString;
 
 							cells[(i * this->colmnsCount) + clmnIndexRow].setId(key);
 
@@ -496,9 +505,9 @@ void MerplyReportTableModel::fillIndexTabel( QVector<QJsonDocument> items)
 		i++;
 		}
 	rowsCount = i;
-endResetModel();
-//	if(this->rowsCount == 0)
-//		this->rowsCount = 1;
+	endResetModel();
+	//	if(this->rowsCount == 0)
+	//		this->rowsCount = 1;
 
 	int r=this->rowsCount-1;
 	int c=this->colmnsCount-1;

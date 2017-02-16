@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.2.1, 2017-01-26T00:52:51. -->
+<!-- Written by QtCreator 4.2.1, 2017-02-15T11:09:45. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -515,7 +515,7 @@
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
-      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Deploy to iOS Device</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Deploy to Michael's iPhone</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.IosDeployStep</value>
      </valuemap>
@@ -577,8 +577,8 @@
      <value type="int" key="type">0</value>
     </valuemap>
     <value type="QString" key="Ios.run_arguments"></value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Run on iOS Device</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Run MERPLY on iOS Device</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Run on Michael's iPhone</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Run MERPLY on Michael's iPhone</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.IosRunConfiguration:/Projects/Merply/Project/src/Merply/Merply.pro</value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>

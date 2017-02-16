@@ -22,6 +22,23 @@ MerplyQueryUI::MerplyQueryUI(QWidget *parent,bool btnFilter) : QWidget(parent)
 void MerplyQueryUI::fill(QJsonObject strct)
 {
 	clear();
+	{
+	QWidget * viewgrp  = new QWidget;
+	viewgrp->setContentsMargins(0,0,0,0);
+	QFormLayout* fieldslayout = new QFormLayout(viewgrp);
+	fieldslayout->setContentsMargins(0,0,0,0);
+	fieldslayout->setSpacing(4);
+	fieldslayout->setMargin(0);
+	this->layout->addWidget(viewgrp);
+	QJsonObject objID;
+	objID.insert("Type","ID");
+	objID.insert("strct",strct.value("document_id").toString().split("::")[1]);
+	//qDebug() << strct;
+	MerplyQuerySubField* qSubField = new MerplyQuerySubField(objID,0);
+	fieldslayout->addRow("ID",qSubField);
+	fields << qSubField;
+	}
+
 	foreach(QJsonValue vg,strct.value("Viewgroups").toArray()){
 		QWidget * viewgrp  = new QWidget;
 		viewgrp->setContentsMargins(0,0,0,0);

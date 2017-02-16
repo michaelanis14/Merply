@@ -19,7 +19,7 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 	QString label = strct.value("Label").toString();
 
 
-	qDebug() << __FILE__ << __LINE__  <<type;
+	//qDebug() << __FILE__ << __LINE__  <<type;
 
 	if(!strct.value("Source").toString().isEmpty() && strct.value("Source").toString().compare("_") != 0){
 		if(!strct.value("Select").toString().isEmpty() && strct.value("Select").toString().compare("ALL") == 0){
@@ -40,8 +40,16 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 			}
 		}
 
-	else if(type.compare("Text") == 0   ||
-			type.compare("Serial") == 0
+	else if(type.isEmpty() && strct.value("Type").toString().compare("ID") == 0){
+		QLineEdit* lineEdit = new QLineEdit();
+		lineEdit->setValidator( new QIntValidator(0, 1000000, this) );
+		lineEdit->setObjectName("ID:"+strct.value("strct").toString());
+		lineEdit->setContentsMargins(0,0,0,0);
+		layout->addWidget(lineEdit);
+		field = lineEdit;
+		}
+	else if(type.compare("Text") == 0
+			|| type.compare("Serial") == 0
 			){
 		QLineEdit* lineEdit = new QLineEdit();
 		lineEdit->setObjectName(label);
@@ -55,6 +63,19 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 		date->setObjectName(label);
 		field = date;
 		}
+	else if(type.compare("Refrence") == 0){
+		//qDebug() << __FILE__ << __LINE__  <<strct;
+		QJsonObject subField = strct.value("SubFields").toArray().first().toObject();
+		combox = new ERPComboBox(this,false);
+		combox->setObjectName(label);
+		layout->addWidget(combox);
+		field = combox;
+		if(strct.value("Editable").toString().compare("false") == 0)
+			combox->setEditable(false);
+		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
+		Controller::Get()->getJsonEntityFieldsList(subField.value("Source").toString(),subField.value("Select").toString(),subField.value("Condition").toString());
+
+		}
 
 }
 
@@ -63,21 +84,33 @@ QString MerplyQuerySubField::getValue(QString entity)
 	QString save = "";
 	//qDebug() << __FILE__ << __LINE__  << field->metaObject()->className();
 	if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
+		qDebug() << __FILE__ << __LINE__  << this->strct;
 		if(((ERPComboBox*)field)->currentIndex() > 0){
 			//	save += component.name;
-			if(strct.value("BeforFilter") != QJsonValue::Undefined)
-				save += this->strct.value("BeforFilter").toString();
-			if(strct.value("matchID") != QJsonValue::Undefined)
-				save += ((ERPComboBox*)field)->getKey();
-			else save += ((QComboBox*)field)->currentText();
-			if(strct.value("AfterFilter")!= QJsonValue::Undefined)
-				save += this->strct.value("AfterFilter").toString();
+			if(strct.value("BeforFilter") != QJsonValue::Undefined){
+
+				if(strct.value("BeforFilter") != QJsonValue::Undefined)
+					save += this->strct.value("BeforFilter").toString();
+				if(strct.value("matchID") != QJsonValue::Undefined)
+					save += ((ERPComboBox*)field)->getKey();
+				else save += ((QComboBox*)field)->currentText();
+				if(strct.value("AfterFilter")!= QJsonValue::Undefined)
+					save += this->strct.value("AfterFilter").toString();
+				}
+			else if(strct.value("Type") == QJsonValue::Undefined){
+				if(!entity.trimmed().isEmpty()){
+					save +=QString(""+entity.trimmed()+".`").append(((QComboBox*)field)->objectName().append("`.`Key` Like '")).append(((ERPComboBox*)field)->getKey()).append("'");
+					}
+				else {
+					save +="`"+((QComboBox*)field)->objectName().append("`.`Key` Like '").append(((ERPComboBox*)field)->getKey()).append("'");
+					}
+				}
 			//qDebug() << __FILE__ << __LINE__  << where;
 			}
 		}
 
 	else if(QString(field->metaObject()->className()).compare("MerplyQuerySubField") == 0 ){
-	//	qDebug() <<"MerplyQuerySubField"<< strct.value("Entity").toString();
+		//	qDebug() <<"MerplyQuerySubField"<< strct.value("Entity").toString();
 		QString where = ((MerplyQuerySubField*)field)->getValue(strct.value("Entity").toString());
 
 		if(!where.trimmed().isEmpty()){
@@ -86,23 +119,23 @@ QString MerplyQuerySubField::getValue(QString entity)
 			save += where;
 			}
 		}
-	else if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
-		//	save += component.name;
-		QString value = ((QComboBox*)field)->currentText();
-		if(!value.trimmed().isEmpty()){
-			QJsonObject comboFields;
-			comboFields.insert("Value", ((QComboBox*)field)->currentText());
-			comboFields.insert("Key", ((ERPComboBox*)field)->getKey());
-			//		save = comboFields;
-			}
-		//save +=" ";
-		}
 	else if(QString(field->metaObject()->className()).compare("QLineEdit") == 0 ){
 		//	save += component.name;
 		if(!((QLineEdit*)field)->text().trimmed().isEmpty()){
-			if(!entity.trimmed().isEmpty())
-				save += QString(entity.trimmed()+".`"+((QLineEdit*)field)->objectName()+"`").append(QString("LIKE  ")).append("'"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"'");
-			else save += QString("`"+((QLineEdit*)field)->objectName()+"`").append(QString("LIKE  ")).append("'%"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"%'");
+			if(((QLineEdit*)field)->objectName().contains("ID:")){
+				if(!entity.trimmed().isEmpty()){
+					//qDebug() << __FILE__ << __LINE__  << entity.trimmed();
+					save += "META(`"+QString(DATABASE)+"`).id LIKE '"+entity.replace("`","")+"::"+((QLineEdit*)field)->text()+"'";
+					}
+				else {
+					save += "META(`"+QString(DATABASE)+"`).id LIKE '"+((QLineEdit*)field)->objectName().split(":")[1]+"::"+((QLineEdit*)field)->text()+"'";
+					}
+				}
+			else if(!entity.trimmed().isEmpty()){
+				//qDebug() << __FILE__ << __LINE__  << entity.trimmed();
+				save += QString("to_string("+entity.trimmed()+".`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"'");
+				}
+			else save += QString("to_string(`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'%"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"%'");
 			}
 		//	save =" ";
 		}
@@ -155,7 +188,7 @@ void MerplyQuerySubField::refrenceData(QVector<QJsonDocument> items)
 		v.insert("Value",0);
 		QJsonObject vv;
 		vv.insert("Value",v);
-		//items.insert(0,QJsonDocument(vv));
+		items.insert(0,QJsonDocument(vv));
 		combox->addJsonItems(items);
 
 		}

@@ -39,7 +39,7 @@ public:
 	void evalTotalRow();
 	double getTotalClmn(QString clmn);
 	int getRowsCount() const;
-
+	QJsonArray getRemovedRows();
 	int getColmnsCount() const;
 
 private:
@@ -59,6 +59,7 @@ private:
 	QStringList clmnsHeader;
 	bool addedTotalRow;
 	QJsonArray dataArray;
+	QJsonArray removedRowsArray;
 signals:
 	void equationColumnsSignal();
 	void done();

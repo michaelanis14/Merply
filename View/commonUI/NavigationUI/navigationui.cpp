@@ -70,6 +70,7 @@ navigationUI::navigationUI(QWidget *parent) :
 
 void navigationUI::loadMainNavigation(QJsonDocument navDoc)
 {
+	//qDebug() << navDoc;
 	mainNavigation->clear();
 	subNavigation->clear();
 	Controller::Get()->clearMainNavigation();
