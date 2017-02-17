@@ -35,7 +35,7 @@ void MerplyQueryUI::fill(QJsonObject strct)
 	objID.insert("strct",strct.value("document_id").toString().split("::")[1]);
 	//qDebug() << strct;
 	MerplyQuerySubField* qSubField = new MerplyQuerySubField(objID,0);
-	fieldslayout->addRow("ID",qSubField);
+	fieldslayout->addRow("ID.No.",qSubField);
 	fields << qSubField;
 	}
 
@@ -144,7 +144,7 @@ void MerplyQueryUI::generateQuery()
 		query += q;
 		}
 	else if(!save.isEmpty()){
-		query += "SELECT `"+QString(DATABASE)+"`.*  FROM  `"+QString(DATABASE)+"`  WHERE META(`AM`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
+		query += "SELECT `"+QString(DATABASE)+"`.*,to_number(SPLIT(META(`"+QString(DATABASE)+"`).id,'::')[1]) AS `ID.No.` FROM  `"+QString(DATABASE)+"`  WHERE META(`"+QString(DATABASE)+"`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
 		}
 	if(!query.isEmpty()){
 		qDebug() << query;

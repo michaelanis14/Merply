@@ -14,7 +14,7 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 	//colmnsCount = 1;
 	if(strct.value("Columns").isArray()){
 		this->clmns = (strct.value("Columns").toArray());
-
+		clmnsHeader << "ID.No.";
 		foreach(QJsonValue clmn,strct.value("Columns").toArray()){
 			//	if(clmn.toObject().value("ShowIndex") == QJsonValue::Undefined){
 			//		continue;
@@ -40,7 +40,8 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 			}
 		}
 	else{
-		clmnsHeader = strct.value("clmnsHeader").toVariant().toStringList();
+		clmnsHeader << "ID.No.";
+		clmnsHeader << strct.value("clmnsHeader").toVariant().toStringList();
 		//qDebug() << __FILE__ << __LINE__  << clmnsHeader;
 		}
 	colmnsCount = clmnsHeader.count();
@@ -396,7 +397,18 @@ void MerplyReportTableModel::fillQuery(QVector<QJsonDocument> documents)
 				if(j > -1){
 					//	qDebug() << __FILE__ << __LINE__  <<i * this->colmnsCount + j << Controller::Get()->toString(row.object().value(key)) ;
 					cells[i * this->colmnsCount + j].setId(row.object().value("ID").toString());
-					cells[i * this->colmnsCount + j].setData(Controller::Get()->toString(row.object().value(key)));
+					QString value;
+
+					QString dtoCompare = QString::fromUtf8("تاريخ");
+					//qDebug() << clmnsHeader.at(j) << clmnsHeader.at(j).trimmed().compare(dtoCompare);
+					if(clmnsHeader.at(j).trimmed().compare(dtoCompare) == 0 || clmnsHeader.at(j).trimmed().contains("Date")){
+						QDateTimeEdit *date = new QDateTimeEdit;
+						date->setHidden(true);
+						date->setDateTime(QDateTime::fromString(row.object().value(clmnsHeader.at(j)).toString(),Qt::ISODate));
+						value  =  date->dateTime().toString("dd/MM/yyyy");
+						}
+					else value = Controller::Get()->toString(row.object().value(key));
+					cells[i * this->colmnsCount + j].setData(value);
 					}
 				}
 			}
@@ -423,7 +435,20 @@ void MerplyReportTableModel::fillText(QJsonArray data)
 	for(int i = 0; i < data.count(); i++){
 		QJsonObject row =  data.at(i).toObject();
 		for(int j = 0; j <clmnsHeader.count(); j++){
-			QString value = Controller::Get()->toString(row.value(clmnsHeader.at(j)));
+			QString value;
+/* // TO SET THE DATE STRING
+			QString dtoCompare = QString::fromUtf8("تاريخ");
+			qDebug() << clmnsHeader.at(j) << clmnsHeader.at(j).trimmed().compare(dtoCompare);
+			if(clmnsHeader.at(j).trimmed().compare(dtoCompare) == 0 || clmnsHeader.at(j).trimmed().contains("Date")){
+				QDateTimeEdit *date = new QDateTimeEdit;
+				date->setHidden(true);
+				date->setDateTime(QDateTime::fromString(row.value(clmnsHeader.at(j)).toString(),Qt::ISODate));
+				value  =  date->dateTime().toString("dd/MM/yyyy");
+				}
+
+			else
+*/
+			value = Controller::Get()->toString(row.value(clmnsHeader.at(j)));
 			//qDebug() << value;
 			if(!value.isEmpty() && value.split("$").count() > 1){
 				cells[i * this->colmnsCount + j].setId(QString(value.split("$")[1]));
@@ -468,7 +493,7 @@ void MerplyReportTableModel::fillIndexTabel( QVector<QJsonDocument> items)
 
 				cells[(i * this->colmnsCount) + clmnIndex].setId(key);
 				QString dtoCompare = QString::fromUtf8("تاريخ");
-				//qDebug() << keyData << keyData.trimmed().compare(dtoCompare);
+				//qDebug()<< __FILE__ << __LINE__ << keyData << keyData.trimmed().compare(dtoCompare);
 				if(keyData.trimmed().compare(dtoCompare) == 0 || keyData.trimmed().contains("Date")){
 					QDateTimeEdit *date = new QDateTimeEdit;
 					date->setHidden(true);

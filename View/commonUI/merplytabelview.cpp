@@ -302,6 +302,9 @@ void merplyTabelView::printTabel(){
 
 	report->loadReport(fileName);
 	report->recordCount << this->model->rowCount();
+	QObject::disconnect(report, SIGNAL(setValue(const int, const QString, QVariant&, const int)),
+					 this->model, SLOT(setValue(const int, const QString, QVariant&, const int)));
+
 	QObject::connect(report, SIGNAL(setValue(const int, const QString, QVariant&, const int)),
 					 this->model, SLOT(setValue(const int, const QString, QVariant&, const int)));
 	report->printExec();

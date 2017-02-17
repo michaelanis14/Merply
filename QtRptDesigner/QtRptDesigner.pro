@@ -44,15 +44,15 @@ LIBS += -L$${DESTDIR}/lib -lQtZint
 }
 
 INCLUDEPATH +=  ../Model\
-		../Controller \
-		../View \
-		../View/structureViewBuilder\
-		../View/commonUI \
-		../View/commonUI/NavigationUI \
-		../View/VisualDesign \
-		../View/structureViewBuilder\
-		../View/permissionsUI \
-		../View/commonUI/MerplyTabel
+                ../Controller \
+                ../View \
+                ../View/structureViewBuilder\
+                ../View/commonUI \
+                ../View/commonUI/NavigationUI \
+                ../View/VisualDesign \
+                ../View/structureViewBuilder\
+                ../View/permissionsUI \
+                ../View/commonUI/MerplyTabel
 
 SOURCES += main.cpp\
     mainwindow.cpp \
@@ -248,7 +248,8 @@ unix {
 
 
 
-macx: LIBS += -L$$PWD/../../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/lib/ -lcouchbase
+macx: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/lib/ -lcouchbase
 
-INCLUDEPATH += $$PWD/../../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/include
-DEPENDPATH += $$PWD/../../../../../../../../usr/local/Cellar/libcouchbase/2.7.0/include
+INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
+DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
+

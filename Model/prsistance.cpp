@@ -1665,7 +1665,7 @@ save:
 					cc.insert("Key","supplier::"+data.at(4));
 					cc.insert("Value",suppliers.at(data.at(4).toInt()).object().value("N").toString());
 
-					c.insert("العميل",cc);
+					c.insert("المورد",cc);
 
 
 					i--;

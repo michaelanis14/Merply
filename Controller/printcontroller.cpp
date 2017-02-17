@@ -16,7 +16,7 @@ PrintController* PrintController::Get()
 }
 void PrintController::printEntity(QString id)
 {
-	//qDebug() << __FILE__ << __LINE__  <<"printEntity"<< id;
+	qDebug() << __FILE__ << __LINE__  <<"printEntity"<< id;
 	QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintEntity(QJsonDocument)));
 	Controller::Get()->getDoc(id);
 }
