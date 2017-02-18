@@ -14,7 +14,7 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 	//colmnsCount = 1;
 	if(strct.value("Columns").isArray()){
 		this->clmns = (strct.value("Columns").toArray());
-		clmnsHeader << "ID.No.";
+		//clmnsHeader << "ID.No.";
 		foreach(QJsonValue clmn,strct.value("Columns").toArray()){
 			//	if(clmn.toObject().value("ShowIndex") == QJsonValue::Undefined){
 			//		continue;
@@ -40,8 +40,10 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 			}
 		}
 	else{
+		//
 		clmnsHeader << "ID.No.";
 		clmnsHeader << strct.value("clmnsHeader").toVariant().toStringList();
+
 		//qDebug() << __FILE__ << __LINE__  << clmnsHeader;
 		}
 	colmnsCount = clmnsHeader.count();

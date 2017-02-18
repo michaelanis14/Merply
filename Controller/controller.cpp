@@ -87,7 +87,7 @@ void Controller::showDisplay()
 	//	navigationUI::Get()->setParent(MainWindow::GetMainDisplay());
 
 	//
-	Prsistance::init();
+//	Prsistance::init();
 	//QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
 	//Database::Get()->getDoc("ViewStructure::5");
 
@@ -371,7 +371,7 @@ QString Controller::toString(QJsonValue value)
 		data += QString::number(value.toDouble());
 		}
 	else {
-		qDebug()<< __FILE__ << __LINE__ << "ERROR TYPE IS NOT DEFIENED" << value;
+		qDebug()<< __FILE__ << __LINE__ << "toString  ERROR TYPE IS NOT DEFIENED" << value;
 		}
 
 	return data;

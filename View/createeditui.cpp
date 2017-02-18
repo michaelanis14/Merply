@@ -3,7 +3,7 @@
 #include "hcontrollers.h"
 #include "controller.h"
 #include "indexui.h"
-
+#include "printcontroller.h"
 
 
 CreateEditUI::CreateEditUI(QWidget* parent ) : MainDisplay(parent)
@@ -22,7 +22,7 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 	this->data = data;
 	this->cas = "";
 	QStringList btnsList;
-	btnsList << "Save->Save"<< "Cancel->Cancel";
+	btnsList << "Print->Print"<<"Save->Save"<< "Cancel->Cancel";
 
 	HControllers* contrls = new HControllers(0,btnsList);
 	connect(contrls, SIGNAL(btnClicked(const QString&)), this, SLOT(controller_Clicked(QString)));
@@ -166,8 +166,24 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 {
 	QStringList nActon = nameAction.split("->");
 	if(nActon.count() > 1){
+		if(nActon.at(1).compare("Print") == 0){
+			this->clearErrorsWidget();
+			QString errs = viewGroups->checkMandatory();
+			if(errs.isEmpty()){
+				//	qDebug() << __FILE__ << __LINE__ <<"Controller Clicked to save" << this->cas;
 
-		if(nActon.at(1).compare("Cancel") == 0){
+				if(this->cas.isEmpty()){
+					}
+				else{
+					QJsonObject vgsSave = viewGroups->save();
+					vgsSave.insert("document_id",this->viewStructure.value("document_id").toString().split("::")[1]);
+					PrintController::Get()->gotPrintEntity(QJsonDocument(vgsSave));
+					}
+
+
+				}
+			}
+		else if(nActon.at(1).compare("Cancel") == 0){
 			IndexUI::ShowUI(this->viewStructure.value("document_id").toString(),QVector<QJsonDocument>());
 			//Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 			}

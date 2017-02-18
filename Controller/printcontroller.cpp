@@ -16,7 +16,7 @@ PrintController* PrintController::Get()
 }
 void PrintController::printEntity(QString id)
 {
-	qDebug() << __FILE__ << __LINE__  <<"printEntity"<< id;
+	//qDebug() << __FILE__ << __LINE__  <<"printEntity"<< id;
 	QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintEntity(QJsonDocument)));
 	Controller::Get()->getDoc(id);
 }
@@ -28,7 +28,7 @@ void PrintController::gotPrintEntity(QJsonDocument document)
 
 	this->printDocumnet = document;
 	QString documentID ;
-	qDebug() << document.object().value("document_id").toString();
+	//qDebug() << document.object().value("document_id").toString();
 	if(QString(document.object().value("document_id").toString().split("::")[0]).compare("Page") == 0){
 		documentID =  "PrintStructure::P"+document.object().value("document_id").toString().split("::")[1];
 		}
@@ -53,6 +53,9 @@ void PrintController::getFieldstoValueMap(QJsonObject entity)
 				QJsonValue value = entity.value(key);
 					if(value.isString())
 						fieldsValues.insert(key,value.toString());
+					else if(value.isDouble())
+						fieldsValues.insert(key,Controller::Get()->toString(value));
+
 					else if(value.isObject()){
 						if(value.toObject().value("Value") != QJsonValue::Undefined)
 							fieldsValues.insert(key,value.toObject().value("Value").toString());
@@ -127,9 +130,9 @@ void PrintController::gotPrintStrct(QJsonDocument strct)
 
 void PrintController::setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage)
 {
-	qDebug() << __FILE__ << __LINE__  << paramName << recNo << reportPage;
+	//qDebug() << __FILE__ << __LINE__  << paramName << recNo << reportPage;
 
-	qDebug() << reportData.at(recNo).toObject().value(paramName);
+	//qDebug() << reportData.at(recNo).toObject().value(paramName);
 	if(fieldsValues.contains(paramName))
 		paramValue = fieldsValues.value(paramName) ;
 	else if(reportData.at(recNo).toObject().value(paramName) != QJsonValue::Undefined){
