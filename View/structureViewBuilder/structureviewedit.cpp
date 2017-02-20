@@ -167,7 +167,7 @@ QJsonObject StructureViewEdit::save()
 		QJsonObject sSFSave = svsf->save();
 
 		if(initData->isChecked()){
-			QJsonObject* savedPreview;
+			QJsonObject* savedPreview = new QJsonObject();
 			previewField->save(savedPreview);
 			//	qDebug() << __FILE__ << __LINE__  << savedPreview;
 			if(savedPreview->keys().count() > 0 && savedPreview->value(savedPreview->keys().first()) != QJsonValue::Undefined){

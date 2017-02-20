@@ -73,6 +73,7 @@ public slots:
 	void fillText(QJsonArray data);
 	void fillIndexTabel(QVector<QJsonDocument> items);
 	void fillLocalSource(QVector<QJsonDocument> items);
+	void fillAddtoTable(QVector<QJsonDocument> items);
 
 };
 

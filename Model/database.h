@@ -26,9 +26,9 @@ class Database: public QObject
 
 	Q_OBJECT
 public:
-	Database();
+	explicit Database();
 
-	static Database* Get();
+	static Database* Gett();
 	static void storage_callback(lcb_t, const void *, lcb_storage_t, lcb_error_t, const lcb_store_resp_t *resp);
 	static void get_callback(lcb_t instance, const void *cookie, lcb_error_t err,
 							 const lcb_get_resp_t *resp);
@@ -42,7 +42,7 @@ public:
 	static bool IncrementKey(QString key);
 	static int GetKey(QString key);
 	static lcb_t InitDatabase(QString connStr = "");
-	static bool KillDatabase(lcb_t instance);
+	static bool KillDatabase(lcb_t instance, bool wait =true);
 	static void got_document(lcb_t instance, const void *, lcb_error_t err,
 							 const lcb_get_resp_t *resp);
 	static bool getDoc(QString key);

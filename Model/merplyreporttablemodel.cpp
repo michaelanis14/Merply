@@ -438,7 +438,7 @@ void MerplyReportTableModel::fillText(QJsonArray data)
 		QJsonObject row =  data.at(i).toObject();
 		for(int j = 0; j <clmnsHeader.count(); j++){
 			QString value;
-/* // TO SET THE DATE STRING
+			/* // TO SET THE DATE STRING
 			QString dtoCompare = QString::fromUtf8("تاريخ");
 			qDebug() << clmnsHeader.at(j) << clmnsHeader.at(j).trimmed().compare(dtoCompare);
 			if(clmnsHeader.at(j).trimmed().compare(dtoCompare) == 0 || clmnsHeader.at(j).trimmed().contains("Date")){
@@ -593,6 +593,90 @@ void MerplyReportTableModel::fillLocalSource(QVector<QJsonDocument> items)
 
 		}
 
+	if(this->equationColumns.count() > 0)
+		emit equationColumnsSignal();
+	else emit done();
+}
+
+void MerplyReportTableModel::fillAddtoTable(QVector<QJsonDocument> items)
+{
+	int i = this->rowsCount;
+	int newItemsCount = 0;
+	if(!cells.isEmpty()){
+		newItemsCount= (cells.count() /(colmnsCount) ) ;
+		}
+	newItemsCount+= items.count();
+	//qDebug()<< this->rowsCount<< newItemsCount << cells.count();
+
+	cells.resize(colmnsCount * newItemsCount);
+	//cells = QVector<TableCell>();
+	beginResetModel();
+	foreach(QJsonDocument item,items){
+		QString  key = item.object().value("document_id").toString();
+		int j = 0;
+		//	qDebug() << cells.count() << QString::number((i * this->colmnsCount + j)-1) << (((i * this->colmnsCount + j)-1) <= cells.count());
+		if(cells.count() > 0 && ((i * this->colmnsCount + j)-1) <= cells.count() )
+			cells[i * this->colmnsCount + j].setId(key);
+
+		foreach(QString keyData,item.object().keys()){
+				//qDebug() << __FILE__ << __LINE__  <<"Filllll"<< keyData << clmnsHeader.indexOf(keyData);
+			int clmnIndex = clmnsHeader.indexOf(keyData);
+			if(clmnIndex > -1){
+				QString valueString;
+				valueString = Controller::Get()->toString(item.object().value(keyData));
+				//		qDebug() << __FILE__ << __LINE__  <<"valueString"<< valueString;
+
+				cells[(i * this->colmnsCount) + clmnIndex].setId(key);
+				QString dtoCompare = QString::fromUtf8("تاريخ");
+				//qDebug()<< __FILE__ << __LINE__ << keyData << keyData.trimmed().compare(dtoCompare);
+				if(keyData.trimmed().compare(dtoCompare) == 0 || keyData.trimmed().contains("Date")){
+					QDateTimeEdit *date = new QDateTimeEdit;
+					date->setHidden(true);
+					date->setDateTime(QDateTime::fromString(valueString,Qt::ISODate));
+					valueString  =  date->dateTime().toString("dd/MM/yyyy");
+					}
+
+			//	qDebug()<< __FILE__ << __LINE__ <<((i * this->colmnsCount) + clmnIndex) << valueString << clmnIndex;
+				cells[(i * this->colmnsCount) + clmnIndex].setData(valueString);
+				//	QModelIndex id=this->index(i,clmnIndex,QModelIndex());
+				//emit dataChanged(id, id);
+
+				}
+			else if(item.object().value(keyData) != QJsonValue::Undefined){
+				foreach(QJsonValue row, item.object().value(keyData).toObject().value("merplyTabel").toArray()){
+					//	qDebug() << __FILE__ << __LINE__  <<"ROwww"<< row;
+					foreach(QString keyDataRow,row.toObject().keys()){
+						//		qDebug() << __FILE__ << __LINE__  <<"Filllll"<< keyData << clmnsHeader.indexOf(keyData);
+						int clmnIndexRow = clmnsHeader.indexOf(keyDataRow);
+						if(clmnIndexRow > -1){
+							QString valueString;
+							valueString = Controller::Get()->toString(row.toObject().value(keyDataRow));
+							//	qDebug() << __FILE__ << __LINE__  <<"valueStringROWW"<< valueString;
+
+							cells[(i * this->colmnsCount) + clmnIndexRow].setId(key);
+
+							if(cells[(i * this->colmnsCount) + clmnIndexRow].getData().isEmpty())
+								cells[(i * this->colmnsCount) + clmnIndexRow].setData(valueString);
+							else cells[(i * this->colmnsCount) + clmnIndexRow].setData(cells[(i * this->colmnsCount) + clmnIndexRow].getData().append(" , ").append(valueString));
+							}
+						}
+					}
+				}
+			}
+		//qDebug() << __FILE__ << __LINE__  <<"ITEMM"<< item;
+		i++;
+		}
+	rowsCount = i;
+	endResetModel();
+	//	if(this->rowsCount == 0)
+	//		this->rowsCount = 1;
+
+	int r=this->rowsCount-1;
+	int c=this->colmnsCount-1;
+	QModelIndex id=this->index(r,c,QModelIndex());
+	QModelIndex id0=this->index(0,0,QModelIndex());
+
+	emit dataChanged(id0,id);
 	if(this->equationColumns.count() > 0)
 		emit equationColumnsSignal();
 	else emit done();

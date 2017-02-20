@@ -3,7 +3,7 @@
 //#include "model.h"
 
 #include "accesscontroller.h"
-
+#include "couchbaselibmanager.h"
 #include <cstdio>
 #include <cstdlib>
 #include <string.h>
@@ -39,21 +39,21 @@ void Database::on_stored_status (lcb_t instance, const void *, lcb_storage_t ,
 		}
 	else {
 		QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
-		Database::Get()->LastKeyID = QString(keyByte);
-		emit Database::Get()->gotLastKey(QString(keyByte));
+		p_instance->LastKeyID = QString(keyByte);
+		emit p_instance->gotLastKey(QString(keyByte));
 		qDebug("Stored Key_on_stored_status:  %.*s\n",(int)resp->v.v0.nkey,resp->v.v0.key);
 
 
-		QString card = Database::Get()->LastKeyID.split("::")[0];
+		QString card = p_instance->LastKeyID.split("::")[0];
 		card.append("::%");
 		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
 
-		//if(Database::Get()->cachedArrayDocuments.contains(query)){
+		//if(p_instance->cachedArrayDocuments.contains(query)){
 		//	qDebug() << "CONTAINNNNS THE Q";
-		//	Database::Get()->cachedArrayDocuments.remove(query);
+		//	p_instance->cachedArrayDocuments.remove(query);
 		//	}
 
-		emit Database::Get()->saved(Database::Get()->LastKeyID);
+		p_instance->emit saved(p_instance->LastKeyID);
 		}
 }
 
@@ -71,9 +71,9 @@ void  Database::arithmatic_callback(lcb_t instance, const void *,
 
 bool Database::updateDoc(QJsonDocument document)
 {
-	if(Database::Get()->cachedDocuments.contains(document.object().value("document_id").toString())){
-	//	qDebug() << "contains update Document" << document.object().value("document_id").toString();
-		Database::Get()->cachedDocuments.remove(document.object().value("document_id").toString());
+	if(p_instance->cachedDocuments.contains(document.object().value("document_id").toString())){
+		//	qDebug() << "contains update Document" << document.object().value("document_id").toString();
+		p_instance->cachedDocuments.remove(document.object().value("document_id").toString());
 		}
 	lcb_t instance = Database::InitDatabase();
 	//qDebug() << __FILE__ << __LINE__  << "UPDATE DOC" << document ;
@@ -159,22 +159,24 @@ bool Database::deleteDoc(QString documentid)
 lcb_t Database::InitDatabase(QString connStr)
 {
 	// initializing
-	//Database::Get()->document = QJsonDocument();
-connStr = "couchbase://localhost/"+QString(DATABASE);
+	//p_instance->document = QJsonDocument();
+	connStr = "couchbase://localhost/"+QString(DATABASE);
 	//	this->instance;
-	//if(Database::Get()->instance){
+
+	return CouchbaseLibManager::Get()->popConnection();
+	//if(p_instance->instance){
 	//qDebug() << "static";
-	//	return Database::Get()->instance;
+	//return p_instance->instance;
 	//	}
 
 	//connStr = "couchbase://ec2-35-166-198-84.us-west-2.compute.amazonaws.com/"+QString(DATABASE);
 
 
-//connStr = "couchbase://139.59.149.28/"+QString(DATABASE);
+	//connStr = "couchbase://139.59.149.28/"+QString(DATABASE);
 
 
 
-	//Database::Get()->array.clear();
+	//p_instance->array.clear();
 
 	struct lcb_create_st cropts;// = { 0 };
 	cropts.version = 3;
@@ -202,21 +204,24 @@ connStr = "couchbase://localhost/"+QString(DATABASE);
 		qDebug() << __FILE__ << __LINE__ << "Couldn't bootstrap! " << lcb_strerror(instance, err);
 		return NULL;
 		}
-	Database::Get()->instance = instance;
+	p_instance->instance = instance;
 	return instance;
 }
 
-bool Database::KillDatabase(lcb_t instance)
+bool Database::KillDatabase(lcb_t instance,bool wait)
 {
-	lcb_wait(instance);
-	lcb_destroy(instance);
+	//lcb_tick_nowait(instance);
+	if(wait)
+		lcb_wait3(instance,LCB_WAIT_NOCHECK);
+	CouchbaseLibManager::Get()->pushConnection(instance);
+	//lcb_destroy(instance);
 	return true;
 }
 
 bool Database::IncrementKey(QString key)
 {
-	//Database::Get()->value = QString::number(-1);
-	Database::Get()->LastKeyID = "-1";
+	//p_instance->value = QString::number(-1);
+	p_instance->LastKeyID = "-1";
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){
 		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
@@ -245,7 +250,7 @@ int Database::GetKey(QString key)
 {
 
 	if(getDoc(key))
-		return Database::Get()->LastKeyID.toInt();
+		return p_instance->LastKeyID.toInt();
 	return -1;
 }
 
@@ -262,14 +267,14 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 			objectwithCAS.insert("cas_value",QString::number(resp->v.v0.cas));
 			QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
 			objectwithCAS.insert("document_id",QString(keyByte));
-			emit (Database::Get()->gotDocument(QJsonDocument(objectwithCAS)));
-		//	Database::Get()->cachedDocuments.insert(QString(keyByte),QJsonDocument(objectwithCAS));
+			emit (p_instance->gotDocument(QJsonDocument(objectwithCAS)));
+			//	p_instance->cachedDocuments.insert(QString(keyByte),QJsonDocument(objectwithCAS));
 			}
 		else{
-			emit Database::Get()->gotValue(QString(byteArray));
-			Database::Get()->LastKeyID = QString(byteArray);
+			emit p_instance->gotValue(QString(byteArray));
+			p_instance->LastKeyID = QString(byteArray);
 			qDebug() << __FILE__ << __LINE__  << "ERR @Database 219" << parserError.errorString() << QString(byteArray);
-			//qDebug() << __FILE__ << __LINE__  <<"Last Keyy"<< Database::Get()->LastKeyID;
+			//qDebug() << __FILE__ << __LINE__  <<"Last Keyy"<< p_instance->LastKeyID;
 			}
 		} else {
 		QByteArray keyByte((char*) resp->v.v0.key,(int)resp->v.v0.nkey);
@@ -282,12 +287,12 @@ bool Database::getDoc(QString key) {
 	//Query("SELECT * from QString(DATABASE)  WHERE  \"id = Contact::* \"");
 	//qDebug() << __FILE__ << __LINE__  << "hello";
 	//qDebug() << __FILE__ << __LINE__  <<"Key:"<< key;
-	if(Database::Get()->cachedDocuments.contains(key)){
-	//	qDebug() << "cached" << key;
-		emit (Database::Get()->gotDocument(Database::Get()->cachedDocuments.value(key)));
+	if(p_instance->cachedDocuments.contains(key)){
+		//	qDebug() << "cached" << key;
+		emit (p_instance->gotDocument(p_instance->cachedDocuments.value(key)));
 		return true;
 		}
-	Database::Get()->LastKeyID = "-1";
+	p_instance->LastKeyID = "-1";
 
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){
@@ -329,23 +334,23 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 		QJsonDocument::fromJson(byteArray , &parserError);
 		if(parserError.error == QJsonParseError::NoError){
 			//	documentToArray.toJson(QJsonDocument::Compact);
-			Database::Get()->array.append(QJsonDocument::fromJson(byteArray , &parserError));
+			p_instance->array.append(QJsonDocument::fromJson(byteArray , &parserError));
 			}
 		else{
 			qDebug() << __FILE__ << __LINE__  << parserError.errorString() << "emitting Value";
-			Database::Get()->emit gotValue(QString(byteArray));
-			//	qDebug() << __FILE__ << __LINE__  << Database::Get()->value;
+			p_instance->emit gotValue(QString(byteArray));
+			//	qDebug() << __FILE__ << __LINE__  << p_instance->value;
 			}
 
 		} else {
-		//	qDebug() << __FILE__ << __LINE__  << Database::Get()->array;
+		//	qDebug() << __FILE__ << __LINE__  << p_instance->array;
 
-		//Database::Get()->document = QJsonDocument(Database::Get()->array);
-//		Database::Get()->cachedArrayDocuments.insert(Database::Get()->lastQuery,Database::Get()->array);
+		//p_instance->document = QJsonDocument(p_instance->array);
+		//		p_instance->cachedArrayDocuments.insert(p_instance->lastQuery,p_instance->array);
 
-		Database::Get()->emit gotDocuments(Database::Get()->array);
+		p_instance->emit gotDocuments(p_instance->array);
 
-	//	qDebug() << __FILE__ << __LINE__ <<Database::Get()->lastQuery << Database::Get()->array;
+		//	qDebug() << __FILE__ << __LINE__ <<p_instance->lastQuery << p_instance->array;
 		//.toJson(QJsonDocument::Compact);
 		//	qDebug("Got metadata: %.*s\n", (int)resp->nrow, resp->row);
 		}
@@ -354,16 +359,16 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 void Database::query(QString query,bool cached)
 {
 
-	//if(cached && Database::Get()->cachedArrayDocuments.contains(query)){
+	//if(cached && p_instance->cachedArrayDocuments.contains(query)){
 	//	qDebug() << "cachedQ:" << query;
-	//	emit (gotDocuments(Database::Get()->cachedArrayDocuments.value(query)));
+	//	emit (gotDocuments(p_instance->cachedArrayDocuments.value(query)));
 	//	return;
 	//	}
-//
+	//
 	qDebug() << __FILE__ << __LINE__ <<"Query:: " << query;
 	this->lastQuery = query;
 	lcb_t instance = Database::InitDatabase();
-	Database::Get()->array.clear();
+	p_instance->array.clear();
 	if(instance == NULL){
 		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
 		return;
@@ -567,14 +572,14 @@ Database* Database::p_instance = 0;
  * Else if the instance already init, it returns this instance
  * @return p_instance "the static database refrence"
  */
-Database* Database::Get()
+Database* Database::Gett()
 {
-	if ( p_instance == 0){
+	//if ( p_instance == 0){
 
-		QThread* thread = new QThread;
-		p_instance = new Database();
-		p_instance->moveToThread(thread);
-		thread->start();
-		}
+	QThread* thread = new QThread;
+	p_instance = new Database();
+	p_instance->moveToThread(thread);
+	thread->start();
+	//	}
 	return p_instance;
 }

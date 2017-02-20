@@ -28,6 +28,7 @@ ERPComboBox::ERPComboBox(QWidget *parent, bool indexedFill) :
 }
 void ERPComboBox::addJsonItems(QVector<QJsonDocument> items){
 	int i = 0;
+//	this->items = items;
 	//qDebug() << __FILE__ << __LINE__  << items;
 	foreach (const QJsonDocument & value, items){
 
@@ -105,7 +106,7 @@ void ERPComboBox::focusOutEvent(QFocusEvent *e)
 			}
 		else if (re.exactMatch(this->currentText())){
 			int index = this->currentText().toInt();
-
+		//	qDebug() << __FILE__ << __LINE__   <<index  << this->currentIndex() <<this->getItemsText().at(index) <<this->items.at(index).object();
 			if(index > -1 && index < this->count() )
 				this->setCurrentIndex(index);
 			else

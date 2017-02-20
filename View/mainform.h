@@ -46,6 +46,7 @@ private:
 
 	void resizeEvent(QResizeEvent* event);
 	void paintEvent(QPaintEvent *);
+
 };
 
 #endif // MAINFORM_H

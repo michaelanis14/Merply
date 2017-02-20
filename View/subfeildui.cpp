@@ -112,7 +112,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		}
 	else if(type.compare("Table") == 0){
 		table = new merplyTabelView(this,true,false);
-		//	qDebug() << __FILE__ << __LINE__ <<"DATAA" << data.toObject() << structureView;
+			qDebug() << __FILE__ << __LINE__ <<"Table" << data.toObject() << structureView;
 		//Controller::Get()->getReportTableData(structureView);
 		QJsonObject firstclmn = structureView.value("Columns").toArray().first().toObject();
 		if(firstclmn.value("SourceLocalFilter") != QJsonValue::Undefined &&firstclmn.value("LocalSource").toBool()){

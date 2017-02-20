@@ -161,7 +161,7 @@ public slots:
 
 	void createEditStoreItems(QString key);
 	void getTabelsData(QString entity,QStringList tbls);
-	void deleteEntityData(QJsonDocument document);
+	void deleteEntityData(QVector<QJsonDocument> items);
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void gotFieldsData(QList<QString> fields);
@@ -173,7 +173,7 @@ signals:
 	void gotJsonListData(QVector<QJsonDocument> items);
 	void queryDatabase(QString q);
 	void saved(QString document_id);
-	void savedItems(bool success);
+	void savedItems(QString document_id);
 
 };
 

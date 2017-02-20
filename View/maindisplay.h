@@ -22,10 +22,9 @@ public:
 	QScrollArea *scrollAreaFormPanel;
 	QWidget *formPanel;
 	void paintEvent(QPaintEvent *);
-
+	void keyPressEvent(QKeyEvent * event);
 signals:
 
-public slots:
 
 };
 

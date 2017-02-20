@@ -53,14 +53,15 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 	lblLayout->setContentsMargins(0,0,0,0);
 	lblLayout->setContentsMargins(0,2,0,0);
 
-	controllers = new HControllers;
-	controllers->setObjectName("controllers");
 
-
-	layout->addWidget(controllers);
 
 	queryUI = new MerplyQueryUI(this,true);
 	layout->addWidget(queryUI);
+
+	controllers = new HControllers;
+	controllers->setObjectName("controllers");
+	layout->addWidget(controllers);
+
 
 	tableView= new QTableView;
 	tableView->setContentsMargins(0,0,0,0);
@@ -126,10 +127,11 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 					Controller::Get()->showCreateEditeValueUI(id);
 					}
 				else if(nActon.at(1).compare("Delete") == 0){
-					if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?").append(" "+id)))
-						if(Controller::Get()->deleteDocument(id))
-							Controller::Get()->queryIndexView("ViewStructure::"+id.split("::")[0]);
-
+					if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?").append(" "+id))){
+						Controller::Get()->deleteEntity(id);
+						queryUI->generateQuery();
+						//Controller::Get()->queryIndexView("ViewStructure::"+id.split("::")[0]);
+						}
 					}
 				}
 			}
@@ -148,6 +150,7 @@ bool merplyTabelView::fill(QJsonObject columns,QString filter)
 	//TODO: Better connect to Signals
 	//	qDebug() << __FILE__ << __LINE__ << "fill";
 	model = new MerplyReportTableModel(columns);
+	initHController(columns);
 	//	queryUI->fill(columns);
 	if(columns.value("QueryUI") != QJsonValue::Undefined){
 		//	QObject::connect(this,SIGNAL(updateModel(QVector<QJsonDocument>)),model,SLOT(fillQuery(QVector<QJsonDocument>)));
@@ -163,14 +166,32 @@ bool merplyTabelView::fill(QJsonObject columns,QString filter)
 		//	}
 
 		}
+	else if(columns.value("Add") != QJsonValue::Undefined){
+		if(columns.value("Add").toBool()){
+			foreach(QJsonValue clmn,columns.value("Columns").toArray()){
+				if(clmn.toObject().value("Source") != QJsonValue::Undefined){
+					QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillAddtoTable(QVector<QJsonDocument>)));
+					QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillAddtoTable(QVector<QJsonDocument>)));
+					queryUI->fillAddtoTable(columns.value("Columns").toArray());
+
+					break; //TODO: SEVERAL INPUTS
+					}
+				}
+
+
+
+		}
+		}
+
 	else {
 		//TODO : Else normal fill
 		QObject::disconnect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotReportData(QVector<QJsonDocument>)));
 		QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotReportData(QVector<QJsonDocument>)));
 		Controller::Get()->getReport(columns,filter);
+		initDelegateClmns(columns); //TODO: Condition specific to init it.
 		}
-	initHController(columns);
-	initDelegateClmns(columns);
+
+
 	return true;
 }
 
@@ -268,8 +289,8 @@ void merplyTabelView::initHController(QJsonObject columns)
 			btns << "Print->Print";
 			}
 
-		if(add && columns.value("Add").toBool())
-			btns <<"Add->Add";
+		//if(add && columns.value("Add").toBool())
+		//	btns <<"Add->Add";
 		if(edit && columns.value("Edit").toBool())
 			btns <<"Edit->Edit";
 		if(add && columns.value("Remove").toBool())
@@ -303,7 +324,7 @@ void merplyTabelView::printTabel(){
 	report->loadReport(fileName);
 	report->recordCount << this->model->rowCount();
 	QObject::disconnect(report, SIGNAL(setValue(const int, const QString, QVariant&, const int)),
-					 this->model, SLOT(setValue(const int, const QString, QVariant&, const int)));
+						this->model, SLOT(setValue(const int, const QString, QVariant&, const int)));
 
 	QObject::connect(report, SIGNAL(setValue(const int, const QString, QVariant&, const int)),
 					 this->model, SLOT(setValue(const int, const QString, QVariant&, const int)));

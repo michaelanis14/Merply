@@ -17,6 +17,7 @@ private:
 	ERPComboBox* combox;
 	QWidget* field;
 	QJsonObject strct;
+	QString label;
 
 signals:
 

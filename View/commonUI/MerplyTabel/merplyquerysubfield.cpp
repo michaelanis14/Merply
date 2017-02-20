@@ -7,6 +7,8 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 	//qDebug() << __FILE__ << __LINE__  <<strct;
 	this->setContentsMargins(0,0,0,0);
 	this->strct = strct;
+
+
 	layout = new QFormLayout(this);
 	//this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	layout->setContentsMargins(0,0,0,0);
@@ -16,12 +18,19 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 	field = new QWidget;
 
 	QString type =  strct.value("SubFields").toArray().first().toObject().value("Type").toString();
-	QString label = strct.value("Label").toString();
+	label = strct.value("Label").toString();
 
+	qDebug() << __FILE__ << __LINE__  <<type <<strct;
 
-	//qDebug() << __FILE__ << __LINE__  <<type;
-
-	if(!strct.value("Source").toString().isEmpty() && strct.value("Source").toString().compare("_") != 0){
+	if(strct.value("clmn") != QJsonValue::Undefined){
+		label = strct.value("Select").toString();
+		QLineEdit* lineEdit = new QLineEdit();
+		lineEdit->setObjectName(label);
+		lineEdit->setContentsMargins(0,0,0,0);
+		layout->addWidget(lineEdit);
+		field = lineEdit;
+		}
+	else if(!strct.value("Source").toString().isEmpty() && strct.value("Source").toString().compare("_") != 0){
 		if(!strct.value("Select").toString().isEmpty() && strct.value("Select").toString().compare("ALL") == 0){
 			MerplyQueryUI* q= new MerplyQueryUI(this);
 			q->fillDocumentID(strct.value("Source").toString());
@@ -83,8 +92,10 @@ QString MerplyQuerySubField::getValue(QString entity)
 {
 	QString save = "";
 	//qDebug() << __FILE__ << __LINE__  << field->metaObject()->className();
-	if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
-		qDebug() << __FILE__ << __LINE__  << this->strct;
+
+
+	 if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
+	//	qDebug() << __FILE__ << __LINE__  << this->strct;
 		if(((ERPComboBox*)field)->currentIndex() > 0){
 			//	save += component.name;
 			if(strct.value("BeforFilter") != QJsonValue::Undefined){

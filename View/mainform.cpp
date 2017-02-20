@@ -119,6 +119,7 @@ MainForm::MainForm(): QWidget()
 	hnavigation->move(NAVIGATION_WIDTH,0);
 	hnavigation->addWidget(LoginTabUI::Get());
 	currentDisplay = 0;
+
 }
 
 
@@ -203,3 +204,4 @@ void MainForm::resizeEvent(QResizeEvent* event) {
 	this->QWidget::resizeEvent(event);
 
 }
+

@@ -49,10 +49,10 @@ int main(int argc, char *argv[])
 
 
 	QApplication::setFont(BDavat);
-	//QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
+//	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 
 
-	//QApplication::setLayoutDirection(Qt::RightToLeft);
+	QApplication::setLayoutDirection(Qt::RightToLeft);
 
 #ifdef Q_OS_WIN32
 	MEMORYSTATUSEX memory_status;
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 #endif
 
 
-	Controller::Log(QStringList() << QTime::currentTime().toString() << "Application Started");
+	//Controller::Log(QStringList() << QTime::currentTime().toString() << "Application Started");
 
 
 	Controller::Get()->showDisplay();

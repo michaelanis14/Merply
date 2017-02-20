@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QJsonObject>
 #include <QVBoxLayout>
+#include <QShortcut>
 
 class CreateEditUI : public MainDisplay
 {
@@ -31,6 +32,9 @@ private:
 	QJsonObject data;
 	void clearErrorsWidget();
 	QStringList getTabelsFieldNames(QJsonObject viewStructure);
+	QShortcut* saveShortCut;
+	QShortcut* cancelShortCut;
+	QShortcut* printShortCut;
 signals:
 protected:
 	//void showEvent(QShowEvent *);
@@ -39,6 +43,9 @@ public slots:
 	void controller_Clicked(QString nameAction);
 	void gotTabelsData(QVector<QJsonDocument> tblsData);
 	void saved();
+	void printEntity();
+	void saveEntity();
+	void cancel();
 };
 
 #endif // CREATEEDITUI_H

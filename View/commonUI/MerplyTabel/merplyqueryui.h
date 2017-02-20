@@ -17,6 +17,7 @@ public:
 	void fill(QJsonObject strct);
 	void fillEntityQuery(QJsonObject strct);
 	void fillDocumentID(QString document_id);
+	void fillAddtoTable(QJsonArray clmns);
 	QString getFields(QString entity);
 private:
 	bool btnFilterFlag;
@@ -25,6 +26,9 @@ private:
 	QVector<MerplyQuerySubField*> fields;
 	QString document_id;
 	QJsonObject strct;
+	bool clmnsFlag;
+	//QJsonArray clmns;
+	QString selectClmnsQuery;
 	void clear();
 signals:
 	void queryResults(QVector<QJsonDocument> items);

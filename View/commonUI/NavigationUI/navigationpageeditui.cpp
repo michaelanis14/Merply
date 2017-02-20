@@ -259,8 +259,8 @@ void NavigationPageEditUI::save(bool updateDataBase)
 		newCardStructure->headerlbl->setTitle(this->headerlbl->getTitle());
 
 		if(updateDataBase){
-			QObject::connect(Controller::Get(),SIGNAL(gotLastKey(QString)),this,SLOT(gotLastKeyData(QString)));
-			Controller::Get()->getLastKey();
+			QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(gotLastKeyData(QString)));
+			//Controller::Get()->getLastKey();
 			QJsonObject newsStruct = newCardStructure->save();
 			Controller::Get()->storeDoc("ViewStructure::"+newsStruct.value("Title").toString(),QJsonDocument(newsStruct));
 
@@ -284,7 +284,7 @@ void NavigationPageEditUI::save(bool updateDataBase)
 void NavigationPageEditUI::gotLastKeyData(QString key)
 {
 	//qDebug() << __FILE__ << __LINE__  << "KEYYYYYYY" << key;
-	QObject::disconnect(Controller::Get(),SIGNAL(gotLastKey(QString)),this,SLOT(gotLastKeyData(QString)));
+	QObject::disconnect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(gotLastKeyData(QString)));
 	saveObject.insert("Card",key);
 	emit this->saved(saveObject);
 	//qDebug() << __FILE__ << __LINE__  << "GOTTTTLASTTTTKEYYY DATAAA" <<  key;

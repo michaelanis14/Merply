@@ -28,10 +28,11 @@ void AccessController::login(QString username, QString password)
 		emit successLogin();
 		}
 	else{
-		QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(loginData(QVector<QJsonDocument>)));
+		Database* database  = Database::Gett();
+		QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(loginData(QVector<QJsonDocument>)));
 		QString query = QString("SELECT (`"+QString(DATABASE)+"`).*  ,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \"Users::%\"  AND Fields[0][0].`Username`[0] = '"+username+"' AND Fields[0][1].`UserPassword`[0] = '"+password+"'");
 		//qDebug() << __FILE__ << __LINE__ <<"Q : " << query;
-		Database::Get()->query(query);
+		database->query(query);
 		}
 }
 
@@ -65,7 +66,7 @@ bool AccessController::hasAccess(QString group)
 
 void AccessController::loginData(QVector<QJsonDocument> user)
 {
-	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(loginData(QVector<QJsonDocument>)));
+	//QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(loginData(QVector<QJsonDocument>)));
 	if(user.isEmpty()){
 		qDebug() << __FILE__ << __LINE__  << "user login faild : Wrong Password or UserName";
 			emit faildLogin();

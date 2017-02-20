@@ -31,7 +31,7 @@ public:
 	QJsonDocument getCurrentJsonItem();
 private:
 	QString oldCompletion;
-
+	//QVector<QJsonDocument> items;
 signals:
 	void refreshModel();
 	void indexedFillEvent(QString completion);

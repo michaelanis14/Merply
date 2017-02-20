@@ -11,6 +11,9 @@ MerplyQueryUI::MerplyQueryUI(QWidget *parent,bool btnFilter) : QWidget(parent)
 	this->btnFilterFlag = btnFilter;
 	this->setContentsMargins(0,0,0,0);
 	layout = new QHBoxLayout(this);
+	this->clmnsFlag = false;
+	this->selectClmnsQuery = "";
+
 	//this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	layout->setContentsMargins(0,0,0,0);
 	layout->setSpacing(0);
@@ -92,6 +95,49 @@ void MerplyQueryUI::fillDocumentID(QString document_id)
 		}
 }
 
+void MerplyQueryUI::fillAddtoTable(QJsonArray clmns)
+{
+
+	//this->clmns = clmns;
+	int i = 0;
+	selectClmnsQuery = "";
+	QWidget * viewgrp  = new QWidget;
+	viewgrp->setContentsMargins(0,0,0,0);
+	QFormLayout* fieldslayout = new QFormLayout(viewgrp);
+	fieldslayout->setContentsMargins(0,0,0,0);
+	fieldslayout->setSpacing(4);
+	fieldslayout->setMargin(0);
+	this->layout->addWidget(viewgrp);
+	foreach(QJsonValue clmn,clmns){
+		QJsonObject clmnObj;
+		clmnObj = clmn.toObject();
+		if(clmnObj.value("Type").toString().compare("Refrence") ==0){
+			this->clmnsFlag = true;
+			this->document_id = clmnObj.value("Source").toString();
+		clmnObj.insert("clmn","");
+		QString label = clmnObj.value("Header").toString();
+		MerplyQuerySubField* qSubField = new MerplyQuerySubField(clmnObj,0);
+		fieldslayout->addRow(label,qSubField);
+		fields << qSubField;
+		{
+	//	if(i > 0)
+			selectClmnsQuery+=" , ";
+		selectClmnsQuery += "`"+clmnObj.value("Select").toString()+"`";
+		selectClmnsQuery += " AS ";
+		selectClmnsQuery += "`"+clmnObj.value("Header").toString()+"`";
+		i++;
+		}
+			}
+		}
+	if(clmnsFlag && btnFilterFlag){
+		btnFilter  = new QPushButton("Filter",this);
+		this->btnFilter->setDisabled(false);
+		QObject::connect(btnFilter,SIGNAL(clicked(bool)),this,SLOT(disablebutton()));
+		this->layout->addWidget(btnFilter);
+		}
+
+}
+
 QString MerplyQueryUI::getFields(QString entity)
 {
 	QString save="";
@@ -106,6 +152,8 @@ QString MerplyQueryUI::getFields(QString entity)
 	return save;
 
 }
+
+
 
 void MerplyQueryUI::clear()
 {
@@ -144,7 +192,8 @@ void MerplyQueryUI::generateQuery()
 		query += q;
 		}
 	else if(!save.isEmpty()){
-		query += "SELECT `"+QString(DATABASE)+"`.*,to_number(SPLIT(META(`"+QString(DATABASE)+"`).id,'::')[1]) AS `ID.No.` FROM  `"+QString(DATABASE)+"`  WHERE META(`"+QString(DATABASE)+"`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
+
+		query += "SELECT `"+QString(DATABASE)+"`.*,to_number(SPLIT(META(`"+QString(DATABASE)+"`).id,'::')[1]) AS `ID.No.`"+selectClmnsQuery+" FROM  `"+QString(DATABASE)+"`  WHERE META(`"+QString(DATABASE)+"`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
 		}
 	if(!query.isEmpty()){
 		qDebug() << query;
