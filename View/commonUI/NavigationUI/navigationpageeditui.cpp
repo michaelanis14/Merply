@@ -232,7 +232,7 @@ void NavigationPageEditUI::save(bool updateDataBase)
 	this->saveObject.insert("TabPermissions",subtabPermissions->save());
 	if(page->isChecked()){
 		saveObject.insert("Type","Page");
-		QJsonObject savedPage = pageEdit->save();
+		QJsonObject savedPage = pageEdit->save() ;
 		if(updateDataBase){
 			if(savedPage.value("document_id") != QJsonValue::Undefined){
 				//qDebug() << __FILE__ << __LINE__  << savedPage.value("document_id");
@@ -261,7 +261,7 @@ void NavigationPageEditUI::save(bool updateDataBase)
 		if(updateDataBase){
 			QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(gotLastKeyData(QString)));
 			//Controller::Get()->getLastKey();
-			QJsonObject newsStruct = newCardStructure->save();
+			QJsonObject newsStruct = newCardStructure->save() ;
 			Controller::Get()->storeDoc("ViewStructure::"+newsStruct.value("Title").toString(),QJsonDocument(newsStruct));
 
 			}
@@ -394,7 +394,7 @@ void NavigationPageEditUI::updatePagePreview()
 
 		//	qDebug() << __FILE__ << __LINE__  << "updatePAge";
 		clearPreview();
-		PageUI*page = new PageUI(0,pageEdit->save());
+		PageUI*page = new PageUI(0,pageEdit->save() );
 		page->headerlbl->setHidden(true);
 		previewLayout->addWidget(page);
 		}
@@ -416,7 +416,7 @@ void NavigationPageEditUI::updateNewCardPreview()
 	if(newCard->isChecked()){
 		//qDebug() << __FILE__ << __LINE__  << "newCard";
 		clearPreview();
-		ViewGroups* vg = ViewGroups::Create(newCardStructure->save(),QJsonObject());
+		ViewGroups* vg = ViewGroups::Create(newCardStructure->save() ,QJsonObject());
 		previewLayout->addWidget(vg);
 		}
 }

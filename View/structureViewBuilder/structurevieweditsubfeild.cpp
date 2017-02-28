@@ -129,8 +129,10 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 			//entityFilter->currentIndexChanged(entityFilter->currentIndex());
 			//entityFilter->setCurrentText();
 			}
-
-
+		defaultValue = new QLineEdit(0);
+		defaultValue->setText(fieldVS.toObject().value("Default").toString());
+		defaultValue->setValidator( new QIntValidator(0, 1000000, this) );
+		layout->addRow(new QLabel(tr("Default ")), defaultValue);
 		}
 	else if(type.compare("Text") == 0){
 
@@ -233,6 +235,8 @@ QJsonObject StructureVieweditSubFeild::save()
 			saveObject.insert("Source",Source->getKey());
 			saveObject.insert("Condition",condition->toPlainText());
 			saveObject.insert("Editable",Editable->isChecked());
+			if(!defaultValue->text().isEmpty())
+				saveObject.insert("Default",defaultValue->text());
 			if(filterOn->currentIndex() == 1){
 				saveObject.insert("LocalFilter",true);
 				saveObject.insert("Local",localFilter->currentText());

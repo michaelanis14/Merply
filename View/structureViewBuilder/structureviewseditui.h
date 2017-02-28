@@ -3,6 +3,7 @@
 
 #include "feildui.h"
 #include "structureviewedit.h"
+#include "structureviewrefrence.h"
 #include <QWidget>
 
 class StructureViewsEditUI : public QWidget
@@ -19,6 +20,7 @@ public:
 	void loadGroup();
 
 	QList<StructureViewEdit *> sVSFs;
+	QList<StructureViewRefrence *> sRSFs;
 private:
 	QVBoxLayout *layout;
 
@@ -40,6 +42,8 @@ private:
 	QStringList styles;
 	void loadStyle();
 	void addStrField(QJsonValue fieldVS);
+	void addStrRefrence(QJsonValue RefrenceVS);
+	//QStringList fieldsName;
 
 protected:
 	QStringList restrictedTypes;
@@ -47,6 +51,7 @@ signals:
 	void changed();
 	void styleChanged();
 	void updateLayout();
+	void constructorDone();
 
 public slots:
 	//void updatePreview(bool oldStrct = false);
@@ -54,6 +59,7 @@ public slots:
 	void styleChanged(QString layout);
 	void joinGroupChanged(bool join);
 	void groupActivated(int);
+	//void addSavedStrRefrence(QJsonValue RefrenceVS);
 
 	void removeField(QWidget* field);
 };

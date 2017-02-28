@@ -325,7 +325,7 @@ bool Prsistance::init()
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 			QJsonObject c;
 
-			int id;
+			int id = -1;
 			if(!data.at(0).isEmpty()){
 				id = data.at(0).toInt();
 				}
@@ -1076,7 +1076,7 @@ bool Prsistance::init()
 			bool newReturn = false;
 			//qDebug() << __FILE__ << __LINE__ << data << data.count();
 
-			int newID;
+			int newID = -1;
 			if(0 < data.count() && !data.at(1).isEmpty()){
 				newID =  data.at(1).toInt();
 				}
@@ -1991,8 +1991,8 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 	QString where;
 	if(!condition.isEmpty()){
 		if(condition.split("=").count() > 1){
-			where = QString("AND d.`"+condition.split("=")[0]+"` = \""+condition.split("=")[1]+"\" ") ;
-
+			//where = QString("AND d.`"+condition.split("=")[0]+"` = '"+condition.split("=")[1]+"' ") ;
+			where = QString("AND d.").append(condition) ;
 			//where = QString("AND ANY item in f SATISFIES item.[0] =  END ");
 			}
 		else{
@@ -2007,7 +2007,7 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 
 
 	QString query = "SELECT  d.`"+select.trimmed()+"` AS `Value`,META(d).id AS `Key`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where+"  ORDER BY `BB` ";
-	qDebug() << __FILE__ << __LINE__ << query;
+	//qDebug() << __FILE__ << __LINE__ << query;
 	Database* database  = Database::Gett();
 	QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QVector<QJsonDocument>)));
 	database->query(query,true);
@@ -2078,7 +2078,7 @@ bool Prsistance::Select(const QString query)
 	//		return true;
 	//	}
 
-	return false;
+	return query.isEmpty();
 }
 
 QString Prsistance::GetDatabaseName()

@@ -1,6 +1,10 @@
 #ifndef SUBFIELDUI_H
 #define SUBFIELDUI_H
 
+#include "rangevalidator.h"
+#include "erpcombobox.h"
+#include "merplytabelview.h"
+
 #include <QObject>
 #include <QWidget>
 #include <QLabel>
@@ -12,9 +16,7 @@
 #include <QDebug>
 #include <QJsonArray>
 
-#include "rangevalidator.h"
-#include "erpcombobox.h"
-#include "merplytabelview.h"
+
 
 
 class SubFieldUI : public QWidget

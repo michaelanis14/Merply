@@ -63,7 +63,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		if(structureView.value("Default") != QJsonValue::Undefined){
 			lineEdit->setText(structureView.value("Default").toString());
 			}
-		lineEdit->setText(data.toString());
+		lineEdit->setText(Controller::Get()->toString(data));
 		if(structureView.value("CharCount") != QJsonValue::Undefined && structureView.value("CharCount").toInt() > 0)
 			lineEdit->setMaxLength(structureView.value("CharCount").toInt());
 		if(structureView.value("InputDataType").toString().compare("IntToMillion") == 0)
@@ -112,7 +112,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		}
 	else if(type.compare("Table") == 0){
 		table = new merplyTabelView(this,true,false);
-			qDebug() << __FILE__ << __LINE__ <<"Table" << data.toObject() << structureView;
+		//	qDebug() << __FILE__ << __LINE__ <<"Table" << data.toObject() << structureView;
 		//Controller::Get()->getReportTableData(structureView);
 		QJsonObject firstclmn = structureView.value("Columns").toArray().first().toObject();
 		if(firstclmn.value("SourceLocalFilter") != QJsonValue::Undefined &&firstclmn.value("LocalSource").toBool()){
@@ -333,6 +333,10 @@ void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 		combox->clear();
 		combox->addJsonItems(items);
 		}
+	//qDebug() << structureView.value("Default") << structureView;
+	if(structureView.value("Default") != QJsonValue::Undefined){
+		combox->setCurrentIndex(structureView.value("Default").toString().toInt());
+		}
 	//qDebug() << __FILE__ << __LINE__  << items;
 }
 
@@ -360,8 +364,9 @@ void SubFieldUI::updateFilter(QString filter)
 	else{
 		//qDebug() << __FILE__ << __LINE__  <<"filter" << filter << structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Entity").toString()+"="+filter;
 		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
-
-		Controller::Get()->getJsonEntityFieldsList(source,select,entity+"="+filter);
+		//qDebug() <<"Source:" << source <<"SELECT:"<< select<<"Entity:" << entity <<"Filter:"<< filter;
+		//QString("`"+entity+"`").append(" = ").append("'").append(filter).append("'");
+		Controller::Get()->getJsonEntityFieldsList(source,select,QString("to_string(d.`"+entity+"`)").append("  LIKE  ").append("'").append(filter).append("'"));
 		}
 
 }

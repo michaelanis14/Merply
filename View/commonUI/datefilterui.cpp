@@ -1,7 +1,7 @@
 #include "datefilterui.h"
 #include <QLabel>
 
-DateFilterUI::DateFilterUI(QWidget *parent) : QWidget(parent)
+DateFilterUI::DateFilterUI(QWidget *parent) : QGroupBox(parent)
 {
 	this->setContentsMargins(0,0,0,0);
 	layout = new QFormLayout(this);
@@ -16,13 +16,13 @@ DateFilterUI::DateFilterUI(QWidget *parent) : QWidget(parent)
 	//from->setDateTime(QDateTime::fromString("2017/1/1",Qt::ISODate));
 	from->setDateTime(QDateTime::currentDateTime().addYears(-1));
 	from->setDisplayFormat("dd/MM/yyyy");
-	layout->addRow(tr("From :"),from);
+	layout->addRow(tr(" من: "),from);
 
 
 	to = new QDateTimeEdit();
 	to->setDateTime(QDateTime::currentDateTime());
 	to->setDisplayFormat("dd/MM/yyyy");
-	layout->addRow(tr("To :"),to);
+	layout->addRow(tr("إلى:"),to);
 
 }
 

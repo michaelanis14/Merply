@@ -40,10 +40,6 @@ ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, 
 
 void ViewGroup::save(QJsonObject* entity)
 {
-
 	foreach(FeildUI* feild,feilds)
 		feild->save(entity);
-
-
-
 }

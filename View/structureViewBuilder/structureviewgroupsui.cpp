@@ -41,7 +41,12 @@ StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject struct
 		headerlbl->setTitle(structureView.value("Title").toString());
 	else headerlbl->setTitle("New Card");///+QString::number(Controller::Get()->Count("ViewStructure")));
 	layout->addWidget(headerlbl);
+//	headerlbl->setDisabled(true);
 
+	saveAs = new HeaderLabel();
+	if(!structureView.value("SaveAs").toString().isEmpty())
+		saveAs->setTitle(structureView.value("SaveAs").toString());
+	layout->addWidget( saveAs);
 
 	sctrlUI = new SettingsCtrlsUI();
 	sctrlUI->addbtn("Print",":/resources/icons/icons/1479148339_free-37.png","print");
@@ -77,12 +82,14 @@ StructureViewGroupsUI::StructureViewGroupsUI(QWidget *parent, QJsonObject struct
 
 QJsonObject StructureViewGroupsUI::save()
 {
-
 	QJsonObject saveObject;
 	if(!init)
 		return saveObject;
 	saveObject.insert("Title",headerlbl->getTitle());
 	saveObject.insert("Type","Entity");
+	if(!saveAs->getTitle().trimmed().isEmpty()){
+		saveObject.insert("SaveAs",saveAs->getTitle().trimmed());
+		}
 	QJsonArray ViewGroups;
 	foreach(StructureViewsEditUI * strcViewUI,sVSFUIs){
 		QJsonObject viewGroup;
@@ -222,7 +229,7 @@ void StructureViewGroupsUI::viewGroupStyleChanged()
 void StructureViewGroupsUI::updateLayout()
 {
 
-	fill(this->save());
+	fill(this->save() );
 }
 
 void StructureViewGroupsUI::removeViewgroup(QWidget* field)
@@ -240,17 +247,17 @@ void StructureViewGroupsUI::editControllerCancelPressed()
 
 void StructureViewGroupsUI::editControllerSavePressed()
 {
-	QJsonObject savedObj = this->save();
+	QJsonObject savedObj = this->save() ;
 	//qDebug() << __FILE__ << __LINE__  <<"SAVE: editControllerSavePressed"<< savedObj;
 	if(savedObj.value("document_id") == QJsonValue::Undefined)
 		Controller::Get()->storeDoc("ViewStructure",QJsonDocument(savedObj));
 	else Controller::Get()->UpdateDoc(QJsonDocument(savedObj));
 
-//	Controller::Get()->createIndexes(savedObj); //TODO: BETTER INDEXING
+	//	Controller::Get()->createIndexes(savedObj); //TODO: BETTER INDEXING
 	Controller::Get()->editControllerCancelPressed();
 }
 
-void StructureViewGroupsUI::getFeildsNames()
+QStringList StructureViewGroupsUI::getFeildsNames()
 {
 	QStringList feildNames;
 	foreach(StructureViewsEditUI* vg,sVSFUIs){
@@ -268,6 +275,7 @@ void StructureViewGroupsUI::getFeildsNames()
 
 		}
 	emit gotFieldsNames(feildNames);
+	return feildNames;
 }
 
 void StructureViewGroupsUI::getTableFields(ERPComboBox* excludeSource)

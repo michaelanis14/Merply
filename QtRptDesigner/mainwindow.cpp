@@ -936,8 +936,9 @@ void MainWindow::showDataSource(bool newfile) {
 		if(!filename.isEmpty())
 			fileName = filename;
 		}
-	QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotDocument(QJsonDocument)));
-	Database::Get()->getDoc("PrintStructure::"+fileName);
+	Database* database  = Database::Gett();
+	QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotDocument(QJsonDocument)));
+	database->getDoc("PrintStructure::"+fileName);
 
 
 }
@@ -1551,11 +1552,13 @@ void MainWindow::saveReport() {
 		QFileInfo fileInfo(tmpfileName);
 		QString filename(fileInfo.fileName());
 		fileName = filename;
-		Database::Get()->storeDoc("PrintStructure::"+fileName,QJsonDocument(printXmlJson));
+		Database* database  = Database::Gett();
+		database->storeDoc("PrintStructure::"+fileName,QJsonDocument(printXmlJson));
 		}else{
 		QJsonObject xmlStrct = loadedXmlJson.object();
 		xmlStrct.insert("XMLSTRCT",xmlDoc->toString());
-		Database::Get()->updateDoc(QJsonDocument(xmlStrct));
+		Database* database  = Database::Gett();
+		database->updateDoc(QJsonDocument(xmlStrct));
 		showDataSource(false);
 		}
 	//qDebug() << "SAVEEE" << fileName;

@@ -11,8 +11,8 @@ class CouchbaseLibManager : public QObject
 {
 	Q_OBJECT
 public:
-	explicit CouchbaseLibManager(QObject *parent = 0, int poolCount = 10, QString connStr = "");
-	static  CouchbaseLibManager* Get(int poolCount = 10,QString connStr = "");
+	explicit CouchbaseLibManager(QObject *parent = 0, int poolCount = 1, QString connStr = "");
+	static  CouchbaseLibManager* Get(int poolCount = 1,QString connStr = "");
 	lcb_t popConnection();
 	void pushConnection(lcb_t instance);
 

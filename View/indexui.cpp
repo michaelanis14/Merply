@@ -14,7 +14,7 @@ IndexUI::IndexUI(QWidget *parent) : MainDisplay(parent)
 	this->setObjectName("IndexUI");
 
 
-	btnCreatNew = new QPushButton("Create New");
+	btnCreatNew = new QPushButton("جديد");
 	connect(btnCreatNew, SIGNAL(pressed()), this, SLOT(createNew()));
 	layout->addWidget(btnCreatNew);
 
@@ -26,7 +26,8 @@ IndexUI::IndexUI(QWidget *parent) : MainDisplay(parent)
 
 
 	layout->addWidget(table);
-//	qDebug() << __FILE__ << __LINE__  <<"Index";
+	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_N), this, SLOT(createNew()));
+	//	qDebug() << __FILE__ << __LINE__  <<"Index";
 
 }
 IndexUI* IndexUI::p_instance = 0;
@@ -35,14 +36,17 @@ void IndexUI::ShowUI(const QString document_id, const QVector<QJsonDocument> doc
 
 	if(p_instance == 0)
 		p_instance = new IndexUI();
-	p_instance->fill(document_id,documents);
+	if(p_instance->document_id.compare(document_id) != 0){
+		p_instance->fill(document_id,documents);
+		}
 	MainForm::Get()->ShowDisplay(p_instance);
+	p_instance->table->generateQuery(50);
 }
 
 
 void IndexUI::fill(const QString document_id,const QVector<QJsonDocument> items)
 {
-/*	this->id = id;
+	/*	this->id = id;
 	QStringList idNumber = id.split("::");
 	if(idNumber.count() > 1)
 		this->id = idNumber.first();
@@ -73,6 +77,7 @@ void IndexUI::fill(const QString document_id,const QVector<QJsonDocument> items)
 	//qDebug() << __FILE__ << __LINE__  << items;
 	this->document_id = document_id;
 	table->indexTable(document_id,items);
+	//table->queryUI->generateQuery();
 }
 
 void IndexUI::createNew()

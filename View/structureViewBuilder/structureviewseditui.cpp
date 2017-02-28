@@ -1,4 +1,5 @@
 #include "structureviewseditui.h"
+#include "structureviewgroupsui.h"
 #include "settingsctrlsui.h"
 #include "controller.h"
 #include "removebtn.h"
@@ -8,6 +9,7 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 	this->structureView = structureView;
 	this->restrictedTypes = restrictedTypes;
 	this->setContentsMargins(2,2,2,2);
+	//	this->fieldsName = QStringList();
 
 	QVBoxLayout* structureViewGroupsUILayout = new QVBoxLayout(this);
 	structureViewGroupsUILayout->setMargin(0);
@@ -139,6 +141,7 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 
 	SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
 	sctrlUI->addbtn("Add Field",":/resources/icons/add.png","add");
+	sctrlUI->addbtn("Add Refrence",":/resources/icons/add.png","Refrence");
 
 	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(controller_Clicked(QString)));
 	sctrlUI->setAutoFillBackground(true);
@@ -150,8 +153,12 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 		titleData->setText(viewgroup.value("GroupTitle").toString());
 		if(viewgroup.value("Fields").isArray())
 			foreach (QJsonValue fieldVS, viewgroup.value("Fields").toArray()) {
+				//	this->fieldsName << fieldVS.toObject().value("Label").toString();
 				addStrField(fieldVS);
 				}
+		foreach (QJsonValue fieldVS, viewgroup.value("RefrenceFields").toArray()) {
+			addStrRefrence(fieldVS);
+			}
 		}
 	else controller_Clicked("Add");
 
@@ -178,7 +185,15 @@ QJsonObject StructureViewsEditUI::save()
 	foreach(StructureViewEdit * strcView,sVSFs){
 		fields << strcView->save();
 		}
-	saveObject.insert("Fields",fields);
+	if(!fields.isEmpty())
+		saveObject.insert("Fields",fields);
+
+	QJsonArray strctRefrence;
+	foreach(StructureViewRefrence * strcRef,sRSFs){
+		strctRefrence << strcRef->save();
+		}
+	if(!strctRefrence.isEmpty())
+		saveObject.insert("RefrenceFields",strctRefrence);
 
 	return saveObject;
 }
@@ -295,12 +310,31 @@ void StructureViewsEditUI::addStrField(QJsonValue fieldVS)
 	layout->addStretch(1);
 }
 
+void StructureViewsEditUI::addStrRefrence(QJsonValue RefrenceVS)
+{
+	//qDebug()<<"addStrRefrence" << StructureViewGroupsUI::GetUI()->getFeildsNames();
+
+	StructureViewRefrence *  strctRef = new StructureViewRefrence(0,RefrenceVS.toObject(),StructureViewGroupsUI::GetUI()->getFeildsNames());
+	//QObject::connect( strctRef,SIGNAL(changed()),this,SIGNAL(changed()));
+	sRSFs <<  strctRef;
+	layout->setStretch(layout->count()-1,0);
+	RemoveBtn* rmvtbn =  new RemoveBtn(0, strctRef);
+	//rmvtbn->hideRemovebtn(true);
+	QObject::connect(rmvtbn,SIGNAL(remove(QWidget*)),this,SLOT(removeField(QWidget*)));
+	//QObject::connect( strctRef->topCntrlsPreview,SIGNAL(removeClicked()),rmvtbn,SLOT(remove()));
+
+	layout->addWidget(rmvtbn);
+	layout->addStretch(1);
+}
+
 void StructureViewsEditUI::controller_Clicked(QString btn)
 {
 
-	if(btn.contains("Add")){
+	if(btn.contains("Refrence")){
+		addStrRefrence(QJsonValue());
+		}
+	else if(btn.contains("Add")){
 		addStrField(QJsonValue());
-
 		}
 	else if(btn.contains("Edit")){
 		topCntrls->isHidden()?hidePreview(true):hidePreview(false);
@@ -368,6 +402,12 @@ void StructureViewsEditUI::groupActivated(int)
 
 void StructureViewsEditUI::removeField(QWidget* field)
 {
-	sVSFs.removeOne((StructureViewEdit *)field);
+	if(QString(field->metaObject()->className()).compare("StructureViewEdit") == 0 ){
+		sVSFs.removeOne((StructureViewEdit *)field);
+		}
+	else if(QString(field->metaObject()->className()).compare("StructureViewRefrence") == 0 ){
+		sRSFs.removeOne((StructureViewRefrence *)field);
+		}
+
 }
 

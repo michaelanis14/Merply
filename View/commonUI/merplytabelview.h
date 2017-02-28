@@ -46,7 +46,9 @@ public:
 	QJsonObject save();
 	MerplyReportTableModel* model;
 	MerplyReportTableModel* getModel() const;
-
+	QModelIndex getIndexAt(QPoint position);
+	QTableView* getTableView() const;
+	void generateQuery(int limit);
 private:
 	QVBoxLayout* layout;
 	QHBoxLayout* lblLayout;
@@ -78,6 +80,7 @@ public slots:
 	void modelFinished();
 	void controller_Clicked(QString nameAction);
 	void selectionChanged(const QItemSelection &, const QItemSelection &);
+	void resizeTabelToContets();
 };
 
 #endif // merplyTabelView_H

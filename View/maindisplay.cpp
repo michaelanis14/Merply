@@ -65,7 +65,7 @@ MainDisplay::MainDisplay(QWidget* parent) :
 
 void MainDisplay::keyPressEvent(QKeyEvent* event)
 {
-	qDebug() << "keyyyy";
+	//qDebug() << "keyyyy";
 	if (event->key() == Qt::Key_Return)
 	{
 	focusNextPrevChild(true);

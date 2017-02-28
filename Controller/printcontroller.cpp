@@ -21,7 +21,10 @@ void PrintController::printEntity(QString id)
 	Controller::Get()->getDoc(id);
 }
 
-
+/**
+ * @brief PrintController::gotPrintEntity
+ * @param document
+ */
 void PrintController::gotPrintEntity(QJsonDocument document)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintEntity(QJsonDocument)));
@@ -125,7 +128,7 @@ void PrintController::gotPrintStrct(QJsonDocument strct)
 	report->recordCount << reportData.count();
 	//qDebug() << reportData.count();
 	//qDebug() << __FILE__ << __LINE__  <<"gotPrintStrct"<< printStrct.object().value("XMLSTRCT").toString();
-	report->printExec();
+	report->printExec(true, false, "printerName");
 }
 
 void PrintController::setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage)
@@ -133,8 +136,11 @@ void PrintController::setValue(const int recNo, const QString paramName, QVarian
 	//qDebug() << __FILE__ << __LINE__  << paramName << recNo << reportPage;
 
 	//qDebug() << reportData.at(recNo).toObject().value(paramName);
-	if(fieldsValues.contains(paramName))
+	if(fieldsValues.contains(paramName)){
+		if(paramName.compare("") == 0)
+			paramValue = fieldsValues.value(paramName) ;
 		paramValue = fieldsValues.value(paramName) ;
+		}
 	else if(reportData.at(recNo).toObject().value(paramName) != QJsonValue::Undefined){
 
 		paramValue =reportData.at(recNo).toObject().value(paramName).toString();

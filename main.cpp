@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 	int id = QFontDatabase::addApplicationFont(":/fonts/artro.ttf");
 	QString family = QFontDatabase::applicationFontFamilies(id).at(0);
 	QFont BDavat(family);
-
+	BDavat.setPointSize(18);
 
 	QApplication::setFont(BDavat);
 //	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));

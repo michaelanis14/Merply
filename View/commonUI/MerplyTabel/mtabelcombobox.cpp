@@ -14,7 +14,7 @@ MTabelCombobox::MTabelCombobox(QObject* parent,QJsonObject strct) : QStyledItemD
 
 }
 
-QWidget* MTabelCombobox::createEditor(QWidget* parent, const QStyleOptionViewItem& , const QModelIndex& index) const
+QWidget* MTabelCombobox::createEditor(QWidget* parent, const QStyleOptionViewItem& , const QModelIndex& ) const
 {
 	//qDebug() << "createEditor";
 	ERPComboBox* cb = new ERPComboBox(parent);

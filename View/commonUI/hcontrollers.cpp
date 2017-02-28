@@ -6,8 +6,8 @@ HControllers::HControllers(QWidget *parent,QStringList btns) : QWidget(parent)
 	this->layout = new QHBoxLayout(this);
 	this->layout->setAlignment(Qt::AlignRight);
 	this->layout->setContentsMargins(0,0,0,0);
-	this->layout->setSpacing(1);
-	this->setMaximumHeight(30);
+	//this->layout->setSpacing(1);
+	this->setMaximumHeight(40);
 
 
 	this->fill(btns);
@@ -32,7 +32,7 @@ void HControllers::clear(){
 void HControllers::fill(QStringList btns){
 	foreach(QString btnName,btns){
 		QPushButton* btn = new QPushButton();
-
+		//btn->setMinimumHeight(35);
 		QStringList nameAction = btnName.split("->");
 		btn->setObjectName(btnName);
 		btn->setText(nameAction.first());

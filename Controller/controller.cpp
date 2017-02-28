@@ -118,7 +118,7 @@ void Controller::showDisplayDataReturned(QJsonDocument document)
 void Controller::loadNavigationData(QJsonDocument document)
 {
 	//	QObject::disconnect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
-	qDebug() << "load";
+	//qDebug() << "load";
 	navigationUI::Get()->loadMainNavigation(document);
 }
 
@@ -259,10 +259,10 @@ Controller* Controller::p_instance = 0;
 Controller* Controller::Get()
 {
 	if (p_instance == 0){
-	//	QThread* thread = new QThread;
+		//	QThread* thread = new QThread;
 		p_instance = new Controller();
-	//	p_instance->moveToThread(thread);
-	//	thread->start();
+		//	p_instance->moveToThread(thread);
+		//	thread->start();
 		}
 
 
@@ -453,7 +453,7 @@ void Controller::getIndexHeader(QString title)
 		Database* database  = Database::Gett();
 		QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getIndexHeaderData(QVector<QJsonDocument>)));
 		QString query = "SELECT array_star("+QString(DATABASE)+".Viewgroups[*].Viewgroup).Fields FROM  `"+QString(DATABASE)+"` WHERE META(`"+QString(DATABASE)+"`).id = '"+title+"'";
-		//	qDebug() << __FILE__ << __LINE__  << "getFields"<<query;
+		//qDebug() << __FILE__ << __LINE__  << "getFields"<<query;
 		database->query(query);
 		}
 }
@@ -480,6 +480,8 @@ void Controller::getIndexHeaderData(QVector<QJsonDocument> documents){
 		//qDebug() << __FILE__ << __LINE__  <<"Fieldss"<<fieldsName;
 		emit gotFieldsData( fieldsName);
 		}
+
+	//qDebug() << __FILE__ << __LINE__  <<"Fieldss"<<documents;
 }
 
 void Controller::updateLayoutViewGroups(QString entityName,QList<StructureViewsEditUI*> sVEUIs)
@@ -746,7 +748,7 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 		QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getReportData(QVector<QJsonDocument>)),Qt::QueuedConnection);
 
 		database->query(clmns.value("QueryUI").toObject().value("Query").toString().replace("#QUERYMERPLY",""),false); //TODO: CACHED FLAGG
-			qDebug() << __FILE__ << __LINE__<<"getReport Querii"  << clmns;
+		//	qDebug() << __FILE__ << __LINE__<<"getReport Querii"  << clmns;
 		}
 	else if(clmns.value("Columns").isArray()){
 		//QJsonArray arr = (columns.value("Columns").toArray());
@@ -869,7 +871,7 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 		//qDebug() << __FILE__ << __LINE__  << "Before Query";
 
 		if(addedSelectItems){
-			qDebug() << __FILE__ << __LINE__  <<"Report Q:"<< query;
+			//qDebug() << __FILE__ << __LINE__  <<"Report Q:"<< query;
 			//qRegisterMetaType<QVector<QJsonDocument> >("MyStruct");
 			//QObject::connect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getReportData(QVector<QJsonDocument>)),Qt::QueuedConnection);
 			//Database::Get()->query(query);
@@ -1070,6 +1072,30 @@ void Controller::deleteEntity(QString documentID)
 	//	qDebug() << __FILE__ << __LINE__  << "getFields"<<query;
 
 
+}
+
+void Controller::saveRefrenceStructures(QJsonObject mainStrct, QJsonObject data)
+{
+	//qDebug() << data;
+	if(mainStrct.value("Viewgroups").isArray()){
+		int d = 0;
+		//	QJsonArray dataVGs =data.value("Fields").toArray();
+
+		foreach (QJsonValue item, mainStrct.value("Viewgroups").toArray()) {
+			QJsonObject viewGroupObject = item.toObject().value("Viewgroup").toObject();
+			if(viewGroupObject.value("RefrenceFields") != QJsonValue::Undefined){
+				foreach(QJsonValue refrenceFields,viewGroupObject.value("RefrenceFields").toArray()){
+					foreach(QJsonValue refrenceSubFields,refrenceFields.toObject().value("RefrenceSubFields").toArray()){
+					//	qDebug()<< __FILE__ << __LINE__ << refrenceSubFields.toObject().value("RefrenceValue").toString();
+
+						qDebug()<< __FILE__ << __LINE__ << data.value(refrenceSubFields.toObject().value("RefrenceValue").toString());
+						}
+					}
+				}
+
+			d++;
+			}
+		}
 }
 void Controller::createEditStoreItems(QString key)
 {

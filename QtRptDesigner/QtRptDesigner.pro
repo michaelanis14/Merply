@@ -122,7 +122,9 @@ SOURCES += main.cpp\
     ../Model/merplyreporttablemodel.cpp \
     ../Model/model.cpp \
     ../Model/prsistance.cpp \
-    ../Model/user.cpp
+    ../Model/user.cpp \
+    ../Model/couchbaselibmanager.cpp \
+    ../View/commonUI/qtooltipper.cpp
 
 HEADERS  += mainwindow.h \
     PageSettingDlg.h \
@@ -191,8 +193,9 @@ HEADERS  += mainwindow.h \
     ../Model/database3.h \
     ../Model/merplyreporttablemodel.h \
     ../Model/model.h \
-    ../Model/prsistance.h \
-    ../Model/user.h
+    ../Model/couchbaselibmanager.h \
+    ../View/commonUI/qtooltipper.h \
+    ../Model/prsistance.h
 
 FORMS    += mainwindow.ui \
     PageSettingDlg.ui \

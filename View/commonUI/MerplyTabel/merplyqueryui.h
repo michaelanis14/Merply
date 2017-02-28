@@ -7,9 +7,10 @@
 #include <QHBoxLayout>
 #include <QObject>
 #include <QWidget>
+#include <QGroupBox>
 #include <QPushButton>
 
-class MerplyQueryUI : public QWidget
+class MerplyQueryUI : public QGroupBox
 {
 	Q_OBJECT
 public:
@@ -34,7 +35,7 @@ signals:
 	void queryResults(QVector<QJsonDocument> items);
 public slots:
 	void fillData(QJsonDocument strct);
-	void generateQuery();
+	void generateQuery(int lmit = -1);
 	void gotData(QVector<QJsonDocument> items);
 	void disablebutton();
 

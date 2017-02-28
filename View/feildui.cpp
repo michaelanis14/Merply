@@ -11,7 +11,7 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 	this->layout = new QHBoxLayout(this);
 	this->layout->setContentsMargins(0,0,0,0);
 	this->setContentsMargins(0,0,0,0);
-	this->layout->setSpacing(0);
+	//this->layout->setSpacing(0);
 	this->strID = strID;
 	this->structureView = structureView;
 	this->subFields = QList<SubFieldUI*>();

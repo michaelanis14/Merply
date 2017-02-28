@@ -20,6 +20,7 @@ public:
 	static StructureViewGroupsUI* GetUI();
 	QJsonObject save();
 	HeaderLabel* headerlbl;
+	HeaderLabel* saveAs;
 	SettingsCtrlsUI* sctrlUI;
 	QVBoxLayout* structureViewGroupsUILayout;
 	void getTableFields(ERPComboBox* excludeSource);
@@ -41,6 +42,8 @@ private:
 	void addViewgroup();
 	QString cas_value;
 	QString document_id;
+
+
 protected:
 
 	QStringList restrictedTypes;
@@ -57,7 +60,7 @@ public slots:
 	void removeViewgroup(QWidget* field);
 	void editControllerCancelPressed();
 	void editControllerSavePressed();
-	void getFeildsNames();
+	QStringList getFeildsNames();
 
 
 protected:

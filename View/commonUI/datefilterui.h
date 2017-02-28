@@ -2,10 +2,11 @@
 #define DATEFILTERUI_H
 
 #include <QWidget>
+#include <QGroupBox>
 #include <QFormLayout>
 #include <QDateTimeEdit>
 
-class DateFilterUI : public QWidget
+class DateFilterUI : public QGroupBox
 {
 	Q_OBJECT
 public:

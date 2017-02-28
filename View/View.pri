@@ -51,7 +51,10 @@ SOURCES += View/maindisplay.cpp \
     $$PWD/commonUI/datefilterui.cpp \
     $$PWD/structureViewBuilder/structurevieweditsubfeildtablecolumnquery.cpp \
     $$PWD/structureViewBuilder/structurevieweditsubfeildtablecolumnqueryui.cpp \
-    $$PWD/commonUI/MerplyTabel/merplyquerysubfield.cpp
+    $$PWD/commonUI/MerplyTabel/merplyquerysubfield.cpp \
+    $$PWD/commonUI/qtooltipper.cpp \
+    $$PWD/structureViewBuilder/structureviewrefrence.cpp \
+    $$PWD/structureViewBuilder/structureviewrefrencesubfield.cpp
 
 HEADERS  += View/maindisplay.h \
     View/commonUI/rangevalidator.h \
@@ -98,7 +101,10 @@ HEADERS  += View/maindisplay.h \
     $$PWD/commonUI/datefilterui.h \
     $$PWD/structureViewBuilder/structurevieweditsubfeildtablecolumnquery.h \
     $$PWD/structureViewBuilder/structurevieweditsubfeildtablecolumnqueryui.h \
-    $$PWD/commonUI/MerplyTabel/merplyquerysubfield.h
+    $$PWD/commonUI/MerplyTabel/merplyquerysubfield.h \
+    $$PWD/commonUI/qtooltipper.h \
+    $$PWD/structureViewBuilder/structureviewrefrence.h \
+    $$PWD/structureViewBuilder/structureviewrefrencesubfield.h
 
 #FORMS    += View/mainwindow.ui
 

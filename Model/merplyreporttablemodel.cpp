@@ -4,6 +4,8 @@
 #include "mtabelcombobox.h"
 
 MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTableModel()
+
+
 {
 	rowsCount = 0;
 	this->strct = strct;
@@ -80,13 +82,11 @@ QVariant MerplyReportTableModel::headerData(int section, Qt::Orientation orienta
 
 QVariant MerplyReportTableModel::data(const QModelIndex& index, int role) const
 {
-	if(index.isValid() && role == Qt::EditRole)
+	if(index.isValid() && (role == Qt::EditRole || role == Qt::ToolTipRole))
 		return cells[index.row() * colmnsCount + index.column()].getData();
 	if (!index.isValid() || role != Qt::DisplayRole)
 		return QVariant();
-
 	//qDebug() << __FILE__ << __LINE__  <<"Edit"<< cells[index.row() * colmnsCount + index.column()].getData();
-
 	return cells[index.row() * colmnsCount + index.column()].getData();
 }
 

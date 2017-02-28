@@ -12,6 +12,7 @@ class MerplyQuerySubField : public QWidget
 public:
 	explicit MerplyQuerySubField(QJsonObject strct,QWidget *parent = 0);
 	QString getValue(QString entity);
+	int getLayoutCount();
 private:
 	QFormLayout * layout;
 	ERPComboBox* combox;

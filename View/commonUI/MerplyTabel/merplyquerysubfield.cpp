@@ -8,7 +8,6 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 	this->setContentsMargins(0,0,0,0);
 	this->strct = strct;
 
-
 	layout = new QFormLayout(this);
 	//this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	layout->setContentsMargins(0,0,0,0);
@@ -20,7 +19,7 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 	QString type =  strct.value("SubFields").toArray().first().toObject().value("Type").toString();
 	label = strct.value("Label").toString();
 
-	qDebug() << __FILE__ << __LINE__  <<type <<strct;
+	//qDebug() << __FILE__ << __LINE__  <<type <<strct;
 
 	if(strct.value("clmn") != QJsonValue::Undefined){
 		label = strct.value("Select").toString();
@@ -94,8 +93,8 @@ QString MerplyQuerySubField::getValue(QString entity)
 	//qDebug() << __FILE__ << __LINE__  << field->metaObject()->className();
 
 
-	 if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
-	//	qDebug() << __FILE__ << __LINE__  << this->strct;
+	if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
+		//	qDebug() << __FILE__ << __LINE__  << this->strct;
 		if(((ERPComboBox*)field)->currentIndex() > 0){
 			//	save += component.name;
 			if(strct.value("BeforFilter") != QJsonValue::Undefined){
@@ -146,7 +145,12 @@ QString MerplyQuerySubField::getValue(QString entity)
 				//qDebug() << __FILE__ << __LINE__  << entity.trimmed();
 				save += QString("to_string("+entity.trimmed()+".`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"'");
 				}
-			else save += QString("to_string(`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'%"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"%'");
+			else {
+				if(strct.value("clmn") != QJsonValue::Undefined)
+					save += QString("to_string(`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"'");
+				else
+					save += QString("to_string(`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'%"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"%'");
+				}
 			}
 		//	save =" ";
 		}
@@ -186,6 +190,11 @@ QString MerplyQuerySubField::getValue(QString entity)
 		save += ((MerplyQueryUI*)field)->getFields(strct.value("Entity").toString());
 		}
 	return save;
+}
+
+int MerplyQuerySubField::getLayoutCount()
+{
+	return this->layout->count();
 }
 
 void MerplyQuerySubField::refrenceData(QVector<QJsonDocument> items)
