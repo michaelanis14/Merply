@@ -93,7 +93,7 @@ void Controller::showDisplay()
 	//	navigationUI::Get()->setParent(MainWindow::GetMainDisplay());
 
 	//
-	//	Prsistance::init();
+		Prsistance::init();
 	//QObject::connect(Database::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showDisplayDataReturned(QJsonDocument)));
 	//Database::Get()->getDoc("ViewStructure::5");
 
@@ -1076,26 +1076,79 @@ void Controller::deleteEntity(QString documentID)
 
 void Controller::saveRefrenceStructures(QJsonObject mainStrct, QJsonObject data)
 {
-	//qDebug() << data;
+	//qDebug() << mainStrct;
+
 	if(mainStrct.value("Viewgroups").isArray()){
-		int d = 0;
 		//	QJsonArray dataVGs =data.value("Fields").toArray();
 
 		foreach (QJsonValue item, mainStrct.value("Viewgroups").toArray()) {
 			QJsonObject viewGroupObject = item.toObject().value("Viewgroup").toObject();
 			if(viewGroupObject.value("RefrenceFields") != QJsonValue::Undefined){
-				foreach(QJsonValue refrenceFields,viewGroupObject.value("RefrenceFields").toArray()){
-					foreach(QJsonValue refrenceSubFields,refrenceFields.toObject().value("RefrenceSubFields").toArray()){
-					//	qDebug()<< __FILE__ << __LINE__ << refrenceSubFields.toObject().value("RefrenceValue").toString();
 
-						qDebug()<< __FILE__ << __LINE__ << data.value(refrenceSubFields.toObject().value("RefrenceValue").toString());
+				foreach(QJsonValue refrenceFields,viewGroupObject.value("RefrenceFields").toArray()){
+					QJsonObject newData;
+					foreach(QJsonValue refrenceSubFields,refrenceFields.toObject().value("RefrenceSubFields").toArray()){
+						//qDebug()<< __FILE__ << __LINE__ << refrenceSubFields.toObject();
+						//qDebug() << data
+						if(refrenceSubFields.toObject().value("RefrenceValue").toString().contains("$")){
+							QStringList refrencTblHeader = refrenceSubFields.toObject().value("RefrenceValue").toString().split("$");
+							QStringList fieldTblHeader = refrenceSubFields.toObject().value("Field").toString().split("$");
+
+							if(refrencTblHeader.count() > 1 && fieldTblHeader.count() > 1){
+								QString dataKey = refrencTblHeader.at(1);
+								QString newDataFieldKey = fieldTblHeader.at(0);
+								if(data.value(dataKey).toObject().value("merplyTabel") != QJsonValue::Undefined){
+									QJsonObject tbl;
+									QJsonArray newDataRows;
+									QJsonArray oldDataRows;
+									bool appendFlag = false;
+									if(newData.value(fieldTblHeader.at(1)) != QJsonValue::Undefined){
+										oldDataRows = newData.value(fieldTblHeader.at(1)).toObject().value("merplyTabel").toArray();
+										appendFlag = true;
+										}
+									int i = 0;
+									foreach(QJsonValue row,data.value(dataKey).toObject().value("merplyTabel").toArray()){
+										QJsonObject newDataRow;
+										if(appendFlag){
+											newDataRow = oldDataRows.at(i).toObject();
+											//newDataRows.takeAt(0);
+											}
+										newDataRow.insert(newDataFieldKey,row.toObject().value(refrencTblHeader.at(0)).toString());
+
+										//newDataRows.insert(i,newDataRow);
+										newDataRows << newDataRow;
+										//qDebug()<< __FILE__ << __LINE__ << row.toObject().value(refrencTblHeader.at(0));
+										i++;
+										}
+
+									tbl.insert("merplyTabel",newDataRows);
+									newData.insert(fieldTblHeader.at(1),tbl);
+									}
+
+								///ELSE not Table
+								}
+
+							}
+						else {
+							if(refrenceSubFields.toObject().value("Field").toString().contains("$"))
+								newData.insert(refrenceSubFields.toObject().value("Field").toString(),data.value(refrenceSubFields.toObject().value("RefrenceValue").toString()));
+							}
+
+						}
+
+					if(!newData.isEmpty()){
+						//qDebug()<< __FILE__ << __LINE__ << refrenceFields.toObject().value("Source");
+						newData.insert("document_id",refrenceFields.toObject().value("Source").toString());
+						Controller::Get()->createEditStore(newData);
 						}
 					}
+
+
 				}
 
-			d++;
 			}
 		}
+
 }
 void Controller::createEditStoreItems(QString key)
 {

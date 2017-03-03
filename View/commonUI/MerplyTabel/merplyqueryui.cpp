@@ -213,7 +213,7 @@ void MerplyQueryUI::generateQuery(int lmit)
 		Controller::Get()->query(query,false);
 		}
 	else{
-
+		if(this->btnFilter)
 		this->btnFilter->setDisabled(false);
 		}
 	//qDebug() << "SELECT *  FROM "<<QString(DATABASE) << "WHERE META('"<<QString(DATABASE)<<"').id LIKE"<<document_id<<" AND "<<save;

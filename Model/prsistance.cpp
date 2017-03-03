@@ -37,6 +37,25 @@ bool Prsistance::init()
 		write("ContactType",QString("Name->Other"));
 		}
 */
+	{
+	Database* database  = Database::Gett();
+	database->query("SELECT (SELECT name  FROM system:indexes WHERE  keyspace_id ='"+QString(DATABASE)+"' AND state = 'deferred')[*].name");
+	if(!database->getArray().isEmpty() && database->getArray().count() > 0){
+		qDebug() << "Building Indexs";
+		foreach(QJsonValue index,database->getArray().first().object().value("name").toArray()){
+
+			database->query("BUILD INDEX ON `"+QString(DATABASE)+"`(`"+index.toString()+"`) USING GSI;");
+			while (CountIndexes(index.toString()) <1 ) {
+				QThread::sleep(6);
+				}
+
+			}
+
+
+
+	}
+	}
+return true;
 	if(Count("ViewStructure::Users\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/Users.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
@@ -1005,7 +1024,10 @@ bool Prsistance::init()
 			if(QString(data.at(15)).toDouble() > 0){
 				QJsonObject row ;
 				row.insert("ID",QString("Products::").append(data.at(0)));
-				row.insert("الأصناف",data.at(1));
+				row.insert("رقم الأصناف",data.at(0));
+				row.insert("الأصناف",data.at(2));
+				row.insert("كود الأصناف",data.at(1));
+
 				row.insert("الكميه",QString(data.at(15)).toDouble());
 				rowsProd.append(row);
 				}
@@ -1371,10 +1393,10 @@ save:
 		QVector<QJsonDocument> clients = databaseClients->getArray();
 
 		Database* databaseProducts  = Database::Gett();
-		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
+		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,`d`.`كود الصنف` AS `C`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
-		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/INV.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		int currentID = -1;
@@ -1399,9 +1421,16 @@ save:
 
 				QJsonObject row ;
 				row.insert("ID",QString("Products::").append(data.at(3)));
-				if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+				if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined){
+					row.insert("رقم الأصناف",products.at(data.at(3).toInt()).object().value("BB").toInt());
 					row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
-				else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					row.insert("كود الأصناف",products.at(data.at(3).toInt()).object().value("C").toString());
+					}
+				else {
+					row.insert("رقم الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					row.insert("كود الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					}
 				row.insert("الكميه",QString(data.at(11)).toDouble());
 				rowsProd.append(row);
 				if(!rowsProd.isEmpty())
@@ -1488,7 +1517,7 @@ save:
 		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
-		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/INV.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		int currentID = -1;
@@ -1513,10 +1542,16 @@ save:
 
 				QJsonObject row ;
 				row.insert("ID",QString("Products::").append(data.at(3)));
-				if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+				if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined){
+					row.insert("رقم الأصناف",products.at(data.at(3).toInt()).object().value("BB").toInt());
 					row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
-				else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
-				row.insert("الكميه",QString(data.at(7)).toDouble());
+					row.insert("كود الأصناف",products.at(data.at(3).toInt()).object().value("C").toString());
+					}
+				else {
+					row.insert("رقم الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					row.insert("كود الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					}	row.insert("الكميه",QString(data.at(7)).toDouble());
 				rowsProd.append(row);
 				if(!rowsProd.isEmpty())
 					tblProd.insert("merplyTabel",rowsProd);
@@ -1602,7 +1637,7 @@ save:
 		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
-		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+		QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/INV.csv");
 		//qDebug() << fileData;
 		//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 		int currentID = -1;
@@ -1627,10 +1662,16 @@ save:
 
 				QJsonObject row ;
 				row.insert("ID",QString("Products::").append(data.at(3)));
-				if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+				if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined){
+					row.insert("رقم الأصناف",products.at(data.at(3).toInt()).object().value("BB").toInt());
 					row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
-				else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
-				row.insert("الكميه",QString(data.at(7)).toDouble());
+					row.insert("كود الأصناف",products.at(data.at(3).toInt()).object().value("C").toString());
+					}
+				else {
+					row.insert("رقم الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					row.insert("كود الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+					}		row.insert("الكميه",QString(data.at(7)).toDouble());
 				rowsProd.append(row);
 				if(!rowsProd.isEmpty())
 					tblProd.insert("merplyTabel",rowsProd);
@@ -1713,7 +1754,7 @@ save:
 		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
-			QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+			QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/INV.csv");
 			//qDebug() << fileData;
 			//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 			int currentID = -1;
@@ -1738,10 +1779,16 @@ save:
 
 					QJsonObject row ;
 					row.insert("ID",QString("Products::").append(data.at(3)));
-					if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+					if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined){
+						row.insert("رقم الأصناف",products.at(data.at(3).toInt()).object().value("BB").toInt());
 						row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
-					else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
-					row.insert("الكميه",QString(data.at(7)).toDouble());
+						row.insert("كود الأصناف",products.at(data.at(3).toInt()).object().value("C").toString());
+						}
+					else {
+						row.insert("رقم الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+						row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+						row.insert("كود الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+						}		row.insert("الكميه",QString(data.at(7)).toDouble());
 					rowsProd.append(row);
 					if(!rowsProd.isEmpty())
 						tblProd.insert("merplyTabel",rowsProd);
@@ -1823,7 +1870,7 @@ save:
 		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
-			QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/1INV.csv");
+			QStringList fileData = readCSVFile(QCoreApplication::applicationDirPath()+"/AM/INV.csv");
 			//qDebug() << fileData;
 			//QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
 			int currentID = -1;
@@ -1848,10 +1895,16 @@ save:
 
 					QJsonObject row ;
 					row.insert("ID",QString("Products::").append(data.at(3)));
-					if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined)
+					if(products.at(data.at(3).toInt()).object().value("N") != QJsonValue::Undefined){
+						row.insert("رقم الأصناف",products.at(data.at(3).toInt()).object().value("BB").toInt());
 						row.insert("الأصناف",products.at(data.at(3).toInt()).object().value("N").toString());
-					else row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
-					row.insert("الكميه",QString(data.at(11)).toDouble());
+						row.insert("كود الأصناف",products.at(data.at(3).toInt()).object().value("C").toString());
+						}
+					else {
+						row.insert("رقم الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+						row.insert("الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+						row.insert("كود الأصناف",QString("P").append(QString::number(products.at(data.at(3).toInt()).object().value("BB").toInt())));
+						}	row.insert("الكميه",QString(data.at(11)).toDouble());
 					rowsProd.append(row);
 					if(!rowsProd.isEmpty())
 						tblProd.insert("merplyTabel",rowsProd);
@@ -2041,7 +2094,7 @@ int Prsistance::Count(const QString table)
 int Prsistance::CountIndexes(const QString index)
 {
 	Database* database  = Database::Gett();
-	database->query("SELECT COUNT(*) AS count  FROM  system:indexes WHERE name= \""+index+"\"");
+	database->query("SELECT COUNT(*) AS count  FROM  system:indexes WHERE name= '"+index+"' AND keyspace_id = '"+QString(DATABASE)+"' AND state = 'online'");
 
 	if(!database->getArray().isEmpty() && database->getArray().count() > 0){
 		return database->getArray().first().object().value("count").toInt();

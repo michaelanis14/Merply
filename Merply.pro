@@ -41,7 +41,7 @@ debug:UI_DIR = debug/.ui
 
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
-CONFIG += static
+#CONFIG += static
 #CONFIG   -= x86_64
 # remove possible other optimization flags
 QMAKE_CXXFLAGS_RELEASE -= -O
@@ -70,3 +70,10 @@ else:win32:CONFIG(debug, debug|release): LIBS += -LC:/libcouchbase/lib/ -llibcou
 
 INCLUDEPATH += C:/libcouchbase/include
 DEPENDPATH += C:/libcouchbase/include
+
+
+unix:LIBS += -L/usr/include/libcouchbase/ -lcouchbase
+
+INCLUDEPATH +=/usr/include/libcouchbase/
+DEPENDPATH +=/usr/include/libcouchbase/
+
