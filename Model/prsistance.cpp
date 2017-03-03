@@ -676,6 +676,8 @@ return true;
 
 			if(0 < data.count() && !data.at(0).isEmpty()){
 				c.insert("رقم",  QString(data.at(0)).toInt());
+				c.insert("باركود",  QString(data.at(0)).toInt());
+				c.insert("حد اعاده الطلب",    1);
 				key =  data.at(0);
 				}
 			if(0 < data.count() && !data.at(1).isEmpty()){
