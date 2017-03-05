@@ -49,7 +49,6 @@ void Database::on_stored_status (lcb_t instance, const void *, lcb_storage_t ,
 		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE \""+card+"\"");
 
 		//if(p_instance->cachedArrayDocuments.contains(query)){
-		//	qDebug() << "CONTAINNNNS THE Q";
 		//	p_instance->cachedArrayDocuments.remove(query);
 		//	}
 
