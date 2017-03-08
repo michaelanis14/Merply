@@ -43,7 +43,7 @@ MerplyReportTableModel::MerplyReportTableModel(QJsonObject strct) :QAbstractTabl
 		}
 	else{
 		//
-		clmnsHeader << "ID.No.";
+		clmnsHeader << "SN";
 		clmnsHeader << strct.value("clmnsHeader").toVariant().toStringList();
 
 		//qDebug() << __FILE__ << __LINE__  << clmnsHeader;
@@ -409,7 +409,7 @@ void MerplyReportTableModel::fillQuery(QVector<QJsonDocument> documents)
 						date->setDateTime(QDateTime::fromString(row.object().value(clmnsHeader.at(j)).toString(),Qt::ISODate));
 						value  =  date->dateTime().toString("dd/MM/yyyy");
 						}
-					else value = Controller::Get()->toString(row.object().value(key));
+					else value = Controller::Get()->toString("",row.object().value(key));
 					cells[i * this->colmnsCount + j].setData(value);
 					}
 				}
@@ -450,7 +450,7 @@ void MerplyReportTableModel::fillText(QJsonArray data)
 
 			else
 */
-			value = Controller::Get()->toString(row.value(clmnsHeader.at(j)));
+			value = Controller::Get()->toString("",row.value(clmnsHeader.at(j)));
 			//qDebug() << value;
 			if(!value.isEmpty() && value.split("$").count() > 1){
 				cells[i * this->colmnsCount + j].setId(QString(value.split("$")[1]));
@@ -490,7 +490,7 @@ void MerplyReportTableModel::fillIndexTabel( QVector<QJsonDocument> items)
 			int clmnIndex = clmnsHeader.indexOf(keyData);
 			if(clmnIndex > -1){
 				QString valueString;
-				valueString = Controller::Get()->toString(item.object().value(keyData));
+				valueString = Controller::Get()->toString("",item.object().value(keyData));
 				//		qDebug() << __FILE__ << __LINE__  <<"valueString"<< valueString;
 
 				cells[(i * this->colmnsCount) + clmnIndex].setId(key);
@@ -515,7 +515,7 @@ void MerplyReportTableModel::fillIndexTabel( QVector<QJsonDocument> items)
 						int clmnIndexRow = clmnsHeader.indexOf(keyDataRow);
 						if(clmnIndexRow > -1){
 							QString valueString;
-							valueString = Controller::Get()->toString(row.toObject().value(keyDataRow));
+							valueString = Controller::Get()->toString("",row.toObject().value(keyDataRow));
 							//	qDebug() << __FILE__ << __LINE__  <<"valueStringROWW"<< valueString;
 
 							cells[(i * this->colmnsCount) + clmnIndexRow].setId(key);
@@ -623,7 +623,7 @@ void MerplyReportTableModel::fillAddtoTable(QVector<QJsonDocument> items)
 			int clmnIndex = clmnsHeader.indexOf(keyData);
 			if(clmnIndex > -1){
 				QString valueString;
-				valueString = Controller::Get()->toString(item.object().value(keyData));
+				valueString = Controller::Get()->toString("",item.object().value(keyData));
 				//		qDebug() << __FILE__ << __LINE__  <<"valueString"<< valueString;
 
 				cells[(i * this->colmnsCount) + clmnIndex].setId(key);
@@ -650,7 +650,7 @@ void MerplyReportTableModel::fillAddtoTable(QVector<QJsonDocument> items)
 						int clmnIndexRow = clmnsHeader.indexOf(keyDataRow);
 						if(clmnIndexRow > -1){
 							QString valueString;
-							valueString = Controller::Get()->toString(row.toObject().value(keyDataRow));
+							valueString = Controller::Get()->toString("",row.toObject().value(keyDataRow));
 							//	qDebug() << __FILE__ << __LINE__  <<"valueStringROWW"<< valueString;
 
 							cells[(i * this->colmnsCount) + clmnIndexRow].setId(key);

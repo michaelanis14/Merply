@@ -124,7 +124,9 @@ SOURCES += main.cpp\
     ../Model/prsistance.cpp \
     ../Model/user.cpp \
     ../Model/couchbaselibmanager.cpp \
-    ../View/commonUI/qtooltipper.cpp
+    ../View/commonUI/qtooltipper.cpp \
+    ../View/structureViewBuilder/structureviewrefrence.cpp \
+    ../View/structureViewBuilder/structureviewrefrencesubfield.cpp
 
 HEADERS  += mainwindow.h \
     PageSettingDlg.h \
@@ -195,7 +197,10 @@ HEADERS  += mainwindow.h \
     ../Model/model.h \
     ../Model/couchbaselibmanager.h \
     ../View/commonUI/qtooltipper.h \
-    ../Model/prsistance.h
+    ../Model/prsistance.h \
+    ../Model/user.h \
+    ../View/structureViewBuilder/structureviewrefrence.h \
+    ../View/structureViewBuilder/structureviewrefrencesubfield.h
 
 FORMS    += mainwindow.ui \
     PageSettingDlg.ui \
@@ -255,4 +260,9 @@ macx: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/l
 
 INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
 DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
+
+DISTFILES += \
+    ../Model/Model.pri \
+    ../Controller/Controller.pri \
+    ../View/View.pri
 

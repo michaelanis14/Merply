@@ -62,18 +62,17 @@ RESOURCES += \
 
 macx: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/lib/ -lcouchbase
 
-INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
-DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
+macx:INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
+macx:DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
 
 win32:CONFIG(release, debug|release): LIBS += -LC:/libcouchbase/lib/ -llibcouchbase
 else:win32:CONFIG(debug, debug|release): LIBS += -LC:/libcouchbase/lib/ -llibcouchbase_d
 
-INCLUDEPATH += C:/libcouchbase/include
-DEPENDPATH += C:/libcouchbase/include
+win32:INCLUDEPATH += C:/libcouchbase/include
+win32:DEPENDPATH += C:/libcouchbase/include
 
 
 unix:LIBS += -L/usr/include/libcouchbase/ -lcouchbase
-
-INCLUDEPATH +=/usr/include/libcouchbase/
-DEPENDPATH +=/usr/include/libcouchbase/
+unix:INCLUDEPATH +=/usr/include/libcouchbase/
+unix:DEPENDPATH +=/usr/include/libcouchbase/
 

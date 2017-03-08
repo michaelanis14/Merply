@@ -63,7 +63,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		if(structureView.value("Default") != QJsonValue::Undefined){
 			lineEdit->setText(structureView.value("Default").toString());
 			}
-		lineEdit->setText(Controller::Get()->toString(data));
+		lineEdit->setText(Controller::Get()->toString("",data));
 		if(structureView.value("CharCount") != QJsonValue::Undefined && structureView.value("CharCount").toInt() > 0)
 			lineEdit->setMaxLength(structureView.value("CharCount").toInt());
 		if(structureView.value("InputDataType").toString().compare("IntToMillion") == 0)
@@ -162,11 +162,11 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		lineEdit->setContentsMargins(0,0,0,0);
 		//lineEdit->setEnabled(false);
 
-		QString dataString = Controller::Get()->toString(data);
+		QString dataString = Controller::Get()->toString("",data);
 		if(!dataString.isEmpty()){
 			lineEdit->setText(dataString);
 			}
-		/* ///TODO: INCREMENT BASED ON YEAR !!!!
+		///TODO: INCREMENT BASED ON YEAR !!!!
 		else{
 			if(structureView.value("startNum") != QJsonValue::Undefined){
 				lineEdit->setText(QString::number(structureView.value("startNum").toInt()));
@@ -179,7 +179,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 				}
 			}
 		//lineEdit->setText(data.toString());
-		*/
+
 		layout->addWidget(lineEdit);
 
 		}
@@ -273,7 +273,7 @@ QJsonValue SubFieldUI::save()
 		save = QString(((QDateTimeEdit*)field)->dateTime().toString(Qt::ISODate));
 		//qDebug() << save;
 		}
-//	qDebug() << __FILE__ << __LINE__<< save;
+	//	qDebug() << __FILE__ << __LINE__<< save;
 	return save;
 }
 
@@ -380,7 +380,12 @@ void SubFieldUI::updateTable(QString)
 void SubFieldUI::updateEquationField()
 {
 	double total = 0;
-	if(this->structureView.value("EquationTerms").isArray())
+
+	if(this->structureView.value("EquationTerms").isArray()){
+		if(structureView.value("EquationTerms").toArray().first().toObject().value("Editable") == QJsonValue::Undefined)
+			((QLineEdit*)field)->setEnabled(false);
+		else ((QLineEdit*)field)->setEnabled(true);
+
 		foreach(QJsonValue eq,this->structureView.value("EquationTerms").toArray()){
 			double subTotal = 0;
 			bool ok = true;
@@ -541,7 +546,7 @@ void SubFieldUI::updateEquationField()
 				}
 			}
 
-
+}
 	//qDebug() << __FILE__ << __LINE__  <<total;
 
 	((QLineEdit*)field)->setText(QString::number(total));

@@ -52,8 +52,9 @@ void Database::on_stored_status (lcb_t instance, const void *, lcb_storage_t ,
 		//	qDebug() << "CONTAINNNNS THE Q";
 		//	p_instance->cachedArrayDocuments.remove(query);
 		//	}
-
+		p_instance->emit savedQJson(p_instance->lastDocument);
 		p_instance->emit saved(p_instance->LastKeyID);
+
 		}
 }
 
@@ -71,6 +72,7 @@ void  Database::arithmatic_callback(lcb_t instance, const void *,
 
 bool Database::updateDoc(QJsonDocument document)
 {
+	p_instance->lastDocument = document;
 	if(p_instance->cachedDocuments.contains(document.object().value("document_id").toString())){
 		//	qDebug() << "contains update Document" << document.object().value("document_id").toString();
 		p_instance->cachedDocuments.remove(document.object().value("document_id").toString());
@@ -241,8 +243,8 @@ bool Database::IncrementKey(QString key)
 	cmdd.v.v0.create = 1; // Create item if it does not exist
 	lcb_arithmetic(instance, NULL, 1, &cmdlistt);
 	lcb_set_arithmetic_callback(instance, arithmatic_callback);
-	lcb_wait(instance); // get_callback is invoked here
-	return Database::KillDatabase(instance);
+	lcb_wait3(instance,LCB_WAIT_NOCHECK);
+	return Database::KillDatabase(instance,false);
 
 }
 
@@ -273,7 +275,7 @@ void Database::got_document(lcb_t instance, const void *, lcb_error_t err,
 		else{
 			emit p_instance->gotValue(QString(byteArray));
 			p_instance->LastKeyID = QString(byteArray);
-			qDebug() << __FILE__ << __LINE__  << "ERR @Database 219" << parserError.errorString() << QString(byteArray);
+		//	qDebug() << __FILE__ << __LINE__  << "ERR @Database 219" << parserError.errorString() << QString(byteArray);
 			//qDebug() << __FILE__ << __LINE__  <<"Last Keyy"<< p_instance->LastKeyID;
 			}
 		} else {
@@ -449,6 +451,7 @@ bool Database::storeDoc(QString key,QJsonDocument document) {
 	objWithKey.insert("created_byID",AccessController::Get()->getUserID());
 	objWithKey.insert("created_byName",AccessController::Get()->getUserName());
 	document = QJsonDocument(objWithKey);
+	p_instance->lastDocument = document;
 	lcb_t instance = Database::InitDatabase();
 	if(instance == NULL){
 		qDebug() << __FILE__ << __LINE__<< "Failed to INIT Database @ Increment";
