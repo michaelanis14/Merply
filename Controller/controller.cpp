@@ -1249,6 +1249,12 @@ bool Controller::ShowQuestion(QString question)
 		return false;
 		}
 }
+void Controller::ShowError(QString message)
+{
+   QMessageBox::StandardButton reply;
+   reply = QMessageBox::critical(0, "Error!", message,QMessageBox::Ok);
+}
+
 
 
 /*

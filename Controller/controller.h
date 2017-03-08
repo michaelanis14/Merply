@@ -40,6 +40,7 @@ public:
 
 	void  setShowWarning(bool value);
 	bool showWarning(QString warning);
+	void ShowError(QString message);
 	static bool ShowQuestion(QString question);
 	void static Log(QStringList log);
 
