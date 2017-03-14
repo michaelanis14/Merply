@@ -23,14 +23,15 @@ AccessController*AccessController::Get()
 
 void AccessController::login(QString username, QString password)
 {
-	if(username.compare("merplyroot") == 0 && password.compare("LilyMichael") == 0){
-		Model::Get()->login("merplyroot","root","Merply");
+	if(username.compare("root") == 0 && password.compare("root") == 0){
+		//qDebug() << "Login"<< username << password;
+		Model::Get()->login("root","root","root");
 		emit successLogin();
 		}
 	else{
 		Database* database  = Database::Gett();
 		QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(loginData(QVector<QJsonDocument>)));
-		QString query = QString("SELECT (`"+QString(DATABASE)+"`).*  ,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \"Users::%\"  AND Fields[0][0].`Username`[0] = '"+username+"' AND Fields[0][1].`UserPassword`[0] = '"+password+"'");
+		QString query = QString("SELECT (`"+QString(DATABASE)+"`).*  ,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \"Users::%\"  AND `Username` = '"+username+"' AND `UserPassword` = '"+password+"'");
 		//qDebug() << __FILE__ << __LINE__ <<"Q : " << query;
 		database->query(query);
 		}
@@ -38,13 +39,15 @@ void AccessController::login(QString username, QString password)
 
 bool AccessController::hasRootGroupAccess()
 {
-	if(Model::Get()->getUserID().compare("merplyroot") == 0 )
+		//qDebug() << __FILE__ << __LINE__<< Model::Get()->getUserName()<<Model::Get()->getUserName().compare("root") ;
+	if(Model::Get()->getUserName().compare("root") == 0 )
 		return true;
 	return false;
 }
 
 bool AccessController::hasAdminGroupAccess()
 {
+	//qDebug() << __FILE__ << __LINE__ <<"hasAdminGroupAccess";
 	if(hasRootGroupAccess())
 		return true;
 	return false;
@@ -56,7 +59,7 @@ bool AccessController::hasAccess(QString group)
 		LoginUI::ShowUI();
 		return false;
 		}
-	else if(Model::Get()->getUserID().compare("merplyroot") == 0 )
+	else if(Model::Get()->getUserID().compare("root") == 0 )
 		return true;
 	else if(group.compare("3") == 0)
 		return false;
@@ -69,26 +72,12 @@ void AccessController::loginData(QVector<QJsonDocument> user)
 	//QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(loginData(QVector<QJsonDocument>)));
 	if(user.isEmpty()){
 		qDebug() << __FILE__ << __LINE__  << "user login faild : Wrong Password or UserName";
-			emit faildLogin();
+		emit faildLogin();
 		}
 	else{
 		QJsonObject userObject = user.first().object();
 		if(!userObject.value("document_id").toString().isEmpty()){
-			QString username;
-			QString name;
-			QJsonArray userFields = userObject.value("Fields").toArray();
-			foreach(QJsonValue field,userFields){
-				foreach(QJsonValue subfield,field.toArray()){
-					if(subfield.toObject().value("Name") != QJsonValue::Undefined){
-						name = subfield.toObject().value("Name").toArray().at(0).toString();
-						}
-					else if(subfield.toObject().value("Username") != QJsonValue::Undefined){
-						username = subfield.toObject().value("Username").toArray().at(0).toString();
-						}
-
-					}
-				}
-			Model::Get()->login(userObject.value("document_id").toString(),username,name);
+			Model::Get()->login(userObject.value("document_id").toString(),user.first().object().value("Username").toString(),user.first().object().value("Name").toString());
 			emit successLogin();
 			}
 		else emit faildLogin();
@@ -102,7 +91,7 @@ bool AccessController::hasReadAccess(QJsonObject permissions)
 		LoginUI::ShowUI();
 		return false;
 		}
-	else if(Model::Get()->getUserID().compare("merplyroot") == 0 )
+	else if(Model::Get()->getUserID().compare("root") == 0 )
 		return true;
 
 
@@ -135,7 +124,7 @@ bool AccessController::hasWriteAccess(QJsonObject permissions)
 		LoginUI::ShowUI();
 		return false;
 		}
-	else if(Model::Get()->getUserID().compare("merplyroot") == 0 )
+	else if(Model::Get()->getUserID().compare("root") == 0 )
 		return true;
 
 	permissions = permissions.value("Permissions").toObject().value("Write").toObject();

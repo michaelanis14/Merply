@@ -74,10 +74,10 @@ void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data,bool creat
 	if(!key.isEmpty())
 		{
 		//this->viewStructure = viewStructure;
-		if( create || !Controller::Get()->isCachedCreateEditUI(key)){
+		if(true || create || !Controller::Get()->isCachedCreateEditUI(key)){
 			CreateEditUI* p =  new CreateEditUI(0,viewStructure, data);
 			//qDebug() << __FILE__ << __LINE__ << "insertCachedCreateEditUI"<<key<< &p_instance;
-			Controller::Get()->insertCachedCreateEditUI(key,p);
+			//Controller::Get()->insertCachedCreateEditUI(key,p);
 			p_instance = p;
 			}
 		else{
@@ -172,11 +172,14 @@ QStringList CreateEditUI::getTabelsFieldNames(QJsonObject viewStructure)
 
 void CreateEditUI::printAfterSave(QJsonObject strct)
 {
+	this->toInvoiceFlag = false;
+	if(strct.value("document_id").toString().compare("ViewStructure::PriceQutation") == 0)
+		this->toInvoiceFlag = true;
 
 	printAfterSaveWidget = new QWidget();
 	//printAfterSaveWidget->setContentsMargins(0,0,0,0);
 	printAfterSaveWidgetLayout = new QHBoxLayout(printAfterSaveWidget);
-	printAfterSaveWidgetLayout->setContentsMargins(0,0,0,0);
+	//printAfterSaveWidgetLayout->setContentsMargins(0,0,0,0);
 	//printAfterSaveWidgetLayout->setSpacing(0);
 	this->layout->addWidget(printAfterSaveWidget);
 	printAfter = new QCheckBox(tr("طباعه فورى"));
@@ -185,6 +188,11 @@ void CreateEditUI::printAfterSave(QJsonObject strct)
 	printAfterSaveWidgetLayout->addWidget(printAfter);
 	showPrintDialog =new QCheckBox(tr("عرض نموزج الطباعه"));
 	printAfterSaveWidgetLayout->addWidget(showPrintDialog);
+
+	if(this->toInvoiceFlag){
+		toInvoice =new QCheckBox(tr("تحويل لفاتوره"));
+		printAfterSaveWidgetLayout->addWidget(toInvoice);
+		}
 	/*
 	 *
 	 * //TODO : EACH ENTITY A CHECK
@@ -303,8 +311,12 @@ void CreateEditUI::saveEntity()
 			vgsSave.insert("document_id",key);
 			QObject::connect(Controller::Get(),SIGNAL(savedItems(QString)),this,SLOT(saved()));
 			Controller::Get()->createEditStore(vgsSave);
-			Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
+			if(this->toInvoiceFlag){
+				if(this->toInvoice->isChecked())
 
+					Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
+				}
+			else Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
 
 			}
 		else{
@@ -314,9 +326,14 @@ void CreateEditUI::saveEntity()
 			vgsSave.insert("document_id",documentID);
 			QObject::connect(Controller::Get(),SIGNAL(savedItems(QString)),this,SLOT(saved()));
 			Controller::Get()->createEditStore(vgsSave);
-			Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
 
 
+			if(this->toInvoiceFlag){
+				if(this->toInvoice->isChecked())
+
+					Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
+				}
+			else Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
 			//QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
 			//Controller::Get()->UpdateDoc(QJsonDocument(vgsSave));
 			}
@@ -360,7 +377,7 @@ void CreateEditUI::printAfterCheckBoxChanged(bool checked)
 void CreateEditUI::printAfterSaved(QJsonDocument document)
 {
 	//QObject::disconnect(Controller::Get(),SIGNAL(savedQJson(QJsonDocument)),this,SLOT(printAfterSaved(QJsonDocument)));
-	//qDebug() << "Will PRINTT" << document;
+	//	qDebug() << "Will PRINTT" << document.object().value("document_id");
 	PrintController::Get()->gotPrintEntity(document,this->showPrintDialog->isChecked());
 }
 

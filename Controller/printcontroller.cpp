@@ -81,7 +81,7 @@ void PrintController::getFieldstoValueMap(QJsonObject entity)
 										}
 									else{
 										reportData.append(row);
-										qDebug() << row ;
+										//qDebug() << row ;
 										}
 									}
 								//TODO : instead of Merging tables have better refrences

@@ -164,6 +164,7 @@ public slots:
 	void getTabelsData(QString entity,QStringList tbls);
 	void deleteEntityData(QVector<QJsonDocument> items);
 
+	void successLogin();
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void gotFieldsData(QList<QString> fields);

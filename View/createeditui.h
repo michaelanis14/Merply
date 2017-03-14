@@ -42,6 +42,8 @@ private:
 	void printAfterSave(QJsonObject strct);
 	QCheckBox* printAfter;
 	QCheckBox* showPrintDialog;
+	QCheckBox* toInvoice;
+	bool toInvoiceFlag;
 signals:
 protected:
 	//void showEvent(QShowEvent *);

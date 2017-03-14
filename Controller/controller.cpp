@@ -64,9 +64,10 @@ Controller::Controller(QObject *parent) :
 void Controller::showDisplay()
 {
 
+	QObject::connect(AccessController::Get(),SIGNAL(successLogin()),this,SLOT(successLogin()));
 
-	AccessController::Get()->logout();
-	AccessController::Get()->login("merplyroot","LilyMichael");
+	//AccessController::Get()->logout();
+	AccessController::Get()->login("root","root");
 	//navigationUI::Get();
 	///Tabs
 	QStringList tabList = QStringList();
@@ -101,13 +102,17 @@ void Controller::showDisplay()
 	//ViewGroups* vgs= new ViewGroups(0,"Contact",d.object(),d.object());
 	//layout->addWidget(vgs);
 
-	QObject::connect(navigationUI::Get(),SIGNAL(subNavPressed(QJsonObject)),this,SLOT(subNavPressed(QJsonObject)));
 
 
-	initNavigation();
+
 }
 
-
+void Controller::successLogin()
+{
+	qDebug() << "SucessLogin";
+	QObject::connect(navigationUI::Get(),SIGNAL(subNavPressed(QJsonObject)),this,SLOT(subNavPressed(QJsonObject)));
+	initNavigation();
+}
 void Controller::showDisplayDataReturned(QJsonDocument document)
 {
 
@@ -135,10 +140,10 @@ void Controller::subNavPressed(QJsonObject view)
 
 				}
 			else{
-			//	Database* database  = Database::Gett();
-			//	QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedData(QJsonDocument)));
+				//	Database* database  = Database::Gett();
+				//	QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedData(QJsonDocument)));
 				//qDebug() << __FILE__ << __LINE__  <<"getDocument"<< view.value("Card").toString();
-			//	database->getDoc(view.value("Card").toString());
+				//	database->getDoc(view.value("Card").toString());
 				Controller::Get()->showCreateEditeStrUI(view.value("Card").toString(),true);
 
 				}
@@ -1250,6 +1255,8 @@ void Controller::deleteEntityData(QVector<QJsonDocument> items)
 			}
 		}
 }
+
+
 
 void Controller::queryData(QVector<QJsonDocument> items)
 {

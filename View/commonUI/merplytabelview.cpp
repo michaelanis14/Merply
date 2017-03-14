@@ -150,8 +150,8 @@ void merplyTabelView::resizeTabelToContets()
 	if(this->model->getColmnsCount() > 6 && this->model->getRowsCount() < 100){
 		this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
 		}
-	if(this->model->getRowsCount() < 30){
-		this->tableView->setMinimumHeight(tableView->rowHeight(1)*this->model->getRowsCount());
+	if(this->model->getRowsCount() < 40){
+		this->tableView->setMinimumHeight(tableView->rowHeight(1)*this->model->getRowsCount()+40);
 		}
 }
 

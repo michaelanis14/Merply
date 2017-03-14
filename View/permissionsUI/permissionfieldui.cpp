@@ -212,9 +212,9 @@ void PermissionFieldUI::loadUsersGroups()
 	usersforDeniedList->addJsonItems(basicPermissonsKeys);
 
 	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
-	Controller::Get()->getJsonList("Users","Fields[0][0].Name[0]");
+	Controller::Get()->getJsonList("Users","ARRAY_REPEAT(TOARRAY(Name),1)");
 	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
-	Controller::Get()->getJsonList("Groups","Fields[0][0].Name[0]");
+	Controller::Get()->getJsonList("Groups","ARRAY_REPEAT(TOARRAY(Name),1)");
 
 }
 

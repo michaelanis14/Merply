@@ -185,8 +185,7 @@ lcb_t Database::InitDatabase(QString connStr)
 	QByteArray databaseByte = connStr.toLatin1();
 	const char *databseCharK = databaseByte.data();
 	cropts.v.v3.connstr = databseCharK;
-	//cropts.v.v3.passwd ="2019066";
-	//cropts.v.v3.username="admin";
+
 
 	//qDebug() << cropts.v.v3.connstr<<cropts.v.v3.passwd <<cropts.v.v3.username;
 	lcb_error_t err;
@@ -339,7 +338,7 @@ void Database::rowCallback(lcb_t , int , const lcb_RESPN1QL *resp) {
 			p_instance->array.append(QJsonDocument::fromJson(byteArray , &parserError));
 			}
 		else{
-			qDebug() << __FILE__ << __LINE__  << parserError.errorString() << "emitting Value";
+			//qDebug() << __FILE__ << __LINE__  << parserError.errorString() << "emitting Value";
 			p_instance->emit gotValue(QString(byteArray));
 			//	qDebug() << __FILE__ << __LINE__  << p_instance->value;
 			}
