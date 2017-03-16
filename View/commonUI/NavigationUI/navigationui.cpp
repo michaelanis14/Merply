@@ -25,16 +25,12 @@ navigationUI::navigationUI(QWidget *parent) :
 	this->layout->setAlignment(Qt::AlignLeft);
 	this->setFixedWidth(Controller::GetNavigationWidth());
 	this->setFixedHeight(Controller::GetWindowHeight());
+	sctrlUI = new SettingsCtrlsUI();
+	sctrlUI->setFixedHeight(Controller::GetNavigationSettingsBarHeight());
+	sctrlUI->addbtn("Settings",":/resources/icons/settings.png","settings");
+	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btn_Clicked(QString)));
+	layout->addWidget(sctrlUI);
 
-//	if(AccessController::Get()->hasAdminGroupAccess()){
-	if(true){
-	qDebug() << __FILE__ << __LINE__  << "admin";
-		SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
-		sctrlUI->setFixedHeight(Controller::GetNavigationSettingsBarHeight());
-		sctrlUI->addbtn("Settings",":/resources/icons/settings.png","settings");
-		QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btn_Clicked(QString)));
-		layout->addWidget(sctrlUI);
-		}
 
 
 	subNavigation = new QTreeWidget();
@@ -76,23 +72,35 @@ void navigationUI::loadMainNavigation(QJsonDocument navDoc)
 	Controller::Get()->clearMainNavigation();
 	Controller::Get()->clearSubNavigation();
 	Controller::Get()->clearPages();
-
+	if(AccessController::Get()->hasAdminGroupAccess()){
+		qDebug() << __FILE__ << __LINE__  << "admin";
+		sctrlUI->setHidden(false);
+		}
+	else {
+		sctrlUI->setHidden(true);
+		}
 	foreach(QJsonValue mainNav,navDoc.object().value("MainNavigations").toArray()){
 		QString title = mainNav.toObject().value("Title").toString();
 		double key = mainNav.toObject().value("ID").toDouble();
 
 		QJsonArray items = mainNav.toObject().value("Items").isArray()?mainNav.toObject().value("Items").toArray():QJsonArray();
-
-		if(!title.isEmpty() && !items.isEmpty()){
-			QTreeWidgetItem* maintab = new QTreeWidgetItem();
-			maintab->setText(2,QString::number(key));
-			maintab->setText(1,title);
-			mainNavigation->insertTopLevelItem(mainNavigation->topLevelItemCount(),maintab);
+		QList<QTreeWidgetItem*> subNavItems = loadSubNavigation(items);
+		if(subNavItems.count() > 0){
+			if(!title.isEmpty() && !items.isEmpty()){
+				QTreeWidgetItem* maintab = new QTreeWidgetItem();
+				maintab->setText(2,QString::number(key));
+				maintab->setText(1,title);
+				mainNavigation->insertTopLevelItem(mainNavigation->topLevelItemCount(),maintab);
+				}
+			mainNavigation->resizeColumnToContents(0);
+			{
+			//qDebug() << __FILE__ << __LINE__  << "subNavItems" << subNavItems;
+			Controller::Get()->addMainNavigation(key,title);
+			Controller::Get()->addSubNavigation(key,subNavItems);
 			}
-		mainNavigation->resizeColumnToContents(0);
 
-		Controller::Get()->addMainNavigation(key,title);
-		Controller::Get()->addSubNavigation(key,loadSubNavigation(items));
+			}
+
 		}
 	if(mainNavigation->topLevelItemCount() > 0){
 		mainNavigation->clearSelection();

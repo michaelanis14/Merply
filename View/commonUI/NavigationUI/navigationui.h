@@ -8,7 +8,7 @@
 #ifndef NAVIGATIONUI_H
 #define NAVIGATIONUI_H
 
-
+#include "settingsctrlsui.h"
 
 #include <QPainter>
 
@@ -50,7 +50,7 @@ public:
 	void paintEvent(QPaintEvent *);
 	bool editMode;
 	void resizeEvent(QResizeEvent* event);
-
+	SettingsCtrlsUI* sctrlUI;
 public slots:
 	void mainNavPressed(QTreeWidgetItem* item, int);
 	void subNavPressed(QTreeWidgetItem* item, int);

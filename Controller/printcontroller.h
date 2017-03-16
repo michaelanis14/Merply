@@ -21,11 +21,11 @@ private:
 	QMap <QString,QString> fieldsValues;
 	QJsonArray reportData;
 	void getFieldstoValueMap(QJsonObject entity);
-
+	bool showDialog;
 signals:
 
 public slots:
-	void gotPrintEntity(QJsonDocument document);
+	void gotPrintEntity(QJsonDocument document, bool showDialog = true);
 	void gotPrintStrct(QJsonDocument strct);
 	void setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage);
 };

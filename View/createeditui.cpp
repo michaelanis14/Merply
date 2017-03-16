@@ -41,6 +41,8 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 	errorsWidgetLayout->setSpacing(0);
 	this->layout->addWidget(errorsWidget);
 
+	QObject::disconnect(Controller::Get(),SIGNAL(savedQJson(QJsonDocument)),this,SLOT(printAfterSaved(QJsonDocument)));
+	printAfterSave(viewStructure);
 
 	createEditWidget = new QWidget();
 	createEditWidget->setContentsMargins(0,0,0,0);
@@ -54,14 +56,14 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 	connect(ndcontrls, SIGNAL(btnClicked(const QString&)), this, SLOT(controller_Clicked(QString)));
 	this->layout->addWidget(ndcontrls);
 
+
+
 	fill(viewStructure,data);
 
 	cancelShortCut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(cancel()));
 	cancelShortCut = new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(cancel()));
 	saveShortCut =new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_S), this, SLOT(saveEntity()));
 	printShortCut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_P), this, SLOT(printEntity()));
-
-
 }
 
 CreateEditUI* CreateEditUI::p_instance = 0;
@@ -72,10 +74,10 @@ void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data,bool creat
 	if(!key.isEmpty())
 		{
 		//this->viewStructure = viewStructure;
-		if( create || !Controller::Get()->isCachedCreateEditUI(key)){
+		if(true || create || !Controller::Get()->isCachedCreateEditUI(key)){
 			CreateEditUI* p =  new CreateEditUI(0,viewStructure, data);
 			//qDebug() << __FILE__ << __LINE__ << "insertCachedCreateEditUI"<<key<< &p_instance;
-			Controller::Get()->insertCachedCreateEditUI(key,p);
+			//Controller::Get()->insertCachedCreateEditUI(key,p);
 			p_instance = p;
 			}
 		else{
@@ -115,8 +117,10 @@ void CreateEditUI::fill(QJsonObject viewStructure, QJsonObject data)
 		this->viewStructure = viewStructure;
 		}
 
-	this->data = data;
-	this->cas = data.value("cas_value").toString();
+	if(!data.isEmpty()){
+		this->data = data;
+		this->cas = data.value("cas_value").toString();
+		}
 	//qDebug() << __FILE__ << __LINE__  <<"Fill"<< this->cas;
 
 	viewGroups = ViewGroups::Create(this->viewStructure,data) ;
@@ -166,6 +170,46 @@ QStringList CreateEditUI::getTabelsFieldNames(QJsonObject viewStructure)
 	return tbls;
 }
 
+void CreateEditUI::printAfterSave(QJsonObject strct)
+{
+	this->toInvoiceFlag = false;
+	if(strct.value("document_id").toString().compare("ViewStructure::PriceQutation") == 0)
+		this->toInvoiceFlag = true;
+
+	printAfterSaveWidget = new QWidget();
+	//printAfterSaveWidget->setContentsMargins(0,0,0,0);
+	printAfterSaveWidgetLayout = new QHBoxLayout(printAfterSaveWidget);
+	//printAfterSaveWidgetLayout->setContentsMargins(0,0,0,0);
+	//printAfterSaveWidgetLayout->setSpacing(0);
+	this->layout->addWidget(printAfterSaveWidget);
+	printAfter = new QCheckBox(tr("طباعه فورى"));
+	connect(printAfter, SIGNAL(toggled(bool)), this, SLOT(printAfterCheckBoxChanged(bool)));
+	printAfter->setChecked(true);
+	printAfterSaveWidgetLayout->addWidget(printAfter);
+	showPrintDialog =new QCheckBox(tr("عرض نموزج الطباعه"));
+	printAfterSaveWidgetLayout->addWidget(showPrintDialog);
+
+	if(this->toInvoiceFlag){
+		toInvoice =new QCheckBox(tr("تحويل لفاتوره"));
+		printAfterSaveWidgetLayout->addWidget(toInvoice);
+		}
+	/*
+	 *
+	 * //TODO : EACH ENTITY A CHECK
+	if(strct.value("Viewgroups").isArray()){
+		foreach (QJsonValue item, strct.value("Viewgroups").toArray()) {
+			QJsonObject viewGroupObject = item.toObject().value("Viewgroup").toObject();
+			if(viewGroupObject.value("RefrenceFields") != QJsonValue::Undefined){
+				foreach(QJsonValue refrenceFields,viewGroupObject.value("RefrenceFields").toArray()){
+					refrenceFields.toObject().value("Source").toString().split("::")[1];
+					}
+				}
+
+			}
+		}
+		*/
+}
+
 void CreateEditUI::paintEvent(QPaintEvent *)
 {
 	QStyleOption opt;
@@ -213,8 +257,6 @@ void CreateEditUI::gotTabelsData(QVector<QJsonDocument> tblsData)
 	MainForm::Get()->ShowDisplay(p_instance);
 }
 
-
-
 void CreateEditUI::printEntity()
 {
 	this->clearErrorsWidget();
@@ -249,7 +291,10 @@ void CreateEditUI::saveEntity()
 	if(errs.isEmpty()){
 		//	qDebug() << __FILE__ << __LINE__ <<"Controller Clicked to save" << this->cas;
 		QString documentID ;
-		if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined){
+		if(!this->data.isEmpty()){
+			documentID = this->data.value("document_id").toString();
+			}
+		else if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined){
 			documentID = this->viewStructure.value("SaveAs").toString();
 			}
 		else{
@@ -264,10 +309,14 @@ void CreateEditUI::saveEntity()
 			QJsonObject vgsSave = viewGroups->save();
 			//vgsSave.insert("cas_value",this->cas);
 			vgsSave.insert("document_id",key);
-			//QObject::connect(Controller::Get(),SIGNAL(savedItems(QString)),this,SLOT(saved()));
-			//Controller::Get()->createEditStore(vgsSave);
-			Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
+			QObject::connect(Controller::Get(),SIGNAL(savedItems(QString)),this,SLOT(saved()));
+			Controller::Get()->createEditStore(vgsSave);
+			if(this->toInvoiceFlag){
+				if(this->toInvoice->isChecked())
 
+					Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
+				}
+			else Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
 
 			}
 		else{
@@ -279,6 +328,12 @@ void CreateEditUI::saveEntity()
 			Controller::Get()->createEditStore(vgsSave);
 
 
+			if(this->toInvoiceFlag){
+				if(this->toInvoice->isChecked())
+
+					Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
+				}
+			else Controller::Get()->saveRefrenceStructures(this->viewStructure,vgsSave);
 			//QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
 			//Controller::Get()->UpdateDoc(QJsonDocument(vgsSave));
 			}
@@ -304,6 +359,26 @@ void CreateEditUI::cancel()
 		documentID = this->viewStructure.value("document_id").toString();
 		}
 	IndexUI::ShowUI(documentID,QVector<QJsonDocument>());
+}
+
+void CreateEditUI::printAfterCheckBoxChanged(bool checked)
+{
+	//TODO : BETTER RE GET THE DOCUMENT WITH ITS ID TO MAKE SURE IT IS ALREADY SAVED CORRECTLY
+	if(checked){
+		QObject::connect(Controller::Get(),SIGNAL(savedQJson(QJsonDocument)),this,SLOT(printAfterSaved(QJsonDocument)));
+		//QObject::connect(Controller::Get(),SIGNAL(savedItems(QString)),this,SLOT(printAfterSaved(QString)));
+		}
+	else {
+		QObject::disconnect(Controller::Get(),SIGNAL(savedQJson(QJsonDocument)),this,SLOT(printAfterSaved(QJsonDocument)));
+		//QObject::disconnect(Controller::Get(),SIGNAL(savedItems(QString)),this,SLOT(printAfterSaved(QString)));
+		}
+}
+
+void CreateEditUI::printAfterSaved(QJsonDocument document)
+{
+	//QObject::disconnect(Controller::Get(),SIGNAL(savedQJson(QJsonDocument)),this,SLOT(printAfterSaved(QJsonDocument)));
+	//	qDebug() << "Will PRINTT" << document.object().value("document_id");
+	PrintController::Get()->gotPrintEntity(document,this->showPrintDialog->isChecked());
 }
 
 void CreateEditUI::saved()

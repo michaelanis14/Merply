@@ -200,7 +200,7 @@ void MerplyQueryUI::generateQuery(int lmit)
 		query += q;
 		}
 	else if(!save.isEmpty()){
-		query += "SELECT `"+QString(DATABASE)+"`.*,to_number(SPLIT(META(`"+QString(DATABASE)+"`).id,'::')[1]) AS `ID.No.`"+selectClmnsQuery+" FROM  `"+QString(DATABASE)+"`  WHERE META(`"+QString(DATABASE)+"`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
+		query += "SELECT `"+QString(DATABASE)+"`.*,to_number(SPLIT(META(`"+QString(DATABASE)+"`).id,'::')[1]) AS `SN`"+selectClmnsQuery+" FROM  `"+QString(DATABASE)+"`  WHERE META(`"+QString(DATABASE)+"`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
 		if(clmnsFlag)
 			query += " LIMIT 1 ";
 		if(lmit > 0){

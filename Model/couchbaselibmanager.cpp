@@ -40,8 +40,8 @@ void CouchbaseLibManager::init(int poolCount,QString connStr)
 	for(int i = 0; i < poolCount; i++){
 	//	qDebug() << __FILE__ << __LINE__  << "init";
 		connStr = "couchbase://localhost/"+QString(DATABASE);
-	//	connStr = "couchbase://139.59.149.28/"+QString(DATABASE);
-
+		//connStr = "couchbase://192.168.1.135,139.59.149.28,193.171.44.206/"+QString(DATABASE);
+		//connStr = "couchbase://193.171.44.206/"+QString(DATABASE);
 
 		struct lcb_create_st cropts;// = { 0 };
 		cropts.version = 3;

@@ -32,7 +32,8 @@ void HControllers::clear(){
 void HControllers::fill(QStringList btns){
 	foreach(QString btnName,btns){
 		QPushButton* btn = new QPushButton();
-		//btn->setMinimumHeight(35);
+		btn->setMinimumHeight(40);
+		btn->setMinimumWidth(70);
 		QStringList nameAction = btnName.split("->");
 		btn->setObjectName(btnName);
 		btn->setText(nameAction.first());

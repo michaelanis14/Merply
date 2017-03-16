@@ -130,6 +130,8 @@ void StructureViewGroupsUI::fill(QJsonObject structureView)
 		headerlbl->setTitle(structureView.value("Title").toString());
 	else headerlbl->setTitle("New Card");///+QString::number(Controller::Get()->Count("ViewStructure")));
 
+	if(structureView.value("SaveAs") != QJsonValue::Undefined)
+		saveAs->setTitle(structureView.value("SaveAs").toString());
 
 	QList<QWidget *> Widgets = viewGroups->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
@@ -253,7 +255,8 @@ void StructureViewGroupsUI::editControllerSavePressed()
 		Controller::Get()->storeDoc("ViewStructure",QJsonDocument(savedObj));
 	else Controller::Get()->UpdateDoc(QJsonDocument(savedObj));
 
-	//	Controller::Get()->createIndexes(savedObj); //TODO: BETTER INDEXING
+
+	Controller::Get()->createIndexes(savedObj);
 	Controller::Get()->editControllerCancelPressed();
 }
 

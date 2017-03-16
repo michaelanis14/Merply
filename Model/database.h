@@ -64,7 +64,7 @@ public:
 
 private:
 	static Database* p_instance;
-	//QJsonDocument document;
+	QJsonDocument lastDocument;
 	QString lastQuery;
 	QJsonDocument documentToArray;
 	QVector<QJsonDocument> array;
@@ -82,6 +82,7 @@ signals:
 	void gotValue(QString value);
 	void gotLastKey(QString LastKeyID);
 	void saved(QString document_id);
+	void savedQJson(QJsonDocument savedDocument);
 };
 
 #endif // DATABASE_H

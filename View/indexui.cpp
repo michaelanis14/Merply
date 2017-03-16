@@ -40,7 +40,7 @@ void IndexUI::ShowUI(const QString document_id, const QVector<QJsonDocument> doc
 		p_instance->fill(document_id,documents);
 		}
 	MainForm::Get()->ShowDisplay(p_instance);
-	p_instance->table->generateQuery(50);
+//	p_instance->table->generateQuery(50);
 }
 
 

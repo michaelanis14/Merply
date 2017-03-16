@@ -9,7 +9,7 @@
 #include <QJsonObject>
 #include <QVBoxLayout>
 #include <QShortcut>
-
+#include <QCheckBox>
 class CreateEditUI : public MainDisplay
 {
 	Q_OBJECT
@@ -35,6 +35,15 @@ private:
 	QShortcut* saveShortCut;
 	QShortcut* cancelShortCut;
 	QShortcut* printShortCut;
+
+	QWidget* printAfterSaveWidget;
+	QHBoxLayout *printAfterSaveWidgetLayout;
+
+	void printAfterSave(QJsonObject strct);
+	QCheckBox* printAfter;
+	QCheckBox* showPrintDialog;
+	QCheckBox* toInvoice;
+	bool toInvoiceFlag;
 signals:
 protected:
 	//void showEvent(QShowEvent *);
@@ -46,6 +55,8 @@ public slots:
 	void printEntity();
 	void saveEntity();
 	void cancel();
+	void printAfterCheckBoxChanged(bool checked);
+	void printAfterSaved(QJsonDocument document);
 };
 
 #endif // CREATEEDITUI_H

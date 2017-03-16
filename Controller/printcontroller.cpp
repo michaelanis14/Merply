@@ -4,12 +4,13 @@
 
 PrintController::PrintController(QObject *parent) : QObject(parent)
 {
+	showDialog = true;
 	report = new QtRPT(this);
 }
 PrintController* PrintController::p_instance = 0;
 PrintController* PrintController::Get()
 {
-	if (p_instance == 0)
+	//if (p_instance == 0)
 		p_instance = new PrintController();
 
 	return p_instance;
@@ -25,8 +26,9 @@ void PrintController::printEntity(QString id)
  * @brief PrintController::gotPrintEntity
  * @param document
  */
-void PrintController::gotPrintEntity(QJsonDocument document)
+void PrintController::gotPrintEntity(QJsonDocument document,bool showDialog)
 {
+	this->showDialog = showDialog;
 	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintEntity(QJsonDocument)));
 
 	this->printDocumnet = document;
@@ -57,7 +59,7 @@ void PrintController::getFieldstoValueMap(QJsonObject entity)
 					if(value.isString())
 						fieldsValues.insert(key,value.toString());
 					else if(value.isDouble())
-						fieldsValues.insert(key,Controller::Get()->toString(value));
+						fieldsValues.insert(key,Controller::Get()->toString("",value));
 
 					else if(value.isObject()){
 						if(value.toObject().value("Value") != QJsonValue::Undefined)
@@ -79,7 +81,7 @@ void PrintController::getFieldstoValueMap(QJsonObject entity)
 										}
 									else{
 										reportData.append(row);
-										qDebug() << row ;
+										//qDebug() << row ;
 										}
 									}
 								//TODO : instead of Merging tables have better refrences
@@ -126,9 +128,9 @@ void PrintController::gotPrintStrct(QJsonDocument strct)
 	xmlDocument.setContent(printStrct.object().value("XMLSTRCT").toString());
 	report->loadReport(xmlDocument);
 	report->recordCount << reportData.count();
-	//qDebug() << reportData.count();
+	//qDebug()<< __FILE__ << __LINE__ << reportData.count();
 	//qDebug() << __FILE__ << __LINE__  <<"gotPrintStrct"<< printStrct.object().value("XMLSTRCT").toString();
-	report->printExec(true, false, "printerName");
+	report->printExec(true, !showDialog, "printerName");
 }
 
 void PrintController::setValue(const int recNo, const QString paramName, QVariant &paramValue, const int reportPage)
@@ -138,8 +140,8 @@ void PrintController::setValue(const int recNo, const QString paramName, QVarian
 	//qDebug() << reportData.at(recNo).toObject().value(paramName);
 	if(fieldsValues.contains(paramName)){
 		if(paramName.compare("") == 0)
-			paramValue = fieldsValues.value(paramName) ;
-		paramValue = fieldsValues.value(paramName) ;
+			paramValue = Controller::Get()->toString(paramName,fieldsValues.value(paramName)) ;
+		paramValue = Controller::Get()->toString(paramName,fieldsValues.value(paramName)) ;
 		}
 	else if(reportData.at(recNo).toObject().value(paramName) != QJsonValue::Undefined){
 

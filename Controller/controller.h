@@ -60,7 +60,7 @@ public:
 
 	QList<QString> select(const QString query);
 	QVector<QJsonDocument> getAll(const QString entity, const QString condition);
-	QString toString(QJsonValue value);
+	QString toString(QString key = "",QJsonValue value = QJsonValue());
 	bool documentInList(QVector<QJsonDocument> all, QString key);
 	QVector<QJsonDocument> getEnities();
 	void getFields(QString Title);
@@ -165,6 +165,7 @@ public slots:
 	void getTabelsData(QString entity,QStringList tbls);
 	void deleteEntityData(QVector<QJsonDocument> items);
 
+	void successLogin();
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void gotFieldsData(QList<QString> fields);
@@ -177,6 +178,7 @@ signals:
 	void queryDatabase(QString q);
 	void saved(QString document_id);
 	void savedItems(QString document_id);
+	void savedQJson(QJsonDocument savedDocument);
 
 };
 

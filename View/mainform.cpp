@@ -96,7 +96,7 @@ MainForm::MainForm(): QWidget()
 				"border-style: inset;"
 				"}"
 				"QLineEdit#error { border-style: outset; border-width: 0.5px; border-radius: 5px; border-color: red;}"
-				"QPushButton {border: 1px solid rgb(100, 100, 100);min-width: 70px;min-height: 30px;}"
+				//"QPushButton {border: 1px solid rgb(100, 100, 100);min-width: 70px;min-height: 30px;}"
 				"QLineEdit { border: 1px solid rgb(100, 100, 100);min-width: 150px;min-height: 30px;}"
 				"QComboBox{  border: 1px solid rgb(100, 100, 100);min-width: 150px;min-height: 30px; } "
 				"QGroupBox::title	{subcontrol-origin: margin;subcontrol-position: top left;padding: 5 5px;font-size: 18px;font-weight: bold;border-radius: 5px; background:gray;min-width: 100px;}"

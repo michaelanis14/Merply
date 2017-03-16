@@ -62,6 +62,9 @@ StructureVieweditSubFeildEquation::StructureVieweditSubFeildEquation(QWidget *pa
 	numbers  = new QLineEdit;
 	equationElementLayout->addRow((tr("Number")), numbers);
 
+	editable = new QCheckBox();
+	equationElementLayout->addRow(tr("Editable"),editable);
+
 
 	QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),this,SLOT(gotFields(QStringList)));
 	StructureViewGroupsUI::GetUI()->getFeildsNames();
@@ -89,6 +92,8 @@ QJsonObject StructureVieweditSubFeildEquation::save()
 		save.insert("ConditionOnTwo",conditionOnTwo->currentIndex());
 		save.insert("ConditionColumnTwo",conditionColumnTwo->currentText());
 		}
+	if(editable->isChecked())
+		save.insert("Editable",this->editable->isChecked());
 
 	//qDebug() << __FILE__ << __LINE__  << save;
 	return save;
@@ -123,6 +128,9 @@ void StructureVieweditSubFeildEquation::fill(QJsonObject data)
 		conditionOnTwo->setCurrentIndex(data.value("ConditionOnTwo").toInt());
 		updateConditionColmnOne(data.value("ConditionOnTwo").toInt());
 		conditionColumnTwo->setCurrentText(data.value("ConditionColumnTwo").toString());
+		}
+	if(data.value("Editable") != QJsonValue::Undefined){
+		this->editable->setChecked(true);
 		}
 }
 

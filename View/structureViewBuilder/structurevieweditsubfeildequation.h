@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QFormLayout>
 #include <QLineEdit>
+#include <QCheckBox>
 
 class StructureVieweditSubFeildEquation : public QWidget
 {
@@ -30,6 +31,7 @@ private:
 	bool firstOperand;
 	QStringList ops ;
 	QStringList conditions ;
+	QCheckBox* editable;
 signals:
 
 public slots:

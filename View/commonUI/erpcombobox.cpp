@@ -44,7 +44,7 @@ void ERPComboBox::addJsonItems(QVector<QJsonDocument> items){
 					keyString = Val.toObject().value("Key").toString();
 				if(Val.toObject().value("Value") != QJsonValue::Undefined){
 				//	qDebug()<< "TOSTRINGG" << Val.toObject().value("Value") << Val;
-					valueString = Controller::Get()->toString(Val.toObject().value("Value"));
+					valueString = Controller::Get()->toString("",Val.toObject().value("Value"));
 					}
 				QComboBox::insertItem(i,valueString);
 				keys.insert(i,keyString);
@@ -55,7 +55,7 @@ void ERPComboBox::addJsonItems(QVector<QJsonDocument> items){
 
 					//qDebug() << __FILE__ << __LINE__  << "chechkkk" << subVal <<Controller::Get()->toString(subVal);
 
-					valueString = Controller::Get()->toString(subVal);
+					valueString = Controller::Get()->toString("",subVal);
 
 					QComboBox::insertItem(i,valueString);
 					keys.insert(i,keyString);
@@ -64,7 +64,7 @@ void ERPComboBox::addJsonItems(QVector<QJsonDocument> items){
 				}
 			else{
 
-				QString valueString = Controller::Get()->toString(Val).trimmed();
+				QString valueString = Controller::Get()->toString("",Val).trimmed();
 				if(valueString.isNull() || valueString.isEmpty()){
 					//	qDebug() << __FILE__ << __LINE__ <<"NULLLL"<<i << Val;
 					continue;
