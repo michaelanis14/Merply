@@ -6,6 +6,8 @@
 
 #include "viewgroups.h"
 #include "pageui.h"
+#include <iostream>
+
 
 
 NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent)
@@ -32,7 +34,6 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	sctrlUI->addbtn("Save",":/resources/icons/save.png","save");
 
 	sctrlUI->addbtn("Cancel",":/resources/icons/cancel.png","cancel");
-	qDebug() << __FILE__ << __LINE__  <<'ana feen';
 
 	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btn_Clicked(QString)));
 	sctrlUI->setAutoFillBackground(true);
@@ -54,7 +55,6 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 
 	card = new QRadioButton(tr("&Card Refrence"));
 	connect(card,SIGNAL(toggled(bool)),this,SLOT(cardToggled(bool)));
-	qDebug() << __FILE__ << __LINE__  <<'connect new card';
 
 	page = new QRadioButton(tr("Custom Page"));
 	connect(page,SIGNAL(toggled(bool)),this,SLOT(pageToggled(bool)));
@@ -85,7 +85,6 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	newCardDetails = new QGroupBox(tr("New Card Details"));
 	QHBoxLayout* newCardDetailsLayout = new QHBoxLayout;
 	newCardDetails->setLayout(newCardDetailsLayout);
-	qDebug() << __FILE__ << __LINE__  <<'new card details';
 
 	newCardStructure = new StructureViewGroupsUI();
 	newCardStructure->headerlbl->setHidden(true);
@@ -93,7 +92,6 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	newCardStructure->sctrlUI->ctrlBtns->value(2)->setHidden(true);
 	newCardDetailsLayout->addWidget(newCardStructure);
 	layout->addWidget(newCardDetails);
-	qDebug() << __FILE__ << __LINE__  <<'add new card detail';
 
 
 	cardDetails = new QGroupBox(tr("Card Details"));
@@ -111,7 +109,6 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 
 	QPushButton* btnRemoveCard = new QPushButton(tr("Delete Card"));
 	QObject::connect(btnRemoveCard,SIGNAL(clicked(bool)),this,SLOT(deleteCard()));
-	qDebug() << __FILE__ << __LINE__  <<'card removed';
 
 	cardDetailsLayout->addWidget(btnRemoveCard);
 
@@ -193,16 +190,12 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 			newCard->setChecked(true);
 			newCardToggled(true);
 			newCardStructure->fill(structureView.value("CardData").toObject());
-			qDebug() << __FILE__ << __LINE__  << structureView.value("Card").toString();
-			qDebug() << __FILE__ << __LINE__  << 'Button Clicked';
 			updateNewCardPreview();
 			}
 		else{
 			cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
 			if(cards->currentIndex() == -1){
 				cards->clear();
-				qDebug() << __FILE__ << __LINE__  <<"cards are";
-				qDebug() << __FILE__ << __LINE__  << structureView.value("Card").toString();
 				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
 				Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 				cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
@@ -216,18 +209,13 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 			}
 		}
 	else{
-		//if(structureView.value("Title").toString().isEmpty())
-		//	this->headerlbl->setTitle(tr("New Page"));
-		//qDebug() << __FILE__ << __LINE__  << structureView.value("Card").toString();
 		if(structureView.value("CardData") != QJsonValue::Undefined){
 			this->getPageData(QJsonDocument(structureView.value("CardData").toObject()));
 			qDebug() << __FILE__ << __LINE__  << structureView.value("Card").toString();
-			qDebug() << __FILE__ << __LINE__  << ' ana feen bardo2';
 			}
 		else{
 			QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getPageData(QJsonDocument)));
 			Controller::Get()->getDoc(structureView.value("Card").toString());
-			qDebug() << __FILE__ << __LINE__  << ' ana feen bardo3';
 			}
 
 		}
@@ -248,7 +236,6 @@ void NavigationPageEditUI::save(bool updateDataBase)
 		if(updateDataBase){
 			if(savedPage.value("document_id") != QJsonValue::Undefined){
 				//qDebug() << __FILE__ << __LINE__  << savedPage.value("document_id");
-				qDebug() << __FILE__ << __LINE__  << 'eh elly saved';
 				saveObject.insert("Card",savedPage.value("document_id").toString());
 				Controller::Get()->UpdateDoc(QJsonDocument(savedPage));
 				emit this->saved(saveObject);
@@ -267,53 +254,32 @@ void NavigationPageEditUI::save(bool updateDataBase)
 		emit this->saved(saveObject);
 		}
 	else if(newCard->isChecked()){
-		if (this->headerlbl->getTitle() == "InVoice"){
-			qDebug() << __FILE__ << __LINE__  << "Count is:";
-			qDebug() << __FILE__ << __LINE__  << Controller::Get()->Count(this->headerlbl->getTitle());
-			Controller::Get()->ShowError(tr("OOPS! There is already a card with the same name"));
-			}
+		if (Controller::Get()->Count("ViewStructure::"+this->headerlbl->getTitle().trimmed()+"\"") > 0)
+			Controller::Get()->ShowError(tr("Card name already exists") );
+
 		else{
 		saveObject.insert("Select",view->currentText());
 		saveObject.insert("Type","Entity");
-		qDebug() << __FILE__ << __LINE__  << 'new card is checked';
 		newCardStructure->headerlbl->setTitle(this->headerlbl->getTitle());
-		//if(this->headerlbl->getTitle() == "InVoice"){
 
-
-			//}
 
 		if(updateDataBase){
 			QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(gotLastKeyData(QString)));
 			//Controller::Get()->getLastKey();
 			QJsonObject newsStruct = newCardStructure->save() ;
-			qDebug() << __FILE__ << __LINE__  << 'DB Updated';
 			Controller::Get()->storeDoc("ViewStructure::"+newsStruct.value("Title").toString(),QJsonDocument(newsStruct));
 
 			}
-			}
-		//	else
-		//	{
-		//	saveObject.insert("CardData",newCardStructure->save());
-		//;
 
-		//	while(Controller::getLastKeyID().toDouble() == -1){
-		//	qDebug() << __FILE__ << __LINE__  << Controller::getLastKeyID();
-		//		}
-
-		//	emit this->saved(saveObject);
-		//		}
 		}
-
-
+	}
 
 }
 void NavigationPageEditUI::gotLastKeyData(QString key)
 {
-	qDebug() << __FILE__ << __LINE__  << 'key';
 	QObject::disconnect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(gotLastKeyData(QString)));
 	saveObject.insert("Card",key);
 	emit this->saved(saveObject);
-	qDebug() << __FILE__ << __LINE__  << 'key bardo';
 }
 NavigationPageEditUI*NavigationPageEditUI::Get()
 {
@@ -337,7 +303,6 @@ void NavigationPageEditUI::btn_Clicked(QString btn)
 	else if(btn.contains("Save")){
 		//qDebug() << __FILE__ << __LINE__  << this->save();
 		//Controller::Get()->storeDoc("ViewStructure",QJsonDocument(this->save()));
-		qDebug() << __FILE__ << __LINE__  << 'save button is clicked';
 		emit editControllerSavePressed();
 		}
 	else if(btn.contains("Cancel")){
@@ -353,23 +318,16 @@ void NavigationPageEditUI::newCardToggled(bool state)
 		//QObject::connect(this, SIGNAL(editControllerSavePressed()), newCardStructure, SLOT(editControllerSavePressed()));
 
 		newCardDetails->setHidden(false);
-		qDebug() << __FILE__ << __LINE__  << "newCard hereeee" ;
-		//QMessageBox::critical(this,"Errorss","hello");
 		newCardDetails->layout()->itemAt(0)->widget()->setHidden(false);
 		headerlbl->setEnabled(true);
-		//headerlbl->setTitle("Safa");
 		headerlbl->setTitle("New Card");
 		viewBox->setHidden(false);
 
 		}
-	//safa
 	else{
-		//if(structureView.value("Card").toString() == "InVoice")
-			//Controller::ShowQuestion(tr("can't be added"));
-		//else
+
 		QObject::disconnect(this, SIGNAL(editControllerCancelPressed()), newCardStructure, SLOT(editControllerCancelPressed()));
 		//QObject::disconnect(this, SIGNAL(editControllerSavePressed()), newCardStructure, SLOT(editControllerSavePressed()));
-		qDebug() << __FILE__ << __LINE__  << 'new cardd';
 		//messageBox = new QMessageBox(tr("&New Message"));
 		//QMessageBox::critical(this,"Error","hello");
 		newCardDetails->setHidden(true);
@@ -381,8 +339,6 @@ void NavigationPageEditUI::cardToggled(bool state)
 	if(state){
 		this->headerlbl->setTitle(structureView.value("Title").toString());
 		headerlbl->setEnabled(true);
-		qDebug() << __FILE__ << __LINE__  << 'title name';
-		qDebug() << __FILE__ << __LINE__  << structureView.value("Title").toString();
 		cardDetails->setHidden(false);
 		viewBox->setHidden(false);
 
@@ -430,7 +386,6 @@ void NavigationPageEditUI::updatePagePreview()
 {
 	if(page->isChecked()){
 
-		//	qDebug() << __FILE__ << __LINE__  << "updatePAge";
 		clearPreview();
 		PageUI*page = new PageUI(0,pageEdit->save() );
 		page->headerlbl->setHidden(true);
@@ -441,7 +396,6 @@ void NavigationPageEditUI::updatePagePreview()
 void NavigationPageEditUI::deleteCard()
 {
 	QString id  = cards->getKey();
-	qDebug() << __FILE__ << __LINE__  << "card deleted id";
 	qDebug() << __FILE__ << __LINE__  <<  cards->getKey();
 	if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?")))
 		if(Controller::Get()->deleteDocument(id)){
@@ -454,7 +408,6 @@ void NavigationPageEditUI::deleteCard()
 void NavigationPageEditUI::updateNewCardPreview()
 {
 	if(newCard->isChecked()){
-		//qDebug() << __FILE__ << __LINE__  << "newCard";
 		clearPreview();
 		ViewGroups* vg = ViewGroups::Create(newCardStructure->save() ,QJsonObject());
 		previewLayout->addWidget(vg);
