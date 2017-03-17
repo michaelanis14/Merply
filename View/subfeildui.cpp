@@ -163,6 +163,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		//lineEdit->setEnabled(false);
 
 		QString dataString = Controller::Get()->toString("",data);
+		//i removed !
 		if(!dataString.isEmpty()){
 			lineEdit->setText(dataString);
 			}
@@ -171,15 +172,14 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			if(structureView.value("startNum") != QJsonValue::Undefined){
 				lineEdit->setText(QString::number(structureView.value("startNum").toInt()));
 				}
-
+			//this split gives the name of the card
 			QStringList id = this->strID.split("ViewStructure::");
 			if(id.count() > 1){
 				QObject::connect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
-				Controller::Get()->getValue(id[1]);
+				Controller::Get()->getValue("clients");
 				}
 			}
 		//lineEdit->setText(data.toString());
-
 		layout->addWidget(lineEdit);
 
 		}
@@ -343,13 +343,19 @@ void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 void SubFieldUI::serialData(QString serial)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
+	//No. of clients in db are 251
+	QString Clients = "clients::%";
 	if(structureView.value("startNum") != QJsonValue::Undefined){
 		int i = structureView.value("startNum").toInt();
 		int current = serial.toInt();
-		int serialized = i + current;
-		//qDebug() << __FILE__ << __LINE__  << serialized << i << current;
-		if(serialized > i)
+		int numDB = Controller::Get()->Count(Clients.trimmed()+"\"") ;
+		qDebug() << __FILE__ << __LINE__  << "num"<< numDB;
+		qDebug() << __FILE__ << __LINE__  << "serial"<< current;
+		qDebug() << __FILE__ << __LINE__  << "StartNum"<< i;
+		int serialized = current-numDB + i;
+		//if(serialized > i){
 			((QLineEdit*)field)->setText(QString::number(serialized));
+			//}
 		}
 }
 
