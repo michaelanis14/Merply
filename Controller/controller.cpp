@@ -488,6 +488,16 @@ void Controller::getIndexHeader(QString title)
 		database->query(query);
 		}
 }
+
+void Controller::getViewStructures()
+{
+		Database* database  = Database::Gett();
+		QString query = " SELECT META(`"+QString(DATABASE)+"`).id AS strctName FROM "+QString(DATABASE)+" WHERE META(`"+QString(DATABASE)+"`).id LIKE 'ViewStructure::% ";
+		qDebug() << __FILE__ << __LINE__  << "getViewStructures"<<query;
+		database->query(query);
+
+}
+
 void Controller::getIndexHeaderData(QVector<QJsonDocument> documents){
 	//	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getIndexHeaderData(QVector<QJsonDocument>)));
 	if(!documents.isEmpty() ){

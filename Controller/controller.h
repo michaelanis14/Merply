@@ -65,6 +65,7 @@ public:
 	QVector<QJsonDocument> getEnities();
 	void getFields(QString Title);
 	void getIndexHeader(QString title);
+	void getViewStructures();
 	void updateLayoutViewGroups(QString entityName, QList<StructureViewsEditUI*> sVEUIs);
 	QStringList getLayoutViewGroups(QString entity);
 	bool storeDoc(QString key,QJsonDocument document);
