@@ -489,15 +489,6 @@ void Controller::getIndexHeader(QString title)
 		}
 }
 
-void Controller::getViewStructures()
-{
-		Database* database  = Database::Gett();
-		QString query = " SELECT META(`"+QString(DATABASE)+"`).id AS strctName FROM "+QString(DATABASE)+" WHERE META(`"+QString(DATABASE)+"`).id LIKE 'ViewStructure::% ";
-		qDebug() << __FILE__ << __LINE__  << "getViewStructures"<<query;
-		database->query(query);
-
-}
-
 void Controller::getIndexHeaderData(QVector<QJsonDocument> documents){
 	//	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getIndexHeaderData(QVector<QJsonDocument>)));
 	if(!documents.isEmpty() ){
@@ -519,10 +510,33 @@ void Controller::getIndexHeaderData(QVector<QJsonDocument> documents){
 				}
 			}
 		//qDebug() << __FILE__ << __LINE__  <<"Fieldss"<<fieldsName;
-		emit gotFieldsData( fieldsName);
+		emit gotFieldsData(fieldsName);
 		}
 
 	//qDebug() << __FILE__ << __LINE__  <<"Fieldss"<<documents;
+}
+
+void Controller::getViewStructures()
+{
+	Database* database  = Database::Gett();
+	QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getViewStructuresData(QVector<QJsonDocument>)));
+	QString query = " SELECT META(`"+QString(DATABASE)+"`).id AS strctName FROM "+QString(DATABASE)+" WHERE META(`"+QString(DATABASE)+"`).id LIKE 'ViewStructure::%' ";
+	qDebug() << __FILE__ << __LINE__  << "getViewStructures"<<query;
+	database->query(query);
+
+}
+
+void Controller::getViewStructuresData(QVector<QJsonDocument> documents){
+	QStringList StructsName;
+	while(!documents.isEmpty()){
+		QJsonObject getjson = documents.first().object();
+		QJsonValue structValue = getjson.value("strctName");
+		StructsName <<structValue.toString();
+		documents.removeFirst();
+	}
+	emit gotStructsData(StructsName);
+	qDebug() << __FILE__ << __LINE__  <<"StructsName"<<StructsName;
+
 }
 
 void Controller::updateLayoutViewGroups(QString entityName,QList<StructureViewsEditUI*> sVEUIs)

@@ -149,6 +149,7 @@ public slots:
 	void subNavPressedPageData(QJsonDocument document);
 	void getFieldsData(QVector<QJsonDocument> documents);
 	void getIndexHeaderData(QVector<QJsonDocument> documents);
+	void getViewStructuresData(QVector<QJsonDocument> documents);
 	void linkPressedData(QJsonDocument document);
 	void getDocData(QJsonDocument document);
 	void GetJsonListData(QVector<QJsonDocument> items);
@@ -170,6 +171,7 @@ public slots:
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void gotFieldsData(QList<QString> fields);
+	void gotStructsData(QList<QString> structsName);
 	void gotReportData(QVector<QJsonDocument> documents);
 	void gotDocument(QJsonDocument docuemnt);
 	void gotDocuments(QVector<QJsonDocument> array);
