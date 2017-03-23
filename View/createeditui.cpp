@@ -71,17 +71,20 @@ void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data,bool creat
 
 	//CreateEditUI* p_instance;
 	QString key = viewStructure.value("document_id").toString().split("::").count() > 1?viewStructure.value("document_id").toString().split("::")[1]:"";
+
+
 	if(!key.isEmpty())
 		{
-		//this->viewStructure = viewStructure;
-		if(true || create || !Controller::Get()->isCachedCreateEditUI(key)){
-			CreateEditUI* p =  new CreateEditUI(0,viewStructure, data);
+		if(true || create ){
+			//CreateEditUI* p =  new CreateEditUI(0,viewStructure, data);
+			Controller::Get()->getViewStructures();
+			Controller::Get()->buildStructure();
+			p_instance = (CreateEditUI*)(Controller::Get()->getStructure(key));
 			//qDebug() << __FILE__ << __LINE__ << "insertCachedCreateEditUI"<<key<< &p_instance;
 			//Controller::Get()->insertCachedCreateEditUI(key,p);
-			p_instance = p;
+			//p_instance = p;
 			}
 		else{
-			//qDebug() << __FILE__ << __LINE__ << "getCachedCreateEditUI"<<key;
 			p_instance = (CreateEditUI*)(Controller::Get()->getCachedCreateEditUI(key));
 			}
 		}

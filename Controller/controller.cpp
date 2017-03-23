@@ -520,24 +520,39 @@ void Controller::getViewStructures()
 {
 	Database* database  = Database::Gett();
 	QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getViewStructuresData(QVector<QJsonDocument>)));
-	QString query = " SELECT META(`"+QString(DATABASE)+"`).id AS strctName FROM "+QString(DATABASE)+" WHERE META(`"+QString(DATABASE)+"`).id LIKE 'ViewStructure::%' ";
+	QString query = " SELECT META(`"+QString(DATABASE)+"`).id AS strctName, * FROM "+QString(DATABASE)+" WHERE META(`"+QString(DATABASE)+"`).id LIKE 'ViewStructure::%' ";
 	qDebug() << __FILE__ << __LINE__  << "getViewStructures"<<query;
 	database->query(query);
 
 }
 
 void Controller::getViewStructuresData(QVector<QJsonDocument> documents){
-	QStringList StructsName;
+	//structNames is private
+	int i = 1;
 	while(!documents.isEmpty()){
 		QJsonObject getjson = documents.first().object();
-		QJsonValue structValue = getjson.value("strctName");
-		StructsName <<structValue.toString();
+		QJsonValue structKey = getjson.value("strctName");
+		QJsonValue structValue = getjson.value("AM");
+		structNames.insert(structKey.toString().split("ViewStructure::")[1],structValue.toObject());
+		i++;
 		documents.removeFirst();
+
 	}
-	emit gotStructsData(StructsName);
-	qDebug() << __FILE__ << __LINE__  <<"StructsName"<<StructsName;
+
+
+	emit gotStructsData(structNames);
 
 }
+void Controller::buildStructure()
+{
+	foreach (QString i, structNames.keys()) {
+		CreateEditUI* createStruct =  new CreateEditUI(0,structNames[i], QJsonObject());
+		createEditUIWidget.insert(i,createStruct);
+
+		}
+
+}
+
 
 void Controller::updateLayoutViewGroups(QString entityName,QList<StructureViewsEditUI*> sVEUIs)
 {
@@ -972,11 +987,27 @@ QWidget* Controller::getCachedCreateEditUI(QString key)
 	return (Model::Get()->cachedCreateEditUI.value(key));
 
 }
+QWidget* Controller::getStructure(QString key)
+{
+
+	if(createEditUIWidget.contains(key)){
+		qDebug() << __FILE__ << __LINE__  <<"found";
+	}
+	else
+		qDebug() << __FILE__ << __LINE__  <<" not found";
+	return (createEditUIWidget.value(key));
+
+}
 bool Controller::isCachedCreateEditUI(QString key)
 {
 	//qDebug() << __FILE__ << __LINE__  << "insert"<<key<< instance;
 	return Model::Get()->cachedCreateEditUI.contains(key);
+
 }
+
+
+
+
 
 void Controller::getReportData(QVector<QJsonDocument> documents)
 {
