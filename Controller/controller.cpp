@@ -101,10 +101,6 @@ void Controller::showDisplay()
 	//QJsonDocument d =Database::Get()->getDocument();
 	//ViewGroups* vgs= new ViewGroups(0,"Contact",d.object(),d.object());
 	//layout->addWidget(vgs);
-
-
-
-
 }
 
 void Controller::successLogin()
@@ -1004,9 +1000,6 @@ bool Controller::isCachedCreateEditUI(QString key)
 	return Model::Get()->cachedCreateEditUI.contains(key);
 
 }
-
-
-
 
 
 void Controller::getReportData(QVector<QJsonDocument> documents)

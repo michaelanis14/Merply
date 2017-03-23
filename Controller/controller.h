@@ -9,7 +9,6 @@
 #define Controller_H
 
 #include "accesscontroller.h"
-#include "createeditui.h"
 #include <structureviewseditui.h>
 
 #include <QObject>
