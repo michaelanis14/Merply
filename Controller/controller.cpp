@@ -526,7 +526,7 @@ void Controller::getViewStructures()
 }
 
 void Controller::getViewStructuresData(QVector<QJsonDocument> documents){
-	//structNames is private
+
 	int i = 1;
 	while(!documents.isEmpty()){
 		QJsonObject getjson = documents.first().object();
@@ -545,18 +545,15 @@ void Controller::getViewStructuresData(QVector<QJsonDocument> documents){
 void Controller::buildStructure()
 {
 	if(accessed == false){
-	foreach (QString i, structNames.keys()) {
+		getViewStructures();
 
-		CreateEditUI* createStruct =  new CreateEditUI(0,structNames[i], QJsonObject());
-		createEditUIWidget.insert(i,createStruct);
-
-			}
+		foreach (QString i, structNames.keys()) {
+			CreateEditUI* createStruct =  new CreateEditUI(0,structNames[i], QJsonObject());
+			createEditUIWidget.insert(i,createStruct);
+		}
 	accessed = true;
 
-		}
-	qDebug() << __FILE__ << __LINE__  <<"flag is"<<accessed ;
-
-
+	}
 }
 
 
@@ -995,7 +992,7 @@ QWidget* Controller::getCachedCreateEditUI(QString key)
 }
 QWidget* Controller::getStructure(QString key)
 {
-	getViewStructures();
+
 	buildStructure();
 	return (createEditUIWidget.value(key));
 
