@@ -104,7 +104,6 @@ void Controller::showDisplay()
 
 
 
-
 }
 
 void Controller::successLogin()
@@ -488,6 +487,7 @@ void Controller::getIndexHeader(QString title)
 		database->query(query);
 		}
 }
+
 void Controller::getIndexHeaderData(QVector<QJsonDocument> documents){
 	//	QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getIndexHeaderData(QVector<QJsonDocument>)));
 	if(!documents.isEmpty() ){
@@ -509,11 +509,53 @@ void Controller::getIndexHeaderData(QVector<QJsonDocument> documents){
 				}
 			}
 		//qDebug() << __FILE__ << __LINE__  <<"Fieldss"<<fieldsName;
-		emit gotFieldsData( fieldsName);
+		emit gotFieldsData(fieldsName);
 		}
 
 	//qDebug() << __FILE__ << __LINE__  <<"Fieldss"<<documents;
 }
+
+void Controller::getViewStructures()
+{
+	Database* database  = Database::Gett();
+	QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(getViewStructuresData(QVector<QJsonDocument>)));
+	QString query = " SELECT META(`"+QString(DATABASE)+"`).id AS strctName, * FROM "+QString(DATABASE)+" WHERE META(`"+QString(DATABASE)+"`).id LIKE 'ViewStructure::%' ";
+	qDebug() << __FILE__ << __LINE__  << "getViewStructures"<<query;
+	database->query(query);
+
+}
+
+void Controller::getViewStructuresData(QVector<QJsonDocument> documents){
+
+	int i = 1;
+	while(!documents.isEmpty()){
+		QJsonObject getjson = documents.first().object();
+		QJsonValue structKey = getjson.value("strctName");
+		QJsonValue structValue = getjson.value("AM");
+		structNames.insert(structKey.toString().split("ViewStructure::")[1],structValue.toObject());
+		i++;
+		documents.removeFirst();
+
+	}
+
+
+	emit gotStructsData(structNames);
+
+}
+void Controller::buildStructure()
+{
+	if(accessed == false){
+		getViewStructures();
+
+		foreach (QString i, structNames.keys()) {
+			CreateEditUI* createStruct =  new CreateEditUI(0,structNames[i], QJsonObject());
+			createEditUIWidget.insert(i,createStruct);
+		}
+	accessed = true;
+
+	}
+}
+
 
 void Controller::updateLayoutViewGroups(QString entityName,QList<StructureViewsEditUI*> sVEUIs)
 {
@@ -948,11 +990,20 @@ QWidget* Controller::getCachedCreateEditUI(QString key)
 	return (Model::Get()->cachedCreateEditUI.value(key));
 
 }
+QWidget* Controller::getStructure(QString key)
+{
+
+	buildStructure();
+	return (createEditUIWidget.value(key));
+
+}
 bool Controller::isCachedCreateEditUI(QString key)
 {
 	//qDebug() << __FILE__ << __LINE__  << "insert"<<key<< instance;
 	return Model::Get()->cachedCreateEditUI.contains(key);
+
 }
+
 
 void Controller::getReportData(QVector<QJsonDocument> documents)
 {
