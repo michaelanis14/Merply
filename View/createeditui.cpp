@@ -77,8 +77,8 @@ void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data,bool creat
 		{
 		if(true || create ){
 			//CreateEditUI* p =  new CreateEditUI(0,viewStructure, data);
-			Controller::Get()->getViewStructures();
-			Controller::Get()->buildStructure();
+			//Controller::Get()->getViewStructures();
+			//Controller::Get()->buildStructure();
 			p_instance = (CreateEditUI*)(Controller::Get()->getStructure(key));
 			//qDebug() << __FILE__ << __LINE__ << "insertCachedCreateEditUI"<<key<< &p_instance;
 			//Controller::Get()->insertCachedCreateEditUI(key,p);

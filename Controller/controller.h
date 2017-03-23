@@ -140,8 +140,8 @@ public:
 
 	//preLoading feature
 	QMap<QString,QJsonObject> structNames;
-	//QMap<QString,QWidget*> structCreateEditUI;
 	QMap<QString,QWidget*> createEditUIWidget;
+	bool accessed = false;
 private:
 	explicit Controller(QObject * parent = 0);
 	static Controller* p_instance;

@@ -101,6 +101,9 @@ void Controller::showDisplay()
 	//QJsonDocument d =Database::Get()->getDocument();
 	//ViewGroups* vgs= new ViewGroups(0,"Contact",d.object(),d.object());
 	//layout->addWidget(vgs);
+
+
+
 }
 
 void Controller::successLogin()
@@ -541,11 +544,18 @@ void Controller::getViewStructuresData(QVector<QJsonDocument> documents){
 }
 void Controller::buildStructure()
 {
+	if(accessed == false){
 	foreach (QString i, structNames.keys()) {
+
 		CreateEditUI* createStruct =  new CreateEditUI(0,structNames[i], QJsonObject());
 		createEditUIWidget.insert(i,createStruct);
 
+			}
+	accessed = true;
+
 		}
+	qDebug() << __FILE__ << __LINE__  <<"flag is"<<accessed ;
+
 
 }
 
@@ -985,12 +995,8 @@ QWidget* Controller::getCachedCreateEditUI(QString key)
 }
 QWidget* Controller::getStructure(QString key)
 {
-
-	if(createEditUIWidget.contains(key)){
-		qDebug() << __FILE__ << __LINE__  <<"found";
-	}
-	else
-		qDebug() << __FILE__ << __LINE__  <<" not found";
+	getViewStructures();
+	buildStructure();
 	return (createEditUIWidget.value(key));
 
 }
