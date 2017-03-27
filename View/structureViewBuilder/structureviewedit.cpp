@@ -304,6 +304,8 @@ bool StructureViewEdit::setHidden(bool hidden)
 	return true;
 }
 
+
+
 void StructureViewEdit::paintEvent(QPaintEvent *)
 {
 	QStyleOption opt;

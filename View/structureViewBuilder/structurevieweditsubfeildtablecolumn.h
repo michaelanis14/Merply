@@ -39,6 +39,7 @@ private:
 	QFormLayout* localFilterWidgetLayout;
 	QCheckBox* editabel;
 	QCheckBox* showIndex;
+	QCheckBox* incremntTotal;
 	void initEquationWidget();
 	QWidget*equationWidget;
 	QFormLayout* equationWidgetLayout;

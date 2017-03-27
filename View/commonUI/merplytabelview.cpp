@@ -39,8 +39,7 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 
 	//tabel->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	//tabel->hideColumn(0); // don't show the ID
-	//tabel->sortByColumn(0,Qt::DescendingOrder);
-	//tabel->setSortingEnabled(true);
+
 	//tabel->resizeColumnsToContents();
 	//tabel->resizeRowsToContents();
 	//	tabel->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -65,6 +64,12 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 
 	tableView= new QTableView;
 	tableView->setContentsMargins(0,0,0,0);
+	//tableView->horizontalHeader()->setStretchLastSection(true);
+	tableView->horizontalHeader()->setStretchLastSection(true);
+	//tableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
+	//tableView->sortByColumn(0,Qt::DescendingOrder);
+	//tableView->setSortingEnabled(true);
+
 	if(edit){
 		controllers->setEnabled(false);
 		}
@@ -147,12 +152,19 @@ void merplyTabelView::selectionChanged(const QItemSelection& , const QItemSelect
 
 void merplyTabelView::resizeTabelToContets()
 {
-	if(this->model->getColmnsCount() > 6 && this->model->getRowsCount() < 100){
-		this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
-		}
-	if(this->model->getRowsCount() < 40){
-		this->tableView->setMinimumHeight(tableView->rowHeight(1)*this->model->getRowsCount()+40);
-		}
+	//if(this->model->getRowsCount() < 100){
+	//this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
+
+	for (int c = 0; c < tableView->horizontalHeader()->count(); ++c)
+	{
+		tableView->horizontalHeader()->setSectionResizeMode(
+			c, QHeaderView::ResizeToContents);
+	}
+
+	//	}
+	//if(this->model->getRowsCount() < 40){
+		this->tableView->setMinimumHeight(tableView->rowHeight(1)*this->model->getRowsCount()+80);
+	//	}
 }
 
 
@@ -274,7 +286,7 @@ void merplyTabelView::indexTable(const QString document_id,const QVector<QJsonDo
 
 QJsonObject merplyTabelView::save()
 {
-	tableView->setDisabled(true);
+//	tableView->setDisabled(true);
 	QJsonObject table;
 	table.insert("merplyTabel",this->model->getJsonData());
 	if(this->model->getRemovedRows().count() > 0)
@@ -480,7 +492,11 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 	QJsonObject clmnObj = QJsonObject();
 	clmnObj.insert("clmnsHeader",QJsonValue::fromVariant(QVariant(headerItems)));
 	model = new MerplyReportTableModel(clmnObj);
+
+
 	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+
+
 	model->fillIndexTabel(items);
 
 	if(!indexDocument_id.isEmpty()){
@@ -496,7 +512,7 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 
 void merplyTabelView::setValue(const int , const QString paramName, QVariant& paramValue, const int )
 {
-	qDebug() << __FILE__ << __LINE__  <<"setValue TabelView"<< paramName;
+//	qDebug() << __FILE__ << __LINE__  <<"setValue TabelView"<< paramName;
 	QJsonValue value;// = indexedTable.value(currenctPrintID).value(paramName);
 	if(value != QJsonValue::Undefined)
 		paramValue = value.toVariant();
@@ -526,7 +542,7 @@ void merplyTabelView::modelFinished()
 				);
 
 	QObject::connect(model,SIGNAL(done()),this,SLOT(resizeTabelToContets()));
-
+	resizeTabelToContets();
 	//this->repaint();
 }
 

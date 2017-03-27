@@ -35,9 +35,19 @@ bool Model::getShowWarning() const
 	return showWarning;
 }
 
+QMap<QString, QJsonObject> Model::getCachedPageStructures() const
+{
+    return cachedPageStructures;
+}
+
+QMap<QString, QJsonObject> Model::getCachedViewStructures() const
+{
+    return cachedViewStructures;
+}
+
 void Model::addSubNavigation(double key, QList<QTreeWidgetItem *> subNav)
 {
-	subNavigation.insert(key, subNav);
+    subNavigation.insert(key, subNav);
 }
 
 void Model::clearSubNavigation()

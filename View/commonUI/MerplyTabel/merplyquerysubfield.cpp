@@ -149,7 +149,7 @@ QString MerplyQuerySubField::getValue(QString entity)
 				if(strct.value("clmn") != QJsonValue::Undefined)
 					save += QString("to_string(`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"'");
 				else
-					save += QString("to_string(`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'%"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"%'");
+					save += QString("to_string(`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"'");
 				}
 			}
 		//	save =" ";

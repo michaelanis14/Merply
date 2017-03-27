@@ -55,7 +55,7 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 	layoutPreviewLayout->setSpacing(0);
 	layoutPreviewLayout->setAlignment(Qt::AlignLeft);
 	//layoutPreviewLayout;
-	layout->addWidget(layoutPreview);
+	//layout->addWidget(layoutPreview);
 
 
 	styleSelect = new QWidget();
@@ -129,7 +129,7 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 	QObject::connect(group, SIGNAL(highlighted(int)),this, SLOT(groupActivated(int)));
 	//QObject::connect(group, SIGNAL(),this, SLOT(groupActivated(int)));
 
-	hidePreview(true);
+	hidePreview(false);
 	joinGroupChanged(false);
 
 
@@ -221,7 +221,7 @@ void StructureViewsEditUI::loadGroup()
 
 			}
 		}
-	hidePreview(true);
+	hidePreview(false); // Looks like a ways to hide the preview !
 }
 
 bool StructureViewsEditUI::hidePreview(bool hide)
@@ -278,7 +278,7 @@ void StructureViewsEditUI::updateLayoutPreview()
 			}
 		}
 	//layoutPreview->raise();
-	emit changed();
+//	emit changed();
 }
 
 void StructureViewsEditUI::loadStyle()

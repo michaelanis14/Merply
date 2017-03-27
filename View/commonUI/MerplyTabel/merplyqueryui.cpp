@@ -3,7 +3,7 @@
 
 
 #include<QHBoxLayout>
-
+#include <QShortcut>
 #include <QDebug>
 
 MerplyQueryUI::MerplyQueryUI(QWidget *parent,bool btnFilter) : QGroupBox(parent)
@@ -22,6 +22,7 @@ MerplyQueryUI::MerplyQueryUI(QWidget *parent,bool btnFilter) : QGroupBox(parent)
 	layout->setMargin(0);
 	this->setLayout(layout);
 	fields = QVector<MerplyQuerySubField*>();
+	new QShortcut(QKeySequence(Qt::Key_Enter), this, SLOT(generateQuery()));
 }
 
 void MerplyQueryUI::fill(QJsonObject strct)
@@ -39,6 +40,8 @@ void MerplyQueryUI::fill(QJsonObject strct)
 		this->layout->addWidget(viewgrp);
 		foreach(QJsonValue vf,vg.toObject().value("Viewgroup").toObject().value("Fields").toArray()){
 			//QJsonObject subfield = vf.toObject().value("SubFields").toArray().first().toObject(); //TODO: LOOP ON ALL SUBFIELDS
+			if(vf.toObject().value("ShowInIndex") == QJsonValue::Undefined)
+				continue;
 			QString label = vf.toObject().value("Label").toString();
 			MerplyQuerySubField* qSubField = new MerplyQuerySubField(vf.toObject(),0);
 			if(qSubField->getLayoutCount() > 0){
@@ -200,7 +203,12 @@ void MerplyQueryUI::generateQuery(int lmit)
 		query += q;
 		}
 	else if(!save.isEmpty()){
-		query += "SELECT `"+QString(DATABASE)+"`.*,to_number(SPLIT(META(`"+QString(DATABASE)+"`).id,'::')[1]) AS `SN`"+selectClmnsQuery+" FROM  `"+QString(DATABASE)+"`  WHERE META(`"+QString(DATABASE)+"`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
+		if(this->document_id.split("::").count() > 1)
+			query += "SELECT `"+QString(DATABASE)+"`.*,to_number(SPLIT(META(`"+QString(DATABASE)+"`).id,'::')[1]) AS `SN`"+selectClmnsQuery+" FROM  `"+QString(DATABASE)+"`  WHERE META(`"+QString(DATABASE)+"`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
+		else{
+			this->btnFilter->setDisabled(false);
+			return;
+			}
 		if(clmnsFlag)
 			query += " LIMIT 1 ";
 		if(lmit > 0){
@@ -214,7 +222,7 @@ void MerplyQueryUI::generateQuery(int lmit)
 		}
 	else{
 		if(this->btnFilter)
-		this->btnFilter->setDisabled(false);
+			this->btnFilter->setDisabled(false);
 		}
 	//qDebug() << "SELECT *  FROM "<<QString(DATABASE) << "WHERE META('"<<QString(DATABASE)<<"').id LIKE"<<document_id<<" AND "<<save;
 	//return save;

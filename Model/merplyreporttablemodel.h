@@ -47,6 +47,7 @@ private:
 	int colmnsCount;
 	QVector<TableCell> cells;
 	QVector<int>totalColmns;
+	QVector<int>incremintTotalColmns;
 	QHash<QString, int> i;
 	QHash<QString, int> rowPointer;
 	QHash<QString, int> entityRowPointer;

@@ -67,6 +67,7 @@ public:
 	void getFields(QString Title);
 	void getIndexHeader(QString title);
 	void getViewStructures();
+	void getPageStructures();
 	void updateLayoutViewGroups(QString entityName, QList<StructureViewsEditUI*> sVEUIs);
 	QStringList getLayoutViewGroups(QString entity);
 	bool storeDoc(QString key,QJsonDocument document);
@@ -77,7 +78,7 @@ public:
 	void queryIndexView(QString vStrctKey);
 
 	void editControllerCancelPressed();
-	SubFieldUI* getFirstSubField(QString feildName);
+	SubFieldUI* getFirstSubField(QString strID, QString feildName);
 
 	void createIndexes(QJsonObject viewStrct);
 	//Model Interface
@@ -105,13 +106,32 @@ public:
 
 	void getReport(QJsonObject clmns, QString filter="");
 	QString getLocalSourceReport(QJsonObject clmn, int index, QString filter);
+
 	void insertCachedCreateEditUI(QString key, QWidget* instance);
 	QWidget* getCachedCreateEditUI(QString key);
 	bool isCachedCreateEditUI(QString key);
-	QWidget* getStructure(QString key);
 
-	//build
-	void buildStructure();
+	void insertCachedViewStructure(QString key, QJsonObject viewStrct);
+	QJsonObject getCachedViewStructure(QString key);
+	QMap<QString, QJsonObject> getCachedViewStructures() const;
+
+	void insertCachedPageStructure(QString key, QJsonObject viewStrct);
+	QJsonObject getCachedPageStructure(QString key);
+	QMap<QString, QJsonObject> getCachedPageStructures() const;
+
+	void insertCachedIndexUI(QString key, QWidget* instance);
+	QWidget* getCachedIndexUI(QString key);
+	bool isCachedIndexUI(QString key);
+
+	void insertCachedPageUI(QString key, QWidget* instance);
+	QWidget* getCachedPageUI(QString key);
+	bool isCachedPageUI(QString key);
+
+
+	//buildCachedUI s
+	void buildCachedCreateEditUI();
+	void buildCachedIndexUI();
+	void buildCachedPageUI();
 
 	//
 	void getReportTableData(QJsonObject strct);
@@ -139,9 +159,9 @@ public:
 	void saveRefrenceStructures(QJsonObject mainStrct,QJsonObject data);
 
 	//preLoading feature
-	QMap<QString,QJsonObject> structNames;
-	QMap<QString,QWidget*> createEditUIWidget;
-	bool accessed = false;
+	//QMap<QString,QJsonObject> structNames;
+	//QMap<QString,QWidget*> createEditUIWidget;
+	//bool accessed = false;
 private:
 	explicit Controller(QObject * parent = 0);
 	static Controller* p_instance;
@@ -160,6 +180,7 @@ public slots:
 	void getFieldsData(QVector<QJsonDocument> documents);
 	void getIndexHeaderData(QVector<QJsonDocument> documents);
 	void getViewStructuresData(QVector<QJsonDocument> documents);
+	void getPageStructuresData(QVector<QJsonDocument> documents);
 	void linkPressedData(QJsonDocument document);
 	void getDocData(QJsonDocument document);
 	void GetJsonListData(QVector<QJsonDocument> items);
@@ -181,7 +202,7 @@ public slots:
 signals:
 	void getDocDataReturned(QJsonDocument document);
 	void gotFieldsData(QList<QString> fields);
-	void gotStructsData(QMap<QString,QJsonObject> structsName);
+//	void gotStructsData(QMap<QString,QJsonObject> structsName);
 	void gotReportData(QVector<QJsonDocument> documents);
 	void gotDocument(QJsonDocument docuemnt);
 	void gotDocuments(QVector<QJsonDocument> array);

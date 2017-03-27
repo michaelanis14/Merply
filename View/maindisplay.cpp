@@ -70,6 +70,7 @@ void MainDisplay::keyPressEvent(QKeyEvent* event)
 	{
 	focusNextPrevChild(true);
 	}
+	QWidget::keyPressEvent(event);
 }
 void MainDisplay::paintEvent(QPaintEvent *)
 {

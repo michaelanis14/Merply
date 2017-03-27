@@ -15,21 +15,22 @@ class ViewGroups : public QWidget
 {
 	Q_OBJECT
 public:
+	explicit ViewGroups(QWidget *parent = 0,QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject()
+			,QHash<QString,FeildUI*> *fieldsgroups = new QHash<QString,FeildUI*>());
 		QJsonObject save();
-		static  ViewGroups* Create(QJsonObject structureView, QJsonObject data);
-		static ViewGroups* Get();
-		static QList<ViewGroup*> Viewgroups;
-		static QHash<QString,FeildUI*> Fieldsgroups;
+	//	static  ViewGroups* Create(QJsonObject structureView, QJsonObject data);
+	//	static ViewGroups* Get();
+
 		QString checkMandatory();
 signals:
 
 private:
-	explicit ViewGroups(QWidget *parent = 0,QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject());
 	static ViewGroups* p_instance;
 	QVBoxLayout * layout;
 	QHash<QString,QWidget*>HViewGroups;
 	QJsonObject structureView;
-
+	QList<ViewGroup*> viewgroups;
+	QHash<QString, FeildUI*>* fieldsgroups;
 	//should be moved to the controller
 
 protected:

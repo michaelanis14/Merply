@@ -28,10 +28,11 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			combox->setEditable(false);
 		layout->addWidget(combox);
 		field = combox;
+		combox->setHidden(true);
 		if(structureView.value("LocalFilter") != QJsonValue::Undefined && structureView.value("LocalFilter").toBool()){
 			//qDebug() << __FILE__ << __LINE__  << "local Field"<< structureView.value("Local").toString();
 			//qDebug() << __FILE__ << __LINE__  << Controller::Get()->getFirstSubField(structureView.value("Local").toString());
-			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(structureView.value("Local").toString());
+			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(strID,structureView.value("Local").toString());
 			if(localFilter->combox){
 				//qDebug() << __FILE__ << __LINE__  << "COMBO";
 				QObject::connect(localFilter->combox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateFilter(QString)));
@@ -52,7 +53,10 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		QJsonObject dataObj = data.toObject();
 		//	qDebug() << __FILE__ << __LINE__  << data;
 		if(!dataObj.isEmpty()){
-			combox->setCurrentIndex(combox->findText(dataObj.value("Value").toString()));
+			if(!dataObj.value("Value").toString().isEmpty()){
+				combox->setCurrentIndex(combox->findText(dataObj.value("Value").toString()));
+				combox->setHidden(false);
+				}
 			}
 		//qDebug() << __FILE__ << __LINE__  << structureView.value("Source").toString() << structureView.value("Select").toString();
 		}
@@ -118,7 +122,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		if(firstclmn.value("SourceLocalFilter") != QJsonValue::Undefined &&firstclmn.value("LocalSource").toBool()){
 			//	qDebug() << __FILE__ << __LINE__  << "local Field"<< firstclmn.value("SourceLocalFilter").toString();
 			//	qDebug() << __FILE__ << __LINE__  << Controller::Get()->getFirstSubField(firstclmn.value("SourceLocalFilter").toString());
-			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(firstclmn.value("SourceLocalFilter").toString());
+			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(strID,firstclmn.value("SourceLocalFilter").toString());
 			localFilterCombobox = localFilter->combox;
 			if(localFilterCombobox){
 				//	qDebug() << __FILE__ << __LINE__  << "COMBO" << localFilter->combox->currentText();
@@ -176,7 +180,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			QStringList id = this->strID.split("ViewStructure::");
 			if(id.count() > 1){
 				QObject::connect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
-				Controller::Get()->getValue("clients");
+				Controller::Get()->getValue(id[1]);
 				}
 			}
 		//lineEdit->setText(data.toString());
@@ -194,7 +198,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 
 
 		//qDebug() << QDateTime::fromMSecsSinceEpoch(data.toString().toDouble());
-		date->setDisplayFormat("dd/MM/yyyy");
+		date->setDisplayFormat("ss:mm:hh dd/MM/yyyy");
 		layout->addWidget(date);
 		field = date;
 		}
@@ -268,7 +272,6 @@ QJsonValue SubFieldUI::save()
 		//	save =" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QDateTimeEdit") == 0){
-
 		//save =((QDateTimeEdit*)field)->dateTime().toString(Qt::DefaultLocaleShortDate);
 		save = QString(((QDateTimeEdit*)field)->dateTime().toString(Qt::ISODate));
 		//qDebug() << save;
@@ -283,8 +286,9 @@ bool SubFieldUI::checkMandatory()
 	if(!structureView.isEmpty()
 			&& structureView.value("Mandatory") != QJsonValue::Undefined
 			&& structureView.value("Mandatory").toBool()){
-		QJsonValue saved = this->save();
 
+		QString saved  = Controller::Get()->toString("",this->save());
+		/*
 		if(saved.isObject()){
 			if(saved.toObject().value("Value").toString().isEmpty()){
 				field->setObjectName("error");
@@ -295,7 +299,10 @@ bool SubFieldUI::checkMandatory()
 				}
 
 			}
-		else if(this->save().toString().isEmpty()){
+
+		else
+ */
+		if(saved.trimmed().isEmpty()){
 			//	qDebug()<< this->save().isNull() << this->save().toString() << field;
 			field->setObjectName("error");
 			field->style()->unpolish(field);
@@ -303,6 +310,7 @@ bool SubFieldUI::checkMandatory()
 			field->update();
 			return false;
 			}
+
 		else{
 			field->setObjectName("NotError");
 			field->style()->unpolish(field);
@@ -332,6 +340,9 @@ void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 	if(combox){
 		combox->clear();
 		combox->addJsonItems(items);
+		if(items.count() > 0)
+			combox->setHidden(false);
+		else combox->setHidden(true);
 		}
 	//qDebug() << structureView.value("Default") << structureView;
 	if(structureView.value("Default") != QJsonValue::Undefined){
@@ -348,7 +359,8 @@ void SubFieldUI::serialData(QString serial)
 	if(structureView.value("startNum") != QJsonValue::Undefined){
 		int i = structureView.value("startNum").toInt();
 		int current = serial.toInt();
-		int numDB = Controller::Get()->Count(Clients.trimmed()+"\"") ;
+		int numDB = 0;
+				//Controller::Get()->Count(Clients.trimmed()+"\"") ;
 		qDebug() << __FILE__ << __LINE__  << "num"<< numDB;
 		qDebug() << __FILE__ << __LINE__  << "serial"<< current;
 		qDebug() << __FILE__ << __LINE__  << "StartNum"<< i;
@@ -361,18 +373,21 @@ void SubFieldUI::serialData(QString serial)
 
 void SubFieldUI::updateFilter(QString filter)
 {
+
 	QString source = structureView.value("Source").toString().trimmed();
 	QString select = structureView.value("Select").toString().trimmed();
 	QString entity = structureView.value("Entity").toString().trimmed();
 	if(source.isEmpty() || select.isEmpty() || entity.isEmpty()){
+		combox->setHidden(true);
 		return;
 		}
 	else{
-		//qDebug() << __FILE__ << __LINE__  <<"filter" << filter << structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Entity").toString()+"="+filter;
+
+		qDebug() << __FILE__ << __LINE__  <<"filter" << filter << structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Entity").toString()+"="+filter;
 		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
 		//qDebug() <<"Source:" << source <<"SELECT:"<< select<<"Entity:" << entity <<"Filter:"<< filter;
 		//QString("`"+entity+"`").append(" = ").append("'").append(filter).append("'");
-		Controller::Get()->getJsonEntityFieldsList(source,select,QString("to_string(d.`"+entity+"`)").append("  LIKE  ").append("'").append(filter).append("'"));
+		Controller::Get()->getJsonEntityFieldsList(source,select,QString("to_string(d.`"+entity+"`.`Value`)").append("  LIKE  ").append("'").append(filter).append("'"));
 		}
 
 }
@@ -401,7 +416,7 @@ void SubFieldUI::updateEquationField()
 			double tempFirstField = -2;
 
 			QString firstClmn = eq.toObject().value("FirstColumn").toString();
-			SubFieldUI* firstTermField = Controller::Get()->getFirstSubField(firstClmn);
+			SubFieldUI* firstTermField = Controller::Get()->getFirstSubField(strID,firstClmn);
 			if(firstClmn.contains("$")){
 
 				tempFirstField = getClmnDataCount(firstClmn);
@@ -430,7 +445,7 @@ void SubFieldUI::updateEquationField()
 				}
 			double tempSecondField = -2;
 			QString secondClmn = eq.toObject().value("SecondColmn").toString();
-			SubFieldUI* secondTermField = Controller::Get()->getFirstSubField(secondClmn);
+			SubFieldUI* secondTermField = Controller::Get()->getFirstSubField(strID,secondClmn);
 			if(secondClmn.contains("$")){
 				tempSecondField = getClmnDataCount(secondClmn);
 				if(tempSecondField < -1){
@@ -472,7 +487,7 @@ void SubFieldUI::updateEquationField()
 						}
 					}
 				else{
-					SubFieldUI* firstTermCondField = Controller::Get()->getFirstSubField(condOnColOne);
+					SubFieldUI* firstTermCondField = Controller::Get()->getFirstSubField(strID,condOnColOne);
 					if((QString((firstTermCondField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) && (QLineEdit*)firstTermCondField->field){
 						tempFirstCondField = ((QLineEdit*)firstTermCondField->field)->text().trimmed().toDouble(&ok);
 						QObject::disconnect(((QLineEdit*)firstTermCondField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
@@ -490,7 +505,7 @@ void SubFieldUI::updateEquationField()
 
 				if(eq.toObject().value("ConditionColumnTwo") != QJsonValue::Undefined){
 					double tempSecondCondField = 0;
-					SubFieldUI* secondTermCondField = Controller::Get()->getFirstSubField(eq.toObject().value("ConditionColumnTwo").toString());
+					SubFieldUI* secondTermCondField = Controller::Get()->getFirstSubField(strID,eq.toObject().value("ConditionColumnTwo").toString());
 					if((QString((secondTermCondField->field)->metaObject()->className()).compare("QLineEdit") == 0 ) && (QLineEdit*)secondTermCondField->field){
 						tempSecondCondField = ((QLineEdit*)secondTermCondField->field)->text().trimmed().toDouble(&ok);
 						QObject::disconnect(((QLineEdit*)secondTermCondField->field),SIGNAL(textChanged(QString)),this,SLOT(updateEquationField()));
@@ -552,7 +567,7 @@ void SubFieldUI::updateEquationField()
 				}
 			}
 
-}
+		}
 	//qDebug() << __FILE__ << __LINE__  <<total;
 
 	((QLineEdit*)field)->setText(QString::number(total));
@@ -565,7 +580,7 @@ double SubFieldUI::getClmnDataCount(QString strct)
 	QString columnName = strct.split("$").count() == 2?strct.split("$")[0]:"";
 
 	double total = 0;
-	SubFieldUI* tableSubField = Controller::Get()->getFirstSubField(fieldName);
+	SubFieldUI* tableSubField = Controller::Get()->getFirstSubField(strID,fieldName);
 	if(((merplyTabelView*)tableSubField->field)->getModel() != NULL && QString( tableSubField->field->metaObject()->className()).compare("merplyTabelView") == 0){
 		QObject::disconnect(((merplyTabelView*)tableSubField->field)->getModel(),SIGNAL(changed()),this,SLOT(updateEquationField()));
 		QObject::connect(((merplyTabelView*)tableSubField->field)->getModel(),SIGNAL(changed()),this,SLOT(updateEquationField()));

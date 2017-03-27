@@ -23,10 +23,11 @@ class IndexUI : public MainDisplay
 public:
 	explicit IndexUI(QWidget *parent = 0);
 	static void ShowUI(const QString document_id,const QVector<QJsonDocument> documents);
+	void fill(const QString document_id,const QVector<QJsonDocument> items);
+
 private:
 	QVBoxLayout * layout;
-	void fill(const QString document_id,const QVector<QJsonDocument> items);
-	static IndexUI* p_instance;
+		static IndexUI* p_instance;
 	merplyTabelView * table ;
 	QPushButton* btnCreatNew;
 	QString document_id;

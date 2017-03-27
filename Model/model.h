@@ -28,7 +28,7 @@
 #define NAVIGATION_MAIN_HEIGHT 150
 #define NAVIGATION_SUB_HEIGHT 100
 
-#include  <createeditui.h>
+//#include  <createeditui.h>
 
 class Model:public QObject
 {
@@ -42,8 +42,12 @@ public:
 	bool getShowWarning() const;
 
 
-	//lazyloading
+	//preloading
 	QMap< QString,QWidget* > cachedCreateEditUI;
+	QMap< QString,QWidget* > cachedIndexUI;
+	QMap< QString,QWidget* > cachedPageUI;
+	QMap<QString,QJsonObject> cachedViewStructures;
+	QMap<QString,QJsonObject> cachedPageStructures;
 
 	//Navigation
 	void addSubNavigation(double key, QList<QTreeWidgetItem*> subNav);
@@ -79,6 +83,10 @@ public:
 
 	QString getDefaulConnStrg() const;
 	void setDefaulConnStrg(const QString& value);
+
+	QMap<QString, QJsonObject> getCachedViewStructures() const;
+
+	QMap<QString, QJsonObject> getCachedPageStructures() const;
 
 private:
 	explicit Model();

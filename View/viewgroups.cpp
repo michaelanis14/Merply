@@ -4,15 +4,17 @@
 #include "structureviewgroupsui.h"
 
 
-ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject data) : QWidget(parent)
+ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject data, QHash<QString, FeildUI*>* fieldsgroups) : QWidget(parent)
 {
 	this->setObjectName("ViewGroups");
+	this->structureView = structureView;
 	layout = new QVBoxLayout(this);
 	layout->setContentsMargins(2,2,2,2);
 	//layout->setSpacing(0);
-	ViewGroups::Viewgroups.clear();
-	this->structureView = structureView;
-	ViewGroups::Fieldsgroups.clear();
+	this->fieldsgroups = fieldsgroups;
+
+	viewgroups =  QList<ViewGroup*>();
+
 
 	if(AccessController::Get()->hasAdminGroupAccess()){
 		SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
@@ -26,7 +28,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 	//	QJsonArray dataVGs =data.value("Fields").toArray();
 
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
-			ViewGroup* viewgroup = new ViewGroup(0,structureView.value("document_id").toString(),item.toObject(),data);
+			ViewGroup* viewgroup = new ViewGroup(0,structureView.value("document_id").toString(),item.toObject(),data,fieldsgroups);
 			QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
 			spRight.setHorizontalStretch(1);
 			viewgroup->setSizePolicy(spRight);
@@ -54,7 +56,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 					}
 				}
 			else 	layout->addWidget(viewgroup);
-			ViewGroups::Viewgroups  << viewgroup;
+			viewgroups  << viewgroup;
 
 			d++;
 			}
@@ -67,7 +69,7 @@ QJsonObject ViewGroups::save()
 {
 	QJsonObject* entity = new QJsonObject();
 
-	foreach(ViewGroup* vg,ViewGroups::Viewgroups ){
+	foreach(ViewGroup* vg,viewgroups ){
 		vg->save(entity);
 		}
 	//entity.insert("Fields",fields);
@@ -75,7 +77,7 @@ QJsonObject ViewGroups::save()
 	//qDebug() << __FILE__ << __LINE__  << entity;
 	return *(entity);
 }
-
+/*
 QHash<QString,FeildUI*> ViewGroups::Fieldsgroups = QHash<QString,FeildUI*>();
 QList<ViewGroup*> ViewGroups::Viewgroups =  QList<ViewGroup*>();
 ViewGroups* ViewGroups::p_instance = 0;
@@ -91,12 +93,12 @@ ViewGroups* ViewGroups::Get()
 		p_instance = new ViewGroups;
 	return p_instance;
 }
-
+*/
 QString ViewGroups::checkMandatory()
 {
 	QString errs;
-	QHash<QString,FeildUI*>::iterator i = ViewGroups::Fieldsgroups.begin();
-	while (i != ViewGroups::Fieldsgroups.end()) {
+	QHash<QString,FeildUI*>::iterator i = fieldsgroups->begin();
+	while (i != fieldsgroups->end()) {
 		QString err = i.value()->checkMandatory();
 		if(!err.isEmpty()){
 			if(!errs.isEmpty())

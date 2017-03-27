@@ -83,5 +83,5 @@ void IndexUI::fill(const QString document_id,const QVector<QJsonDocument> items)
 void IndexUI::createNew()
 {
 
-	Controller::Get()->showCreateEditeStrUI(this->document_id,true);
+	Controller::Get()->showCreateEditeStrUI(this->document_id,false);
 }

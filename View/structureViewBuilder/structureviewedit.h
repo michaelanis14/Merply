@@ -45,6 +45,7 @@ private:
 	SettingsCtrlsUI* topCntrls;
 	QWidget* arrayWidget;
 	QCheckBox* array;
+
 signals:
 	void changed();
 protected:

@@ -25,6 +25,9 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 	//this->layout->setSpacing(0);
 	this->data = data;
 	this->cas = "";
+	fieldsgroups = QHash<QString,FeildUI*>();
+
+
 	QStringList btnsList;
 	btnsList << "طباعه->Print"<<"حفظ->Save"<< "إلغاء->Cancel";
 
@@ -58,7 +61,7 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 
 
 
-	fill(viewStructure,data);
+	//fill(viewStructure,data);
 
 	cancelShortCut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(cancel()));
 	cancelShortCut = new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(cancel()));
@@ -66,56 +69,65 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 	printShortCut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_P), this, SLOT(printEntity()));
 }
 
-CreateEditUI* CreateEditUI::p_instance = 0;
-void CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data,bool create) {
+//CreateEditUI* CreateEditUI::this = 0;
+/*
+CreateEditUI* CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data,bool create) {
 
-	//CreateEditUI* p_instance;
+	//CreateEditUI* this;
 	QString key = viewStructure.value("document_id").toString().split("::").count() > 1?viewStructure.value("document_id").toString().split("::")[1]:"";
 
 
 	if(!key.isEmpty())
 		{
-		if(true || create ){
-			//CreateEditUI* p =  new CreateEditUI(0,viewStructure, data);
-			//Controller::Get()->getViewStructures();
-			//Controller::Get()->buildStructure();
-			p_instance = (CreateEditUI*)(Controller::Get()->getStructure(key));
-			//qDebug() << __FILE__ << __LINE__ << "insertCachedCreateEditUI"<<key<< &p_instance;
+		if(create ){
+			CreateEditUI* p =  new CreateEditUI(0,viewStructure, data);
+
+			//qDebug() << __FILE__ << __LINE__ << "insertCachedCreateEditUI"<<key<< &this;
 			//Controller::Get()->insertCachedCreateEditUI(key,p);
-			//p_instance = p;
-			}
-		else{
-			p_instance = (CreateEditUI*)(Controller::Get()->getCachedCreateEditUI(key));
-			}
-		}
-	else if(!data.isEmpty()){
-		QStringList tbls =p_instance->getTabelsFieldNames(p_instance->viewStructure);
-		if(tbls.count() == 0){
-			p_instance->clear();
-			p_instance->fill(QJsonObject(), data);
+			this = p;
 			}
 		else{
 
-			p_instance->data = data;
-			//qDebug()<<"INITTT" << p_instance->data;
-			QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),p_instance,SLOT(gotTabelsData(QVector<QJsonDocument>)));
+			this = (CreateEditUI*)(Controller::Get()->getStructure(key));
+
+			//	this = (CreateEditUI*)(Controller::Get()->getCachedCreateEditUI(key));
+			}
+		}
+	else if(!data.isEmpty()){
+		QStringList tbls =this->getTabelsFieldNames(this->viewStructure);
+		if(tbls.count() == 0){
+			this->clear();
+			this->fill(QJsonObject(), data);
+			}
+		else{
+
+			this->data = data;
+			//qDebug()<<"INITTT" << this->data;
+			QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotTabelsData(QVector<QJsonDocument>)));
 			Controller::Get()->getTabelsData(data.value("document_id").toString(),tbls);
-			return;
+		//	return;
 			}
 		//	return; //TODO: PREVENT MULITPE LOADS with fill
 		}
 	else {
 		qDebug() << __FILE__ << __LINE__ << __FILE__ << __LINE__ << "ERRLOG" << viewStructure.value("document_id").toString() << "SPLIT COUNT";
-		return;
+//		return;
 		}
-	p_instance->saveShortCut->setEnabled(true);
-	p_instance->cancelShortCut->setEnabled(true);
-	p_instance->printShortCut->setEnabled(true);
-	MainForm::Get()->ShowDisplay(p_instance);
+	this->saveShortCut->setEnabled(true);
+	this->cancelShortCut->setEnabled(true);
+	this->printShortCut->setEnabled(true);
+
+	if(!create)
+		MainForm::Get()->ShowDisplay(this);
+
+	return this;
 }
+*/
+
 
 void CreateEditUI::fill(QJsonObject viewStructure, QJsonObject data)
 {
+
 	if(!viewStructure.isEmpty()){
 		this->viewStructure = viewStructure;
 		}
@@ -126,7 +138,7 @@ void CreateEditUI::fill(QJsonObject viewStructure, QJsonObject data)
 		}
 	//qDebug() << __FILE__ << __LINE__  <<"Fill"<< this->cas;
 
-	viewGroups = ViewGroups::Create(this->viewStructure,data) ;
+	viewGroups = new ViewGroups(0,this->viewStructure,data,&this->fieldsgroups) ;
 	createEditWidgetLayout->addWidget(viewGroups);
 
 	//this->layout->addWidget(createEditWidget);
@@ -135,11 +147,12 @@ void CreateEditUI::fill(QJsonObject viewStructure, QJsonObject data)
 void CreateEditUI::clear()
 {
 	this->cas = "";
-	QList<QWidget *> Widgets = createEditWidget->findChildren<QWidget *>();
+
+	QList<QWidget *> Widgets = this->createEditWidget->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
 		{
 		if(child != NULL){
-			createEditWidgetLayout->removeWidget(child);
+			this->createEditWidgetLayout->removeWidget(child);
 			child->setHidden(true);
 			//child->setParent(0);
 			child->deleteLater();
@@ -147,12 +160,37 @@ void CreateEditUI::clear()
 		}
 }
 
+
+
+
+
+
+
+void CreateEditUI::fillData(QJsonObject data)
+{
+	if(!data.isEmpty()){
+			QStringList tbls =this->getTabelsFieldNames(this->viewStructure);
+			if(tbls.count() == 0){
+				this->clear();
+				this->fill(QJsonObject(), data);
+				}
+			else{
+
+				this->data = data;
+				//qDebug()<<"INITTT" << this->data;
+				QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotTabelsData(QVector<QJsonDocument>)));
+				Controller::Get()->getTabelsData(data.value("document_id").toString(),tbls);
+			//	return;
+				}
+		}
+}
+
 void CreateEditUI::clearErrorsWidget()
 {
-	QList<QWidget *> Widgets = errorsWidget->findChildren<QWidget *>();
+	QList<QWidget *> Widgets = this->errorsWidget->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
 		{
-		errorsWidgetLayout->removeWidget(child);
+		this->errorsWidgetLayout->removeWidget(child);
 		child->setHidden(true);
 		child->setParent(0);
 		child->deleteLater();  // TODO : check the stability of the app
@@ -213,6 +251,14 @@ void CreateEditUI::printAfterSave(QJsonObject strct)
 		*/
 }
 
+QHash<QString, FeildUI*> CreateEditUI::getFieldsgroups() const
+{
+
+	if(!fieldsgroups.isEmpty())
+	return fieldsgroups;
+	else return QHash<QString, FeildUI*>();
+}
+
 void CreateEditUI::paintEvent(QPaintEvent *)
 {
 	QStyleOption opt;
@@ -241,10 +287,10 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 
 void CreateEditUI::gotTabelsData(QVector<QJsonDocument> tblsData)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),p_instance,SLOT(gotTabelsData(QVector<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotTabelsData(QVector<QJsonDocument>)));
 
 	//qDebug() <<"gotTabelsData"<< tblsData.first();
-	//qDebug()<<"BEFOREEEE" << p_instance->data;
+	//qDebug()<<"BEFOREEEE" << this->data;
 
 	QStringList keys ;
 	if(tblsData.count() > 0)
@@ -252,12 +298,12 @@ void CreateEditUI::gotTabelsData(QVector<QJsonDocument> tblsData)
 	foreach(QString key,keys){
 		QJsonObject row;
 		row.insert("merplyTabel",tblsData.first().object().value(key).toArray());
-		p_instance->data.insert(key,row);
+		this->data.insert(key,row);
 		}
-	p_instance->clear();
-	//qDebug() << p_instance->data;
-	p_instance->fill(QJsonObject(), p_instance->data);
-	MainForm::Get()->ShowDisplay(p_instance);
+	this->clear();
+	//qDebug() << this->data;
+	this->fill(QJsonObject(), this->data);
+	//MainForm::Get()->ShowDisplay(this);
 }
 
 void CreateEditUI::printEntity()
@@ -288,9 +334,10 @@ void CreateEditUI::printEntity()
 
 void CreateEditUI::saveEntity()
 {
-	saveShortCut->setEnabled(false);
+	this->saveShortCut->setEnabled(false);
 	this->clearErrorsWidget();
-	QString errs = viewGroups->checkMandatory();
+	//qDebug() << "SAVEEE"	 << this->viewStructure;
+	QString errs = this->viewGroups->checkMandatory();
 	if(errs.isEmpty()){
 		//	qDebug() << __FILE__ << __LINE__ <<"Controller Clicked to save" << this->cas;
 		QString documentID ;
@@ -309,7 +356,7 @@ void CreateEditUI::saveEntity()
 
 			QString key = documentID.replace("ViewStructure::","");
 
-			QJsonObject vgsSave = viewGroups->save();
+			QJsonObject vgsSave = this->viewGroups->save();
 			//vgsSave.insert("cas_value",this->cas);
 			vgsSave.insert("document_id",key);
 			QObject::connect(Controller::Get(),SIGNAL(savedItems(QString)),this,SLOT(saved()));
@@ -323,7 +370,7 @@ void CreateEditUI::saveEntity()
 
 			}
 		else{
-			QJsonObject vgsSave = viewGroups->save();
+			QJsonObject vgsSave = this->viewGroups->save();
 			//qDebug() << vgsSave;
 			vgsSave.insert("cas_value",this->cas);
 			vgsSave.insert("document_id",documentID);
@@ -345,9 +392,9 @@ void CreateEditUI::saveEntity()
 		}
 	else{
 		foreach(QString err,errs.split(";")){
-			errorsWidgetLayout->addWidget(new QLabel(err +" can not be empty"));
+			this->errorsWidgetLayout->addWidget(new QLabel(err +" can not be empty"));
 			}
-		saveShortCut->setEnabled(true);
+		this->saveShortCut->setEnabled(true);
 		}
 }
 
@@ -361,6 +408,10 @@ void CreateEditUI::cancel()
 	else{
 		documentID = this->viewStructure.value("document_id").toString();
 		}
+
+	this->clear();
+	this->data = QJsonObject();
+	this->fill(QJsonObject(),QJsonObject());
 	IndexUI::ShowUI(documentID,QVector<QJsonDocument>());
 }
 
@@ -387,6 +438,8 @@ void CreateEditUI::printAfterSaved(QJsonDocument document)
 void CreateEditUI::saved()
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
-
+	this->clear();
+	this->data = QJsonObject();
+	this->fill(QJsonObject(),QJsonObject());
 	IndexUI::ShowUI(this->viewStructure.value("document_id").toString(),QVector<QJsonDocument>());
 }

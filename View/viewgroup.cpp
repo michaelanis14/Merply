@@ -2,7 +2,7 @@
 #include "structureviewedit.h"
 
 
-ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, QJsonObject data) : QGroupBox (parent)
+ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, QJsonObject data,QHash<QString,FeildUI*>* fieldsgroups) : QGroupBox (parent)
 {
 
 	this->structureView = structureView;
@@ -29,7 +29,7 @@ ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, 
 				//qDebug() << __FILE__ << __LINE__  << fieldVS.toObject();
 				FeildUI* feild = new FeildUI(0,strID,fieldVS.toObject(),data);
 				feilds << feild;
-				ViewGroups::Fieldsgroups.insert(fieldVS.toObject().value("Label").toString().trimmed(),feild);
+				fieldsgroups->insert(fieldVS.toObject().value("Label").toString().trimmed(),feild);
 				layout->addWidget(feild);
 				d++;
 				}

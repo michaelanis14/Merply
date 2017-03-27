@@ -74,7 +74,8 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 	layout->addRow(new QLabel(tr("Editable ")), editabel);
 	showIndex = new QCheckBox;
 	layout->addRow(new QLabel(tr("Show Index ")), showIndex);
-
+	incremntTotal = new QCheckBox;
+	layout->addRow(new QLabel(tr("Tncremnt Total ")), incremntTotal);
 
 	QObject::connect(type,SIGNAL(currentIndexChanged(int)),this,SLOT(updateFields(int)));
 	type->setCurrentIndex(0);
@@ -97,6 +98,8 @@ QJsonObject StructureVieweditSubFeildTableColumn::save()
 		clmn.insert("TotalRow",totalRow->isChecked());
 	if(showIndex->isChecked())
 		clmn.insert("ShowIndex",showIndex->isChecked());
+	if(incremntTotal->isChecked())
+		clmn.insert("IncremntTotal",incremntTotal->isChecked());
 
 	clmn.insert("Editable",editabel->isChecked());
 
@@ -164,6 +167,9 @@ void StructureVieweditSubFeildTableColumn::fill(QJsonObject clmn)
 		inputData->setCurrentIndex(clmn.value("inputData").toInt());
 	if(clmn.value("ShowIndex") != QJsonValue::Undefined)
 		this->showIndex->setChecked(true);
+	if(clmn.value("IncremntTotal") != QJsonValue::Undefined)
+		this->incremntTotal->setChecked(true);
+
 
 	if(this->type->currentIndex() == 2){
 		QJsonArray equationTerms =  clmn.value("EquationTerms").toArray();

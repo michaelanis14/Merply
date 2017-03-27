@@ -16,11 +16,18 @@ class CreateEditUI : public MainDisplay
 public:
 	CreateEditUI(QWidget *parent = 0);
 	explicit CreateEditUI(QWidget *parent = 0,QJsonObject viewStructure = QJsonObject(),QJsonObject data = QJsonObject());
-	static void ShowUI(QJsonObject viewStructure, QJsonObject data, bool create);
-private:
-	static CreateEditUI* p_instance;
+	//static CreateEditUI* ShowUI(QJsonObject viewStructure, QJsonObject data, bool create);
+
+
+	QJsonObject getViewStructure() const;
+	void fillData(QJsonObject data);
 	void fill(QJsonObject viewStructure,QJsonObject data);
-	void clear();
+	QHash<QString, FeildUI*> getFieldsgroups() const;
+
+private:
+	//static CreateEditUI* p_instance;
+
+	 void clear();
 	QWidget* createEditWidget;
 	QVBoxLayout *createEditWidgetLayout;
 	QWidget* errorsWidget;
@@ -30,8 +37,8 @@ private:
 	QJsonObject viewStructure;
 	QString cas;
 	QJsonObject data;
-	void clearErrorsWidget();
-	QStringList getTabelsFieldNames(QJsonObject viewStructure);
+	 void clearErrorsWidget();
+	 QStringList getTabelsFieldNames(QJsonObject viewStructure);
 	QShortcut* saveShortCut;
 	QShortcut* cancelShortCut;
 	QShortcut* printShortCut;
@@ -44,6 +51,8 @@ private:
 	QCheckBox* showPrintDialog;
 	QCheckBox* toInvoice;
 	bool toInvoiceFlag;
+
+	QHash<QString,FeildUI*> fieldsgroups;
 signals:
 protected:
 	//void showEvent(QShowEvent *);

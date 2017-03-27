@@ -15,13 +15,13 @@ DateFilterUI::DateFilterUI(QWidget *parent) : QGroupBox(parent)
 	//from->setDateTime(QDateTime::currentDateTime());
 	//from->setDateTime(QDateTime::fromString("2017/1/1",Qt::ISODate));
 	from->setDateTime(QDateTime::currentDateTime().addYears(-1));
-	from->setDisplayFormat("dd/MM/yyyy");
+	from->setDisplayFormat("ss:mm:hh dd/MM/yyyy");
 	layout->addRow(tr(" من: "),from);
 
 
 	to = new QDateTimeEdit();
 	to->setDateTime(QDateTime::currentDateTime());
-	to->setDisplayFormat("dd/MM/yyyy");
+	to->setDisplayFormat("ss:mm:hh dd/MM/yyyy");
 	layout->addRow(tr("إلى:"),to);
 
 }

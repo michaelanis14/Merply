@@ -19,10 +19,11 @@ public:
 	explicit PageUI(QWidget *parent = 0, QJsonObject viewStructure = QJsonObject());
 	static void ShowUI(QJsonObject viewStructure);
 	HeaderLabel* headerlbl;
+	void fill(QJsonObject viewStructure);
 private:
 	static PageUI* p_instance;
 	HControllers* controllers ;
-	void fill(QJsonObject viewStructure);
+
 	void clear();
 	//QWidget* createEditWidget;
 	//QVBoxLayout *createEditWidgetLayout;
