@@ -13,6 +13,8 @@
 #include <QFormLayout>
 #include <QDateEdit>
 #include <QTextEdit>
+#include <QPushButton>
+
 
 
 class StructureVieweditSubFeild : public QWidget
@@ -20,7 +22,7 @@ class StructureVieweditSubFeild : public QWidget
 	Q_OBJECT
 public:
 	explicit StructureVieweditSubFeild(QWidget *parent = 0);
-	void fillTypeFields(QString type, QJsonValue fieldVS, QStringList restrictedTypes);
+	void fillTypeFields(QString type, QJsonValue fieldVS, QStringList restrictedTypes, QString document_id);
 	QJsonObject save();
 	QFormLayout *layout;
 	QString getType();
@@ -33,7 +35,9 @@ private:
 	QTextEdit* condition;
 	QCheckBox* Editable;
 	QLineEdit* defaultValue;
+	QLineEdit* updateValue;
 	QLineEdit* charCount;
+	QPushButton* btnUpdate;
 	ERPComboBox* inputDataType;
 	bool loadData;
 	QLineEdit* title;
@@ -44,6 +48,7 @@ private:
 	QWidget* preview;
 	QHBoxLayout* previewLayout;
 	QStringList restrictedTypes;
+	QString document_id;
 	QCheckBox* mandatory;
 	void initFilterWidget();
 	QWidget*filterWidget;
@@ -74,6 +79,8 @@ public slots:
 
 	void addEquationWidget(QJsonObject data = QJsonObject());
 	void removeEqElement(QWidget* eqElement);
+
+	void btnUpdate_Clicked();
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILD_H

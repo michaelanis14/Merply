@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QWidget>
 
+
 class StructureViewGroupsUI : public MainDisplay
 {
 	Q_OBJECT

@@ -3,7 +3,7 @@
 #include <QWidget>
 #include <QPushButton>
 
-StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStringList restrictedTypes) : QWidget(parent)
+StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStringList restrictedTypes, QString document_id) : QWidget(parent)
 {
 
 
@@ -11,7 +11,9 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 	this->setContentsMargins(2,2,2,2);
 
 	this->restrictedTypes = restrictedTypes;
+	this->document_id = document_id;
 	this->structureView = fieldVS.toObject();
+
 
 	layout = new QHBoxLayout(0);
 	layout->setContentsMargins(2,2,2,2);
@@ -237,7 +239,7 @@ void StructureViewEdit::fill(QJsonObject structureView)
 				QString type = fieldVS.toObject().value("Type").toString();
 				StructureVieweditSubFeild * svsf = new StructureVieweditSubFeild(this);
 				sVSFs << svsf;
-				svsf->fillTypeFields(type,fieldVS,this->restrictedTypes);
+				svsf->fillTypeFields(type,fieldVS,this->restrictedTypes,this->document_id);
 
 				QObject::disconnect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 				QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
@@ -366,7 +368,7 @@ void StructureViewEdit::addField()
 	if(restrictedTypes.contains("Links"))
 		type = "Link";
 	StructureVieweditSubFeild * svsf = new StructureVieweditSubFeild(this);
-	svsf->fillTypeFields(type,QJsonObject(),this->restrictedTypes);
+	svsf->fillTypeFields(type,QJsonObject(),this->restrictedTypes,this->document_id);
 	sVSFs << svsf;
 	QObject::disconnect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 	QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));

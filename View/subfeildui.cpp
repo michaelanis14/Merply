@@ -2,6 +2,8 @@
 #include "controller.h"
 
 #include<QDateTimeEdit>
+#include <cmath>
+#include <cstdlib>
 
 SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView, QJsonValue data) : QWidget(parent)
 {
@@ -163,7 +165,6 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		//lineEdit->setEnabled(false);
 
 		QString dataString = Controller::Get()->toString("",data);
-		//i removed !
 		if(!dataString.isEmpty()){
 			lineEdit->setText(dataString);
 			}
@@ -172,14 +173,12 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			if(structureView.value("startNum") != QJsonValue::Undefined){
 				lineEdit->setText(QString::number(structureView.value("startNum").toInt()));
 				}
-			//this split gives the name of the card
 			QStringList id = this->strID.split("ViewStructure::");
 			if(id.count() > 1){
 				QObject::connect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
-				Controller::Get()->getValue("clients");
+				Controller::Get()->getValue(id[1]);
 				}
 			}
-		//lineEdit->setText(data.toString());
 		layout->addWidget(lineEdit);
 
 		}
@@ -343,20 +342,18 @@ void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 void SubFieldUI::serialData(QString serial)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
-	//No. of clients in db are 251
-	QString Clients = "clients::%";
-	if(structureView.value("startNum") != QJsonValue::Undefined){
-		int i = structureView.value("startNum").toInt();
-		int current = serial.toInt();
-		int numDB = Controller::Get()->Count(Clients.trimmed()+"\"") ;
-		qDebug() << __FILE__ << __LINE__  << "num"<< numDB;
-		qDebug() << __FILE__ << __LINE__  << "serial"<< current;
-		qDebug() << __FILE__ << __LINE__  << "StartNum"<< i;
-		int serialized = current-numDB + i;
-		//if(serialized > i){
-			((QLineEdit*)field)->setText(QString::number(serialized));
-			//}
-		}
+	int newValue = Controller::Get()->Count((this->strID.split("ViewStructure::")[1] + "::%").trimmed()+"\"") ;
+	int oldValue = structureView.value("currentNum").toInt();
+	int startNum = structureView.value("startNum").toInt();
+	int serializedNum = newValue - oldValue + startNum;
+//	qDebug() << __FILE__ << __LINE__  << "card is"<< this->strID.split("ViewStructure::")[1];
+//	qDebug() << __FILE__ << __LINE__  << "new num"<< newValue;
+//	qDebug() << __FILE__ << __LINE__  << "old num"<< oldValue;
+//	qDebug() << __FILE__ << __LINE__  << "start num"<< startNum;
+//	qDebug() << __FILE__ << __LINE__  << "serialized num"<< serializedNum;
+
+	((QLineEdit*)field)->setText(QString::number(serializedNum));
+
 }
 
 void SubFieldUI::updateFilter(QString filter)

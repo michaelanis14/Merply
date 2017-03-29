@@ -10,7 +10,7 @@ class StructureViewsEditUI : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit StructureViewsEditUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject(), QStringList restrictedTypes = QStringList());
+	explicit StructureViewsEditUI(QWidget *parent = 0, QJsonObject structureView = QJsonObject(), QStringList restrictedTypes = QStringList(),QString document_id = "");
 	QJsonObject save();
 	QComboBox* group;
 	QLineEdit* groupName;
@@ -41,12 +41,13 @@ private:
 	QWidget* styleSelect;
 	QStringList styles;
 	void loadStyle();
-	void addStrField(QJsonValue fieldVS);
+	void addStrField(QJsonValue fieldVS, QString document_id);
 	void addStrRefrence(QJsonValue RefrenceVS);
 	//QStringList fieldsName;
 
 protected:
 	QStringList restrictedTypes;
+	QString document_id;
 signals:
 	void changed();
 	void styleChanged();

@@ -4,10 +4,12 @@
 #include "controller.h"
 #include "removebtn.h"
 
-StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structureView, QStringList restrictedTypes) : QWidget(parent)
+StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structureView, QStringList restrictedTypes, QString document_id) : QWidget(parent)
 {
+
 	this->structureView = structureView;
 	this->restrictedTypes = restrictedTypes;
+	this->document_id = document_id;
 	this->setContentsMargins(2,2,2,2);
 	//	this->fieldsName = QStringList();
 
@@ -147,16 +149,16 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 	sctrlUI->setAutoFillBackground(true);
 	layout->addWidget(sctrlUI);
 	layout->addStretch(1);
-
 	if(structureView.value("Viewgroup").isObject()){
 		QJsonObject viewgroup = structureView.value("Viewgroup").toObject();
 		titleData->setText(viewgroup.value("GroupTitle").toString());
 		if(viewgroup.value("Fields").isArray())
 			foreach (QJsonValue fieldVS, viewgroup.value("Fields").toArray()) {
-				//	this->fieldsName << fieldVS.toObject().value("Label").toString();
-				addStrField(fieldVS);
+				addStrField(fieldVS,this->document_id);
 				}
+
 		foreach (QJsonValue fieldVS, viewgroup.value("RefrenceFields").toArray()) {
+			//add it here??
 			addStrRefrence(fieldVS);
 			}
 		}
@@ -294,10 +296,11 @@ void StructureViewsEditUI::loadStyle()
 
 }
 
-void StructureViewsEditUI::addStrField(QJsonValue fieldVS)
+void StructureViewsEditUI::addStrField(QJsonValue fieldVS,QString document_id)
 {
-
-	StructureViewEdit * strcView = new StructureViewEdit(0,fieldVS,this->restrictedTypes);
+	//qDebug() << __FILE__ << __LINE__  << "addSTRFRIELD"<< fieldVS;
+	//here
+	StructureViewEdit * strcView = new StructureViewEdit(0,fieldVS,this->restrictedTypes,this->document_id);
 	QObject::connect(strcView,SIGNAL(changed()),this,SIGNAL(changed()));
 	sVSFs << strcView;
 	layout->setStretch(layout->count()-1,0);
@@ -334,7 +337,7 @@ void StructureViewsEditUI::controller_Clicked(QString btn)
 		addStrRefrence(QJsonValue());
 		}
 	else if(btn.contains("Add")){
-		addStrField(QJsonValue());
+		addStrField(QJsonValue(),"");
 		}
 	else if(btn.contains("Edit")){
 		topCntrls->isHidden()?hidePreview(true):hidePreview(false);

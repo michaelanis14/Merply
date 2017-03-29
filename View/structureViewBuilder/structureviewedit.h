@@ -14,7 +14,8 @@ class StructureViewEdit : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit StructureViewEdit(QWidget *parent = 0, QJsonValue fieldVS = QJsonValue(), QStringList restrictedTypes = QStringList());
+	//is it initialied with two quotations?
+	explicit StructureViewEdit(QWidget *parent = 0, QJsonValue fieldVS = QJsonValue(), QStringList restrictedTypes = QStringList(), QString document_id = "");
 	QJsonObject save();
 	void showTypeFields();
 	void hideTypeFields();
@@ -51,6 +52,7 @@ protected:
 	//void showEvent(QShowEvent *);
 	void paintEvent(QPaintEvent*event);
 	QStringList restrictedTypes;
+	QString document_id;
 
 public slots:
 	void updatePreview(bool oldStrct = false);

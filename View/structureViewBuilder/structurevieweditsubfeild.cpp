@@ -46,12 +46,16 @@ StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(
 }
 
 
-void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,QStringList restrictedTypes)
+void StructureVieweditSubFeild::fillTypeFields(QString type, QJsonValue fieldVS, QStringList restrictedTypes, QString document_id)
 {
-	//qDebug() << __FILE__ << __LINE__  << "fffield" << fieldVS;
+	//qDebug() << __FILE__ << __LINE__  << "document is" << document_id;
+
+	//qDebug() << __FILE__ << __LINE__  <<"source ss is"<< s;
 	this->filled = true;
 	this->type = type;
 	this->restrictedTypes = restrictedTypes;
+	this->document_id = document_id;
+
 	if(fieldVS.isObject())
 		this->fieldVS = fieldVS;
 
@@ -84,6 +88,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 
 		if(!fieldVS.toObject().value("Source").toString().isEmpty())
 			Source->setCurrentText(fieldVS.toObject().value("Source").toString());
+
 		layout->addRow(new QLabel(tr("Source ")), Source);
 		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
 		Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
@@ -187,10 +192,24 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		}
 	else if(type.compare("Serial") == 0){
 		defaultValue = new QLineEdit;
+		updateValue = new QLineEdit;
+		btnUpdate = new QPushButton(tr("Update value"));
+
+
 		if(fieldVS.toObject().value("startNum").toInt() > 0)
 			defaultValue->setText(QString::number(fieldVS.toObject().value("startNum").toInt()));
 		else defaultValue->setText(QString::number(1));
+
+		QObject::connect(btnUpdate, SIGNAL(clicked()),this, SLOT(btnUpdate_Clicked()));
+		QString document_id_splitted = document_id.split("::").count() > 1 ?document_id.split("::")[1]:document_id;
+		if(!document_id_splitted.trimmed().isEmpty())
+			updateValue->setText((QString::number(Controller::Get()->Count((document_id_splitted + "::%").trimmed()+"\""))));
+		else
+			updateValue->setText(QString::number(0));
+
 		layout->addRow(new QLabel(tr("Start Number")), defaultValue);
+		layout->addRow(new QLabel(tr("Current Number")), updateValue);
+		layout->addRow(btnUpdate);
 		}
 	else if(type.compare("Date") == 0){
 		date = new QDateEdit(this);
@@ -269,6 +288,9 @@ QJsonObject StructureVieweditSubFeild::save()
 			if(!defaultValue->text().isEmpty())
 				saveObject.insert("startNum",defaultValue->text().toInt());
 			else saveObject.insert("startNum",1);
+
+			saveObject.insert("currentNum",updateValue->text().toInt());
+
 			}
 		else if(type.compare("Date") == 0){
 			//qDebug() << __FILE__ << __LINE__  << date->date().toString(Qt::DefaultLocaleShortDate);
@@ -370,7 +392,7 @@ void StructureVieweditSubFeild::updateFields(QString type)
 			}
 		}
 
-	this->fillTypeFields(type,this->fieldVS,this->restrictedTypes);
+	this->fillTypeFields(type,this->fieldVS,this->restrictedTypes,this->document_id);
 	//emit changed();
 }
 
@@ -387,6 +409,7 @@ void StructureVieweditSubFeild::updateSelectData(QList<QString> fields)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	Select->clear();
+	//qDebug() << __FILE__ << __LINE__  << "in updateSelectData" << fields;
 	Select->addItems(fields);
 	if(loadData && fieldVS.toObject().value("Select") != QJsonValue::Undefined){
 		loadData = false;
@@ -398,7 +421,6 @@ void StructureVieweditSubFeild::updateSelectData(QList<QString> fields)
 
 void StructureVieweditSubFeild::gotSourceData(QVector<QJsonDocument> items)
 {
-	//qDebug() << __FILE__ << __LINE__<< "gotSourceData" << items;
 	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
 	Source->clear();
 	Source->addJsonItems(items);
@@ -463,6 +485,7 @@ void StructureVieweditSubFeild::addEquationWidget(QJsonObject data)
 		eqElemnet->fill(data);
 		}
 	equationElements << eqElemnet;
+	//remove button
 	RemoveBtn* removeEqElement = new RemoveBtn(this,eqElemnet);
 	QObject::connect(removeEqElement,SIGNAL(remove(QWidget*)),this,SLOT(removeEqElement(QWidget*)));
 	equationWidgetLayout->addWidget(removeEqElement);
@@ -473,7 +496,13 @@ void StructureVieweditSubFeild::removeEqElement(QWidget* eqElement)
 	equationElements.removeOne((StructureVieweditSubFeildEquation*)eqElement);
 }
 
-
+void StructureVieweditSubFeild::btnUpdate_Clicked(){
+	QString document_id_splitted = document_id.split("::").count() > 1 ?document_id.split("::")[1]:document_id;
+	if(!document_id_splitted.trimmed().isEmpty())
+		updateValue->setText((QString::number(Controller::Get()->Count((document_id_splitted + "::%").trimmed()+"\""))));
+	else
+		updateValue->setText(QString::number(0));
+}
 
 void StructureVieweditSubFeild::paintEvent(QPaintEvent * event)
 {

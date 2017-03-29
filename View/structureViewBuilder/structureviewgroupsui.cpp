@@ -122,10 +122,9 @@ void StructureViewGroupsUI::ShowUI(QJsonObject structureView) {
 
 void StructureViewGroupsUI::fill(QJsonObject structureView)
 {
-	//	qDebug() << __FILE__ << __LINE__  << structureView.value("document_id").toString() << structureView;
+
 	this->cas_value = structureView.value("cas_value").toString();
 	this->document_id = structureView.value("document_id").toString();
-
 	if(!structureView.value("Title").toString().isEmpty())
 		headerlbl->setTitle(structureView.value("Title").toString());
 	else headerlbl->setTitle("New Card");///+QString::number(Controller::Get()->Count("ViewStructure")));
@@ -148,7 +147,7 @@ void StructureViewGroupsUI::fill(QJsonObject structureView)
 
 	if(structureView.value("Viewgroups").isArray()){
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
-			StructureViewsEditUI* viewgroup = new StructureViewsEditUI(0,item.toObject(),this->restrictedTypes);
+			StructureViewsEditUI* viewgroup = new StructureViewsEditUI(0,item.toObject(),this->restrictedTypes,this->document_id);
 
 			QObject::connect(viewgroup,SIGNAL(updateLayout()),this,SLOT(updateLayout()));
 			QObject::connect(viewgroup, SIGNAL(styleChanged()),this, SLOT(viewGroupStyleChanged()));
