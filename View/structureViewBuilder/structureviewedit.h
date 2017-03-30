@@ -26,7 +26,7 @@ public:
 	QCheckBox* indexField;
 	QCheckBox* showInIdexView;
 	QStringList getFieldsType();
-	StructureVieweditSubFeild * getTableFeild();
+    StructureVieweditSubFeild * getTableFeild();
 private:
 	QHBoxLayout *layout;
 	//ERPComboBox* typeSelect;

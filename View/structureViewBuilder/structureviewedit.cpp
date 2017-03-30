@@ -1,7 +1,9 @@
 #include "structureviewedit.h"
 #include "removebtn.h"
+#include "controller.h"
 #include <QWidget>
 #include <QPushButton>
+#include <QMessageBox>
 
 StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStringList restrictedTypes) : QWidget(parent)
 {
@@ -90,8 +92,8 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 	indexField = new QCheckBox(tr("I"));
 	showInIdexView = new QCheckBox(tr("SIV"));
 	showInIdexView->setChecked(true);
-	layout->addWidget(hideLabel,0,Qt::AlignTop);
-	layout->addWidget(hideField,0,Qt::AlignTop);
+    layout->addWidget(hideLabel,0,Qt::AlignTop);
+    layout->addWidget(hideField,0,Qt::AlignTop);
 	layout->addWidget(initData,0,Qt::AlignTop);
 	layout->addWidget(indexField,0,Qt::AlignTop);
 	layout->addWidget(showInIdexView,0,Qt::AlignTop);
@@ -131,7 +133,7 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 
 
 	//this->controller_Clicked("Edit");
-	//hideTypeFields();
+    //hideTypeFields();
 
 	//fill(fieldVS.toObject());
 
@@ -143,16 +145,16 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 }
 
 
-
 QJsonObject StructureViewEdit::save()
 {
 	QJsonObject saveObject;
-	saveObject.insert("Label",label->text().trimmed());
+
+    saveObject.insert("Label",label->text());
 	if(label->text().trimmed().isEmpty())
 		label->setText("F"+QString::number(rand()));
-	if(hideLabel->isChecked())
+    if(hideLabel->isChecked())
 		saveObject.insert("LabelHidden",true);
-	if(hideField->isChecked())
+    if(hideField->isChecked())
 		saveObject.insert("FieldHidden",true);
 	if(initData->isChecked())
 		saveObject.insert("initData",true);
@@ -170,7 +172,7 @@ QJsonObject StructureViewEdit::save()
 			QJsonObject* savedPreview = new QJsonObject();
 			previewField->save(savedPreview);
 			//	qDebug() << __FILE__ << __LINE__  << savedPreview;
-			if(savedPreview->keys().count() > 0 && savedPreview->value(savedPreview->keys().first()) != QJsonValue::Undefined){
+            if(savedPreview->keys().count() > 0 && savedPreview->value(savedPreview->keys().first()) != QJsonValue::Undefined){
 				QJsonObject tblObj = savedPreview->value(savedPreview->keys().first()).toArray().first().toObject();
 				//	qDebug() << __FILE__ << __LINE__  << tblObj;
 				sSFSave.insert("initData",tblObj);
@@ -212,9 +214,9 @@ StructureVieweditSubFeild* StructureViewEdit::getTableFeild()
 
 void StructureViewEdit::fill(QJsonObject structureView)
 {
-	if(!structureView.isEmpty() ){
-		this->structureView = structureView;
-		if(structureView.value("Label").toString().isEmpty())
+    if(!structureView.isEmpty() ){
+        this->structureView = structureView;
+        if(structureView.value("Label").toString().isEmpty())
 			label->setText("F"+QString::number(rand()));
 		else
 			label->setText(structureView.value("Label").toString());
@@ -289,7 +291,7 @@ bool StructureViewEdit::setHidden(bool hidden)
 	if(sctrlUI) sctrlUI->setHidden(hidden);
 
 	//preview->setHidden(hidden);
-	if(hidden){
+    if(hidden){
 		topCntrls->setHidden(false);
 		topCntrlsPreview->setHidden(true);
 		}
@@ -350,9 +352,21 @@ void StructureViewEdit::controller_Clicked(QString btn)
 		this->updatePreview(true);
 		}
 	else if(btn.contains("Save")){
-		this->structureView = this->save();
-		this->updatePreview(false);
-		setHidden(true);
+        // (this->label->text());
+
+        if (Controller::Get()->checkLabelDuplicates(this->label->text()) == false){ //CAlling the COntroller to avoid label duplication
+
+            this->structureView = this->save();
+            this->updatePreview(false);
+            setHidden(true);
+            }
+        else
+        {//Displaying error message on occurance of duplicates
+            QMessageBox Msgbox;
+            Msgbox.setText(tr("This label name used already existed"));
+            Msgbox.exec();
+            label->setStyleSheet("border: 1px solid red");
+        }
 		}
 	else if(btn.contains("Add")){
 		addField();

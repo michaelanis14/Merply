@@ -29,7 +29,7 @@ public:
 	void showDisplay();
 
 
-
+    bool checkLabelDuplicates(QString newLabel);
 	static Controller* Get();
 
 

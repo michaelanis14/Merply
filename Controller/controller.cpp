@@ -1323,6 +1323,34 @@ void Controller::showWarning(QString warning)
 void Controller::Log(QStringList log){
 	Model::Get()->Log(log);
 }
+
+/**
+ * @brief Controller::checkLabelDuplicates : checking for duplicates labels in the new fields added
+ * @param newLabel is the New label added by the user
+ * @return whether there is a duplicate or not
+ * @author Andrew Assad
+ */
+bool Controller::checkLabelDuplicates(QString newLabel)
+{
+    int labelCount =0;
+    QJsonObject structureViewGroups= StructureViewGroupsUI::GetUI()->save();;
+    foreach(QJsonValue viewGroupsStruct,structureViewGroups.value("Viewgroups").toArray()){
+        foreach(QJsonValue labelStruct,viewGroupsStruct.toObject().value("Viewgroup").toObject().value("Fields").toArray()){
+            //qDebug() << labelStruct.toObject().value("Label").toString();
+            if( labelStruct.toObject().value("Label").toString() == newLabel)
+            {
+                labelCount++;
+                if(labelCount == 2 )
+                     return true;
+            }
+
+        }
+
+    }
+   return false;
+
+}
+
 ////////Controlling the Model_ Model Functions //////////////////////
 
 /*
@@ -1366,3 +1394,4 @@ bool Controller::Compare(QJsonObject first, QJsonObject second)
 
 	return true;
 }
+
