@@ -24,10 +24,13 @@ public:
 	SettingsCtrlsUI* sctrlUI;
 	QVBoxLayout* structureViewGroupsUILayout;
 	void getTableFields(ERPComboBox* excludeSource);
-private:
-	QVBoxLayout *layout;
+    QJsonObject getStructureView() const;
+    void saveLastViewEdited (QJsonObject latestEditView);
 
-	QList<StructureViewsEditUI*> sVSFUIs;
+private:
+    QVBoxLayout *layout;
+
+    QList<StructureViewsEditUI*> sVSFUIs;
 
 	bool init;
 	//QWidget* preview;
@@ -43,7 +46,6 @@ private:
 	QString cas_value;
 	QString document_id;
 
-
 protected:
 
 	QStringList restrictedTypes;
@@ -52,7 +54,7 @@ protected:
 signals:
 	void cancel();
 	void gotFieldsNames(QStringList names);
-	void gotSourcesJson(QList<QVector<QJsonDocument> > sources);
+    void gotSourcesJson(QList<QVector<QJsonDocument> > sources);
 public slots:
 	void btn_Clicked(QString btn);
 	void viewGroupStyleChanged();

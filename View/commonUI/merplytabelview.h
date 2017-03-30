@@ -15,7 +15,7 @@
 #include "hcontrollers.h"
 #include "merplyqueryui.h"
 
-#include <QtGui>
+//#include <QtGui>
 #include <QWidget>
 #include <QLabel>
 #include <QFileDialog>

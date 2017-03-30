@@ -60,10 +60,16 @@ void StructureVieweditSubFeildTableColumnQuery::fill(QJsonObject strct)
 	if(strct.value("AfterFilter")!= QJsonValue::Undefined)
 		afterCondition->setText(strct.value("AfterFilter").toString());
 }
-
+int count = 0 ;
+QString k;
 QJsonObject StructureVieweditSubFeildTableColumnQuery::save()
 {
-	QJsonObject save;
+    if (count == 0 )
+    {
+        k=label->text();
+        count++;
+    }
+    QJsonObject save;
 	save.insert("Label",label->text());
 	if(!entity->text().isEmpty())
 		save.insert("Entity",entity->text());

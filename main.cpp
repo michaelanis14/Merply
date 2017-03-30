@@ -19,6 +19,7 @@
 #endif
 
 #include <QTextCodec>
+#include <QFontDatabase>
 class Merply_Application : public QApplication {
 public:
 	Merply_Application(int& argc, char** argv) : QApplication(argc, argv) {}

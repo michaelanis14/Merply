@@ -93,7 +93,7 @@ QJsonObject StructureViewGroupsUI::save()
 	QJsonArray ViewGroups;
 	foreach(StructureViewsEditUI * strcViewUI,sVSFUIs){
 		QJsonObject viewGroup;
-		viewGroup.insert("Viewgroup",strcViewUI->save());
+        viewGroup.insert("Viewgroup",strcViewUI->save());
 		ViewGroups << viewGroup;
 		}
 	saveObject.insert("Viewgroups",ViewGroups);
@@ -101,12 +101,10 @@ QJsonObject StructureViewGroupsUI::save()
 		saveObject.insert("cas_value",cas_value); //Inserting Document ID TODO: REMOVE
 		saveObject.insert("document_id",document_id);//TODO: REMOVE
 		}
-
+    //labelDuplicates(saveObject);
+    //qDebug() << __FILE__ << __LINE__  <<"Save";
 	return saveObject;
 }
-
-
-
 
 StructureViewGroupsUI* StructureViewGroupsUI::p_instance = 0;
 void StructureViewGroupsUI::ShowUI(QJsonObject structureView) {
@@ -150,7 +148,7 @@ void StructureViewGroupsUI::fill(QJsonObject structureView)
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
 			StructureViewsEditUI* viewgroup = new StructureViewsEditUI(0,item.toObject(),this->restrictedTypes);
 
-			QObject::connect(viewgroup,SIGNAL(updateLayout()),this,SLOT(updateLayout()));
+            QObject::connect(viewgroup,SIGNAL(updateLayout()),this,SLOT(updateLayout()));
 			QObject::connect(viewgroup, SIGNAL(styleChanged()),this, SLOT(viewGroupStyleChanged()));
 			viewgroup->loadGroup();
 			QJsonObject viewGroupObject = item.toObject().value("Viewgroup").toObject();
@@ -250,7 +248,7 @@ void StructureViewGroupsUI::editControllerCancelPressed()
 void StructureViewGroupsUI::editControllerSavePressed()
 {
 	QJsonObject savedObj = this->save() ;
-	//qDebug() << __FILE__ << __LINE__  <<"SAVE: editControllerSavePressed"<< savedObj;
+    //qDebug() << __FILE__ << __LINE__  <<"SAVE: editControllerSavePressed"<< savedObj;
 	if(savedObj.value("document_id") == QJsonValue::Undefined)
 		Controller::Get()->storeDoc("ViewStructure",QJsonDocument(savedObj));
 	else Controller::Get()->UpdateDoc(QJsonDocument(savedObj));
@@ -277,6 +275,7 @@ QStringList StructureViewGroupsUI::getFeildsNames()
 			}
 
 		}
+
 	emit gotFieldsNames(feildNames);
 	return feildNames;
 }
@@ -295,11 +294,16 @@ void StructureViewGroupsUI::getTableFields(ERPComboBox* excludeSource)
 	emit gotSourcesJson(sourcesList);
 }
 
+QJsonObject StructureViewGroupsUI::getStructureView() const
+{
+    return structureView;
+}
+
 
 void StructureViewGroupsUI::paintEvent(QPaintEvent * event)
 {
-	QStyleOption opt;
-	opt.init(this);
+    QStyleOption opt;
+    opt.init(this);
 	QPainter p(this);
 	style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 	QWidget::paintEvent(event);
