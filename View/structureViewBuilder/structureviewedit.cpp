@@ -354,7 +354,7 @@ void StructureViewEdit::controller_Clicked(QString btn)
 	else if(btn.contains("Save")){
         // (this->label->text());
 
-        if (Controller::Get()->checkLabelDuplicates(this->label->text()) == false){ //CAlling the COntroller to avoid label duplication
+        if (Controller::Get()->checkLabelDuplicates(this->label->text()) == false){ //Calling the Controller to avoid label duplication
 
             this->structureView = this->save();
             this->updatePreview(false);

@@ -1330,7 +1330,7 @@ void Controller::Log(QStringList log){
  * @return whether there is a duplicate or not
  * @author Andrew Assad
  */
-bool Controller::checkLabelDuplicates(QString newLabel)
+bool Controller::checkLabelDuplicates(QString newLabel) // Function
 {
     int labelCount =0;
     QJsonObject structureViewGroups= StructureViewGroupsUI::GetUI()->save();;
