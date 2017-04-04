@@ -42,25 +42,30 @@ bool Prsistance::init()
 	database->query("SELECT (SELECT name  FROM system:indexes WHERE  keyspace_id ='"+QString(DATABASE)+"' AND state = 'deferred')[*].name");
 	if(!database->getArray().isEmpty() && database->getArray().count() > 0){
 		qDebug() << "Building Indexs";
+		/**
+		 * @brief building indexes
+		 */
 		QStringList indexes;
-		indexes<<"CREATE INDEX `AM_OrederInproducts_idx` ON `AM`(`OrederIn`) WHERE ((((meta(self).`id`) like'OrederIn:products:: %')and (`OrederIn` like   'OrederIn::%' )) and (`OrederIn` is not missing))";
-		indexes<<"CREATE INDEX `AM_OrederInO0_idx` ON `AM`(`رقم`) WHERE ((meta(self).`id`) like 'OrederIn::%')";
-		indexes<<"CREATE INDEX `AM_clientsc0_idx` ON `AM`(`رقم`) WHERE ((meta(self).`id`) like 'clients::%')";
-		indexes<<"CREATE PRIMARY INDEX `primary-idx` ON `AM`";
+		indexes<<"CREATE INDEX `AM_OrederInproducts_idx` ON '"+QString(DATABASE)+"'(`OrederIn`) WHERE ((((meta(self).`id`) like'OrederIn:products:: %')and (`OrederIn` like   'OrederIn::%' )) and (`OrederIn` is not missing))";
+		indexes<<"CREATE INDEX `AM_OrederInO0_idx` ON '"+QString(DATABASE)+"'(`رقم`) WHERE ((meta(self).`id`) like 'OrederIn::%')";
+		indexes<<"CREATE INDEX `AM_clientsc0_idx` ON'"+QString(DATABASE)+"'(`رقم`) WHERE ((meta(self).`id`) like 'clients::%')";
+		indexes<<"CREATE PRIMARY INDEX `primary-idx` ON '"+QString(DATABASE)+"'";
 
-		for (QStringList::iterator indexes_iterator = indexes.begin();
-			 indexes_iterator != indexes.end(); ++indexes_iterator) {
-				QString currentIndex = *indexes_iterator;
-				database->query(currentIndex);
-				//qDebug() <<(current.split("CREATE INDEX")[1]).split("ON")[0];
+		for (QStringList::iterator indexes_iterator = indexes.begin();indexes_iterator != indexes.end(); ++indexes_iterator) {
+			QString currentIndex = *indexes_iterator;
+			database->query(currentIndex);
+//			while (CountIndexes(currentIndex.split("INDEX")[1].split("ON")[0]) <1 ) {
+//				QThread::sleep(1);
+//				}
 			}
-		foreach(QJsonValue index,database->getArray().first().object().value("name").toArray()){
-			database->query("BUILD INDEX ON `"+QString(DATABASE)+"`(`"+index.toString()+"`) USING GSI;");
-			while (CountIndexes(index.toString()) <1 ) {
-				QThread::sleep(6);
-				}
 
-			}
+//		foreach(QJsonValue index,database->getArray().first().object().value("name").toArray()){
+//			database->query("BUILD INDEX ON `"+QString(DATABASE)+"`(`"+index.toString()+"`) USING GSI;");
+//			while (CountIndexes(index.toString()) <1 ) {
+//				QThread::sleep(6);
+//				}
+
+//			}
 
 
 

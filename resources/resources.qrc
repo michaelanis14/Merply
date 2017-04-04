@@ -54,6 +54,7 @@
         <file>icons/1479148675_seo_fun-05.png</file>
         <file>icons/1479148684_free-38.png</file>
         <file>icons/1479148686_free-38.png</file>
+        <file>search.png</file>
     </qresource>
     <qresource prefix="/">
         <file>example4.xml</file>

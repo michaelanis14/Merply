@@ -4,6 +4,8 @@
 #include "rangevalidator.h"
 #include "erpcombobox.h"
 #include "merplytabelview.h"
+#include "settingsctrlsui.h"
+#include "searchui.h"
 
 #include <QObject>
 #include <QWidget>
@@ -15,6 +17,7 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QJsonArray>
+
 
 
 
@@ -35,11 +38,13 @@ private:
 	QString strID;
 	merplyTabelView * table;
 	ERPComboBox* localFilterCombobox;
+	SettingsCtrlsUI* sctrlUI;
 signals:
-
+	void btnClicked(QString);
 public slots:
 	void indexedFillEvent(QString completion);
 	void linkPressed();
+	void btnSearch_Clicked();
 	void refrenceData(QVector<QJsonDocument> items);
 	void serialData(QString serial);
 	void updateFilter(QString filter);

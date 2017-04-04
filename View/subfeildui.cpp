@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cstdlib>
 
+
 SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView, QJsonValue data) : QWidget(parent)
 {
 
@@ -28,8 +29,15 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		//qDebug() << __FILE__ << __LINE__ <<"SELECT" << structureView.value("Select");
 		if(structureView.value("Editable").toString().compare("false") == 0)
 			combox->setEditable(false);
+
+		sctrlUI = new SettingsCtrlsUI();
+		sctrlUI->addbtn("Search",":/resources/icons/search.png","search");
+		QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btnSearch_Clicked()));
+
 		layout->addWidget(combox);
+		layout->addWidget(sctrlUI);
 		field = combox;
+
 		if(structureView.value("LocalFilter") != QJsonValue::Undefined && structureView.value("LocalFilter").toBool()){
 			//qDebug() << __FILE__ << __LINE__  << "local Field"<< structureView.value("Local").toString();
 			//qDebug() << __FILE__ << __LINE__  << Controller::Get()->getFirstSubField(structureView.value("Local").toString());
@@ -323,6 +331,12 @@ void SubFieldUI::linkPressed()
 {
 	Controller::Get()->linkPressed(this->structureView);
 }
+
+void SubFieldUI::btnSearch_Clicked()
+{
+	SearchUI::ShowUI(strID,QVector<QJsonDocument>());
+}
+
 
 void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 {
