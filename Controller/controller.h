@@ -63,6 +63,7 @@ public:
 	QString toString(QString key = "",QJsonValue value = QJsonValue());
 	bool documentInList(QVector<QJsonDocument> all, QString key);
 	QVector<QJsonDocument> getEnities();
+    QStringList getLabelNames();
 	void getFields(QString Title);
 	void getIndexHeader(QString title);
 	void updateLayoutViewGroups(QString entityName, QList<StructureViewsEditUI*> sVEUIs);

@@ -37,7 +37,7 @@
 
 
 
-
+//als
 Controller::Controller(QObject *parent) :
 	QObject(parent)
 {
@@ -451,6 +451,23 @@ void Controller::getFields(QString Title)
 		database->query(query);
 		}
 }
+
+QStringList Controller::getLabelNames()
+{
+    QStringList labels;
+    if(StructureViewGroupsUI::GetUI()){
+
+    QJsonObject structureViewGroups = StructureViewGroupsUI::GetUI()->save();
+    foreach(QJsonValue viewGroupsStruct,structureViewGroups.value("Viewgroups").toArray()){
+        foreach(QJsonValue labelStruct,viewGroupsStruct.toObject().value("Viewgroup").toObject().value("Fields").toArray()){
+            labels << labelStruct.toObject().value("Label").toString();
+        }
+    }
+    }
+    qDebug()<<labels;
+    return labels;
+}
+
 
 
 
@@ -1350,6 +1367,7 @@ bool Controller::checkLabelDuplicates(QString newLabel) // Function
    return false;
 
 }
+
 
 ////////Controlling the Model_ Model Functions //////////////////////
 
