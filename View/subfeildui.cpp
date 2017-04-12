@@ -71,7 +71,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		else if(structureView.value("InputDataType").toString().compare("DoubleToMillion")== 0)
 			lineEdit->setValidator( new QDoubleValidator(0, 1000000,2, this) );
 		layout->addWidget(lineEdit);
-		field = lineEdit;
+        field = lineEdit;
 		}
 	else if(type.compare("TextArea") == 0){
 
@@ -166,7 +166,9 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		if(!dataString.isEmpty()){
 			lineEdit->setText(dataString);
 			}
-		///TODO: INCREMENT BASED ON YEAR !!!!
+
+
+        ///TODO: INCREMENT BASED ON YEAR !!!!
 		else{
 			if(structureView.value("startNum") != QJsonValue::Undefined){
 				lineEdit->setText(QString::number(structureView.value("startNum").toInt()));
@@ -212,7 +214,42 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		//	}
 
 		}
+
+    else if (type.compare("Query") == 0){
+        QLineEdit* userQuery = new QLineEdit();
+        field = userQuery;
+        userQuery->setContentsMargins(0,0,0,0);
+        userQuery->setEnabled(false);
+        updateQueryField();
+        layout->addWidget(userQuery);
+
+    }
 	else field  = new QWidget();
+}
+void SubFieldUI::updateQueryField()//Slot for updating query line according to the user's choice
+{
+    QString queryText = structureView.value("QueryText").toString();
+    //qDebug() <<structureView;
+
+    QJsonArray queryListSaved = structureView.value("QueriesReplacments").toArray();
+    foreach(QJsonValue querySaved,queryListSaved){
+        SubFieldUI* query = Controller::Get()->getFirstSubField(querySaved.toObject().value("EntityReference").toString());
+        if(QString(query->field->metaObject()->className()).compare("ERPComboBox") == 0 )
+        {
+            queryText.replace(querySaved.toObject().value("Keyword").toString(), ((ERPComboBox*)query->field)->getKey());
+            QObject::disconnect(((ERPComboBox*)query->field),SIGNAL(currentIndexChanged(QString)),this,SLOT(updateQueryField()));
+            QObject::connect(((ERPComboBox*)query->field),SIGNAL(currentIndexChanged(QString)),this,SLOT(updateQueryField()));
+            }
+
+        else if (QString(query->field->metaObject()->className()).compare("QLineEdit") == 0)
+        {
+            queryText.replace(querySaved.toObject().value("Keyword").toString(), ((QLineEdit*)query->field)->text());
+            QObject::disconnect(((QLineEdit*)query->field),SIGNAL(textChanged(QString)),this,SLOT(updateQueryField()));
+            QObject::connect(((QLineEdit*)query->field),SIGNAL(textChanged(QString)),this,SLOT(updateQueryField()));
+            //qDebug()<<queryText;
+        }
+    }
+
 }
 
 void SubFieldUI::clear()

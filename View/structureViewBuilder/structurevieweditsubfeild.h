@@ -5,7 +5,7 @@
 
 #include "structurevieweditsubfeildtable.h"
 #include "structurevieweditsubfeildequation.h"
-
+#include "structurevieweditsubfieldquery.h"
 
 #include <QObject>
 #include <QWidget>
@@ -25,6 +25,7 @@ public:
 	QFormLayout *layout;
 	QString getType();
 	StructureVieweditSubFeildTable* getTableEdit() const;
+    void savedQueryAdditionUI(QString key, QString replacment);
 
 private:
 	StructureVieweditSubFeildTable* tableEdit;
@@ -34,6 +35,8 @@ private:
 	QCheckBox* Editable;
 	QLineEdit* defaultValue;
 	QLineEdit* charCount;
+    QTextEdit* query;
+    QList<StructureVieweditSubFieldQuery*> queryList;
 	ERPComboBox* inputDataType;
 	bool loadData;
 	QLineEdit* title;
@@ -71,9 +74,12 @@ public slots:
 	void gotSourceData(QVector<QJsonDocument> items);
 	void filterOnChanged(int index);
 	void fillLocalFilter(QStringList feilds);
+    void addNewQuery();
 
+    void removeQuery(QWidget* queryWidget);
 	void addEquationWidget(QJsonObject data = QJsonObject());
 	void removeEqElement(QWidget* eqElement);
+    void addQueryWidgetData();
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILD_H

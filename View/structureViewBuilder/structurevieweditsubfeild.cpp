@@ -6,6 +6,7 @@
 #include "controller.h"
 #include "prsistance.h"
 #include "removebtn.h"
+#include "structurevieweditsubfieldquery.h"
 
 StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(parent)
 {
@@ -59,7 +60,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	if(!restrictedTypes.isEmpty()){
 		types << restrictedTypes;
 		}else
-		types << "Index"<<"Text"<< "Refrence" <<"Date"<< "Fixed" <<"Serial" << "Table" <<"TextArea" <<"Equation";
+        types << "Index"<<"Text"<< "Refrence" <<"Date"<< "Fixed" <<"Serial" << "Table" <<"TextArea" <<"Equation" <<"Query";
 	typeSelect->addItems(types);
 	typeSelect->setCurrentIndex(types.indexOf(type));
 	//if(restrictedTypes.isEmpty())
@@ -204,9 +205,44 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 			addEquationWidget(equationTerm.toObject());
 			}
 		}
+    else if (type.compare("Query") == 0){
+        // qDebug() << fieldVS.toObject();
 
 
+        QPushButton* addQuery = new QPushButton("Add Query");
+        QObject::connect(addQuery,SIGNAL(pressed()),this,SLOT(addNewQuery()));
+        queryList.clear();
+        if(fieldVS.toObject().value("QueryText")!= QJsonValue::Undefined)
+        {
+            query = new QTextEdit(fieldVS.toObject().value("QueryText").toString());
+            layout->addRow(new QLabel(tr("Query")),query);
+            layout->addRow(addQuery);
+            //StructureViewEdit Q = new StructureViewEdit(this,fieldVS,QStringList());
+            //QObject::connect(this,SIGNAL(StructureViewEdit::updateQueryList()),this,SLOT(addQueryWidgetData()));
+            QJsonArray queryListSaved = fieldVS.toObject().value("QueriesReplacments").toArray();
+            foreach(QJsonValue querySaved,queryListSaved){
+                StructureVieweditSubFieldQuery* queryWidget = new StructureVieweditSubFieldQuery();
+                QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),queryWidget,SLOT(setFieldsNames(QStringList)));
+                StructureViewGroupsUI::GetUI()->getFeildsNames();
+                queryWidget->fill(querySaved.toObject().value("EntityReference").toString(),querySaved.toObject().value("Keyword").toString());
+                queryList.push_back(queryWidget);
+                RemoveBtn* removeQuery = new RemoveBtn(this,queryWidget);
+                QObject::connect(removeQuery,SIGNAL(remove(QWidget*)),this,SLOT(removeQuery(QWidget*)));
+                layout->addRow(removeQuery);
+            }
 
+        }
+        else{
+
+            query = new QTextEdit();
+            layout->addRow(new QLabel(tr("Query")),query);
+            layout->addRow(addQuery);
+        }
+
+    }
+    //emit changed();
+
+    //QObject::connect(this,SIGNAL(changed()),SubFieldUI,SLOT(updateQueryField()));
 	mandatory = new QCheckBox(this);
 	if(fieldVS.toObject().value("Mandatory").toBool())
 		mandatory->setChecked(true);
@@ -214,6 +250,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	//previewLayout->addWidget(new SubFieldUI(0,"V",this->save()));
 	//	qDebug() << __FILE__ << __LINE__  <<this->save();
 }
+
 
 QJsonObject StructureVieweditSubFeild::save()
 {
@@ -281,8 +318,33 @@ QJsonObject StructureVieweditSubFeild::save()
 				}
 			saveObject.insert("EquationTerms",equationTerms);
 			}
-		}
+        else if(type.compare("Query") == 0)
+        {
+            saveObject.insert("QueryText",query->toPlainText());
+              //              qDebug() << __FILE__ << __LINE__  <<queryList.count();
+            QJsonArray queriesArray;
+            foreach(StructureVieweditSubFieldQuery* list,queryList){
+                queriesArray.append(list->save());
+               // qDebug() << __FILE__ << __LINE__  << "SAVE QUERY/replace"<< list->save();
+            }
+            //qDebug() << queryList;
+            saveObject.insert("QueriesReplacments",queriesArray);
+        }
+
+
+    }
 	return saveObject;
+}
+
+void StructureVieweditSubFeild::addQueryWidgetData()
+{
+    QJsonArray queryListSaved = fieldVS.toObject().value("QueriesReplacments").toArray();
+    int countIndices=0;
+    foreach (StructureVieweditSubFieldQuery* queryWidget, queryList) {
+       queryWidget->fill(queryListSaved[countIndices].toObject().value("EntityReference").toString(),queryListSaved[countIndices].toObject().value("Keyword").toString());
+       countIndices++;
+    }
+
 }
 
 QString StructureVieweditSubFeild::getType()
@@ -380,7 +442,6 @@ void StructureVieweditSubFeild::updateSelect(QString)
 	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	Controller::Get()->getFields(Source->getKey());
 
-
 }
 
 void StructureVieweditSubFeild::updateSelectData(QList<QString> fields)
@@ -474,6 +535,23 @@ void StructureVieweditSubFeild::removeEqElement(QWidget* eqElement)
 }
 
 
+void StructureVieweditSubFeild::addNewQuery()
+{
+    StructureVieweditSubFieldQuery* queryWidget = new StructureVieweditSubFieldQuery();
+    QObject::connect(StructureViewGroupsUI::GetUI(),SIGNAL(gotFieldsNames(QStringList)),queryWidget,SLOT(setFieldsNames(QStringList)));
+    StructureViewGroupsUI::GetUI()->getFeildsNames();
+    queryList.push_back(queryWidget);
+    RemoveBtn* removeQuery = new RemoveBtn(this,queryWidget);
+    QObject::connect(removeQuery,SIGNAL(remove(QWidget*)),this,SLOT(removeQuery(QWidget*)));
+    layout->addRow(removeQuery);
+}
+
+
+
+void StructureVieweditSubFeild::removeQuery(QWidget* queryWidget)
+{
+    queryList.removeOne((StructureVieweditSubFieldQuery*) queryWidget);
+}
 
 void StructureVieweditSubFeild::paintEvent(QPaintEvent * event)
 {
