@@ -1,4 +1,6 @@
+
 #include "searchui.h"
+#include "controller.h"
 
 SearchUI::SearchUI(QWidget *parent) : MainDisplay(parent)
 {
@@ -10,32 +12,53 @@ SearchUI::SearchUI(QWidget *parent) : MainDisplay(parent)
 	this->setObjectName("SearchUI");
 
 	table = new merplyTabelView(this,false,true);
-	table->indexTable("ViewStructure::Clients",QVector<QJsonDocument>());
+
+	this->strID = strID;
+	QObject::connect(table,SIGNAL(doubleClicked()),this,SLOT(showEditUI()));
+	QPushButton *back = new QPushButton("back");
+	sctrlUI = new SettingsCtrlsUI();
+	sctrlUI->addbtn("Back",":/resources/icons/back.png","back");
+	layout->addWidget(sctrlUI);
 	layout->addWidget(table);
 
-	//table->indexTable("ViewStructure::clients",QVector<QJsonDocument>());
-//	this->
+
+	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(showEditUI()));
+
 }
 SearchUI* SearchUI::p_instance = 0;
-void SearchUI::ShowUI(const QString document_id, const QVector<QJsonDocument> documents) {
 
-	if(p_instance == 0)
-		p_instance = new SearchUI();
+void SearchUI::ShowUI(const QString document_id, const QVector<QJsonDocument> documents,QString strID)
+{
+	p_instance = new SearchUI();
+	Get()->strID = strID;
 	if(p_instance->document_id.compare(document_id) != 0){
 		p_instance->fill(document_id,documents);
 		}
 	MainForm::Get()->ShowDisplay(p_instance);
-//	p_instance->table->generateQuery(50);
+
 }
 
-
-void SearchUI::fill(const QString document_id,const QVector<QJsonDocument> items){
-
+void SearchUI::fill(const QString document_id,const QVector<QJsonDocument> items)
+{
 	this->document_id = document_id;
-	qDebug() << __FILE__ << __LINE__  << document_id ;
 	table->indexTable(document_id,items);
-
-
 }
 
+void SearchUI::showEditUI()
+{
+	Controller::Get()->showCreateEditeStrUI(strID,false);
+}
+
+merplyTabelView* SearchUI::getTable() {
+	return this->table;
+}
+
+
+SearchUI* SearchUI::Get()
+{
+	if (p_instance == 0)
+		p_instance = new SearchUI();
+
+	return p_instance;
+}
 

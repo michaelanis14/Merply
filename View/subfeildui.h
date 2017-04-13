@@ -16,6 +16,7 @@
 #include <QJsonObject>
 #include <QMouseEvent>
 #include <QDebug>
+#include <QShortcut>
 #include <QJsonArray>
 
 
@@ -36,9 +37,12 @@ private:
 	QJsonObject structureView;
 	ERPComboBox* combox;
 	QString strID;
+	QShortcut* searchShortCut;
 	merplyTabelView * table;
 	ERPComboBox* localFilterCombobox;
 	SettingsCtrlsUI* sctrlUI;
+
+protected:
 signals:
 	void btnClicked(QString);
 public slots:
@@ -52,6 +56,7 @@ public slots:
 	void updateEquationField();
 	double getClmnDataCount(QString strct);
 	double evalEquationCondition(int condition,double col1,double col2);
+	void editComboxText(QVector<QString> rowData);
 };
 
 #endif // SUBFIELDUI_H

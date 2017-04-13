@@ -28,10 +28,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-
-
-
-
 class merplyTabelView : public QWidget
 {
 	Q_OBJECT
@@ -49,15 +45,19 @@ public:
 	QModelIndex getIndexAt(QPoint position);
 	QTableView* getTableView() const;
 	void generateQuery(int limit);
+signals:
+	void gotRowData(QVector<QString> rowData);
+	void doubleClicked();
+
 private:
 	QVBoxLayout* layout;
 	QHBoxLayout* lblLayout;
 	QLabel* print;
 	QTableView* tableView;
 	MerplyQueryUI* queryUI;
-
 	HControllers* controllers ;
 	QString currenctPrintID;
+	QVector<QString> clickedRowData;
 	QtRPT *report;
 	bool add;
 	bool edit;
@@ -69,6 +69,8 @@ private:
 	//QStringList headerLabels;
 signals:
 	void updateModel(QVector<QJsonDocument> documents);
+	void doubleClicked(const QModelIndex &index);
+
 
 
 public slots:
@@ -81,6 +83,9 @@ public slots:
 	void controller_Clicked(QString nameAction);
 	void selectionChanged(const QItemSelection &, const QItemSelection &);
 	void resizeTabelToContets();
+	void rowDoubleClicked(QModelIndex);
+
 };
+
 
 #endif // merplyTabelView_H

@@ -9,8 +9,6 @@
 SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView, QJsonValue data) : QWidget(parent)
 {
 
-	//qDebug() << __FILE__ << __LINE__  << "wassup" << structureView;
-	//	qDebug() << __FILE__ << __LINE__  << "data" << data;
 	this->structureView = QJsonObject();
 	this->structureView = structureView;
 	layout = new QHBoxLayout(this);
@@ -22,28 +20,25 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 	this->combox = 0;
 	QString type = structureView.value("Type").toString();
 
-
-
 	if(type.compare("Refrence") == 0){
 		combox = new ERPComboBox(this,false);
-		//qDebug() << __FILE__ << __LINE__ <<"SELECT" << structureView.value("Select");
 		if(structureView.value("Editable").toString().compare("false") == 0)
 			combox->setEditable(false);
 
 		sctrlUI = new SettingsCtrlsUI();
 		sctrlUI->addbtn("Search",":/resources/icons/search.png","search");
 		QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btnSearch_Clicked()));
-
+		searchShortCut = new QShortcut(QKeySequence(Qt::Key_F8), this,SLOT(btnSearch_Clicked()));
+		searchShortCut->setEnabled(true);
 		layout->addWidget(combox);
 		layout->addWidget(sctrlUI);
 		field = combox;
 
 		if(structureView.value("LocalFilter") != QJsonValue::Undefined && structureView.value("LocalFilter").toBool()){
-			//qDebug() << __FILE__ << __LINE__  << "local Field"<< structureView.value("Local").toString();
-			//qDebug() << __FILE__ << __LINE__  << Controller::Get()->getFirstSubField(structureView.value("Local").toString());
+			qDebug() << __FILE__ << __LINE__  << Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			SubFieldUI* localFilter = Controller::Get()->getFirstSubField(structureView.value("Local").toString());
 			if(localFilter->combox){
-				//qDebug() << __FILE__ << __LINE__  << "COMBO";
+				qDebug() << __FILE__ << __LINE__  << "COMBO";
 				QObject::connect(localFilter->combox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateFilter(QString)));
 				this->updateFilter(localFilter->combox->currentText());
 				//emit localFilter->combox->currentIndexChanged(localFilter->combox->currentIndex());
@@ -54,17 +49,18 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			}
 		else{
 			if(!structureView.value("Source").toString().isEmpty() && structureView.value("Source").toString().compare("_") != 0){
-				//	qDebug() << __FILE__ << __LINE__  << "NOT LOACL FILTER" <<structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Condition").toString() ;
 				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
 				Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Condition").toString());
+				//qDebug() << __FILE__ << __LINE__  << "currentText"<<structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Condition").toString();
 				}
 			}
 		QJsonObject dataObj = data.toObject();
-		//	qDebug() << __FILE__ << __LINE__  << data;
+		qDebug()<<__FILE__<<__LINE__<<"source isss"<<combox->currentIndex();
 		if(!dataObj.isEmpty()){
 			combox->setCurrentIndex(combox->findText(dataObj.value("Value").toString()));
 			}
-		//qDebug() << __FILE__ << __LINE__  << structureView.value("Source").toString() << structureView.value("Select").toString();
+		//combox->setCurrentText("test");
+
 		}
 	else if(type.compare("Text") == 0){
 
@@ -280,7 +276,8 @@ QJsonValue SubFieldUI::save()
 		save = QString(((QDateTimeEdit*)field)->dateTime().toString(Qt::ISODate));
 		//qDebug() << save;
 		}
-	//	qDebug() << __FILE__ << __LINE__<< save;
+
+
 	return save;
 }
 
@@ -334,9 +331,10 @@ void SubFieldUI::linkPressed()
 
 void SubFieldUI::btnSearch_Clicked()
 {
-	SearchUI::ShowUI(strID,QVector<QJsonDocument>());
+	searchShortCut->setEnabled(false);
+	SearchUI::ShowUI(structureView.value("Source").toString(),QVector<QJsonDocument>(),strID);
+	QObject::connect(SearchUI::Get()->getTable(),SIGNAL(gotRowData(QVector<QString>)),this,SLOT(editComboxText(QVector<QString>)));
 }
-
 
 void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 {
@@ -346,11 +344,10 @@ void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 		combox->clear();
 		combox->addJsonItems(items);
 		}
-	//qDebug() << structureView.value("Default") << structureView;
 	if(structureView.value("Default") != QJsonValue::Undefined){
 		combox->setCurrentIndex(structureView.value("Default").toString().toInt());
 		}
-	//qDebug() << __FILE__ << __LINE__  << items;
+
 }
 
 void SubFieldUI::serialData(QString serial)
@@ -360,11 +357,6 @@ void SubFieldUI::serialData(QString serial)
 	int oldValue = structureView.value("currentNum").toInt();
 	int startNum = structureView.value("startNum").toInt();
 	int serializedNum = newValue - oldValue + startNum;
-//	qDebug() << __FILE__ << __LINE__  << "card is"<< this->strID.split("ViewStructure::")[1];
-//	qDebug() << __FILE__ << __LINE__  << "new num"<< newValue;
-//	qDebug() << __FILE__ << __LINE__  << "old num"<< oldValue;
-//	qDebug() << __FILE__ << __LINE__  << "start num"<< startNum;
-//	qDebug() << __FILE__ << __LINE__  << "serialized num"<< serializedNum;
 
 	((QLineEdit*)field)->setText(QString::number(serializedNum));
 
@@ -607,4 +599,13 @@ double SubFieldUI::evalEquationCondition(int condition, double col1, double col2
 		else return col2;
 		}
 	return 0;
+}
+
+void SubFieldUI::editComboxText(QVector<QString> rowData){
+
+	qDebug() << __FILE__ << __LINE__  <<"here"<<structureView.value("Source").toString();
+	qDebug() << __FILE__ << __LINE__  <<"combox key"<<combox->getKey();
+	if(!rowData.isEmpty())
+		combox->setCurrentText(rowData.last());
+
 }
