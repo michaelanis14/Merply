@@ -93,7 +93,6 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 
 		if(nActon.count() > 1){
 			if(nActon.at(1).compare("Add") == 0){
-
 				if(model->insertRow(model->rowCount(QModelIndex()))){
 
 					QModelIndex index = tableView->model()->index((model->getRowsCount()-1),0, QModelIndex());
@@ -160,17 +159,6 @@ bool merplyTabelView::fill(QJsonObject columns,QString filter)
 {
 	//TODO: Better connect to Signals
 	model = new MerplyReportTableModel(columns);
-
-
-	// Multiple rows can be selected
-//	if(!selection.isEmpty()){
-//	for(int i=0; i< selection.count(); i++)
-//	{
-//		QModelIndex index = selection.at(i);
-//		qDebug() <<"row is" <<index.row();
-//	}
-//		}
-
 	bool initDelegate = true;
 	//	queryUI->fill(columns);
 	if(columns.value("QueryUI") != QJsonValue::Undefined){
@@ -486,12 +474,10 @@ void merplyTabelView::gotReportData(QVector<QJsonDocument> documents)
 void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
-
+	this->headerItems = headerItems;
 	QJsonObject clmnObj = QJsonObject();
 	clmnObj.insert("clmnsHeader",QJsonValue::fromVariant(QVariant(headerItems)));
 	model = new MerplyReportTableModel(clmnObj);
-//	for(int i =0;i<headerItems.size();i++)
-//		qDebug()<<__FILE__<<__LINE__<<"headerItems"<<headerItems[i];
 	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 	model->fillIndexTabel(items);
 	if(!indexDocument_id.isEmpty()){
@@ -499,10 +485,6 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 		QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
 		queryUI->fillDocumentID(indexDocument_id);
 		}
-
-
-
-
 }
 
 void merplyTabelView::setValue(const int , const QString paramName, QVariant& paramValue, const int )
@@ -516,17 +498,13 @@ void merplyTabelView::setValue(const int , const QString paramName, QVariant& pa
 
 void merplyTabelView::modelFinished()
 {
-
 	QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
-
-
 	tableView->setModel(model);
 	tableView->viewport()->installEventFilter(new QToolTipper(tableView));
 	/**
 	 * @brief getting a signal when user double click on a row
 	 */
 	QObject::connect(tableView,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(rowDoubleClicked(QModelIndex)));
-
 
 	QObject::disconnect(
 				tableView->selectionModel(),
@@ -544,16 +522,22 @@ void merplyTabelView::modelFinished()
 	//this->repaint();
 }
 /**
- * @brief merplyTabelView::rowDoubleClicked saves data of clicked row in QVector
+ * @brief merplyTabelView::rowDoubleClicked saves data of clicked row in QVector containing headers of the table in the format of (header,data)
  * @param modelIndex
+ * @author Safa Ads
  */
 void merplyTabelView::rowDoubleClicked(QModelIndex modelIndex)
 {
-	for (int i=0; i< modelIndex.model()->columnCount(); i++)
-		clickedRowData.insert(i,tableView->model()->data(tableView->model()->index(modelIndex.row(),i)).toString());
+	if(!headerItems.isEmpty()){
+		for (int i=1; i< modelIndex.model()->columnCount(); i++){
+			clickedRowData.insert(i-1,tableView->model()->data(tableView->model()->index(modelIndex.row(),i)).toString());
+			clickedRowData[i-1].append(",").append(headerItems[i-1]);
+		}
+	}
 	emit gotRowData(this->clickedRowData);
 	emit doubleClicked();
 	QObject::disconnect(tableView,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(rowDoubleClicked(QModelIndex)));
 }
+
 
 

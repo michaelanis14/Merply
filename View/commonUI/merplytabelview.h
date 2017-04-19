@@ -45,9 +45,6 @@ public:
 	QModelIndex getIndexAt(QPoint position);
 	QTableView* getTableView() const;
 	void generateQuery(int limit);
-signals:
-	void gotRowData(QVector<QString> rowData);
-	void doubleClicked();
 
 private:
 	QVBoxLayout* layout;
@@ -65,13 +62,13 @@ private:
 	void initDelegateClmns(QJsonObject columns);
 	QVector<MTabelCombobox *> delegateItems;
 	QString indexDocument_id;
-	//QStandardItemModel *model;
-	//QStringList headerLabels;
+	QList<QString> headerItems;
+
 signals:
 	void updateModel(QVector<QJsonDocument> documents);
 	void doubleClicked(const QModelIndex &index);
-
-
+	void gotRowData(QVector<QString> rowData);
+	void doubleClicked();
 
 public slots:
 	void printTabel();
@@ -84,7 +81,6 @@ public slots:
 	void selectionChanged(const QItemSelection &, const QItemSelection &);
 	void resizeTabelToContets();
 	void rowDoubleClicked(QModelIndex);
-
 };
 
 

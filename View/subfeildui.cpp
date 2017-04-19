@@ -20,6 +20,9 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 	this->combox = 0;
 	QString type = structureView.value("Type").toString();
 
+	searchShortCut = new QShortcut(QKeySequence(Qt::Key_F8), this, SLOT(btnSearch_Clicked()));
+	this->searchShortCut->setEnabled(true);
+
 	if(type.compare("Refrence") == 0){
 		combox = new ERPComboBox(this,false);
 		if(structureView.value("Editable").toString().compare("false") == 0)
@@ -28,8 +31,6 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		sctrlUI = new SettingsCtrlsUI();
 		sctrlUI->addbtn("Search",":/resources/icons/search.png","search");
 		QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(btnSearch_Clicked()));
-		searchShortCut = new QShortcut(QKeySequence(Qt::Key_F8), this,SLOT(btnSearch_Clicked()));
-		searchShortCut->setEnabled(true);
 		layout->addWidget(combox);
 		layout->addWidget(sctrlUI);
 		field = combox;
@@ -55,12 +56,9 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 				}
 			}
 		QJsonObject dataObj = data.toObject();
-		qDebug()<<__FILE__<<__LINE__<<"source isss"<<combox->currentIndex();
 		if(!dataObj.isEmpty()){
 			combox->setCurrentIndex(combox->findText(dataObj.value("Value").toString()));
 			}
-		//combox->setCurrentText("test");
-
 		}
 	else if(type.compare("Text") == 0){
 
@@ -350,6 +348,7 @@ void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 
 }
 
+
 void SubFieldUI::serialData(QString serial)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
@@ -600,12 +599,16 @@ double SubFieldUI::evalEquationCondition(int condition, double col1, double col2
 		}
 	return 0;
 }
-
-void SubFieldUI::editComboxText(QVector<QString> rowData){
-
-	qDebug() << __FILE__ << __LINE__  <<"here"<<structureView.value("Source").toString();
-	qDebug() << __FILE__ << __LINE__  <<"combox key"<<combox->getKey();
-	if(!rowData.isEmpty())
-		combox->setCurrentText(rowData.last());
-
+/**
+ * @brief SubFieldUI::editComboxText, it sets the text of combox based on the clicked row
+ * @param rowData
+ * @author Safa Ads
+ */
+void SubFieldUI::editComboxText(QVector<QString> rowData)
+{
+	for(int i =0; i<rowData.size();i++){
+		QString dataHeader = rowData[i].split(",")[1];
+		if(dataHeader.compare(structureView.value("Select").toString())==0)
+			combox->setCurrentText(rowData[i].split(",")[0]);
+		}
 }

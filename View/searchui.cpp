@@ -10,17 +10,13 @@ SearchUI::SearchUI(QWidget *parent) : MainDisplay(parent)
 	layout->setSpacing(0);
 	this->setContentsMargins(2,2,2,2);
 	this->setObjectName("SearchUI");
-
 	table = new merplyTabelView(this,false,true);
-
 	this->strID = strID;
 	QObject::connect(table,SIGNAL(doubleClicked()),this,SLOT(showEditUI()));
-	QPushButton *back = new QPushButton("back");
 	sctrlUI = new SettingsCtrlsUI();
 	sctrlUI->addbtn("Back",":/resources/icons/back.png","back");
 	layout->addWidget(sctrlUI);
 	layout->addWidget(table);
-
 
 	QObject::connect(sctrlUI, SIGNAL(btnClicked(QString)),this, SLOT(showEditUI()));
 
@@ -58,7 +54,6 @@ SearchUI* SearchUI::Get()
 {
 	if (p_instance == 0)
 		p_instance = new SearchUI();
-
 	return p_instance;
 }
 

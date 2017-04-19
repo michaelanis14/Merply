@@ -37,10 +37,10 @@ private:
 	QJsonObject structureView;
 	ERPComboBox* combox;
 	QString strID;
-	QShortcut* searchShortCut;
 	merplyTabelView * table;
 	ERPComboBox* localFilterCombobox;
 	SettingsCtrlsUI* sctrlUI;
+	QShortcut* searchShortCut;
 
 protected:
 signals:
