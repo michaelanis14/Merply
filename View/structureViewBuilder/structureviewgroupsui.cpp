@@ -87,12 +87,15 @@ QJsonObject StructureViewGroupsUI::save()
 		return saveObject;
 	saveObject.insert("Title",headerlbl->getTitle());
 	saveObject.insert("Type","Entity");
+
 	if(!saveAs->getTitle().trimmed().isEmpty()){
 		saveObject.insert("SaveAs",saveAs->getTitle().trimmed());
 		}
+
 	QJsonArray ViewGroups;
 	foreach(StructureViewsEditUI * strcViewUI,sVSFUIs){
 		QJsonObject viewGroup;
+        //qDebug() << "ADiwa7da ";
         viewGroup.insert("Viewgroup",strcViewUI->save());
 		ViewGroups << viewGroup;
 		}
@@ -191,8 +194,10 @@ void StructureViewGroupsUI::fill(QJsonObject structureView)
 
 StructureViewGroupsUI* StructureViewGroupsUI::GetUI()
 {
-	if (p_instance == 0)
+    if (p_instance == 0){
+        qDebug() << __FILE__ << __LINE__ << "NOT INITTTTTTTTTTT";
 		p_instance = new StructureViewGroupsUI();
+    }
 	return p_instance;
 }
 
@@ -274,8 +279,7 @@ QStringList StructureViewGroupsUI::getFeildsNames()
 				}
 			}
 
-		}
-
+        }
 	emit gotFieldsNames(feildNames);
 	return feildNames;
 }

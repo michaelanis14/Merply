@@ -2,6 +2,8 @@
 #include "controller.h"
 
 #include<QDateTimeEdit>
+#include "structurevieweditsubfieldpiechart.h"
+
 
 SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView, QJsonValue data) : QWidget(parent)
 {
@@ -224,6 +226,16 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
         layout->addWidget(userQuery);
 
     }
+    else if(type.compare("Charts") == 0 )
+    {
+        QPushButton* addChart = new QPushButton("Add Data");
+        StructureViewEditSubFieldPieChart* chart = new StructureViewEditSubFieldPieChart();
+        chart->fill(structureView);
+        layout->addWidget(chart->getPieChart());
+        field = addChart;
+        layout->addWidget(field);
+
+    }
 	else field  = new QWidget();
 }
 void SubFieldUI::updateQueryField()//Slot for updating query line according to the user's choice
@@ -250,6 +262,14 @@ void SubFieldUI::updateQueryField()//Slot for updating query line according to t
         }
     }
 
+}
+
+void SubFieldUI::updateChartField()//Slot for updating Chart line according to the user's choice
+{
+    if(structureView.value("ChartType").toString() == "Pie Chart")
+    {
+
+    }
 }
 
 void SubFieldUI::clear()

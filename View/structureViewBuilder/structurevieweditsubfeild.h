@@ -37,6 +37,7 @@ private:
 	QLineEdit* charCount;
     QTextEdit* query;
     QList<StructureVieweditSubFieldQuery*> queryList;
+    ERPComboBox* charts;
 	ERPComboBox* inputDataType;
 	bool loadData;
 	QLineEdit* title;

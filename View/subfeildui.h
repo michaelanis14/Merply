@@ -36,6 +36,7 @@ private:
 	merplyTabelView * table;
 	ERPComboBox* localFilterCombobox;
     QLineEdit *queryLineEdit;
+
 signals:
 
 public slots:
@@ -47,7 +48,8 @@ public slots:
 	void updateTable(QString);
 	void updateEquationField();
     void updateQueryField();
-	double getClmnDataCount(QString strct);
+    void updateChartField();
+    double getClmnDataCount(QString strct);
 	double evalEquationCondition(int condition,double col1,double col2);
 };
 

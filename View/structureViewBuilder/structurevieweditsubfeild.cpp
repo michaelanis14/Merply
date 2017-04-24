@@ -7,6 +7,7 @@
 #include "prsistance.h"
 #include "removebtn.h"
 #include "structurevieweditsubfieldquery.h"
+#include "structurevieweditsubfieldpiechart.h"
 
 StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(parent)
 {
@@ -60,7 +61,7 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	if(!restrictedTypes.isEmpty()){
 		types << restrictedTypes;
 		}else
-        types << "Index"<<"Text"<< "Refrence" <<"Date"<< "Fixed" <<"Serial" << "Table" <<"TextArea" <<"Equation" <<"Query";
+        types << "Index"<<"Text"<< "Refrence" <<"Date"<< "Fixed" <<"Serial" << "Table" <<"TextArea" <<"Equation" <<"Query" << "Charts";
 	typeSelect->addItems(types);
 	typeSelect->setCurrentIndex(types.indexOf(type));
 	//if(restrictedTypes.isEmpty())
@@ -241,7 +242,25 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 
     }
     //emit changed();
+    else if (type.compare("Charts") == 0)
+    {
 
+        QList<QString> choices;
+        choices << "Graph Chart" << "Pie Chart" <<"Vertical Bar Graph" <<"Horizontal Bar Graph " <<"Vertical Percentage Graph" << "Horizontal Percentage Graph";
+        charts = new ERPComboBox();
+        charts->addItems(choices);
+        layout->addRow("Choose which Graph",charts);
+        if(fieldVS.toObject().value("ChartType")!= QJsonValue::Undefined)
+        {
+            charts->setCurrentText(fieldVS.toObject().value("ChartType").toString());
+            if(fieldVS.toObject().value("ChartType").toString() == "Pie Chart")
+            {
+                StructureViewEditSubFieldPieChart* pieChart = new StructureViewEditSubFieldPieChart();
+                layout->addWidget(pieChart->getPieChart());
+            }
+        }
+
+    }
     //QObject::connect(this,SIGNAL(changed()),SubFieldUI,SLOT(updateQueryField()));
 	mandatory = new QCheckBox(this);
 	if(fieldVS.toObject().value("Mandatory").toBool())
@@ -330,7 +349,12 @@ QJsonObject StructureVieweditSubFeild::save()
             //qDebug() << queryList;
             saveObject.insert("QueriesReplacments",queriesArray);
         }
-
+        else if (type.compare("Charts")==0)
+        {
+            StructureViewEditSubFieldPieChart* pieChart = new StructureViewEditSubFieldPieChart();
+            saveObject = pieChart->save();
+            saveObject.insert("ChartType",charts->currentText());
+        }
 
     }
 	return saveObject;
