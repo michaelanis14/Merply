@@ -1,4 +1,4 @@
-
+﻿
 
 #include "structureviewgroupsui.h"
 #include "structurevieweditsubfeild.h"
@@ -8,6 +8,9 @@
 #include "removebtn.h"
 #include "structurevieweditsubfieldquery.h"
 #include "structurevieweditsubfieldpiechart.h"
+#include "structurevieweditsubfieldgraphchart.h"
+#include "structurevieweditsubfieldbargraph.h"
+#include "structurevieweditsubfieldpercentagegraph.h"
 
 StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(parent)
 {
@@ -244,9 +247,8 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
     //emit changed();
     else if (type.compare("Charts") == 0)
     {
-
         QList<QString> choices;
-        choices << "Graph Chart" << "Pie Chart" <<"Vertical Bar Graph" <<"Horizontal Bar Graph " <<"Vertical Percentage Graph" << "Horizontal Percentage Graph";
+        choices << "Graph Chart" << "Pie Chart" <<"Vertical Bar Graph" <<"Horizontal Bar Graph" <<"Vertical Percentage Graph" << "Horizontal Percentage Graph";
         charts = new ERPComboBox();
         charts->addItems(choices);
         layout->addRow("Choose which Graph",charts);
@@ -256,7 +258,39 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
             if(fieldVS.toObject().value("ChartType").toString() == "Pie Chart")
             {
                 StructureViewEditSubFieldPieChart* pieChart = new StructureViewEditSubFieldPieChart();
+                pieChart->fill(fieldVS.toObject());
                 layout->addWidget(pieChart->getPieChart());
+            }
+
+            else if(fieldVS.toObject().value("ChartType").toString() == "Graph Chart")
+            {
+                StructureViewEditSubFieldGraphChart* graphChart = new StructureViewEditSubFieldGraphChart();
+                graphChart->fill(fieldVS.toObject());
+                layout->addWidget(graphChart->getGraphChart());
+            }
+            else if(fieldVS.toObject().value("ChartType").toString() == "Vertical Bar Graph")
+            {
+                StructureViewEditSubFieldBarGraph* graphChart = new StructureViewEditSubFieldBarGraph("Vertical");
+                graphChart->fill(fieldVS.toObject());
+                layout->addWidget(graphChart->getGraphChart());
+            }
+            else if(fieldVS.toObject().value("ChartType").toString() == "Horizontal Bar Graph")
+            {
+                StructureViewEditSubFieldBarGraph* graphChart = new StructureViewEditSubFieldBarGraph("Horizontal");
+                graphChart->fill(fieldVS.toObject());
+                layout->addWidget(graphChart->getGraphChart());
+            }
+            else if(fieldVS.toObject().value("ChartType").toString() == "Vertical Percentage Graph")
+            {
+                StructureViewEditSubFieldPercentageGraph* graphChart = new StructureViewEditSubFieldPercentageGraph("Vertical");
+                graphChart->fill(fieldVS.toObject());
+                layout->addWidget(graphChart->getGraphChart());
+            }
+            else if(fieldVS.toObject().value("ChartType").toString() == "Horizontal Percentage Graph")
+            {
+                StructureViewEditSubFieldPercentageGraph* graphChart = new StructureViewEditSubFieldPercentageGraph("Horizontal");
+                graphChart->fill(fieldVS.toObject());
+                layout->addWidget(graphChart->getGraphChart());
             }
         }
 
@@ -351,10 +385,39 @@ QJsonObject StructureVieweditSubFeild::save()
         }
         else if (type.compare("Charts")==0)
         {
+            if(charts->currentText().compare("Pie Chart")==0){
             StructureViewEditSubFieldPieChart* pieChart = new StructureViewEditSubFieldPieChart();
             saveObject = pieChart->save();
-            saveObject.insert("ChartType",charts->currentText());
+            //qDebug() << saveObject;
+            }
+            else if(charts->currentText().compare("Graph Chart")==0){
+            StructureViewEditSubFieldGraphChart* graphChart = new StructureViewEditSubFieldGraphChart();
+            saveObject = graphChart->save();
+            //qDebug() << saveObject;
+            }
+            else if(charts->currentText().compare("Vertical Bar Graph")==0){
+            StructureViewEditSubFieldBarGraph* graphChart = new StructureViewEditSubFieldBarGraph("Vertical");
+            saveObject = graphChart->save();
+            //qDebug() << saveObject;
+            }
+            else if(charts->currentText().compare("Horizontal Bar Graph")==0){
+            StructureViewEditSubFieldBarGraph* graphChart = new StructureViewEditSubFieldBarGraph("Horizontal");
+            saveObject = graphChart->save();
+            //qDebug() << saveObject;
+            }
+            else if(charts->currentText().compare("Vertical Percentage Graph")==0){
+            StructureViewEditSubFieldPercentageGraph* graphChart = new StructureViewEditSubFieldPercentageGraph("Vertical");
+            saveObject = graphChart->save();
+            //qDebug() << saveObject;
+            }
+            else if(charts->currentText().compare("Horizontal Percentage Graph")==0){
+            StructureViewEditSubFieldPercentageGraph* graphChart = new StructureViewEditSubFieldPercentageGraph("Horizontal");
+            saveObject = graphChart->save();
+            //qDebug() << saveObject;
+            }
+            saveObject.insert("Type","Charts");
         }
+
 
     }
 	return saveObject;

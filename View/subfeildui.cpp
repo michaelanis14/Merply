@@ -3,7 +3,9 @@
 
 #include<QDateTimeEdit>
 #include "structurevieweditsubfieldpiechart.h"
-
+#include "structurevieweditsubfieldgraphchart.h"
+#include "structurevieweditsubfieldbargraph.h"
+#include "structurevieweditsubfieldpercentagegraph.h"
 
 SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView, QJsonValue data) : QWidget(parent)
 {
@@ -229,11 +231,56 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
     else if(type.compare("Charts") == 0 )
     {
         QPushButton* addChart = new QPushButton("Add Data");
-        StructureViewEditSubFieldPieChart* chart = new StructureViewEditSubFieldPieChart();
-        chart->fill(structureView);
-        layout->addWidget(chart->getPieChart());
-        field = addChart;
-        layout->addWidget(field);
+        qDebug() << structureView;
+        if(structureView.value("ChartType").toString() == "Pie Chart")
+        {
+            StructureViewEditSubFieldPieChart* chart = new StructureViewEditSubFieldPieChart();
+            chart->fill(structureView);
+            layout->addWidget(chart->getPieChart());
+            field = addChart;
+            layout->addWidget(field);
+        }
+        else if(structureView.value("ChartType").toString() == "Graph Chart")
+        {
+            StructureViewEditSubFieldGraphChart* chart = new StructureViewEditSubFieldGraphChart();
+            chart->fill(structureView);
+            layout->addWidget(chart->getGraphChart());
+            field = addChart;
+            layout->addWidget(field);
+        }
+        if(structureView.value("ChartType").toString() == "Vertical Bar Graph")
+        {
+            StructureViewEditSubFieldBarGraph* chart = new StructureViewEditSubFieldBarGraph("Vertical");
+            chart->fill(structureView);
+            layout->addWidget(chart->getGraphChart());
+            field = addChart;
+            layout->addWidget(field);
+        }
+        if(structureView.value("ChartType").toString() == "Horizontal Bar Graph")
+        {
+            StructureViewEditSubFieldBarGraph* chart = new StructureViewEditSubFieldBarGraph("Horizontal");
+            chart->fill(structureView);
+            layout->addWidget(chart->getGraphChart());
+            field = addChart;
+            layout->addWidget(field);
+        }
+        if(structureView.value("ChartType").toString() == "Vertical Percentage Graph")
+        {
+            StructureViewEditSubFieldPercentageGraph* chart = new StructureViewEditSubFieldPercentageGraph("Vertical");
+            chart->fill(structureView);
+            layout->addWidget(chart->getGraphChart());
+            field = addChart;
+            layout->addWidget(field);
+        }
+        if(structureView.value("ChartType").toString() == "Horizontal Percentage Graph")
+        {
+            StructureViewEditSubFieldPercentageGraph* chart = new StructureViewEditSubFieldPercentageGraph("Horizontal");
+            chart->fill(structureView);
+            layout->addWidget(chart->getGraphChart());
+            field = addChart;
+            layout->addWidget(field);
+        }
+
 
     }
 	else field  = new QWidget();
