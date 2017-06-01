@@ -14,12 +14,13 @@ class StructureViewEdit : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit StructureViewEdit(QWidget *parent = 0, QJsonValue fieldVS = QJsonValue(), QStringList restrictedTypes = QStringList());
+	explicit StructureViewEdit(QWidget *parent = 0, QJsonObject fieldVS = QJsonObject(), QStringList restrictedTypes = QStringList());
 	QJsonObject save();
 	void showTypeFields();
 	void hideTypeFields();
 	SettingsCtrlsUI* topCntrlsPreview;
 	QLineEdit* label;
+
 	QCheckBox* hideLabel;
 	QCheckBox* hideField;
 	QCheckBox* initData;

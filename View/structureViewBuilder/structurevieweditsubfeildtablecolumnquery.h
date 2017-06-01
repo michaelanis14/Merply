@@ -33,8 +33,8 @@ signals:
 
 public slots:
 	void updateSelect(QString);
-	void updateSelectData(QList<QString> fields);
-	void gotSourceData(QVector<QJsonDocument> items);
+	void updateSelectData(QList<int> fields);
+	void gotSourceData();
 };
 
 #endif // STRUCTUREVIEWEDITSUBFEILDTABLECOLUMNQUERY_H

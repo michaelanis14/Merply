@@ -3,14 +3,14 @@
 
 CouchbaseLibManager::CouchbaseLibManager(QObject *parent,int poolCount,QString connStr) : QObject(parent)
 {
-	this->connStr = connStr;
-	this->poolCount = poolCount;
-	init(poolCount,connStr);
+//	this->connStr = connStr;
+//	this->poolCount = poolCount;
+//	init(poolCount,connStr);
 }
 
 
 
-
+ /*
  CouchbaseLibManager* CouchbaseLibManager::Get(int poolCount,QString connStr)
 {
 	if ( p_instance == 0){
@@ -18,6 +18,7 @@ CouchbaseLibManager::CouchbaseLibManager(QObject *parent,int poolCount,QString c
 		}
 	return p_instance;
 }
+
 
 lcb_t CouchbaseLibManager::popConnection()
 {
@@ -37,6 +38,7 @@ void CouchbaseLibManager::pushConnection(lcb_t instance)
 
 void CouchbaseLibManager::init(int poolCount,QString connStr)
 {
+	/*
 	for(int i = 0; i < poolCount; i++){
 	//	qDebug() << __FILE__ << __LINE__  << "init";
 		connStr = "couchbase://localhost/"+QString(DATABASE);
@@ -69,10 +71,11 @@ void CouchbaseLibManager::init(int poolCount,QString connStr)
 			}
 		couchbaseConnectPool.push(instance);
 		}
+		//
 }
 
 
 
+*/
 
-
-CouchbaseLibManager* CouchbaseLibManager::p_instance = 0;
+//CouchbaseLibManager* CouchbaseLibManager::p_instance = 0;

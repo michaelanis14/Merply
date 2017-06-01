@@ -1,9 +1,11 @@
 #include "structureviewedit.h"
 #include "removebtn.h"
+#include "controller.h"
+
 #include <QWidget>
 #include <QPushButton>
 
-StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStringList restrictedTypes) : QWidget(parent)
+StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonObject fieldVS, QStringList restrictedTypes) : QWidget(parent)
 {
 
 
@@ -11,7 +13,7 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 	this->setContentsMargins(2,2,2,2);
 
 	this->restrictedTypes = restrictedTypes;
-	this->structureView = fieldVS.toObject();
+	this->structureView = fieldVS;
 
 	layout = new QHBoxLayout(0);
 	layout->setContentsMargins(2,2,2,2);
@@ -69,19 +71,23 @@ StructureViewEdit::StructureViewEdit(QWidget *parent, QJsonValue fieldVS, QStrin
 
 	//TODO:   QObject::connect(label,SIGNAL(textEdited(QString)),this,SLOT(updatePreview()));
 	label->setText(tr("New Field"));
-	//labelWidget = new QWidget();
-	//labelWidget->setContentsMargins(0,0,0,0);
+	labelWidget = new QWidget();
+	labelWidget->setContentsMargins(0,0,0,0);
 	//labelWidget->setVisible(true);
-	//QVBoxLayout* labelWidgetLayout = new QVBoxLayout(labelWidget);
-	//labelWidgetLayout->setContentsMargins(0,0,5,0);
-	//labelWidgetLayout->setFormAlignment(Qt::AlignHCenter | Qt::AlignTop);
-	//labelWidgetLayout->setLabelAlignment(Qt::AlignLeft);
-	//labelWidgetLayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-	//labelWidgetLayout->setSpacing(0);
+	QVBoxLayout* labelWidgetLayout = new QVBoxLayout(labelWidget);
+	labelWidgetLayout->setContentsMargins(0,0,5,0);
+	labelWidgetLayout->setSpacing(0);
 	//labelWidgetLayout->setMargin(0);
 	//labelWidgetLayout->setAlignment(Qt::AlignLeft);
-	//labelWidgetLayout->addWidget(label);
-	layout->addWidget(label,0,Qt::AlignTop);
+	labelWidgetLayout->addWidget(label);
+
+
+
+
+
+
+	layout->addWidget(labelWidget);
+
 
 
 	hideLabel = new QCheckBox(tr("HL"));
@@ -148,6 +154,7 @@ QJsonObject StructureViewEdit::save()
 {
 	QJsonObject saveObject;
 	saveObject.insert("Label",label->text().trimmed());
+
 	if(label->text().trimmed().isEmpty())
 		label->setText("F"+QString::number(rand()));
 	if(hideLabel->isChecked())
@@ -168,7 +175,7 @@ QJsonObject StructureViewEdit::save()
 
 		if(initData->isChecked()){
 			QJsonObject* savedPreview = new QJsonObject();
-			previewField->save(savedPreview);
+		//	previewField->save(savedPreview);
 			//	qDebug() << __FILE__ << __LINE__  << savedPreview;
 			if(savedPreview->keys().count() > 0 && savedPreview->value(savedPreview->keys().first()) != QJsonValue::Undefined){
 				QJsonObject tblObj = savedPreview->value(savedPreview->keys().first()).toArray().first().toObject();
@@ -219,6 +226,9 @@ void StructureViewEdit::fill(QJsonObject structureView)
 		else
 			label->setText(structureView.value("Label").toString());
 		label->setMinimumWidth(100);
+
+
+
 		if(structureView.value("LabelHidden") != QJsonValue::Undefined)
 			hideLabel->setChecked(true);
 		if(structureView.value("FieldHidden") != QJsonValue::Undefined)
@@ -237,7 +247,9 @@ void StructureViewEdit::fill(QJsonObject structureView)
 				QString type = fieldVS.toObject().value("Type").toString();
 				StructureVieweditSubFeild * svsf = new StructureVieweditSubFeild(this);
 				sVSFs << svsf;
-				svsf->fillTypeFields(type,fieldVS,this->restrictedTypes);
+				QJsonObject subFieldID = fieldVS.toObject();
+				subFieldID.insert("document_id",structureView.value("document_id").toString());
+				svsf->fillTypeFields(type,subFieldID,this->restrictedTypes);
 
 				QObject::disconnect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
 				QObject::connect(svsf,SIGNAL(changed()),this,SLOT(updatePreview()));
@@ -278,6 +290,7 @@ bool StructureViewEdit::setHidden(bool hidden)
 {
 
 	typeFields->setHidden(hidden);
+	labelWidget->setHidden(hidden);
 	label->setHidden(hidden);
 	arrayWidget->setHidden(hidden);
 	hideLabel->setHidden(hidden);

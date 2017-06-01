@@ -17,8 +17,11 @@ StructureVieweditSubFeildTableColumnQuery::StructureVieweditSubFeildTableColumnQ
 	afterCondition = new QTextEdit;
 	editabel = new QCheckBox;
 	matchID = new QCheckBox;
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
-	Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
+	//QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
+
+	gotSourceData();
+	//Controller::Get()->getSelectList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
+
 
 
 	//if(firstOperand){
@@ -49,7 +52,8 @@ void StructureVieweditSubFeildTableColumnQuery::fill(QJsonObject strct)
 		entity->setText(strct.value("Entity").toString());
 	if(strct.value("Source") != QJsonValue::Undefined){
 		QString sour = strct.value("Source").toString().split("::").count() > 1 ?strct.value("Source").toString().split("::")[1]:strct.value("Source").toString();
-		source->setCurrentIndex(source->keys.indexOf(QString("ViewStructure::"+sour)));
+qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+		//		source->setCurrentIndex(source->keys.indexOf(QString("ViewStructure::"+sour)));
 		}
 	if(strct.value("Select") != QJsonValue::Undefined)
 		select->setCurrentText(strct.value("Select").toString());
@@ -83,19 +87,22 @@ QJsonObject StructureVieweditSubFeildTableColumnQuery::save()
 
 void StructureVieweditSubFeildTableColumnQuery::updateSelect(QString)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
-	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
-	Controller::Get()->getFields(source->getKey());
+//	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+//	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+
+	updateSelectData(Controller::Get()->getCachedViewStructureSubFields(source->currentText().toInt()).keys());
+	//Controller::Get()->getFields(source->getKey());
 }
 
-void StructureVieweditSubFeildTableColumnQuery::updateSelectData(QList<QString> fields)
+void StructureVieweditSubFeildTableColumnQuery::updateSelectData(QList<int> fields)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+	//QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	select->clear();
 	select->addItem("ALL");
 	//select->addItem("ID");
-	select->addItems(fields);
-
+	foreach(int i, fields){
+		select->addItem(QString::number(i));
+		}
 	if(strct.value("Select") != QJsonValue::Undefined){
 		select->setCurrentIndex(select->getItemsText().indexOf(strct.value("Select").toString()));
 		//	qDebug() << __FILE__ << __LINE__  << "select" << strct.value("select").toString() << fields << select->getItemsText() << select->getItemsText().indexOf(strct.value("select").toString()) << select->currentIndex();
@@ -103,19 +110,21 @@ void StructureVieweditSubFeildTableColumnQuery::updateSelectData(QList<QString> 
 		}
 }
 
-void StructureVieweditSubFeildTableColumnQuery::gotSourceData(QVector<QJsonDocument> items)
+void StructureVieweditSubFeildTableColumnQuery::gotSourceData()
 {
 	//qDebug() << __FILE__ << __LINE__<< "gotsourceData" << items;
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
+//	QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
 	source->clear();
-	source->addJsonItems(items);
+
+	source->addItems(Controller::Get()->getCachedViewStructureNames());
 
 	QObject::disconnect(source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
 	QObject::connect(source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
 
 	if(strct.value("source") != QJsonValue::Undefined){
 		QString sour = strct.value("source").toString().split("::").count() > 1 ?strct.value("Source").toString().split("::")[1]:strct.value("Source").toString();
-		source->setCurrentIndex(source->keys.indexOf(QString("ViewStructure::"+sour)));
+qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+		//		source->setCurrentIndex(source->keys.indexOf(QString("ViewStructure::"+sour)));
 		//	source->currentIndexChanged(source->currentIndex());
 		}
 }

@@ -28,6 +28,19 @@ Model::Model():QObject()
 	pages =  QMap<double, QJsonObject >();
 	loggedUser = 0;
 	this->defaulConnStrg = "couchbase://localhost/";//default";
+
+	//qDebug() << "HAS TRANSACTION" << QSqlDriver::hasFeature(QSqlDriver::Transactions) ;
+
+	db = QSqlDatabase::addDatabase("QMYSQL");
+	db.setHostName( "localhost" );
+	db.setDatabaseName( QString(DATABASE) );
+	db.setUserName( "root" );
+	db.setPassword( "merply" );
+}
+
+QSqlDatabase Model::getDb() const
+{
+	return db;
 }
 
 bool Model::getShowWarning() const
@@ -35,19 +48,24 @@ bool Model::getShowWarning() const
 	return showWarning;
 }
 
-QMap<QString, QJsonObject> Model::getCachedPageStructures() const
+QMap<int, QVector<QJsonObject> > Model::getCachedViewStructureTabelFields() const
 {
-    return cachedPageStructures;
+	return cachedViewStructureTabelFields;
+}
+
+QMap<int, QJsonObject> Model::getCachedPageStructures() const
+{
+	return cachedPageStructures;
 }
 
 QMap<QString, QJsonObject> Model::getCachedViewStructures() const
 {
-    return cachedViewStructures;
+	return cachedViewStructures;
 }
 
 void Model::addSubNavigation(double key, QList<QTreeWidgetItem *> subNav)
 {
-    subNavigation.insert(key, subNav);
+	subNavigation.insert(key, subNav);
 }
 
 void Model::clearSubNavigation()

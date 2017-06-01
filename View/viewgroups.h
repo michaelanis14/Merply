@@ -17,7 +17,7 @@ class ViewGroups : public QWidget
 public:
 	explicit ViewGroups(QWidget *parent = 0,QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject()
 			,QHash<QString,FeildUI*> *fieldsgroups = new QHash<QString,FeildUI*>());
-		QJsonObject save();
+		QPair<QString, QString> save();
 	//	static  ViewGroups* Create(QJsonObject structureView, QJsonObject data);
 	//	static ViewGroups* Get();
 

@@ -210,11 +210,11 @@ void PermissionFieldUI::loadUsersGroups()
 
 	usersforAllowedList->addJsonItems(basicPermissonsKeys);
 	usersforDeniedList->addJsonItems(basicPermissonsKeys);
-
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
-	Controller::Get()->getJsonList("Users","ARRAY_REPEAT(TOARRAY(Name),1)");
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
-	Controller::Get()->getJsonList("Groups","ARRAY_REPEAT(TOARRAY(Name),1)");
+qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+//	QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
+//	Controller::Get()->getJsonList("Users","ARRAY_REPEAT(TOARRAY(Name),1)");
+//	QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
+//	Controller::Get()->getJsonList("Groups","ARRAY_REPEAT(TOARRAY(Name),1)");
 
 }
 
@@ -234,11 +234,13 @@ void PermissionFieldUI::load(QJsonObject saved)
 		readPermissons->setCurrentIndex(2);
 		loadUsersGroups();
 		foreach(QJsonValue allow,saved.value("Allowed").toArray()){
-			usersforAllowedList->setCurrentIndex(usersforAllowedList->keys.indexOf(allow.toObject().value("Key").toString()));
+			qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+		//	usersforAllowedList->setCurrentIndex(usersforAllowedList->keys.indexOf(allow.toObject().value("Key").toString()));
 			addAllowed(allow.toObject().value("Value").toString(),allow.toObject().value("Key").toString());
 			}
 		foreach(QJsonValue deny,saved.value("Denied").toArray()){
-			usersforDeniedList->setCurrentIndex(usersforDeniedList->keys.indexOf(deny.toObject().value("Key").toString()));
+			qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+	//		usersforDeniedList->setCurrentIndex(usersforDeniedList->keys.indexOf(deny.toObject().value("Key").toString()));
 			addDenied(deny.toObject().value("Value").toString(),deny.toObject().value("Key").toString());
 			}
 
@@ -330,7 +332,9 @@ void PermissionFieldUI::addDenied()
 {
 	if(usersforDeniedList->currentIndex() >= 0 && !(usersforDeniedList->currentText().isEmpty()) ){
 		QString title = usersforDeniedList->currentText();
-		QString key = usersforDeniedList->getKey();
+		qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+	QString key ;
+		//	;= usersforDeniedList->getKey();
 		//if(key <= 0) key =  ++idCount;
 		addDenied(title,key);
 		}
@@ -340,7 +344,9 @@ void PermissionFieldUI::addAllowed()
 {
 	if(usersforAllowedList->currentIndex() >= 0 && !(usersforAllowedList->currentText().isEmpty()) ){
 		QString title = usersforAllowedList->currentText();
-		QString key = usersforAllowedList->getKey();
+		qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+		QString key;
+		//= usersforAllowedList->getKey();
 		addAllowed(title,key);
 		}
 	//qDebug() << __FILE__ << __LINE__  << save();
@@ -348,7 +354,7 @@ void PermissionFieldUI::addAllowed()
 
 void PermissionFieldUI::loadUsers(QVector<QJsonDocument> users)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(loadUsers(QVector<QJsonDocument>)));
 	usersforAllowedList->addJsonItems(users);
 	usersforDeniedList->addJsonItems(users);
 }

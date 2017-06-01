@@ -7,6 +7,8 @@
 #include "prsistance.h"
 #include "removebtn.h"
 
+
+
 StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(parent)
 {
 	//this->setFixedWidth(150);
@@ -48,7 +50,7 @@ StructureVieweditSubFeild::StructureVieweditSubFeild(QWidget *parent) : QWidget(
 
 void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,QStringList restrictedTypes)
 {
-	//qDebug() << __FILE__ << __LINE__  << "fffield" << fieldVS;
+	//qDebug() << __FILE__ << __LINE__ <<fieldVS.toObject().value("document_id").toString() << "fffield" << fieldVS;
 	this->filled = true;
 	this->type = type;
 	this->restrictedTypes = restrictedTypes;
@@ -85,11 +87,13 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		if(!fieldVS.toObject().value("Source").toString().isEmpty())
 			Source->setCurrentText(fieldVS.toObject().value("Source").toString());
 		layout->addRow(new QLabel(tr("Source ")), Source);
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
-		Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
+		//	QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
+		//	Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
 
 
 		Select = new ERPComboBox(0);
+		setSourceData();
+
 		Select->addItems(QStringList() << "Index" <<"New");
 		if(!fieldVS.toObject().value("Select").toString().isEmpty())
 			Select->setCurrentText(fieldVS.toObject().value("Select").toString());
@@ -106,8 +110,9 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 		Source = new ERPComboBox(0);
 		Select = new ERPComboBox(0);
 		layout->addRow(new QLabel(tr("Source ")), Source);
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
-		Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
+		//QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
+		//Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
+		setSourceData();
 		layout->addRow(new QLabel(tr("Select ")), Select);
 		condition = new QTextEdit;
 		condition->setText(fieldVS.toObject().value("Condition").toString());
@@ -211,6 +216,18 @@ void StructureVieweditSubFeild::fillTypeFields(QString type,QJsonValue fieldVS,Q
 	if(fieldVS.toObject().value("Mandatory").toBool())
 		mandatory->setChecked(true);
 	layout->addRow("Mandatory", mandatory);
+
+	clmnNumber = new QLineEdit();
+	clmnNumber->setDisabled(true);
+	//qDebug() << __FILE__ << __LINE__ <<"CLMNN"<<Controller::Get()->getCachedSubFieldsClmnRef(fieldVS.toObject().value("document_id").toString().toInt());
+	if(fieldVS.toObject().value("clmnNumber") == QJsonValue::Undefined)
+		clmnNumber->setText(QString::number(Controller::Get()->getCachedSubFieldsClmnRef(fieldVS.toObject().value("document_id").toString().toInt())));
+
+	else clmnNumber->setText(fieldVS.toObject().value("clmnNumber").toString());
+
+	layout->addRow("SQL",clmnNumber);
+
+
 	//previewLayout->addWidget(new SubFieldUI(0,"V",this->save()));
 	//	qDebug() << __FILE__ << __LINE__  <<this->save();
 }
@@ -223,16 +240,18 @@ QJsonObject StructureVieweditSubFeild::save()
 		//qDebug() << __FILE__ << __LINE__  << this->type << filled << Link;
 		saveObject.insert("Type",type);
 		saveObject.insert("Mandatory",mandatory->isChecked());
+		saveObject.insert("clmnNumber",QString(clmnNumber->text().trimmed()));
+
 		if(type.compare("Link") == 0){
 			saveObject.insert("Select",Select->currentText());
-			saveObject.insert("Source",Source->getKey());
+			saveObject.insert("Source",QString::number(Controller::Get()->getCachedViewStructureNames(Source->currentText())));
 			saveObject.insert("Title",title->text());
 			}
 
 		else if(type.compare("Refrence") == 0){
 			//qDebug() << __FILE__ << __LINE__  <<"Save Refrence subfield:213"<< Select->getKey() << Source->getKey();
 			saveObject.insert("Select",Select->currentText());
-			saveObject.insert("Source",Source->getKey());
+			saveObject.insert("Source",QString::number(Controller::Get()->getCachedViewStructureNames(Source->currentText())));
 			saveObject.insert("Condition",condition->toPlainText());
 			saveObject.insert("Editable",Editable->isChecked());
 			if(!defaultValue->text().isEmpty())
@@ -259,7 +278,7 @@ QJsonObject StructureVieweditSubFeild::save()
 			}
 		else  if(type.compare("Index") == 0){
 			saveObject.insert("Select",Select->currentText());
-			saveObject.insert("Source",Source->getKey());
+			saveObject.insert("Source",QString::number(Controller::Get()->getCachedViewStructureNames(Source->currentText())));
 			}
 		else if(type.compare("Table") == 0){
 			//qDebug() << __FILE__ << __LINE__  << tableEdit->save();
@@ -376,32 +395,41 @@ void StructureVieweditSubFeild::updateFields(QString type)
 
 void StructureVieweditSubFeild::updateSelect(QString)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
-	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
-	Controller::Get()->getFields(Source->getKey());
-
-
+	//	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+	//	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+	//	Controller::Get()->getFields(Source->getKey());
+	//Controller::Get()->getCachedViewStructureNames(Source->currentText()))
+	//qDebug()<< __FILE__ << __LINE__   << fieldVS.toObject().value("document_id").toString().toInt();
+	updateSelectData(Controller::Get()->getCachedViewStructureSubFields(Controller::Get()->getCachedViewStructureNames(Source->currentText())).keys());
 }
 
-void StructureVieweditSubFeild::updateSelectData(QList<QString> fields)
+void StructureVieweditSubFeild::updateSelectData(QList<int> fields)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	Select->clear();
-	Select->addItems(fields);
+	foreach(int i, fields){
+		Select->addItem(QString::number(i));
+		}
 	if(loadData && fieldVS.toObject().value("Select") != QJsonValue::Undefined){
 		loadData = false;
-		Select->setCurrentIndex(Select->getItemsText().indexOf(fieldVS.toObject().value("Select").toString()));
-		//	qDebug() << __FILE__ << __LINE__  << "Select" << fieldVS.toObject().value("Select").toString() << fields << Select->getItemsText() << Select->getItemsText().indexOf(fieldVS.toObject().value("Select").toString()) << Select->currentIndex();
+		Select->setCurrentText((fieldVS.toObject().value("Select").toString()));
+		//int c = (Controller::Get()->getCachedViewStructureFieldsNames(Controller::Get()->getCachedViewStructureNames(Source->currentText())).indexOf(fieldVS.toObject().value("Select").toString()));
+
+		//		qDebug() << __FILE__ << __LINE__<<"SOURCE:"<<fieldVS.toObject().value("Source")<<"SOURCE CURRENT:"<<  Source->currentText() <<"NAMES:"<< Controller::Get()->getCachedViewStructureNames(Source->currentText()) <<"FIELDS:"<<  Controller::Get()->getCachedViewStructureFieldsNames(Controller::Get()->getCachedViewStructureNames(Source->currentText())) ;
+		//		qDebug() << __FILE__ << __LINE__ <<"SELCT INDEX:"<< QString::number(c) << "Select" << fieldVS.toObject().value("Select").toString();
+
+		//Select->setCurrentText(QString::number(Controller::Get()->getCachedViewStructureFieldsNames(Controller::Get()->getCachedViewStructureNames(Source->currentText())).indexOf(fieldVS.toObject().value("Select").toString())));
+		//<< fields << Select->getItemsText() << Select->getItemsText().indexOf(fieldVS.toObject().value("Select").toString()) << Select->currentIndex();
 		//	Select->currentIndexChanged(Select->currentIndex());
 		}
 }
 
-void StructureVieweditSubFeild::gotSourceData(QVector<QJsonDocument> items)
+void StructureVieweditSubFeild::setSourceData()
 {
 	//qDebug() << __FILE__ << __LINE__<< "gotSourceData" << items;
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
+	//QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
 	Source->clear();
-	Source->addJsonItems(items);
+
+	Source->addItems(Controller::Get()->getCachedViewStructureNames());
 
 	QObject::disconnect(Source,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSelect(QString)));
 	QObject::disconnect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
@@ -409,9 +437,19 @@ void StructureVieweditSubFeild::gotSourceData(QVector<QJsonDocument> items)
 	QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
 
 	if(fieldVS.toObject().value("Source") != QJsonValue::Undefined){
-		QString source = fieldVS.toObject().value("Source").toString().split("::").count() > 1 ?fieldVS.toObject().value("Source").toString().split("::")[1]:fieldVS.toObject().value("Source").toString();
-		Source->setCurrentIndex(Source->keys.indexOf(QString("ViewStructure::"+source)));
-		//	Source->currentIndexChanged(Source->currentIndex());
+		QString source;
+		if(fieldVS.toObject().value("Source").toString().split("::").count() > 1) {
+			QString strctureSoruce = (fieldVS.toObject().value("Source").toString().split("::")[1]);
+			strctureSoruce = strctureSoruce.simplified();
+			strctureSoruce.replace(" ","");
+			source = QString::number(Controller::Get()->getCachedViewStructureNames(strctureSoruce) );
+			}
+		else {
+			source = fieldVS.toObject().value("Source").toString();
+			}
+
+		Source->setCurrentText(Controller::Get()->getCachedViewStructure(source).value("document_Name").toString());
+		updateSelect("");
 		}
 }
 

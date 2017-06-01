@@ -9,7 +9,7 @@ MTabelCombobox::MTabelCombobox(QObject* parent,QJsonObject strct) : QStyledItemD
 	this->strct = strct;
 	this->items = QVector<QJsonDocument>();
 	//	qDebug() << __FILE__ << __LINE__   <<"MTabelCombobox"<< strct;
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotReportData(QVector<QJsonDocument>)));
+	QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(gotReportData(QVector<QJsonDocument>)));
 	Controller::Get()->getJsonEntityFieldsList(strct.value("Source").toString(),strct.value("Select").toString(),strct.value("Condition").toString());
 
 }
@@ -59,7 +59,7 @@ void MTabelCombobox::setModelData(QWidget* editor, QAbstractItemModel* model, co
 
 void MTabelCombobox::gotReportData(QVector<QJsonDocument> items)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotReportData(QVector<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(gotReportData(QVector<QJsonDocument>)));
 	this->items = items;
 	//qDebug() << items;
 }

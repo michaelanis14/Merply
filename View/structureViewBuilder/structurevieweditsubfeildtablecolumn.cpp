@@ -4,6 +4,8 @@
 #include "controller.h"
 #include "removebtn.h"
 
+#include "model.h"
+
 StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidget *parent,QJsonObject clmn) : QWidget(parent)
 {
 	this->setContentsMargins(0,0,5,0);
@@ -38,9 +40,9 @@ StructureVieweditSubFeildTableColumn::StructureVieweditSubFeildTableColumn(QWidg
 
 	Source = new ERPComboBox(0);
 	layout->addRow(new QLabel(tr("Source ")), Source);
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(selectData(QVector<QJsonDocument>)));
-	Controller::Get()->getJsonList("ViewStructure","Title","`"+ QString(DATABASE).append("`.Type =\"Entity\""));
-
+	QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT((QVector<QJsonDocument>)));
+	Controller::Get()->getSelectList("ViewStructure","Title","`"+ QString(DATABASE).append("`.Type =\"Entity\""));
+	selectData();
 	Select = new ERPComboBox(0);
 	//Select->setText(fieldVS.toObject().value("Select").toString());
 	layout->addRow(new QLabel(tr("Select ")), Select);
@@ -178,13 +180,13 @@ void StructureVieweditSubFeildTableColumn::fill(QJsonObject clmn)
 			}
 		}
 	else{
-		this->Source->setCurrentIndex(Source->keys.indexOf(clmn.value("Source").toString().trimmed()));
+		this->Source->setCurrentIndex(Source->keys.indexOf(clmn.value("Source").toString().toInt()));
 		updateSelect(Source->currentText());
 		this->Select->setCurrentIndex(Select->getItemsText().indexOf(clmn.value("Select").toString().trimmed()));
 
 		if(clmn.value("LocalFilter") != QJsonValue::Undefined){
 			filterOn->setCurrentIndex(1);
-			localFilter->setCurrentIndex(localFilter->keys.indexOf(clmn.value("LocalFilter").toString()));
+			localFilter->setCurrentIndex(localFilter->keys.indexOf(clmn.value("LocalFilter").toString().toInt()));
 			//localFilterChanged(0);
 			entityFilter->setCurrentText(clmn.value("EntityFilter").toString());
 			}
@@ -279,22 +281,26 @@ void StructureVieweditSubFeildTableColumn::updateFields(int value)
 
 void StructureVieweditSubFeildTableColumn::updateSelect(QString )
 {
-	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
-	Controller::Get()->getFields(Source->getKey());
+	//QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+	//Controller::Get()->getFields(Source->getKey());
+	updateSelectData(Controller::Get()->getCachedViewStructureSubFields(Source->currentText().toInt()).keys());
+
 }
-void StructureVieweditSubFeildTableColumn::updateSelectData(QList<QString> fields)
+void StructureVieweditSubFeildTableColumn::updateSelectData(QList<int> fields)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
 	Select->clear();
-	Select->addItems(fields);
+	foreach(int i, fields){
+		Select->addItem(QString::number(i));
+		}
 }
 
-void StructureVieweditSubFeildTableColumn::selectData(QVector<QJsonDocument> items)
+void StructureVieweditSubFeildTableColumn::selectData()
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(selectData(QVector<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(selectData(QVector<QJsonDocument>)));
 	Source->clear();
-	Source->addJsonItems(items);
-}
+	Source->addItems(Controller::Get()->getCachedViewStructureNames());
+	}
 
 void StructureVieweditSubFeildTableColumn::filterOnChanged(int index)
 {
@@ -441,8 +447,10 @@ void StructureVieweditSubFeildTableColumn::removeEqElement(QWidget* eqElement)
 void StructureVieweditSubFeildTableColumn::localFilterChanged(int)
 {
 
-	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updatelocalFilterData(QList<QString>)));
-	Controller::Get()->getFields(this->Source->getKey());
+	//QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updatelocalFilterData(QList<QString>)));
+	//Controller::Get()->getFields(this->Source->getKey());
+	updatelocalFilterData(Controller::Get()->getCachedViewStructureFieldsNames(Source->getKey()));
+
 }
 
 void StructureVieweditSubFeildTableColumn::updatelocalFilterData(QList<QString> fields)

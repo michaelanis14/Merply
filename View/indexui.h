@@ -22,15 +22,15 @@ class IndexUI : public MainDisplay
 	Q_OBJECT
 public:
 	explicit IndexUI(QWidget *parent = 0);
-	static void ShowUI(const QString document_id,const QVector<QJsonDocument> documents);
-	void fill(const QString document_id,const QVector<QJsonDocument> items);
+	static void ShowUI(const int document_id, const QVector<QJsonDocument> documents);
+	void fill(const int document_id, const QVector<QJsonDocument> items);
 
 private:
 	QVBoxLayout * layout;
 		static IndexUI* p_instance;
 	merplyTabelView * table ;
 	QPushButton* btnCreatNew;
-	QString document_id;
+	int document_id;
 signals:
 
 public slots:

@@ -28,22 +28,22 @@ ERPComboBox::ERPComboBox(QWidget *parent, bool indexedFill) :
 }
 void ERPComboBox::addJsonItems(QVector<QJsonDocument> items){
 	int i = 0;
-//	this->items = items;
+	//	this->items = items;
 	//qDebug() << __FILE__ << __LINE__  << items;
 	foreach (const QJsonDocument & value, items){
 
 		//QString valueString = value.object().value("Value").toString();
-		QString keyString = value.object().value("Key").toString();
+		int keyString = value.object().value("Key").toInt();
 		QString valueString;
 		if(value.object().value("Value") != QJsonValue::Undefined){
 			QJsonValue Val = value.object().value("Value");
 			//	qDebug() << __FILE__ << __LINE__ <<"VAL" << Val << keyString;
 			if(Val.isObject()){
-			//	qDebug() << __FILE__ << __LINE__  << i << "isObJect" << Val.toString();
+				//	qDebug() << __FILE__ << __LINE__  << i << "isObJect" << Val.toString();
 				if(Val.toObject().value("Key") != QJsonValue::Undefined)
-					keyString = Val.toObject().value("Key").toString();
+					keyString = Val.toObject().value("Key").toInt();
 				if(Val.toObject().value("Value") != QJsonValue::Undefined){
-				//	qDebug()<< "TOSTRINGG" << Val.toObject().value("Value") << Val;
+					//	qDebug()<< "TOSTRINGG" << Val.toObject().value("Value") << Val;
 					valueString = Controller::Get()->toString("",Val.toObject().value("Value"));
 					}
 				QComboBox::insertItem(i,valueString);
@@ -90,9 +90,30 @@ void ERPComboBox::addJsonItems(QVector<QJsonDocument> items){
 			}
 		}
 	if(count() < 100)
-	this->adjustSize();
+		this->adjustSize();
 	if(count() > 0)
 		this->setEnabled(true);
+}
+
+void ERPComboBox::addSqlItems(QVector<QSqlRecord> items)
+{
+	int i = 0;
+	//	this->items = items;
+	//qDebug() << __FILE__ << __LINE__  << items;
+	foreach (const QSqlRecord & value, items){
+		QString valueString;
+		valueString = value.value("Value").toString();
+		int key = value.value("Key").toInt();
+		QComboBox::insertItem(i,valueString);
+		keys.insert(i,key);
+		i++;
+		}
+
+	if(count() < 100)
+		this->adjustSize();
+	if(count() > 0)
+		this->setEnabled(true);
+
 }
 
 void ERPComboBox::focusOutEvent(QFocusEvent *e)
@@ -107,7 +128,7 @@ void ERPComboBox::focusOutEvent(QFocusEvent *e)
 			}
 		else if (re.exactMatch(this->currentText())){
 			int index = this->currentText().toInt();
-		//	qDebug() << __FILE__ << __LINE__   <<index  << this->currentIndex() <<this->getItemsText().at(index) <<this->items.at(index).object();
+			//	qDebug() << __FILE__ << __LINE__   <<index  << this->currentIndex() <<this->getItemsText().at(index) <<this->items.at(index).object();
 			if(index > -1 && index < this->count() )
 				this->setCurrentIndex(index);
 			else
@@ -133,12 +154,12 @@ void ERPComboBox::focusOutEvent(QFocusEvent *e)
 
 }
 
-QString ERPComboBox::getKey(){
+int ERPComboBox::getKey(){
 
 	if(this->addedItems && currentIndex() != -1)
 		if(keys.count() > currentIndex())
 			return keys.at(currentIndex());
-	return "_";
+	return -1;
 
 }
 

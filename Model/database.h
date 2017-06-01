@@ -1,88 +1,51 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include <cstdio>
-#include <cstdlib>
-#include <string.h>
-
-
 #include <QObject>
-#include <QString>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QJsonValue>
-#include <QDebug>
-
-#include <libcouchbase/couchbase.h>
-#include <libcouchbase/n1ql.h>
-
+#include <QtSql>
+#include <QtConcurrent>
+#include <QFuture>
 //#define DATABASE "default"
-#define DATABASE "AM"
-#define ORDERBY "رقم"
 
-class Database: public QObject
+
+class Database : public QObject
 {
-
 	Q_OBJECT
 public:
-	explicit Database();
-
-	static Database* Gett();
-	static void storage_callback(lcb_t, const void *, lcb_storage_t, lcb_error_t, const lcb_store_resp_t *resp);
-	static void get_callback(lcb_t instance, const void *cookie, lcb_error_t err,
-							 const lcb_get_resp_t *resp);
-	static void on_stored_status (lcb_t instance, const void *, lcb_storage_t,
-								  lcb_error_t err, const lcb_store_resp_t *resp);
-	static void on_removed(lcb_t instance, const void *, lcb_error_t err, const lcb_remove_resp_t *resp);
-	static void arithmatic_callback(lcb_t instance, const void*, lcb_error_t error, const lcb_arithmetic_resp_t*);
-	bool storeDoc(QString key,QJsonDocument document);
-	bool updateDoc(QJsonDocument document);
-	bool deleteDoc(QString documentid);
-	static bool IncrementKey(QString key);
-	static int GetKey(QString key);
-	static lcb_t InitDatabase(QString connStr = "");
-	static bool KillDatabase(lcb_t instance, bool wait =true);
-	static void got_document(lcb_t instance, const void *, lcb_error_t err,
-							 const lcb_get_resp_t *resp);
-	static bool getDoc(QString key);
-
-	//QJsonDocument getDocument() const;
-	static void rowCallback(lcb_t, int, const lcb_RESPN1QL *resp);
-
-	static lcb_t instance;
+	explicit Database(QObject *parent = 0);
+	//static Database* Get();
+//	QList<QSqlRecord> query(const QString &query, const QVariantMap &arguments);
+	void query(const QString &query);
+	void getJson(const QString& select, const QString &tabel, const QString& key, const QString &id);
+	void deletRow(const QString &tabel, const QString &id);
+	void insert(QString query);
+	~Database();
+private :
 
 
-
-	QVector<QJsonDocument> getArray() const;
-
-	QString getValue() const;
-	QString LastKeyID;
-	QString getLastKeyID() const;
-
-	void query(QString query, bool cached = true);
-
-private:
+	QString connectionName;
+	QString connectionNameMain;
 	static Database* p_instance;
-	QJsonDocument lastDocument;
-	QString lastQuery;
-	QJsonDocument documentToArray;
-	QVector<QJsonDocument> array;
-	bool connIssue;
-	QMap<QString,QJsonDocument> cachedDocuments;
-	//QMap<QString,QVector<QJsonDocument> > cachedArrayDocuments;
-	int waitCounter;
-	//	QString value;
-
-public slots :
-
+	//QVector<QSqlRecord> queryresults;
+	QFutureWatcher<QVector<QSqlRecord>> *watcher;
+	QFuture<QVector<QSqlRecord> > future;
+	//static QAtomicInt no = 0;
+	QVector<QSqlRecord> threadedSql(const QSqlDatabase &db, const QString &query) ;
+	bool treadedInsert(const QSqlDatabase &db,const QString &query);
 signals:
+	void queryResults(QVector<QSqlRecord> results);
 	void gotDocument(QJsonDocument document);
-	void gotDocuments(QVector<QJsonDocument> array);
+	void gotDocuments(QVector<QJsonDocument> documents);
 	void gotValue(QString value);
-	void gotLastKey(QString LastKeyID);
+	//void gotLastKey(QString LastKeyID);
 	void saved(QString document_id);
 	void savedQJson(QJsonDocument savedDocument);
+
+public slots:
+	void gotQueryResutls();
+	void gotJson();
+
+
 };
 
 #endif // DATABASE_H

@@ -7,7 +7,7 @@
 
 #include <QString>
 #include <QStringList>
-
+#include <QMap>
 
 
 
@@ -21,20 +21,28 @@ public:
 	static QString readFile(QString path);
 	static QStringList readCSVFile(QString path);
 
-	static void GetJsonList(QString table, QString select,QString condition = "");
+	static void GetSelectList(QString table, QString select,QString condition = "");
 	static void GetJsonEntityFields(QString table, QString select,QString condition = "");
 
-	static int Count(const QString table);
+
+
+	void count(const QString &table);
+	void countTabel(const QString &table);
 	static int CountIndexes(const QString index);
 	static QVector<QJsonDocument> GetALL(const QString entity,const QString condition);
 	static bool Select(const QString query);
 	static QString GetDatabaseName();
+	static bool CreateViewStructureTabels();
+
 private:
 	static Prsistance* p_instance;
+	Database* database;
 signals:
-	void GotJsonSelectList(QVector<QJsonDocument> items);
+	void GotSelectList(QVector<QSqlRecord> items);
+	void count(int count);
 public slots:
-	void GetJsonListData(QVector<QJsonDocument> items);
+	void GetSelectListData(QVector<QSqlRecord> items);
+	void gotCount(QString value);
 };
 
 #endif // PRSISTANCE_H

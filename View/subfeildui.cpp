@@ -10,6 +10,9 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 	//	qDebug() << __FILE__ << __LINE__  << "data" << data;
 	this->structureView = QJsonObject();
 	this->structureView = structureView;
+	this->sqlClmnNumber = structureView.value("clmnNumber").toString();
+
+
 	layout = new QHBoxLayout(this);
 	this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	layout->setContentsMargins(0,0,0,0);
@@ -46,7 +49,9 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		else{
 			if(!structureView.value("Source").toString().isEmpty() && structureView.value("Source").toString().compare("_") != 0){
 				//	qDebug() << __FILE__ << __LINE__  << "NOT LOACL FILTER" <<structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Condition").toString() ;
-				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
+
+
+				QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(refrenceData(QVector<QSqlRecord>)));
 				Controller::Get()->getJsonEntityFieldsList(structureView.value("Source").toString(),structureView.value("Select").toString(),structureView.value("Condition").toString());
 				}
 			}
@@ -101,14 +106,15 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		field = lineEdit;
 		}
 	else if(type.compare("Index") == 0){
+		qDebug() << "TODO: SQL SAVE  GenetrateCreateTabelQuery";
 		combox = new ERPComboBox(0,true);
 		combox->setEditable(true);
 		QObject::connect(combox,SIGNAL(indexedFillEvent(QString)),this,SLOT(indexedFillEvent(QString)));
 		layout->addWidget(combox);
 		field = combox;
 
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
-		Controller::Get()->getJsonList(structureView.value("Source").toString(),structureView.value("Select").toString());
+		QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(refrenceData(QVector<QSqlRecord>)));
+		Controller::Get()->getSelectList(structureView.value("Source").toString(),structureView.value("Select").toString());
 		QString dataString = data.toString();
 		if(!dataString.isEmpty()){
 			combox->setCurrentIndex(combox->findText(dataString));
@@ -179,8 +185,8 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 			//this split gives the name of the card
 			QStringList id = this->strID.split("ViewStructure::");
 			if(id.count() > 1){
-				QObject::connect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
-				Controller::Get()->getValue(id[1]);
+				QObject::connect(Controller::Get(),SIGNAL(CountData(int)),this,SLOT(serialData(int)));
+				Controller::Get()->Count(id[1]);
 				}
 			}
 		//lineEdit->setText(data.toString());
@@ -224,19 +230,19 @@ void SubFieldUI::clear()
 
 }
 
-QJsonValue SubFieldUI::save()
+QString SubFieldUI::save()
 {
-	QJsonValue save = QJsonValue::Null;
+	QString save = "";
 	if(QString(field->metaObject()->className()).compare("ERPComboBox") == 0 ){
 		//	save += component.name;
 		QString value = ((QComboBox*)field)->currentText();
 		if(!value.trimmed().isEmpty()){
-			QJsonObject comboFields;
-			comboFields.insert("Value", ((QComboBox*)field)->currentText());
-			comboFields.insert("Key", ((ERPComboBox*)field)->getKey());
-			save = comboFields;
+		//	QJsonObject comboFields;
+		//	comboFields.insert("Value", ((QComboBox*)field)->currentText());
+		//	comboFields.insert("Key", );
+			save = QString::number(((ERPComboBox*)field)->getKey());
 			}
-		else save = QJsonValue::Null;
+
 		//save +=" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QLineEdit") == 0 ){
@@ -245,17 +251,16 @@ QJsonValue SubFieldUI::save()
 			bool tonum = false ;
 			int number = ((QLineEdit*)field)->text().trimmed().toInt(&tonum);
 			if(tonum)
-				save = number;
-			else save =((QLineEdit*)field)->text().trimmed();
+				save = QString::number(number);
+			else save =QString("'").append((((QLineEdit*)field)->text().trimmed())).append("'");
 
 			}
-		else save = QJsonValue::Null;
 		//	save =" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QTextEdit") == 0 ){
 		if(!((QTextEdit*)field)->toPlainText().trimmed().isEmpty())
-			save =((QTextEdit*)field)->toPlainText();
-		else save = QJsonValue::Null;
+			save =QString("'").append(((QTextEdit*)field)->toPlainText()).append("'");
+		//else save = QJsonValue::Null;
 		}
 	else if(QString(field->metaObject()->className()).compare("QCheckBox") == 0 ){
 		//	save = component.name;
@@ -265,15 +270,18 @@ QJsonValue SubFieldUI::save()
 	else if(QString(field->metaObject()->className()).compare("merplyTabelView") == 0){
 		//	save = component.name;
 		//		save =((merplyTabelView*)field)->save("this->key");
-		QJsonObject tblSave = ((merplyTabelView*)field)->save();
-		if(!tblSave.isEmpty())
-			save = tblSave;
-		else save = QJsonValue::Null;
+		qDebug() << __FILE__ << __LINE__  << "TODO SAVE TABEL";
+		//QJsonObject tblSave = ((merplyTabelView*)field)->save();
+	//	if(!tblSave.isEmpty())
+	//		save = tblSave;
+	//	else save = QJsonValue::Null;
 		//	save =" ";
 		}
 	else if(QString(field->metaObject()->className()).compare("QDateTimeEdit") == 0){
 		//save =((QDateTimeEdit*)field)->dateTime().toString(Qt::DefaultLocaleShortDate);
-		save = QString(((QDateTimeEdit*)field)->dateTime().toString(Qt::ISODate));
+		save +="'";
+		save += QString(((QDateTimeEdit*)field)->dateTime().toString("yyyy-MM-dd hh:mm:ss"));
+		save +="'";
 		//qDebug() << save;
 		}
 	//	qDebug() << __FILE__ << __LINE__<< save;
@@ -322,6 +330,11 @@ bool SubFieldUI::checkMandatory()
 	return true;
 }
 
+QString SubFieldUI::getSqlClmnNumber() const
+{
+	return sqlClmnNumber;
+}
+
 void SubFieldUI::indexedFillEvent(QString completion)
 {
 	qDebug() << __FILE__ << __LINE__  << completion;
@@ -333,13 +346,13 @@ void SubFieldUI::linkPressed()
 	Controller::Get()->linkPressed(this->structureView);
 }
 
-void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
+void SubFieldUI::refrenceData(QVector<QSqlRecord> items)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(refrenceData(QVector<QSqlRecord>)));
 
 	if(combox){
 		combox->clear();
-		combox->addJsonItems(items);
+		combox->addSqlItems(items);
 		if(items.count() > 0)
 			combox->setHidden(false);
 		else combox->setHidden(true);
@@ -351,14 +364,14 @@ void SubFieldUI::refrenceData(QVector<QJsonDocument> items)
 	//qDebug() << __FILE__ << __LINE__  << items;
 }
 
-void SubFieldUI::serialData(QString serial)
+void SubFieldUI::serialData(int serial)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
 	//No. of clients in db are 251
 	QString Clients = "clients::%";
 	if(structureView.value("startNum") != QJsonValue::Undefined){
 		int i = structureView.value("startNum").toInt();
-		int current = serial.toInt();
+		int current = serial;
 		int numDB = 0;
 				//Controller::Get()->Count(Clients.trimmed()+"\"") ;
 		qDebug() << __FILE__ << __LINE__  << "num"<< numDB;
@@ -383,11 +396,11 @@ void SubFieldUI::updateFilter(QString filter)
 		}
 	else{
 
-		qDebug() << __FILE__ << __LINE__  <<"filter" << filter << structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Entity").toString()+"="+filter;
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
+	//	qDebug() << __FILE__ << __LINE__  <<"filter" << filter << structureView.value("Source").toString()<<structureView.value("Select").toString()<<structureView.value("Entity").toString()+"="+filter;
+		QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(refrenceData(QVector<QSqlRecord>)));
 		//qDebug() <<"Source:" << source <<"SELECT:"<< select<<"Entity:" << entity <<"Filter:"<< filter;
 		//QString("`"+entity+"`").append(" = ").append("'").append(filter).append("'");
-		Controller::Get()->getJsonEntityFieldsList(source,select,QString("to_string(d.`"+entity+"`.`Value`)").append("  LIKE  ").append("'").append(filter).append("'"));
+		Controller::Get()->getJsonEntityFieldsList(source,select,QString("`"+entity+"`").append("  =  ").append("'").append(filter).append("'"));
 		}
 
 }
@@ -395,7 +408,7 @@ void SubFieldUI::updateFilter(QString filter)
 void SubFieldUI::updateTable(QString)
 {
 	if(localFilterCombobox)
-		table->fillLocalSource(structureView,localFilterCombobox->getKey());
+		table->fillLocalSource(structureView,QString::number(localFilterCombobox->getKey()));
 }
 
 void SubFieldUI::updateEquationField()

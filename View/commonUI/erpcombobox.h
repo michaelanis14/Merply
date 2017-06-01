@@ -12,7 +12,7 @@
 #include <QKeyEvent>
 #include <QJsonDocument>
 #include <QJsonObject>
-
+#include <QtSql>
 
 class ERPComboBox : public QComboBox
 {
@@ -20,11 +20,12 @@ class ERPComboBox : public QComboBox
 public:
 	explicit ERPComboBox(QWidget *parent = 0 ,bool indexedFill = false);
 	void addJsonItems(QVector<QJsonDocument> items);
-	QString getKey();
+	void addSqlItems(QVector<QSqlRecord> items);
+	int getKey();
 	bool addedItems;
 	bool indexedFill;
 	QStringList getItemsText();
-	QList<QString> keys;
+	QVector<int> keys;
 	void removeSelected();
 	void removeList(QStringList list);
 	void clear();

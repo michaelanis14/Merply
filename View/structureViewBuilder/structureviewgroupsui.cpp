@@ -98,7 +98,7 @@ QJsonObject StructureViewGroupsUI::save()
 		}
 	saveObject.insert("Viewgroups",ViewGroups);
 	if(!document_id.isEmpty()){
-		saveObject.insert("cas_value",cas_value); //Inserting Document ID TODO: REMOVE
+	//	saveObject.insert("cas_value",cas_value); //Inserting Document ID TODO: REMOVE
 		saveObject.insert("document_id",document_id);//TODO: REMOVE
 		}
 
@@ -148,7 +148,9 @@ void StructureViewGroupsUI::fill(QJsonObject structureView)
 
 	if(structureView.value("Viewgroups").isArray()){
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
-			StructureViewsEditUI* viewgroup = new StructureViewsEditUI(0,item.toObject(),this->restrictedTypes);
+			QJsonObject itemObj = item.toObject();
+			itemObj.insert("document_id",this->document_id );
+			StructureViewsEditUI* viewgroup = new StructureViewsEditUI(0,itemObj,this->restrictedTypes);
 
 			QObject::connect(viewgroup,SIGNAL(updateLayout()),this,SLOT(updateLayout()));
 			QObject::connect(viewgroup, SIGNAL(styleChanged()),this, SLOT(viewGroupStyleChanged()));
@@ -252,8 +254,9 @@ void StructureViewGroupsUI::editControllerSavePressed()
 	QJsonObject savedObj = this->save() ;
 	//qDebug() << __FILE__ << __LINE__  <<"SAVE: editControllerSavePressed"<< savedObj;
 	if(savedObj.value("document_id") == QJsonValue::Undefined)
-		Controller::Get()->storeDoc("ViewStructure",QJsonDocument(savedObj));
-	else Controller::Get()->UpdateDoc(QJsonDocument(savedObj));
+		Controller::Get()->storeJson("","ViewStructure",QJsonDocument(savedObj));
+	else Controller::Get()->updateJson(savedObj.value("document_id").toString(),"ViewStructure",QJsonDocument(savedObj));
+
 
 
 	Controller::Get()->createIndexes(savedObj);

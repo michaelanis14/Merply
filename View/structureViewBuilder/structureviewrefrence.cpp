@@ -16,8 +16,9 @@ StructureViewRefrence::StructureViewRefrence(QWidget *parent,QJsonObject strct,Q
 
 	source = new ERPComboBox(0);
 	layout->addRow(new QLabel(tr("Source ")), source);
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
-	Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
+//	QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
+//	Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
+	gotSourceData();
 	getItemsbtn = new QPushButton("Get Items");
 	QObject::connect(getItemsbtn,SIGNAL(clicked(bool)),this,SLOT(getItemsbtnClicked(bool)));
 	layout->addWidget(getItemsbtn);
@@ -43,22 +44,26 @@ QJsonObject StructureViewRefrence::save()
 	return save;
 }
 
-void StructureViewRefrence::gotSourceData(QVector<QJsonDocument> items)
+void StructureViewRefrence::gotSourceData()
 {
 	//qDebug() << __FILE__ << __LINE__<< "gotSourceData" << items;
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
+	//QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(gotSourceData(QVector<QJsonDocument>)));
 	source->clear();
-	source->addJsonItems(items);
+
+	source->addItems(Controller::Get()->getCachedViewStructureNames());
 	if(strct.value("Source") != QJsonValue::Undefined){
-		source->setCurrentIndex(source->keys.indexOf(strct.value("Source").toString()));
+		qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+//		source->setCurrentIndex(source->keys.indexOf(strct.value("Source").toString()));
 		}
 }
 
 void StructureViewRefrence::getItemsbtnClicked(bool)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
-	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
-	Controller::Get()->getFields(source->getKey());
+//	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+//	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateSelectData(QList<QString>)));
+//	Controller::Get()->getFields(source->getKey());
+
+	updateSelectData(Controller::Get()->getCachedViewStructureFieldsNames(source->getKey()));
 }
 void StructureViewRefrence::updateSelectData(QList<QString> fields)
 {

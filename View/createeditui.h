@@ -27,7 +27,7 @@ public:
 private:
 	//static CreateEditUI* p_instance;
 
-	 void clear();
+	void clear();
 	QWidget* createEditWidget;
 	QVBoxLayout *createEditWidgetLayout;
 	QWidget* errorsWidget;
@@ -37,12 +37,12 @@ private:
 	QJsonObject viewStructure;
 	QString cas;
 	QJsonObject data;
-	 void clearErrorsWidget();
-	 QStringList getTabelsFieldNames(QJsonObject viewStructure);
+	void clearErrorsWidget();
+	QStringList getTabelsFieldNames(QJsonObject viewStructure);
 	QShortcut* saveShortCut;
 	QShortcut* cancelShortCut;
 	QShortcut* printShortCut;
-
+	bool init;
 	QWidget* printAfterSaveWidget;
 	QHBoxLayout *printAfterSaveWidgetLayout;
 

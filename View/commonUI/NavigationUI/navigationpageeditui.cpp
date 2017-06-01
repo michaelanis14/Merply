@@ -103,7 +103,7 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	//	cardDetailsLayout->setFormAlignment(Qt::AlignLeft | Qt::AlignTop);
 	//	cardDetailsLayout->setLabelAlignment(Qt::AlignLeft);
 	cards = new ERPComboBox(this,false);
-	cards->clear();
+	//cards->clear();
 	cardDetailsLayout->addWidget(lblCard);
 	cardDetailsLayout->addWidget(cards);
 
@@ -115,8 +115,10 @@ NavigationPageEditUI::NavigationPageEditUI(QWidget *parent) : MainDisplay(parent
 	views = new ERPComboBox(this,false);
 	views->clear();
 
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
-	Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
+	//	QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
+	//Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
+	//	cards->clear();
+	cards->addItems(Controller::Get()->getCachedViewStructureNames());
 
 	//cardDetailsLayout->addRow(tr("View"),view);
 	layout->addWidget(cardDetails);
@@ -178,7 +180,7 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 
 	this->structureView = structureView;
 
-	//QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
+	//QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
 	//Controller::Get()->getJsonList("ViewStructure","Title",QString(DATABASE).append(".Type =\"Entity\""));
 
 	//if(!structureView.value("Title").toString().isEmpty())
@@ -193,17 +195,28 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 			updateNewCardPreview();
 			}
 		else{
-			cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
+				qDebug() << __FILE__ << __LINE__<< __func__ <<structureView.value("Card");
+			//	cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
+			if(structureView.value("Card").isDouble())
+			cards->setCurrentText((Controller::Get()->getCachedViewStructure(QString::number(structureView.value("Card").toInt()))).value("document_Name").toString());
+			else{
+				QString card = structureView.value("Card").toString().split("::")[1];
+				cards->setCurrentText(card);
+				}
+
+
+			/*
 			if(cards->currentIndex() == -1){
 				cards->clear();
-				QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
+				QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
 				Controller::Get()->getJsonList("ViewStructure","Title","`"+QString(DATABASE).append("`.Type =\"Entity\""));
+				qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
 
-
-				cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
+				//cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
 
 
 				}
+				*/
 			//qDebug() << __FILE__ << __LINE__  << cards->currentIndex() << structureView.value("CardData") << structureView;
 
 			view->setCurrentIndex(viewList.indexOf(structureView.value("Select").toString()));
@@ -218,7 +231,9 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 			}
 		else{
 			QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getPageData(QJsonDocument)));
-			Controller::Get()->getDoc(structureView.value("Card").toString());
+			if(structureView.value("Card").toString().split("::").count() > 1)
+				Controller::Get()->getDoc("viewstructure",QString(structureView.value("Card").toString().split("::")[0]),QString(structureView.value("Card").toString().split("::")[1]),"");
+			else qDebug() << __FILE__ << __LINE__  << structureView.value("Card").toString();
 			}
 
 		}
@@ -240,29 +255,31 @@ void NavigationPageEditUI::save(bool updateDataBase)
 			if(savedPage.value("document_id") != QJsonValue::Undefined){
 				//qDebug() << __FILE__ << __LINE__  << savedPage.value("document_id");
 				saveObject.insert("Card",savedPage.value("document_id").toString());
-				Controller::Get()->UpdateDoc(QJsonDocument(savedPage));
+				Controller::Get()->updateJson(savedPage.value("document_id").toString(),"Page",QJsonDocument(savedPage));
 				emit this->saved(saveObject);
 				}
 			else {
-				QObject::connect(Controller::Get(),SIGNAL(gotLastKey(QString)),this,SLOT(gotLastKeyData(QString)));
-				Controller::Get()->getLastKey();
-				Controller::Get()->storeDoc("Page",QJsonDocument(savedPage));
+				QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(gotLastKeyData(QString)));
+				Controller::Get()->storeJson("","Page",QJsonDocument(savedPage));
 				}
 			}
 		}
 	else if(card->isChecked()){
-		saveObject.insert("Card",cards->getKey());
+		qDebug() << __FILE__ << __LINE__<< cards->currentText() << Controller::Get()->getCachedViewStructureNames(cards->currentText());
+		saveObject.insert("Card",Controller::Get()->getCachedViewStructureNames(cards->currentText()));
 		saveObject.insert("Select",view->currentText());
-		qDebug() << cards->getKey()<< cards->getKey() << cards->getKey().contains("Page");
-		if(!cards->getKey().contains("Page"))
+		//qDebug() << cards->getKey()<< cards->getKey() << cards->getKey().contains("Page");
+		//qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+		//if(!cards->getKey().contains("Page"))
 		saveObject.insert("Type","Entity");
 		emit this->saved(saveObject);
 		}
 	else if(newCard->isChecked()){
-		if (Controller::Get()->Count("ViewStructure::"+this->headerlbl->getTitle().trimmed()+"\"") > 0)
-			Controller::Get()->ShowError(tr("Card name already exists") );
+		//		if (Controller::Get()->Count("ViewStructure::"+this->headerlbl->getTitle().trimmed()+"\"") > 0)
+		//			Controller::Get()->ShowError(tr("Card name already exists") );
 
-		else{
+		//	else
+		{
 		saveObject.insert("Select",view->currentText());
 		saveObject.insert("Type","Entity");
 		newCardStructure->headerlbl->setTitle(this->headerlbl->getTitle());
@@ -272,18 +289,18 @@ void NavigationPageEditUI::save(bool updateDataBase)
 			QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(gotLastKeyData(QString)));
 			//Controller::Get()->getLastKey();
 			QJsonObject newsStruct = newCardStructure->save() ;
-			Controller::Get()->storeDoc("ViewStructure::"+newsStruct.value("Title").toString(),QJsonDocument(newsStruct));
-
+			Controller::Get()->storeJson(newsStruct.value("Title").toString(),"ViewStructure",QJsonDocument(newsStruct));
 			}
 
 		}
-	}
+		}
 
 }
 void NavigationPageEditUI::gotLastKeyData(QString key)
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(gotLastKeyData(QString)));
 	saveObject.insert("Card",key);
+	qDebug() << __FILE__ << __LINE__  << "new Card Key" <<key;
 	emit this->saved(saveObject);
 }
 NavigationPageEditUI*NavigationPageEditUI::Get()
@@ -374,23 +391,25 @@ void NavigationPageEditUI::pageToggled(bool state)
 
 void NavigationPageEditUI::getCardData(QVector<QJsonDocument> items)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
 	cards->clear();
 	cards->addJsonItems(items);
-	cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
+	qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+	//	cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
 
 
-	QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getPagesList(QVector<QJsonDocument>)));
-	Controller::Get()->getJsonList("Page","Title");
+//	QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(getPagesList(QVector<QJsonDocument>)));
+//	Controller::Get()->getJsonList("Page","Title");
 
 }
 
 void NavigationPageEditUI::getPagesList(QVector<QJsonDocument> items)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(getCardData(QVector<QJsonDocument>)));
 	//cards->clear();
 	cards->addJsonItems(items);
-	cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
+	qDebug() << __FILE__ << __LINE__<< __func__ <<"DATABASE ERR";
+	//	cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
 
 }
 
@@ -415,12 +434,14 @@ void NavigationPageEditUI::updatePagePreview()
 
 void NavigationPageEditUI::deleteCard()
 {
-	QString id  = cards->getKey();
+	QString id  = QString::number(Controller::Get()->getCachedViewStructureNames(cards->currentText()));
+	//= cards->getKey();
 	qDebug() << __FILE__ << __LINE__  <<  cards->getKey();
-	if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?")))
-		if(Controller::Get()->deleteDocument(id)){
-			cards->removeSelected();
-			}
+	if(id.split("::").count()>1){
+		if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?")))
+			Controller::Get()->deleteDocument("ViewStructure",id);
+		cards->removeSelected();
+		}
 	//Controller::Get()->queryIndexView("ViewStructure::"+id.split("::")[0]);
 
 }
@@ -438,11 +459,13 @@ void NavigationPageEditUI::updateNewCardPreview()
 void NavigationPageEditUI::updateCardPreview()
 {
 	if(card->isChecked()){
-		if(currentCardKey.compare(cards->getKey()) != 0){
+		if(currentCardKey.compare(QString::number(Controller::Get()->getCachedViewStructureNames(cards->currentText()))) != 0)
+			{
 			clearPreview();
-			currentCardKey = cards->getKey();
+			currentCardKey = Controller::Get()->getCachedViewStructureNames(cards->currentText());
 			QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadCard(QJsonDocument)));
-			Controller::Get()->getDoc(this->currentCardKey);
+
+			Controller::Get()->getDoc("viewstructure","ViewStructure","",QString(this->currentCardKey));
 			}
 		}
 

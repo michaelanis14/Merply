@@ -25,8 +25,11 @@ class SubFieldUI : public QWidget
 public:
 	explicit SubFieldUI(QWidget *parent = 0,QString strID = "", QJsonObject structureView = QJsonObject(), QJsonValue data = QJsonValue());
 	void clear();
-	QJsonValue save();
+	QString save();
 	bool checkMandatory();
+
+	QString getSqlClmnNumber() const;
+
 private:
 	QHBoxLayout *layout;
 	QWidget* field;
@@ -35,13 +38,14 @@ private:
 	QString strID;
 	merplyTabelView * table;
 	ERPComboBox* localFilterCombobox;
+	QString sqlClmnNumber;
 signals:
 
 public slots:
 	void indexedFillEvent(QString completion);
 	void linkPressed();
-	void refrenceData(QVector<QJsonDocument> items);
-	void serialData(QString serial);
+	void refrenceData(QVector<QSqlRecord> items);
+	void serialData(int serial);
 	void updateFilter(QString filter);
 	void updateTable(QString);
 	void updateEquationField();

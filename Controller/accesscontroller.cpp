@@ -25,11 +25,11 @@ void AccessController::login(QString username, QString password)
 {
 	if(username.compare("root") == 0 && password.compare("root") == 0){
 		//qDebug() << "Login"<< username << password;
-		Model::Get()->login("root","root","root");
+		Model::Get()->login("0","root","root");
 		emit successLogin();
 		}
 	else{
-		Database* database  = Database::Gett();
+		Database* database  = new Database();
 		QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(loginData(QVector<QJsonDocument>)));
 		QString query = QString("SELECT (`"+QString(DATABASE)+"`).*  ,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \"Users::%\"  AND `Username` = '"+username+"' AND `UserPassword` = '"+password+"'");
 		//qDebug() << __FILE__ << __LINE__ <<"Q : " << query;
@@ -59,7 +59,7 @@ bool AccessController::hasAccess(QString group)
 		LoginUI::ShowUI();
 		return false;
 		}
-	else if(Model::Get()->getUserID().compare("root") == 0 )
+	else if(Model::Get()->getUserID().compare("0") == 0 )
 		return true;
 	else if(group.compare("3") == 0)
 		return false;
@@ -69,7 +69,7 @@ bool AccessController::hasAccess(QString group)
 
 void AccessController::loginData(QVector<QJsonDocument> user)
 {
-	//QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(loginData(QVector<QJsonDocument>)));
+	//QObject::disconnect(new Database(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),this,SLOT(loginData(QVector<QJsonDocument>)));
 	if(user.isEmpty()){
 		qDebug() << __FILE__ << __LINE__  << "user login faild : Wrong Password or UserName";
 		emit faildLogin();
@@ -91,7 +91,7 @@ bool AccessController::hasReadAccess(QJsonObject permissions)
 		LoginUI::ShowUI();
 		return false;
 		}
-	else if(Model::Get()->getUserID().compare("root") == 0 )
+	else if(Model::Get()->getUserID().compare("0") == 0 )
 		return true;
 
 
@@ -124,7 +124,7 @@ bool AccessController::hasWriteAccess(QJsonObject permissions)
 		LoginUI::ShowUI();
 		return false;
 		}
-	else if(Model::Get()->getUserID().compare("root") == 0 )
+	else if(Model::Get()->getUserID().compare("0") == 0 )
 		return true;
 
 	permissions = permissions.value("Permissions").toObject().value("Write").toObject();

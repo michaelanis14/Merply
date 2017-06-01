@@ -8,6 +8,8 @@
 #ifndef Controller_H
 #define Controller_H
 
+
+#include "model.h"
 #include "accesscontroller.h"
 #include <structureviewseditui.h>
 
@@ -45,18 +47,20 @@ public:
 	static bool ShowQuestion(QString question);
 	void static Log(QStringList log);
 
-	bool deleteDocument(QString id);
+	void deleteDocument(const QString& tabel, const QString& id);
 	static bool Compare(QJsonObject first,QJsonObject second);
 
 	QStringList getModelDocumentsNameByType(const QString& modelType);
 
-	int Count(const QString table);
+	void Count(const QString table);
 	int countIndex(const QString index);
-	void getDoc(QString key);
-	void getJsonList(QString table, QString select,QString condition = "");
+	void getDoc(const QString& select, const QString &tabel, const QString& key, const QString &id);
+	void getSelectList(QString table, QString select,QString condition = "");
 	void getJsonEntityFieldsList(QString table, QString select,QString condition = "");
 	void getLastKey();
+	/*
 	void getValue(QString key);
+	*/
 	QString getDatabaseName();
 
 	QList<QString> select(const QString query);
@@ -64,14 +68,14 @@ public:
 	QString toString(QString key = "",QJsonValue value = QJsonValue());
 	bool documentInList(QVector<QJsonDocument> all, QString key);
 	QVector<QJsonDocument> getEnities();
-	void getFields(QString Title);
-	void getIndexHeader(QString title);
+	//void getFields(QString Title,int);
+	//void getIndexHeader(QString title);
 	void getViewStructures();
 	void getPageStructures();
 	void updateLayoutViewGroups(QString entityName, QList<StructureViewsEditUI*> sVEUIs);
 	QStringList getLayoutViewGroups(QString entity);
-	bool storeDoc(QString key,QJsonDocument document);
-	static bool UpdateDoc(QJsonDocument document);
+	void storeJson(const QString& key,const QString& tabel,QJsonDocument document);
+	void updateJson(const QString& id,const QString& tabel,QJsonDocument document);
 
 	void showCreateEditeStrUI(QString str, bool create);
 	void showCreateEditeValueUI(QString key);
@@ -81,6 +85,7 @@ public:
 	SubFieldUI* getFirstSubField(QString strID, QString feildName);
 
 	void createIndexes(QJsonObject viewStrct);
+	void createEditSqlTabel(QJsonObject viewStrct);
 	//Model Interface
 
 	//Navigation
@@ -115,18 +120,38 @@ public:
 	QJsonObject getCachedViewStructure(QString key);
 	QMap<QString, QJsonObject> getCachedViewStructures() const;
 
-	void insertCachedPageStructure(QString key, QJsonObject viewStrct);
-	QJsonObject getCachedPageStructure(QString key);
-	QMap<QString, QJsonObject> getCachedPageStructures() const;
+	void insertCachedPageStructure(int key, QJsonObject viewStrct);
+	QJsonObject getCachedPageStructure(int key);
+	QMap<int, QJsonObject> getCachedPageStructures() const;
 
 	void insertCachedIndexUI(QString key, QWidget* instance);
 	QWidget* getCachedIndexUI(QString key);
 	bool isCachedIndexUI(QString key);
 
-	void insertCachedPageUI(QString key, QWidget* instance);
-	QWidget* getCachedPageUI(QString key);
-	bool isCachedPageUI(QString key);
+	void insertCachedPageUI(int key, QWidget* instance);
+	QWidget* getCachedPageUI(int key);
+	bool isCachedPageUI(int key);
 
+	void insertCachedViewStructureFieldsNames(int id, QStringList fieldsNames);
+	QStringList getCachedViewStructureFieldsNames(int id);
+
+	void insertCachedViewStructureIndexFieldsNames(int id, QStringList fieldsNames);
+	QStringList getCachedViewStructureIndexFieldsNames(int id);
+
+	void insertCachedViewStructureNames(QString name, int id);
+	int getCachedViewStructureNames(QString name);
+	QStringList getCachedViewStructureNames();
+
+	QHash<int, QJsonObject> getCachedViewStructureSubFields(int id);
+	void insertCachedViewStructureSubFields(int id, QHash<int, QJsonObject> subFields);
+
+	void insertCachedViewStructureTabelFields(int key, QVector<QJsonObject> tabelFields);
+	QVector<QJsonObject> getCachedViewStructureTabelFields(int key);
+	QMap<int, QVector<QJsonObject> > getCachedViewStructureTabelFields() const;
+
+
+	int getCachedSubFieldsClmnRef(int strctID);
+	QHash<int,int> subFieldsCounter;
 
 	//buildCachedUI s
 	void buildCachedCreateEditUI();
@@ -150,18 +175,22 @@ public:
 
 	bool runQRPTDesingerapp();
 
-	void query(QString query,bool cached);
+	void query(QString query);
 
 	bool createEditStore(QJsonObject document);
 	bool createEditRemoveRowItems(QJsonArray rowsItems);
 	QVector<QJsonObject> creatEditeItems;
-	void deleteEntity(QString documentID);
+	void deleteEntity(const QString& tabel, const QString& id);
 	void saveRefrenceStructures(QJsonObject mainStrct,QJsonObject data);
+
+	//Database Interface
+	void insertUpdateRow(QString query);
 
 	//preLoading feature
 	//QMap<QString,QJsonObject> structNames;
 	//QMap<QString,QWidget*> createEditUIWidget;
 	//bool accessed = false;
+
 private:
 	explicit Controller(QObject * parent = 0);
 	static Controller* p_instance;
@@ -175,44 +204,48 @@ public slots:
 	void showDisplayDataReturned(QJsonDocument document);
 	void loadNavigationData(QJsonDocument document);
 	void subNavPressedData(QJsonDocument documents);
-	void subNavPressedIndexData(QVector<QJsonDocument> documents);
+	void subNavPressedIndexData(QVector<QSqlRecord> documents);
 	void subNavPressedPageData(QJsonDocument document);
-	void getFieldsData(QVector<QJsonDocument> documents);
-	void getIndexHeaderData(QVector<QJsonDocument> documents);
-	void getViewStructuresData(QVector<QJsonDocument> documents);
-	void getPageStructuresData(QVector<QJsonDocument> documents);
+	//void getFieldsData(QVector<QJsonDocument> documents);
+	//void getIndexHeaderData(QVector<QJsonDocument> documents);
+	void getViewStructuresData(QVector<QSqlRecord> documents);
+	void getPageStructuresData(QVector<QSqlRecord> documents);
 	void linkPressedData(QJsonDocument document);
 	void getDocData(QJsonDocument document);
-	void GetJsonListData(QVector<QJsonDocument> items);
-	void getValueData(QString value);
+	void GetSelectListData(QVector<QSqlRecord> items);
+	//void getValueData(QString value);
 
-	void getReportData(QVector<QJsonDocument> documents);
+	void getReportData(QVector<QSqlRecord> documents);
 	void getLastKeyData(QString key);
 
 	void showCreateEditeStrUICreateTrueData(QJsonDocument str);
 	void showCreateEditeStrUIData(QJsonDocument str);
 	void showCreateEditeValueUIData(QJsonDocument value);
-	void queryData(QVector<QJsonDocument> items);
+	void queryData(QVector<QSqlRecord> items);
 
 	void createEditStoreItems(QString key);
 	void getTabelsData(QString entity,QStringList tbls);
-	void deleteEntityData(QVector<QJsonDocument> items);
+	//void deleteEntityData(QVector<QJsonDocument> items);
+
+	void buildViewStructureIndexFieldsNamesList(QJsonObject viewstrct); //
 
 	void successLogin();
+	void reBuildViewStructures();
 signals:
 	void getDocDataReturned(QJsonDocument document);
-	void gotFieldsData(QList<QString> fields);
+//	void gotFieldsData(QList<QString> fields);
 //	void gotStructsData(QMap<QString,QJsonObject> structsName);
-	void gotReportData(QVector<QJsonDocument> documents);
+	void gotReportData(QVector<QSqlRecord> documents);
 	void gotDocument(QJsonDocument docuemnt);
 	void gotDocuments(QVector<QJsonDocument> array);
-	void gotValue(QString value);
+	//void gotValue(QString value);
 	void gotLastKey(QString LastKeyID);
-	void gotJsonListData(QVector<QJsonDocument> items);
+	void gotSelectListData(QVector<QSqlRecord> items);
 	void queryDatabase(QString q);
 	void saved(QString document_id);
 	void savedItems(QString document_id);
 	void savedQJson(QJsonDocument savedDocument);
+	void CountData(int count);
 
 };
 

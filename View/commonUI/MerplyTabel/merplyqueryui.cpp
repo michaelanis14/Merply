@@ -99,7 +99,8 @@ void MerplyQueryUI::fillDocumentID(QString document_id)
 	if(!document_id.isEmpty() && document_id.split("::").count() > 1){
 		this->document_id = document_id;
 		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(fillData(QJsonDocument)));
-		Controller::Get()->getDoc(document_id);
+
+		Controller::Get()->getDoc("viewstructure","ViewStructure",QString(this->document_id.split("::")[1]),"");
 		}
 }
 
@@ -218,7 +219,7 @@ void MerplyQueryUI::generateQuery(int lmit)
 	if(!query.isEmpty()){
 		//qDebug() << query;
 		QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotData(QVector<QJsonDocument>)));
-		Controller::Get()->query(query,false);
+		Controller::Get()->query(query);
 		}
 	else{
 		if(this->btnFilter)

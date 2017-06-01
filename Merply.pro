@@ -4,9 +4,9 @@
 # Copyright (C) 2015 Merply - Michael Bishara e.U.
 #-------------------------------------------------
 
-QT       += core gui printsupport
+QT       += core gui printsupport sql
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets concurrent
 
 TARGET = MERPLY
 TEMPLATE = app
@@ -60,19 +60,25 @@ LIBS += -L$${DESTDIR}/lib -lQtZint
 RESOURCES += \
     resources/resources.qrc
 
-macx: LIBS += -L$$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/lib/ -lcouchbase
-
-macx:INCLUDEPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
-macx:DEPENDPATH += $$PWD/../../../../../../../usr/local/Cellar/libcouchbase/2.7.1/include
-
-win32:CONFIG(release, debug|release): LIBS += -LC:/libcouchbase/lib/ -llibcouchbase
-else:win32:CONFIG(debug, debug|release): LIBS += -LC:/libcouchbase/lib/ -llibcouchbase_d
-
-win32:INCLUDEPATH += C:/libcouchbase/include
-win32:DEPENDPATH += C:/libcouchbase/include
 
 
-unix:LIBS += -L/usr/include/libcouchbase/ -lcouchbase
-unix:INCLUDEPATH +=/usr/include/libcouchbase/
-unix:DEPENDPATH +=/usr/include/libcouchbase/
+macx: LIBS += -L$$PWD/../Build/debug/lib/mySQL/lib/ -lmysqlcppconn.7.1.1.8
+
+INCLUDEPATH += $$PWD/../Build/debug/lib/mySQL/include
+DEPENDPATH += $$PWD/../Build/debug/lib/mySQL/include
+
+
+
+macx: LIBS += -L$$PWD/../../../../../usr/local/Cellar/mysql/5.7.17/lib/ -lmysqlclient.20
+
+INCLUDEPATH += $$PWD/../../../../../usr/local/Cellar/mysql/5.7.17/include
+DEPENDPATH += $$PWD/../../../../../usr/local/Cellar/mysql/5.7.17/include
+
+
+
+macx: LIBS += -L$$PWD/../../../../../Users/michaelbishara/Qt5.8.0/5.8/clang_64/plugins/sqldrivers/ -lqsqlmysql
+
+INCLUDEPATH += $$PWD/../../../../../Users/michaelbishara/Qt5.8.0/5.8/clang_64/plugins/sqldrivers
+DEPENDPATH += $$PWD/../../../../../Users/michaelbishara/Qt5.8.0/5.8/clang_64/plugins/sqldrivers
+
 

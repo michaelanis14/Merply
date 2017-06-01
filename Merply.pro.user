@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.2.1, 2017-03-25T11:40:03. -->
+<!-- Written by QtCreator 4.2.1, 2017-05-26T16:15:48. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -515,7 +515,7 @@
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
-      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Deploy to Michael's iPhone</value>
+      <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Deploy to *unknown*2</value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
       <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.IosDeployStep</value>
      </valuemap>
@@ -577,8 +577,8 @@
      <value type="int" key="type">0</value>
     </valuemap>
     <value type="QString" key="Ios.run_arguments"></value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Run on Michael's iPhone</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Run MERPLY on Michael's iPhone</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Run on *unknown*2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Run MERPLY on *unknown*2</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.IosRunConfiguration:/Projects/Merply/Project/src/Merply/Merply.pro</value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
@@ -841,8 +841,8 @@
      <value type="int">14</value>
     </valuelist>
     <valuemap type="QVariantMap" key="Ios.device_type">
-     <value type="QString" key="displayName">iPhone SE, iOS 10.2</value>
-     <value type="QString" key="identifier">DE05640D-4843-48EB-A9C0-1E99B3222747</value>
+     <value type="QString" key="displayName">iPhone SE, iOS 10.3</value>
+     <value type="QString" key="identifier">8B5C150D-C92D-4CC5-A84D-279BE13CBB40</value>
      <value type="int" key="type">1</value>
     </valuemap>
     <value type="QString" key="Ios.run_arguments"></value>

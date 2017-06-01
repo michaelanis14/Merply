@@ -13,7 +13,7 @@ public:
 	explicit FeildUI(QWidget *parent = 0,QString strID = ""
 			, QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject());
 //	void clear();
-	void save(QJsonObject* entity);
+	void save(QPair<QString, QString>* insertQuery);
 	QLabel * label;
 	QList<SubFieldUI*> subFields;
 	QString checkMandatory();

@@ -66,7 +66,7 @@ navigationUI::navigationUI(QWidget *parent) :
 
 void navigationUI::loadMainNavigation(QJsonDocument navDoc)
 {
-	//qDebug() << navDoc;
+	qDebug() << navDoc.object().value("viewstructure");
 	mainNavigation->clear();
 	subNavigation->clear();
 	Controller::Get()->clearMainNavigation();
@@ -94,7 +94,7 @@ void navigationUI::loadMainNavigation(QJsonDocument navDoc)
 				}
 			mainNavigation->resizeColumnToContents(0);
 			{
-			//qDebug() << __FILE__ << __LINE__  << "subNavItems" << subNavItems;
+		//	qDebug() << __FILE__ << __LINE__  << "subNavItems" << subNavItems;
 			Controller::Get()->addMainNavigation(key,title);
 			Controller::Get()->addSubNavigation(key,subNavItems);
 			}
@@ -195,7 +195,7 @@ void navigationUI::btn_Clicked(QString btn)
 		navigationUI::Get()->setHidden(true);
 		NavigationEditUI::Get()->setParent(MainForm::Get());
 		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(btn_ClickedDataReturned(QJsonDocument)));
-		Controller::Get()->getDoc("NavigationUI::1");
+		Controller::Get()->getDoc("viewstructure","Navigation","Default","1");
 		}
 }
 

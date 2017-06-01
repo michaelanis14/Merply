@@ -134,7 +134,7 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 					}
 				else if(nActon.at(1).compare("Delete") == 0){
 					if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?").append(" "+id))){
-						Controller::Get()->deleteEntity(id);
+						Controller::Get()->deleteEntity(id.split("::")[0],id.split("::")[1]);
 						queryUI->generateQuery();
 						//Controller::Get()->queryIndexView("ViewStructure::"+id.split("::")[0]);
 						}
@@ -259,7 +259,7 @@ bool merplyTabelView::fillText(QJsonObject data)
 	return true;
 }
 
-void merplyTabelView::indexTable(const QString document_id,const QVector<QJsonDocument> items)
+void merplyTabelView::indexTable(const int document_id,const QVector<QJsonDocument> items)
 {
 	this->items = items;
 	this->indexDocument_id = document_id;
@@ -276,10 +276,10 @@ void merplyTabelView::indexTable(const QString document_id,const QVector<QJsonDo
 
 	//QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QVector<QJsonDocument>)),this,SLOT(fill(QVector<QJsonDocument>)));
 	//qDebug() << __FILE__ << __LINE__  << "indexTable" << document_id ;
-	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
-	Controller::Get()->getIndexHeader(document_id);
+//	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT());
+//	getIndexHeader();
 
-
+	updateHeaderData(Controller::Get()->getCachedViewStructureIndexFieldsNames(document_id));
 	//	initHController(QJsonObject());
 
 }
@@ -487,7 +487,7 @@ void merplyTabelView::gotReportData(QVector<QJsonDocument> documents)
 
 void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
+	//QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
 
 	QJsonObject clmnObj = QJsonObject();
 	clmnObj.insert("clmnsHeader",QJsonValue::fromVariant(QVariant(headerItems)));

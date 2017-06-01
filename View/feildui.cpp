@@ -113,7 +113,7 @@ emptyData:
 		}
 }
 
-void FeildUI::save(QJsonObject* entity)
+void FeildUI::save(QPair<QString,QString> *insertQuery)
 {
 	if(structureView.value("ArrayList") != QJsonValue::Undefined   && structureView.value("ArrayList").toBool()){
 		QJsonArray arrySubfieldsValues;
@@ -134,26 +134,36 @@ void FeildUI::save(QJsonObject* entity)
 				}
 			arrySubfieldsValues.append(subfieldsValues);
 			}
-		entity->insert(this->label->text(),arrySubfieldsValues);
+		//	TODO : SAVE ARRAYLIST:
+		//	entity->insert(this->label->text(),arrySubfieldsValues);
 		}
 	else{
 
 		if(!subFields.isEmpty()){
-			if(subFields.count() > 1){
+			if(subFields.count() > 0){
 				//qDebug() << "subFields.count() > 1";
-				QString subfieldsValues;
+
 				foreach(SubFieldUI* subfeild,subFields){
-					if(!subfieldsValues.isEmpty())
-						subfieldsValues.append(";");
-					subfieldsValues.append(subfeild->save().toString());
+
+					QString subFieldSave = subfeild->save();
+					if(subFieldSave.isEmpty())
+						continue;
+
+					if(!insertQuery->first.isEmpty())
+						insertQuery->first.append(" , ");
+					insertQuery->first.append("`"+subfeild->getSqlClmnNumber().trimmed()+"`");
+					if(!insertQuery->second.isEmpty())
+						insertQuery->second.append(" , ");
+					insertQuery->second.append(subFieldSave);
+
 					}
 				}
-			else if(!subFields.isEmpty()){
+			//else if(!subFields.isEmpty()){
 			//	qDebug() << "!subFields.isEmpty()";
-				QJsonValue savedField = subFields.first()->save();
-				if(!savedField.isNull())
-					entity->insert(this->label->text(),subFields.first()->save());
-				}
+			//	QJsonValue savedField = subFields.first()->save();
+			//	if(!savedField.isNull())
+			//		entity->insert(this->label->text(),subFields.first()->save());
+			//	}
 			}
 
 		}

@@ -64,10 +64,13 @@ void PageUI::controller_Clicked(QString nameAction)
 		QStringList nActon = nameAction.split("->");
 		if(nActon.count() > 1){
 			if(nActon.at(1).compare("Print") == 0){
-				QJsonObject toPrint = viewGroups->save();
-				qDebug() << toPrint;
-				toPrint.insert("document_id",document_id);
-				PrintController::Get()->gotPrintEntity(QJsonDocument(toPrint));
+				qDebug()<< __FILE__ << __LINE__ << "TODO" << "PRINTING ";
+				//TODO PRINTINGG
+
+				//QJsonObject toPrint = viewGroups->save();
+				//qDebug() << toPrint;
+				//toPrint.insert("document_id",document_id);
+			///	PrintController::Get()->gotPrintEntity(QJsonDocument(toPrint));
 			//	PrintController::Get()->printEntity("id");
 				//////////////				Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 				}

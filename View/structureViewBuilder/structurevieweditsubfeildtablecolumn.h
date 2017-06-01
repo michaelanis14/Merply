@@ -59,8 +59,8 @@ signals:
 public slots:
 	void updateFields(int value);
 	void updateSelect(QString);
-	void updateSelectData(QList<QString> fields);
-	void selectData(QVector<QJsonDocument> items);
+	void updateSelectData(QList<int> fields);
+	void selectData();
 	void filterOnChanged(int index);
 	void fillLocalFilter(QList<QVector<QJsonDocument> > feilds);
 	void fillLocalFilterLocalSource(QStringList fields);

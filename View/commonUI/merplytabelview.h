@@ -41,7 +41,7 @@ public:
 	bool fill(QJsonObject columns,QString filter = "");
 	bool fillLocalSource(QJsonObject columns,QString filter = "");
 	bool fillText(QJsonObject data);
-	void indexTable(const QString document_id, const QVector<QJsonDocument> items);
+	void indexTable(const int document_id, const QVector<QJsonDocument> items);
 	QVector<QJsonDocument> items;
 	QJsonObject save();
 	MerplyReportTableModel* model;

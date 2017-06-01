@@ -26,7 +26,7 @@ private:
 signals:
 
 public slots:
-	void gotSourceData(QVector<QJsonDocument> items);
+	void gotSourceData();
 	void getItemsbtnClicked(bool);
 	void updateSelectData(QList<QString> fields);
 };

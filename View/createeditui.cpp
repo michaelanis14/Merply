@@ -12,6 +12,8 @@
 
 CreateEditUI::CreateEditUI(QWidget* parent ) : MainDisplay(parent)
 {
+	this->init = false;
+	this->fieldsgroups = QHash<QString,FeildUI*>();
 
 }
 
@@ -67,6 +69,7 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 	cancelShortCut = new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(cancel()));
 	saveShortCut =new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_S), this, SLOT(saveEntity()));
 	printShortCut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_P), this, SLOT(printEntity()));
+	this->init = true;
 }
 
 //CreateEditUI* CreateEditUI::this = 0;
@@ -169,19 +172,19 @@ void CreateEditUI::clear()
 void CreateEditUI::fillData(QJsonObject data)
 {
 	if(!data.isEmpty()){
-			QStringList tbls =this->getTabelsFieldNames(this->viewStructure);
-			if(tbls.count() == 0){
-				this->clear();
-				this->fill(QJsonObject(), data);
-				}
-			else{
+		QStringList tbls =this->getTabelsFieldNames(this->viewStructure);
+		if(tbls.count() == 0){
+			this->clear();
+			this->fill(QJsonObject(), data);
+			}
+		else{
 
-				this->data = data;
-				//qDebug()<<"INITTT" << this->data;
-				QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotTabelsData(QVector<QJsonDocument>)));
-				Controller::Get()->getTabelsData(data.value("document_id").toString(),tbls);
+			this->data = data;
+			//qDebug()<<"INITTT" << this->data;
+			QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotTabelsData(QVector<QJsonDocument>)));
+			Controller::Get()->getTabelsData(data.value("document_id").toString(),tbls);
 			//	return;
-				}
+			}
 		}
 }
 
@@ -254,8 +257,8 @@ void CreateEditUI::printAfterSave(QJsonObject strct)
 QHash<QString, FeildUI*> CreateEditUI::getFieldsgroups() const
 {
 
-	if(!fieldsgroups.isEmpty())
-	return fieldsgroups;
+	if(init &&!fieldsgroups.isEmpty())
+		return fieldsgroups;
 	else return QHash<QString, FeildUI*>();
 }
 
@@ -316,7 +319,9 @@ void CreateEditUI::printEntity()
 		if(this->cas.isEmpty()){
 			}
 		else{
-			QJsonObject vgsSave = viewGroups->save();
+			QJsonObject vgsSave;
+			qDebug() << __FILE__ << __LINE__ <<"TODO PRINTING";
+			//= viewGroups->save();
 			QString documentID ;
 			if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined){
 				documentID = this->viewStructure.value("SaveAs").toString();
@@ -336,6 +341,7 @@ void CreateEditUI::saveEntity()
 {
 	this->saveShortCut->setEnabled(false);
 	this->clearErrorsWidget();
+	bool newDocument = true;
 	//qDebug() << "SAVEEE"	 << this->viewStructure;
 	QString errs = this->viewGroups->checkMandatory();
 	if(errs.isEmpty()){
@@ -343,6 +349,7 @@ void CreateEditUI::saveEntity()
 		QString documentID ;
 		if(!this->data.isEmpty()){
 			documentID = this->data.value("document_id").toString();
+			newDocument = false;
 			}
 		else if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined){
 			documentID = this->viewStructure.value("SaveAs").toString();
@@ -350,17 +357,91 @@ void CreateEditUI::saveEntity()
 		else{
 			documentID = this->viewStructure.value("document_id").toString();
 			}
-		if(this->cas.isEmpty()){
+		if(newDocument){
 
 
 
-			QString key = documentID.replace("ViewStructure::","");
+			QPair<QString,QString> insertQuery = this->viewGroups->save();
 
-			QJsonObject vgsSave = this->viewGroups->save();
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`Enabled`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append("1");
+
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`Active`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append("1");
+
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`ShowOnWebSite`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append("1");
+
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`CreatedOn`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append(QString("'"+(QDateTime::currentDateTime()).toString("yyyy-MM-dd hh:mm:ss")+"'"));
+
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`EditedOn`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append(QString("'"+(QDateTime::currentDateTime()).toString("yyyy-MM-dd hh:mm:ss")+"'"));
+
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`CreatedByName`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append(QString("'"+AccessController::Get()->getUserName()+"'"));
+
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`CreatedByID`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append(AccessController::Get()->getUserID());
+
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`EditedByName`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append(QString("'"+AccessController::Get()->getUserName()+"'"));
+
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`EditedByID`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append(AccessController::Get()->getUserID());
+
+
+
+			qDebug() << __FILE__ << __LINE__ <<"TODO NEW SAVE";
+			//= this->viewGroups->save();
 			//vgsSave.insert("cas_value",this->cas);
-			vgsSave.insert("document_id",key);
-			QObject::connect(Controller::Get(),SIGNAL(savedItems(QString)),this,SLOT(saved()));
-			Controller::Get()->createEditStore(vgsSave);
+			//vgsSave.insert("document_id",key);
+
+			QString insertQueryMerged =
+					QString("INSERT INTO `").append(documentID).append("` (").append(insertQuery.first.append(" ) VALUES (").append(insertQuery.second.append(" );")));
+
+			QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
+			Controller::Get()->insertUpdateRow(insertQueryMerged);
+
+
+
+/*
 			if(this->toInvoiceFlag){
 				if(this->toInvoice->isChecked())
 
@@ -370,7 +451,11 @@ void CreateEditUI::saveEntity()
 
 			}
 		else{
-			QJsonObject vgsSave = this->viewGroups->save();
+
+			QJsonObject vgsSave ;
+
+			//= this->viewGroups->save();
+			qDebug() << __FILE__ << __LINE__ <<"TODO NEW SAVE";
 			//qDebug() << vgsSave;
 			vgsSave.insert("cas_value",this->cas);
 			vgsSave.insert("document_id",documentID);
@@ -388,25 +473,27 @@ void CreateEditUI::saveEntity()
 			//Controller::Get()->UpdateDoc(QJsonDocument(vgsSave));
 			}
 
-
+*/
+		}
 		}
 	else{
+		qDebug()<<"ERRORRRR:" << errs;
 		foreach(QString err,errs.split(";")){
 			this->errorsWidgetLayout->addWidget(new QLabel(err +" can not be empty"));
 			}
 		this->saveShortCut->setEnabled(true);
 		}
-}
 
+}
 void CreateEditUI::cancel()
 {
 	saveShortCut->setEnabled(false);
-	QString documentID ;
+	int documentID ;
 	if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined){
-		documentID = this->viewStructure.value("SaveAs").toString();
+		documentID = this->viewStructure.value("SaveAs").toString().toInt();
 		}
 	else{
-		documentID = this->viewStructure.value("document_id").toString();
+		documentID = this->viewStructure.value("document_id").toString().toInt();
 		}
 
 	this->clear();
@@ -441,5 +528,5 @@ void CreateEditUI::saved()
 	this->clear();
 	this->data = QJsonObject();
 	this->fill(QJsonObject(),QJsonObject());
-	IndexUI::ShowUI(this->viewStructure.value("document_id").toString(),QVector<QJsonDocument>());
+	IndexUI::ShowUI(this->viewStructure.value("document_id").toString().toInt(),QVector<QJsonDocument>());
 }

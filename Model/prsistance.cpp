@@ -1,4 +1,6 @@
 #include "prsistance.h"
+#include "inittabel.h"
+
 
 #include <QFile>
 #include <QDir>
@@ -7,7 +9,7 @@
 
 Prsistance::Prsistance(QObject *parent) : QObject(parent)
 {
-//	Database::Get();
+	//	Database::Get();
 }
 Prsistance* Prsistance::p_instance = 0;
 Prsistance*Prsistance::Get()
@@ -23,6 +25,8 @@ Prsistance*Prsistance::Get()
 
 bool Prsistance::init()
 {
+
+	//CreateViewStructureTabels();
 	qDebug() << __FILE__ << __LINE__  <<"Init" << QCoreApplication::applicationDirPath()
 				;//<< Count("City::%\"");//<< Count("ViewStructure::Contact\"");
 	bool shipping = false;
@@ -37,8 +41,9 @@ bool Prsistance::init()
 		write("ContactType",QString("Name->Other"));
 		}
 */
+	/*
 	{
-	Database* database  = Database::Gett();
+	Database* database  =new Database();
 	database->query("SELECT (SELECT name  FROM system:indexes WHERE  keyspace_id ='"+QString(DATABASE)+"' AND state = 'deferred')[*].name");
 	if(!database->getArray().isEmpty() && database->getArray().count() > 0){
 		qDebug() << "Building Indexs";
@@ -59,48 +64,48 @@ return true;
 	if(Count("ViewStructure::Users\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/Users.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-		Database* database  = Database::Gett(); database->storeDoc("ViewStructure::Users",doc);
+		Database* database  =new Database(); database->storeDoc("ViewStructure::Users",doc);
 		}
 
 	if(shipping&&Count("NavigationUI::1\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/NavigationUI.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-		Database* database  = Database::Gett(); database->storeDoc("NavigationUI::1",doc);
+		Database* database  =new Database(); database->storeDoc("NavigationUI::1",doc);
 		}
 	else if(shipping&&Count("NavigationUI::1\"") ==  0){
 		QString jsonFile = readFile(QCoreApplication::applicationDirPath()+"/AM/NAV.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-		Database* database  = Database::Gett(); database->storeDoc("NavigationUI::1",doc);
+		Database* database  =new Database(); database->storeDoc("NavigationUI::1",doc);
 		}
 	if(Count("ViewStructure::Groups\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/Groups.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-		Database* database  = Database::Gett(); database->storeDoc("ViewStructure::Groups",doc);
+		Database* database  =new Database(); database->storeDoc("ViewStructure::Groups",doc);
 		}
 	if(Count("ViewStructure::Contact\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/contact.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-		//	Database* database  = Database::Gett(); database->storeDoc("ViewStructure::Contact",doc);
+		//	Database* database  =new Database(); database->storeDoc("ViewStructure::Contact",doc);
 		}
 	if(Count("ViewStructure::Country\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/ViewStructureCountry.Json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-		Database* database  = Database::Gett(); database->storeDoc("ViewStructure::Country",doc);
+		Database* database  =new Database(); database->storeDoc("ViewStructure::Country",doc);
 		}
 	if(Count("ViewStructure::City\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/City.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-		Database* database  = Database::Gett(); database->storeDoc("ViewStructure::City",doc);
+		Database* database  =new Database(); database->storeDoc("ViewStructure::City",doc);
 		}
 	if(shipping && Count("ViewStructure::AirlinesCode\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/AirlinesCode.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-		//Database* database  = Database::Gett(); database->storeDoc("ViewStructure::AirlinesCode",doc);
+		//Database* database  =new Database(); database->storeDoc("ViewStructure::AirlinesCode",doc);
 		}
 	if(shipping &&Count("ViewStructure::AirportsCode\"") ==  0){
 		QString jsonFile = readFile(":/initData/initData/AirportsCode.json");
 		QJsonDocument doc = QJsonDocument::fromJson(jsonFile.toUtf8());
-		//Database* database  = Database::Gett(); database->storeDoc("ViewStructure::AirportsCode",doc);
+		//Database* database  =new Database(); database->storeDoc("ViewStructure::AirportsCode",doc);
 		}
 	if(shipping &&Count("AirlinesCode::%\"") ==  0){
 		QStringList fileData = readCSVFile(":/initData/initData/AirlinesCodeData.csv");
@@ -132,7 +137,7 @@ return true;
 				}
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett(); database->storeDoc("AirlinesCode",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("AirlinesCode",QJsonDocument(c));
 				}
 			}
 
@@ -170,7 +175,7 @@ return true;
 				}
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett(); database->storeDoc("AirportsCode",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("AirportsCode",QJsonDocument(c));
 				}
 			}
 
@@ -217,7 +222,7 @@ return true;
 
 				}
 			if(!c.isEmpty()){
-				Database* database  = Database::Gett(); database->storeDoc("Country",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Country",QJsonDocument(c));
 				}
 			}
 		}
@@ -248,7 +253,7 @@ return true;
 				}
 			if(!c.isEmpty()){
 
-				Database* database  = Database::Gett(); database->storeDoc("City",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("City",QJsonDocument(c));
 				}
 			}
 
@@ -279,7 +284,7 @@ return true;
 		if(!arryObj.isEmpty()){
 			QJsonObject fieldsArry;
 			fieldsArry.insert("Fields",QJsonArray() << arryObj);
-			Database* database  = Database::Gett(); database->storeDoc("ContactType",QJsonDocument(fieldsArry));
+			Database* database  =new Database(); database->storeDoc("ContactType",QJsonDocument(fieldsArry));
 			}
 
 		}
@@ -327,7 +332,7 @@ return true;
 				}
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett(); database->storeDoc("Contact",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Contact",QJsonDocument(c));
 				}
 			}
 		}
@@ -351,7 +356,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("Category1",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Category1",QJsonDocument(c));
 				continue;
 				}
 
@@ -365,7 +370,7 @@ return true;
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett(); database->storeDoc("Category1",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Category1",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -387,7 +392,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("Category2",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Category2",QJsonDocument(c));
 				continue;
 				}
 
@@ -401,7 +406,7 @@ return true;
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett(); database->storeDoc("Category2",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Category2",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -427,7 +432,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett();
+				Database* database  =new Database();
 				database->storeDoc("Category3",QJsonDocument(c));
 				continue;
 				}
@@ -442,7 +447,7 @@ return true;
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett();
+				Database* database  =new Database();
 				database->storeDoc("Category3",QJsonDocument(c));
 				idx++;
 				}
@@ -469,7 +474,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("Category4",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Category4",QJsonDocument(c));
 				continue;
 				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
@@ -482,7 +487,7 @@ return true;
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett(); database->storeDoc("Category4",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Category4",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -508,7 +513,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("Category5",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Category5",QJsonDocument(c));
 				continue;
 				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
@@ -521,7 +526,7 @@ return true;
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett(); database->storeDoc("Category5",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Category5",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -547,7 +552,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("Category6",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Category6",QJsonDocument(c));
 				continue;
 				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
@@ -560,7 +565,7 @@ return true;
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett(); database->storeDoc("Category6",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Category6",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -586,7 +591,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("Unit",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Unit",QJsonDocument(c));
 				continue;
 				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
@@ -600,7 +605,7 @@ return true;
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett(); database->storeDoc("Unit",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Unit",QJsonDocument(c));
 				}
 			}
 		}
@@ -625,7 +630,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("CountryArabic",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("CountryArabic",QJsonDocument(c));
 				continue;
 				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
@@ -638,7 +643,7 @@ return true;
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << fieldsArry;
-				Database* database  = Database::Gett(); database->storeDoc("CountryArabic",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("CountryArabic",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -669,7 +674,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("Products",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Products",QJsonDocument(c));
 				continue;
 				}
 
@@ -779,7 +784,7 @@ return true;
 
 			if(!c.isEmpty()){
 				//	qDebug() << __FILE__ << __LINE__ << c;
-				Database* database  = Database::Gett(); database->storeDoc("Products",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Products",QJsonDocument(c));
 				idx++;
 				}
 			//if (i % 100 == 0)
@@ -808,7 +813,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("clients",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("clients",QJsonDocument(c));
 				continue;
 				}
 
@@ -825,7 +830,7 @@ return true;
 			//qDebug() << __FILE__ << __LINE__ << c;
 			if(!c.isEmpty()){
 				qDebug() << __FILE__ << __LINE__ << c;
-				Database* database  = Database::Gett(); database->storeDoc("clients",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("clients",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -852,7 +857,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("supplier",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("supplier",QJsonDocument(c));
 				continue;
 				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
@@ -868,7 +873,7 @@ return true;
 			//	qDebug() << __FILE__ << __LINE__ << data.at(14);
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << c;
-				Database* database  = Database::Gett(); database->storeDoc("supplier",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("supplier",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -890,7 +895,7 @@ return true;
 			//	qDebug() << __FILE__ << __LINE__ << data.at(14);
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << c;
-				Database* database  = Database::Gett(); database->storeDoc("PaymentMethod",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("PaymentMethod",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -916,7 +921,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("Regions",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Regions",QJsonDocument(c));
 				continue;
 				}
 			if(0 < data.count() && !data.at(0).isEmpty()){
@@ -928,7 +933,7 @@ return true;
 			//qDebug() << __FILE__ << __LINE__ << data.at(1) << data.at(0);
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << c;
-				Database* database  = Database::Gett(); database->storeDoc("Regions",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Regions",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -949,7 +954,7 @@ return true;
 			//	qDebug() << __FILE__ << __LINE__ << data.at(14);
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << c;
-				Database* database  = Database::Gett(); database->storeDoc("Safe",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Safe",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -975,7 +980,7 @@ return true;
 			if(i != id ){
 				QJsonObject c;
 				c.insert("Name","404");
-				Database* database  = Database::Gett(); database->storeDoc("Stores",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Stores",QJsonDocument(c));
 				continue;
 				}
 
@@ -988,7 +993,7 @@ return true;
 			//	qDebug() << __FILE__ << __LINE__ << data.at(14);
 			if(!c.isEmpty()){
 				//qDebug() << __FILE__ << __LINE__ << c;
-				Database* database  = Database::Gett(); database->storeDoc("Stores",QJsonDocument(c));
+				Database* database  =new Database(); database->storeDoc("Stores",QJsonDocument(c));
 				idx++;
 				}
 			}
@@ -1053,19 +1058,19 @@ return true;
 
 	if(Count("OrederIn::%\"") < 0){
 
-		Database* databaseStores  = Database::Gett();
+		Database* databaseStores  =new Database();
 		databaseStores->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> stores = databaseStores->getArray();
 
-		Database* databaseClients  = Database::Gett();
+		Database* databaseClients  =new Database();
 		databaseClients->query("SELECT `d`.`أسم العميل` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `AM` d WHERE meta(`d`).id LIKE 'clients::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> clients = databaseClients->getArray();
 
-		Database* databaseSuppliers  = Database::Gett();
+		Database* databaseSuppliers  =new Database();
 		databaseSuppliers->query("SELECT `d`.`أسم المورد` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `AM` d WHERE meta(`d`).id LIKE 'supplier::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> suppliers = databaseSuppliers->getArray();
 
-		Database* databaseProducts  = Database::Gett();
+		Database* databaseProducts  =new Database();
 		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
@@ -1226,6 +1231,7 @@ save:
 										idxReturns++;
 										}
 										*/
+	/*
 									c.insert("document_id","Returns");
 									Controller::Get()->createEditStore(c);
 									//Database::Get()->storeDoc("Returns",QJsonDocument(c));
@@ -1233,6 +1239,7 @@ save:
 									idxReturns++;
 									}
 								else{
+									/*
 									/*
 								if(currentID != -1)
 
@@ -1243,6 +1250,7 @@ save:
 										idxOrderOut++;
 										}
 										*/
+	/*
 									c.insert("document_id","OrderOut");
 									Controller::Get()->createEditStore(c);
 									//Database::Get()->storeDoc("OrderOut",QJsonDocument(c));
@@ -1261,7 +1269,9 @@ save:
 								idxOrderIn++;
 								}
 								*/
-								c.insert("document_id","OrederIn");
+	\
+	/*
+	 * c.insert("document_id","OrederIn");
 								Controller::Get()->createEditStore(c);
 
 								//Database::Get()->storeDoc("OrederIn",QJsonDocument(c));
@@ -1386,15 +1396,15 @@ save:
 
 	if(Count("OrderOut::%\"") < 10){
 
-		Database* databaseStores  = Database::Gett();
+		Database* databaseStores  =new Database();
 		databaseStores->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> stores = databaseStores->getArray();
 
-		Database* databaseClients  = Database::Gett();
+		Database* databaseClients  =new Database();
 		databaseClients->query("SELECT `d`.`أسم العميل` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `AM` d WHERE meta(`d`).id LIKE 'clients::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> clients = databaseClients->getArray();
 
-		Database* databaseProducts  = Database::Gett();
+		Database* databaseProducts  =new Database();
 		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,`d`.`كود الصنف` AS `C`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
@@ -1507,15 +1517,15 @@ save:
 
 	if(Count("Returns::%\"") < 10){
 
-		Database* databaseStores  = Database::Gett();
+		Database* databaseStores  =new Database();
 		databaseStores->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> stores = databaseStores->getArray();
 
-		Database* databaseClients  = Database::Gett();
+		Database* databaseClients  =new Database();
 		databaseClients->query("SELECT `d`.`أسم العميل` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `AM` d WHERE meta(`d`).id LIKE 'clients::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> clients = databaseClients->getArray();
 
-		Database* databaseProducts  = Database::Gett();
+		Database* databaseProducts  =new Database();
 		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
@@ -1627,15 +1637,15 @@ save:
 
 	if(Count("OrederIn::%\"") < 10){
 
-		Database* databaseStores  = Database::Gett();
+		Database* databaseStores  =new Database();
 		databaseStores->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> stores = databaseStores->getArray();
 
-		Database* databaseSuppliers  = Database::Gett();
+		Database* databaseSuppliers  =new Database();
 		databaseSuppliers->query("SELECT `d`.`أسم المورد` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `AM` d WHERE meta(`d`).id LIKE 'supplier::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> suppliers = databaseSuppliers->getArray();
 
-		Database* databaseProducts  = Database::Gett();
+		Database* databaseProducts  =new Database();
 		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
@@ -1748,11 +1758,11 @@ save:
 
 	if(Count("TransferTo::%\"") < 10){
 
-		Database* databaseStores  = Database::Gett();
+		Database* databaseStores  =new Database();
 		databaseStores->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> stores = databaseStores->getArray();
 
-		Database* databaseProducts  = Database::Gett();
+		Database* databaseProducts  =new Database();
 		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
@@ -1864,11 +1874,11 @@ save:
 		//if()
 	if(Count("TransferFrom::%\"") < 10){
 
-		Database* databaseStores  = Database::Gett();
+		Database* databaseStores  =new Database();
 		databaseStores->query("SELECT `d`.`أسم المخزن` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Stores::%' ORDER BY `BB` ",false);
 		QVector<QJsonDocument> stores = databaseStores->getArray();
 
-		Database* databaseProducts  = Database::Gett();
+		Database* databaseProducts  =new Database();
 		databaseProducts->query("SELECT `d`.`أسم الصنف` AS `N`,to_number(SPLIT(META(d).id,'::')[1]) AS `BB` FROM `AM`  d WHERE meta(`d`).id LIKE 'Products::%' ORDER BY `BB`",false);
 		QVector<QJsonDocument> products = databaseProducts->getArray();
 
@@ -1980,6 +1990,7 @@ save:
 		//if()
 
 	return true;
+			*/
 }
 
 
@@ -2025,7 +2036,7 @@ QStringList Prsistance::readCSVFile(QString path)
 
 	return lines;
 }
-
+/*
 void Prsistance::GetJsonList(QString table, QString select,QString condition)
 {
 	QString where;
@@ -2034,25 +2045,18 @@ void Prsistance::GetJsonList(QString table, QString select,QString condition)
 	QString query = "SELECT ARRAY_REPEAT(TOARRAY("+select.trimmed()+"),1) AS `Value`,META( `"+QString(DATABASE)+"`).id AS `Key`  FROM  `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE \""+table+"::%\" "+where;
 	//qDebug() << __FILE__ << __LINE__ << query;
 
-	Database* database  = Database::Gett();
-	QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QVector<QJsonDocument>)));
+	Database* database  =new Database();
+	QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),Prsistance::Get(),SLOT(GetSelectListData(QVector<QJsonDocument>)));
 	database->query(query);
 }
-
-void Prsistance::GetJsonEntityFields(QString table, QString select, QString condition)
+*/
+void Prsistance::GetSelectList(QString table, QString select, QString condition)
 {
-	//qDebug() << __FILE__ << __LINE__ << table << select << condition;
+		//qDebug() << __FILE__ << __LINE__ << table << select << condition;
 
 	QString where;
 	if(!condition.isEmpty()){
-		if(condition.split("=").count() > 1){
-			//where = QString("AND d.`"+condition.split("=")[0]+"` = '"+condition.split("=")[1]+"' ") ;
-			where = QString("AND d.").append(condition) ;
-			//where = QString("AND ANY item in f SATISFIES item.[0] =  END ");
-			}
-		else{
-			where = QString("AND "+condition);
-			}
+		where = QString("WHERE ").append(condition) ;
 		}
 	QString entities = table.split("::").count() > 1 ?table.split("::")[1]:table;
 
@@ -2061,43 +2065,45 @@ void Prsistance::GetJsonEntityFields(QString table, QString select, QString cond
 	//QString query ="SELECT Array item.`"+select.trimmed()+"` FOR item IN f END As `Value`,META(d).id AS `Key`  FROM "+QString(DATABASE)+" d UNNEST d.Fields f WHERE  META(d).id LIKE '"+entities+"::%' "+where;
 
 
-	QString query = "SELECT  d.`"+select.trimmed()+"` AS `Value`,META(d).id AS `Key`,to_number(SPLIT(META(d).id,'::')[1]) AS BB FROM `"+QString(DATABASE)+"` d WHERE META(d).id LIKE '"+entities+"::%' "+where+"  ORDER BY `BB` ";
-	//qDebug() << __FILE__ << __LINE__ << query;
-	Database* database  = Database::Gett();
-	QObject::connect(database,SIGNAL(gotDocuments(QVector<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QVector<QJsonDocument>)));
-	database->query(query,true);
+	QString query = "SELECT  `"+select.trimmed()+"` AS 'Value',`id` AS 'Key',`id` AS 'BB' FROM `"+entities+"` "+where+" ";
+	//qDebug() << __FILE__ << __LINE__ <<"GetJsonEntityFields REMAP" << query;
+	Database* database  =new Database();
+	QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),Prsistance::Get(),SLOT(GetSelectListData(QVector<QSqlRecord>)));
+	database->query(query);
 
 }
-void Prsistance::GetJsonListData(QVector<QJsonDocument> items)
+void Prsistance::GetSelectListData(QVector<QSqlRecord> items)
 {
-	//QObject::disconnect(Database::Get(),SIGNAL(gotDocuments(QVector<QJsonDocument>)),Prsistance::Get(),SLOT(GetJsonListData(QVector<QJsonDocument>)));
-	//	foreach(QJsonDocument doc,items){
-	//qDebug() << __FILE__ << __LINE__ << items;
-	//	}
-
-	emit GotJsonSelectList(items);
+	emit GotSelectList(items);
 }
-int Prsistance::Count(const QString table)
+
+
+void Prsistance::count(const QString& table)
 {
-	Database* database  = Database::Gett();
-	database->query("SELECT COUNT(*) AS count  FROM  "+QString(DATABASE)+" WHERE META( "+QString(DATABASE)+").id LIKE \""+table);
-
-	if(!database->getArray().isEmpty() && database->getArray().count() > 0){
-		return database->getArray().first().object().value("count").toInt();
-		}
-	else{
-		//	qDebug() << __FILE__ << __LINE__ <<"-1";
-		return 0;
-		}
-
-	return -1;
+	Database* database  =new Database();
+	QObject::connect(database,SIGNAL(gotValue(QString)),Prsistance::Get(),SLOT(gotCount(QString)));
+	database->query("SELECT COUNT(*) AS Value  FROM  "+table);
 }
+
+void Prsistance::countTabel(const QString& table)
+{
+	Database* database  =new Database();
+	QObject::connect(database,SIGNAL(gotValue(QString)),Prsistance::Get(),SLOT(gotCount(QString)));
+	database->query("SELECT count(*) AS Value FROM information_schema.tables WHERE table_schema = '"+QString(DATABASE)+"' AND table_name = '"+table+"'");
+}
+void Prsistance::gotCount(QString value)
+{
+	QObject::disconnect(sender(),SIGNAL(gotValue(QString)),Prsistance::Get(),SLOT(gotCount(QString)));
+	emit count(value.toInt());
+}
+
+
 
 int Prsistance::CountIndexes(const QString index)
 {
-	Database* database  = Database::Gett();
-	database->query("SELECT COUNT(*) AS count  FROM  system:indexes WHERE name= '"+index+"' AND keyspace_id = '"+QString(DATABASE)+"' AND state = 'online'");
-
+	//	Database* database  =new Database();
+	//	database->query("SELECT COUNT(*) AS count  FROM  system:indexes WHERE name= '"+index+"' AND keyspace_id = '"+QString(DATABASE)+"' AND state = 'online'");
+	/*
 	if(!database->getArray().isEmpty() && database->getArray().count() > 0){
 		return database->getArray().first().object().value("count").toInt();
 		}
@@ -2105,22 +2111,24 @@ int Prsistance::CountIndexes(const QString index)
 		//	qDebug() << __FILE__ << __LINE__ <<"-1";
 		return 0;
 		}
-
-	return -1;
+*/
+	return 1;
 }
 
 QVector<QJsonDocument> Prsistance::GetALL(const QString entity, const QString condition)
 {
+	/*
 	QString where;
 	if(!condition.isEmpty())
 		where = QString("AND "+condition);
 	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE META( `"+QString(DATABASE)+"`).id LIKE '"+entity+"::%' "+where);
 	qDebug() << __FILE__ << __LINE__ << query <<"===";
-	Database* database  = Database::Gett();
+	Database* database  =new Database();
 	database->query(query);
-	//qDebug() << __FILE__ << __LINE__ << Database::Get()->getArray().first().object().value("count").toInt();
+	//qDebug() << __FILE__ << __LINE__ <<new Database()->getArray().first().object().value("count").toInt();
 	return database->getArray();
-	//return QVector<QJsonDocument>();
+	*/
+	return QVector<QJsonDocument>();
 }
 
 
@@ -2141,4 +2149,33 @@ QString Prsistance::GetDatabaseName()
 	return QString(DATABASE);
 }
 
+bool Prsistance::CreateViewStructureTabels()
+{
+	QMap<int,QJsonObject>* builtTabels  = new QMap<int,QJsonObject>();
+	InitTabel* initT = new InitTabel(0,"");
+	while (builtTabels->count() < Model::Get()->cachedViewStructures.count()) {
+		QMapIterator<QString, QJsonObject> i(Model::Get()->cachedViewStructures);
+		while (i.hasNext()) {
+			outerloop:
+			i.next();
+			if(builtTabels->contains(i.key().toInt())){
+				continue;
+				}
+			else{
+				foreach(QJsonObject subField,Model::Get()->cachedViewStructureSubFields.value(i.key().toInt())){
+					if(subField.value("Type").toString().compare("Refrence") == 0){
+						if(!builtTabels->contains(subField.value("Source").toString().toInt())){
+							goto outerloop;
+							}
+						}
+					}
+					initT->count(QString::number(i.key().toInt()));
+					builtTabels->insert(i.key().toInt(),i.value());
+
+				}
+
+
+			}
+		}
+}
 

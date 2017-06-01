@@ -38,8 +38,8 @@ ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, 
 		}
 }
 
-void ViewGroup::save(QJsonObject* entity)
+void ViewGroup::save(QPair<QString,QString> *insertQuery)
 {
 	foreach(FeildUI* feild,feilds)
-		feild->save(entity);
+		feild->save(insertQuery);
 }

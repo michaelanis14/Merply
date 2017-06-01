@@ -154,6 +154,9 @@ StructureViewsEditUI::StructureViewsEditUI(QWidget *parent, QJsonObject structur
 		if(viewgroup.value("Fields").isArray())
 			foreach (QJsonValue fieldVS, viewgroup.value("Fields").toArray()) {
 				//	this->fieldsName << fieldVS.toObject().value("Label").toString();
+
+//				qDebug() << "DocumentID" << structureView.value("document_id").toString();
+
 				addStrField(fieldVS);
 				}
 		foreach (QJsonValue fieldVS, viewgroup.value("RefrenceFields").toArray()) {
@@ -278,7 +281,7 @@ void StructureViewsEditUI::updateLayoutPreview()
 			}
 		}
 	//layoutPreview->raise();
-//	emit changed();
+	//	emit changed();
 }
 
 void StructureViewsEditUI::loadStyle()
@@ -296,8 +299,9 @@ void StructureViewsEditUI::loadStyle()
 
 void StructureViewsEditUI::addStrField(QJsonValue fieldVS)
 {
-
-	StructureViewEdit * strcView = new StructureViewEdit(0,fieldVS,this->restrictedTypes);
+	QJsonObject strObject = fieldVS.toObject();
+	strObject.insert("document_id",this->structureView.value("document_id").toString());
+	StructureViewEdit * strcView = new StructureViewEdit(0,strObject,this->restrictedTypes);
 	QObject::connect(strcView,SIGNAL(changed()),this,SIGNAL(changed()));
 	sVSFs << strcView;
 	layout->setStretch(layout->count()-1,0);

@@ -43,7 +43,7 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 			field = combox;
 			if(strct.value("Editable").toString().compare("false") == 0)
 				combox->setEditable(false);
-			QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
+			QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
 			Controller::Get()->getJsonEntityFieldsList(strct.value("Source").toString(),strct.value("Select").toString(),strct.value("Condition").toString());
 			}
 		}
@@ -80,7 +80,7 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 		field = combox;
 		if(strct.value("Editable").toString().compare("false") == 0)
 			combox->setEditable(false);
-		QObject::connect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
+		QObject::connect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
 		Controller::Get()->getJsonEntityFieldsList(subField.value("Source").toString(),subField.value("Select").toString(),subField.value("Condition").toString());
 
 		}
@@ -199,7 +199,7 @@ int MerplyQuerySubField::getLayoutCount()
 
 void MerplyQuerySubField::refrenceData(QVector<QJsonDocument> items)
 {
-	QObject::disconnect(Controller::Get(),SIGNAL(gotJsonListData(QVector<QJsonDocument>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
+	QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(refrenceData(QVector<QJsonDocument>)));
 
 	if(combox){
 		combox->clear();

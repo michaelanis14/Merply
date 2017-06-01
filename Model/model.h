@@ -12,11 +12,15 @@
 #include "user.h"
 
 
-#include <QList>
+#include <QSqlDatabase>
+
 #include <QStringList>
 #include <QMap>
+#include <QJsonObject>
 #include <QTreeWidgetItem>
 
+#define DATABASE "sql2"
+#define ORDERBY "رقم"
 
 //DEFINES
 #define WINDOW_WIDTH 1000
@@ -45,10 +49,15 @@ public:
 	//preloading
 	QMap< QString,QWidget* > cachedCreateEditUI;
 	QMap< QString,QWidget* > cachedIndexUI;
-	QMap< QString,QWidget* > cachedPageUI;
+	QMap< int,QWidget* > cachedPageUI;
 	QMap<QString,QJsonObject> cachedViewStructures;
-	QMap<QString,QJsonObject> cachedPageStructures;
+	QMap<int,QJsonObject> cachedPageStructures;
+	QMap<int,QStringList> cachedViewStructureFieldsNames;
+	QMap<QString,int> cachedViewStructureNames;
+	QMap<int,QStringList> cachedViewStructureIndexFieldsNames;
+	QMap<int,QHash<int,QJsonObject> > cachedViewStructureSubFields;
 
+	QMap<int,QVector<QJsonObject>> cachedViewStructureTabelFields;
 	//Navigation
 	void addSubNavigation(double key, QList<QTreeWidgetItem*> subNav);
 	QList<QTreeWidgetItem*> getSubNavigation(double key);
@@ -70,6 +79,8 @@ public:
 
 
 
+
+
 	QMap<double, QList<QTreeWidgetItem*> > getSubNavigationModel();
 	QMap<double, QString > getMainNavigationModel();
 
@@ -86,10 +97,15 @@ public:
 
 	QMap<QString, QJsonObject> getCachedViewStructures() const;
 
-	QMap<QString, QJsonObject> getCachedPageStructures() const;
+	QMap<int, QJsonObject> getCachedPageStructures() const;
+
+	QSqlDatabase getDb() const;
+
+	QMap<int, QVector<QJsonObject> > getCachedViewStructureTabelFields() const;
 
 private:
 	explicit Model();
+	QSqlDatabase db;
 	///Flags///
 	bool showWarning;
 	bool isNameExistInList(QStringList &list, QString &name) ;

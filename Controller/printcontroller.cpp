@@ -11,15 +11,18 @@ PrintController* PrintController::p_instance = 0;
 PrintController* PrintController::Get()
 {
 	//if (p_instance == 0)
-		p_instance = new PrintController();
+	p_instance = new PrintController();
 
 	return p_instance;
 }
 void PrintController::printEntity(QString id)
 {
 	//qDebug() << __FILE__ << __LINE__  <<"printEntity"<< id;
-	QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintEntity(QJsonDocument)));
-	Controller::Get()->getDoc(id);
+	QStringList idSplit = id.split("::");
+	if(idSplit.count() > 1){
+		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintEntity(QJsonDocument)));
+		Controller::Get()->getDoc(" * ",idSplit[0],idSplit[1],"");
+		}
 }
 
 /**
@@ -41,62 +44,63 @@ void PrintController::gotPrintEntity(QJsonDocument document,bool showDialog)
 	getFieldstoValueMap(this->printDocumnet.object());
 	QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintStrct(QJsonDocument)));
 	//qDebug() << __FILE__ << __LINE__  <<"gotPrintEntity"<< documentID;
-	Controller::Get()->getDoc(documentID);
+	//Controller::Get()->getDoc(documentID);
+	Controller::Get()->getDoc("printstructure","PrintStructure",documentID,"");
 
 }
 void PrintController::getFieldstoValueMap(QJsonObject entity)
 {
 	reportData = QJsonArray();
 
-			QStringList keys;
+	QStringList keys;
 
-			keys = entity.keys();
-			//qDebug() << __FILE__ << __LINE__  << entity << keys;
-			foreach(QString key,keys){
+	keys = entity.keys();
+	//qDebug() << __FILE__ << __LINE__  << entity << keys;
+	foreach(QString key,keys){
 
 
-				QJsonValue value = entity.value(key);
-					if(value.isString())
-						fieldsValues.insert(key,value.toString());
-					else if(value.isDouble())
-						fieldsValues.insert(key,Controller::Get()->toString("",value));
+		QJsonValue value = entity.value(key);
+		if(value.isString())
+			fieldsValues.insert(key,value.toString());
+		else if(value.isDouble())
+			fieldsValues.insert(key,Controller::Get()->toString("",value));
 
-					else if(value.isObject()){
-						if(value.toObject().value("Value") != QJsonValue::Undefined)
-							fieldsValues.insert(key,value.toObject().value("Value").toString());
-						else if(value.toObject().value("merplyTabel") != QJsonValue::Undefined){
-								//qDebug() << value;
-							if(value.toObject().value("merplyTabel").isArray()){
-								//qDebug() << value.toObject().value("merplyTabel");
-								foreach (QJsonValue row, value.toObject().value("merplyTabel").toArray()) {
-									if(row.toObject().value("Value") != QJsonValue::Undefined){
-										QString rowValue = row.toObject().value("Value").toString();
-										if(!rowValue.isEmpty() && rowValue.compare("0") !=0)
-											reportData.append(row);
-										}
-									else if(row.toObject().value("Amount") != QJsonValue::Undefined){
-										QString rowAmount = row.toObject().value("Amount").toString();
-										if(!rowAmount.isEmpty() && rowAmount.compare("0") !=0)
-											reportData.append(row);
-										}
-									else{
-										reportData.append(row);
-										//qDebug() << row ;
-										}
-									}
-								//TODO : instead of Merging tables have better refrences
-
-								//qDebug() << reportData;
-								}
+		else if(value.isObject()){
+			if(value.toObject().value("Value") != QJsonValue::Undefined)
+				fieldsValues.insert(key,value.toObject().value("Value").toString());
+			else if(value.toObject().value("merplyTabel") != QJsonValue::Undefined){
+				//qDebug() << value;
+				if(value.toObject().value("merplyTabel").isArray()){
+					//qDebug() << value.toObject().value("merplyTabel");
+					foreach (QJsonValue row, value.toObject().value("merplyTabel").toArray()) {
+						if(row.toObject().value("Value") != QJsonValue::Undefined){
+							QString rowValue = row.toObject().value("Value").toString();
+							if(!rowValue.isEmpty() && rowValue.compare("0") !=0)
+								reportData.append(row);
+							}
+						else if(row.toObject().value("Amount") != QJsonValue::Undefined){
+							QString rowAmount = row.toObject().value("Amount").toString();
+							if(!rowAmount.isEmpty() && rowAmount.compare("0") !=0)
+								reportData.append(row);
+							}
+						else{
+							reportData.append(row);
+							//qDebug() << row ;
 							}
 						}
+					//TODO : instead of Merging tables have better refrences
+
+					//qDebug() << reportData;
+					}
+				}
+			}
 
 
-				//qDebug() << __FILE__ << __LINE__  << fvvapn.toObject().value(key).toString();
+		//qDebug() << __FILE__ << __LINE__  << fvvapn.toObject().value(key).toString();
 
 
 
-			/*
+		/*
 			foreach(QJsonValue subFld,fvvapn.toObject().value("SubFields").toArray()){
 				if(subFld.toObject().value("Type").toString().compare("Table") == 0){
 					QString tableName= fieldsName.count() > 0?fieldsName.at(fieldsName.count()-1):"";

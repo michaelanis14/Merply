@@ -15,6 +15,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 
 	viewgroups =  QList<ViewGroup*>();
 
+	//structureView.value("document_id").toString()
 
 	if(AccessController::Get()->hasAdminGroupAccess()){
 		SettingsCtrlsUI* sctrlUI = new SettingsCtrlsUI();
@@ -25,7 +26,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 
 	if(structureView.value("Viewgroups").isArray()){
 		int d = 0;
-	//	QJsonArray dataVGs =data.value("Fields").toArray();
+		//	QJsonArray dataVGs =data.value("Fields").toArray();
 
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
 			ViewGroup* viewgroup = new ViewGroup(0,structureView.value("document_id").toString(),item.toObject(),data,fieldsgroups);
@@ -65,17 +66,21 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 }
 
 
-QJsonObject ViewGroups::save()
+QPair<QString,QString> ViewGroups::save()
 {
-	QJsonObject* entity = new QJsonObject();
+	QPair<QString,QString> *insertQuery = new QPair<QString,QString>();
 
 	foreach(ViewGroup* vg,viewgroups ){
-		vg->save(entity);
+		vg->save(insertQuery);
 		}
-	//entity.insert("Fields",fields);
-	//entity.insert("Title",this->structureView.value("Title"))
-	//qDebug() << __FILE__ << __LINE__  << entity;
-	return *(entity);
+
+	QString id = this->structureView.value("document_id").toString();
+	//return QString("INSERT INTO `").append(id).append("` (").append(insertQuery->first.append(" ) VALUES (").append(insertQuery->second.append(" );")));
+
+
+
+	return *insertQuery;
+
 }
 /*
 QHash<QString,FeildUI*> ViewGroups::Fieldsgroups = QHash<QString,FeildUI*>();
@@ -111,6 +116,7 @@ QString ViewGroups::checkMandatory()
 		}
 	return errs;
 }
+
 void ViewGroups::paintEvent(QPaintEvent *)
 {
 	QStyleOption opt;
@@ -124,7 +130,8 @@ void ViewGroups::btn_Clicked(QString btn)
 	//qDebug() << __FILE__ << __LINE__  << btn;
 	if(btn.contains("settings")){
 		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotSetttingsDocument(QJsonDocument)));
-		Controller::Get()->getDoc(this->structureView.value("document_id").toString());
+		QString key = this->structureView.value("document_id").toString().split("::").count() > 1?this->structureView.value("document_id").toString().split("::")[1]:this->structureView.value("document_id").toString();
+		Controller::Get()->getDoc("viewstructure","ViewStructure","",key);
 		}
 }
 

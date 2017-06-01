@@ -61,14 +61,15 @@ private:
 	QFormLayout* equationWidgetLayout;
 	QList<StructureVieweditSubFeildEquation*> equationElements;
 	void paintEvent(QPaintEvent *event);
+	QLineEdit* clmnNumber;
 signals:
 	void changed();
 
 public slots:
 	void updateFields(QString type);
 	void updateSelect(QString);
-	void updateSelectData(QList<QString> fields);
-	void gotSourceData(QVector<QJsonDocument> items);
+	void updateSelectData(QList<int> fields);
+	void setSourceData();
 	void filterOnChanged(int index);
 	void fillLocalFilter(QStringList feilds);
 

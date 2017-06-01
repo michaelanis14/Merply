@@ -31,12 +31,12 @@ IndexUI::IndexUI(QWidget *parent) : MainDisplay(parent)
 
 }
 IndexUI* IndexUI::p_instance = 0;
-void IndexUI::ShowUI(const QString document_id, const QVector<QJsonDocument> documents) {
+void IndexUI::ShowUI(const int document_id, const QVector<QJsonDocument> documents) {
 	//qDebug() << __FILE__ << __LINE__  << id;
 
 	if(p_instance == 0)
 		p_instance = new IndexUI();
-	if(p_instance->document_id.compare(document_id) != 0){
+	if(p_instance->document_id !=  document_id){
 		p_instance->fill(document_id,documents);
 		}
 	MainForm::Get()->ShowDisplay(p_instance);
@@ -44,7 +44,7 @@ void IndexUI::ShowUI(const QString document_id, const QVector<QJsonDocument> doc
 }
 
 
-void IndexUI::fill(const QString document_id,const QVector<QJsonDocument> items)
+void IndexUI::fill(const int document_id,const QVector<QJsonDocument> items)
 {
 	/*	this->id = id;
 	QStringList idNumber = id.split("::");
@@ -83,5 +83,5 @@ void IndexUI::fill(const QString document_id,const QVector<QJsonDocument> items)
 void IndexUI::createNew()
 {
 
-	Controller::Get()->showCreateEditeStrUI(this->document_id,false);
+	Controller::Get()->showCreateEditeStrUI(QString::number(this->document_id),false);
 }
