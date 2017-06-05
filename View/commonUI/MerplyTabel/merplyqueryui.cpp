@@ -28,7 +28,7 @@ MerplyQueryUI::MerplyQueryUI(QWidget *parent,bool btnFilter) : QGroupBox(parent)
 void MerplyQueryUI::fill(QJsonObject strct)
 {
 	clear();
-
+	this->document_Name = strct.value("document_Name").toString();
 	//qDebug() <<strct;
 	foreach(QJsonValue vg,strct.value("Viewgroups").toArray()){
 		QWidget * viewgrp  = new QWidget;
@@ -59,7 +59,7 @@ void MerplyQueryUI::fill(QJsonObject strct)
 	this->layout->addWidget(viewgrp);
 	QJsonObject objID;
 	objID.insert("Type","ID");
-	objID.insert("strct",strct.value("document_id").toString().split("::")[1]);
+	objID.insert("strct",strct.value("document_Name").toString());
 	//qDebug() << strct;
 	MerplyQuerySubField* qSubField = new MerplyQuerySubField(objID,0);
 	fieldslayout->addRow("المسلسل",qSubField);
@@ -95,13 +95,8 @@ void MerplyQueryUI::fillEntityQuery(QJsonObject strct)
 
 void MerplyQueryUI::fillDocumentID(QString document_id)
 {
-	//qDebug() << document_id;
-	if(!document_id.isEmpty() && document_id.split("::").count() > 1){
-		this->document_id = document_id;
-		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(fillData(QJsonDocument)));
-
-		Controller::Get()->getDoc("viewstructure","ViewStructure",QString(this->document_id.split("::")[1]),"");
-		}
+	qDebug()<< __FILE__ << __LINE__ << document_id;
+	fill(Controller::Get()->getCachedViewStructure((document_id)));
 }
 
 void MerplyQueryUI::fillAddtoTable(QJsonArray clmns)
@@ -204,20 +199,17 @@ void MerplyQueryUI::generateQuery(int lmit)
 		query += q;
 		}
 	else if(!save.isEmpty()){
-		if(this->document_id.split("::").count() > 1)
-			query += "SELECT `"+QString(DATABASE)+"`.*,to_number(SPLIT(META(`"+QString(DATABASE)+"`).id,'::')[1]) AS `SN`"+selectClmnsQuery+" FROM  `"+QString(DATABASE)+"`  WHERE META(`"+QString(DATABASE)+"`).id LIKE '"+this->document_id.split("::")[1]+"::%'  AND "+save;
-		else{
-			this->btnFilter->setDisabled(false);
-			return;
-			}
+
+			query += "SELECT *,id AS `SN` "+selectClmnsQuery+" FROM  `"+document_id+"`  WHERE "+save;
+
 		if(clmnsFlag)
 			query += " LIMIT 1 ";
-		if(lmit > 0){
+		else if(lmit > 0){
 			query += QString(" LIMIT ").append(QString::number(lmit));
 			}
 		}
 	if(!query.isEmpty()){
-		//qDebug() << query;
+		qDebug() << query;
 		QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotData(QVector<QJsonDocument>)));
 		Controller::Get()->query(query);
 		}

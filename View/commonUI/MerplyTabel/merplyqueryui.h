@@ -26,6 +26,7 @@ private:
 	QHBoxLayout *layout;
 	QVector<MerplyQuerySubField*> fields;
 	QString document_id;
+	QString document_Name;
 	QJsonObject strct;
 	bool clmnsFlag;
 	//QJsonArray clmns;

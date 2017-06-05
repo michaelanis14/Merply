@@ -347,22 +347,22 @@ void CreateEditUI::saveEntity()
 	if(errs.isEmpty()){
 		//	qDebug() << __FILE__ << __LINE__ <<"Controller Clicked to save" << this->cas;
 		QString documentID ;
+		QString tbl;
 		if(!this->data.isEmpty()){
 			documentID = this->data.value("document_id").toString();
 			newDocument = false;
 			}
 		else if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined){
-			documentID = this->viewStructure.value("SaveAs").toString();
+			tbl = this->viewStructure.value("SaveAs").toString();
 			}
 		else{
-			documentID = this->viewStructure.value("document_id").toString();
+			tbl = this->viewStructure.value("document_id").toString();
 			}
+
+
 		if(newDocument){
-
-
-
-			QPair<QString,QString> insertQuery = this->viewGroups->save();
-
+			// new
+			QPair<QString,QString> insertQuery = this->viewGroups->save(true);
 			if(!insertQuery.first.isEmpty())
 				insertQuery.first.append(" , ");
 			insertQuery.first.append("`Enabled`");
@@ -434,14 +434,14 @@ void CreateEditUI::saveEntity()
 			//vgsSave.insert("document_id",key);
 
 			QString insertQueryMerged =
-					QString("INSERT INTO `").append(documentID).append("` (").append(insertQuery.first.append(" ) VALUES (").append(insertQuery.second.append(" );")));
+					QString("INSERT INTO `").append(tbl).append("` (").append(insertQuery.first.append(" ) VALUES (").append(insertQuery.second.append(" );")));
 
 			QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
 			Controller::Get()->insertUpdateRow(insertQueryMerged);
 
 
 
-/*
+			/*
 			if(this->toInvoiceFlag){
 				if(this->toInvoice->isChecked())
 
@@ -474,8 +474,44 @@ void CreateEditUI::saveEntity()
 			}
 
 */
+			}
+
+		else{
+			//update
+			QPair<QString,QString> insertQuery = this->viewGroups->save(false);
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`EditedOn`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append(QString("'"+(QDateTime::currentDateTime()).toString("yyyy-MM-dd hh:mm:ss")+"'"));
+
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`EditedByName`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append(QString("'"+AccessController::Get()->getUserName()+"'"));
+
+			if(!insertQuery.first.isEmpty())
+				insertQuery.first.append(" , ");
+			insertQuery.first.append("`EditedByID`");
+			if(!insertQuery.second.isEmpty())
+				insertQuery.second.append(" , ");
+			insertQuery.second.append(AccessController::Get()->getUserID());
+
+
+
+			QString insertQueryMerged =
+					QString("UPDATE `").append(tbl).append("` (").append(insertQuery.first.append(" ) VALUES (").append(insertQuery.second.append(" );")));
+
+			QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
+			Controller::Get()->insertUpdateRow(insertQueryMerged);
+
+
+			}
 		}
-		}
+
 	else{
 		qDebug()<<"ERRORRRR:" << errs;
 		foreach(QString err,errs.split(";")){

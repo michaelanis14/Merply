@@ -66,12 +66,12 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 }
 
 
-QPair<QString,QString> ViewGroups::save()
+QPair<QString,QString> ViewGroups::save(bool newDocument)
 {
 	QPair<QString,QString> *insertQuery = new QPair<QString,QString>();
 
 	foreach(ViewGroup* vg,viewgroups ){
-		vg->save(insertQuery);
+		vg->save(insertQuery,newDocument);
 		}
 
 	QString id = this->structureView.value("document_id").toString();

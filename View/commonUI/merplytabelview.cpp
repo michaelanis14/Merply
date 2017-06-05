@@ -262,7 +262,7 @@ bool merplyTabelView::fillText(QJsonObject data)
 void merplyTabelView::indexTable(const int document_id,const QVector<QJsonDocument> items)
 {
 	this->items = items;
-	this->indexDocument_id = document_id;
+	this->indexDocument_id = QString::number(document_id);
 	controllers->setEnabled(false);
 	//	if(model){
 	//		if(model->rowCount( )== items.count()

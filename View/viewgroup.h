@@ -12,7 +12,7 @@ class ViewGroup  : public QGroupBox
 public:
 	explicit ViewGroup(QWidget *parent = 0, QString strID = ""
 			, QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject(), QHash<QString, FeildUI*>* fieldsgroups =new  QHash<QString, FeildUI*>());
-	void save(QPair<QString, QString>* insertQuery);
+	void save(QPair<QString, QString>* insertQuery, bool newDocument);
 
 	QList<FeildUI*> feilds;
 private:

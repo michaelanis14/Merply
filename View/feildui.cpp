@@ -113,7 +113,7 @@ emptyData:
 		}
 }
 
-void FeildUI::save(QPair<QString,QString> *insertQuery)
+void FeildUI::save(QPair<QString,QString> *insertQuery,bool newDocument)
 {
 	if(structureView.value("ArrayList") != QJsonValue::Undefined   && structureView.value("ArrayList").toBool()){
 		QJsonArray arrySubfieldsValues;
@@ -148,13 +148,20 @@ void FeildUI::save(QPair<QString,QString> *insertQuery)
 					QString subFieldSave = subfeild->save();
 					if(subFieldSave.isEmpty())
 						continue;
-
+					if(newDocument){
 					if(!insertQuery->first.isEmpty())
 						insertQuery->first.append(" , ");
 					insertQuery->first.append("`"+subfeild->getSqlClmnNumber().trimmed()+"`");
 					if(!insertQuery->second.isEmpty())
 						insertQuery->second.append(" , ");
 					insertQuery->second.append(subFieldSave);
+						}
+					else{
+						if(!insertQuery->first.isEmpty())
+							insertQuery->first.append(" , ");
+						insertQuery->first.append("`"+subfeild->getSqlClmnNumber().trimmed()+"` = "+subFieldSave);
+
+						}
 
 					}
 				}
