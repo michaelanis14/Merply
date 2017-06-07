@@ -7,7 +7,8 @@ HEADERS += \
     $$PWD/merplyreporttablemodel.h \
     $$PWD/couchbaselibmanager.h \
     $$PWD/database.h \
-    $$PWD/inittabel.h
+    $$PWD/inittabel.h \
+    $$PWD/sqltabelmodel.h
 
 SOURCES += \
     Model/model.cpp \
@@ -16,5 +17,6 @@ SOURCES += \
     $$PWD/merplyreporttablemodel.cpp \
     $$PWD/couchbaselibmanager.cpp \
     $$PWD/database.cpp \
-    $$PWD/inittabel.cpp
+    $$PWD/inittabel.cpp \
+    $$PWD/sqltabelmodel.cpp
 

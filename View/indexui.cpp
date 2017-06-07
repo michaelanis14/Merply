@@ -31,20 +31,18 @@ IndexUI::IndexUI(QWidget *parent) : MainDisplay(parent)
 
 }
 IndexUI* IndexUI::p_instance = 0;
-void IndexUI::ShowUI(const int document_id, const QVector<QJsonDocument> documents) {
+void IndexUI::ShowUI(const int document_id) {
 	//qDebug() << __FILE__ << __LINE__  << id;
-
 	if(p_instance == 0)
 		p_instance = new IndexUI();
 	if(p_instance->document_id !=  document_id){
-		p_instance->fill(document_id,documents);
+		p_instance->fill(document_id);
 		}
 	MainForm::Get()->ShowDisplay(p_instance);
-//	p_instance->table->generateQuery(50);
 }
 
 
-void IndexUI::fill(const int document_id,const QVector<QJsonDocument> items)
+void IndexUI::fill(const int document_id)
 {
 	/*	this->id = id;
 	QStringList idNumber = id.split("::");
@@ -76,7 +74,7 @@ void IndexUI::fill(const int document_id,const QVector<QJsonDocument> items)
 */
 	//qDebug() << __FILE__ << __LINE__  << items;
 	this->document_id = document_id;
-	table->indexTable(document_id,items);
+	table->indexTable(document_id);
 	//table->queryUI->generateQuery();
 }
 

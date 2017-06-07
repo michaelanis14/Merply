@@ -19,6 +19,7 @@ private:
 	QWidget* field;
 	QJsonObject strct;
 	QString label;
+	QString clmnNumber;
 
 signals:
 

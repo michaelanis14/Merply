@@ -35,7 +35,6 @@ private:
 signals:
 	void queryResults(QVector<QJsonDocument> items);
 public slots:
-	void fillData(QJsonDocument strct);
 	void generateQuery(int lmit = -1);
 	void gotData(QVector<QJsonDocument> items);
 	void disablebutton();

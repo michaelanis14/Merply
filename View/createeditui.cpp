@@ -503,7 +503,7 @@ void CreateEditUI::saveEntity()
 
 
 			QString insertQueryMerged =
-					QString("UPDATE `").append(tbl).append("` (").append(insertQuery.first.append(" ) VALUES (").append(insertQuery.second.append(" );")));
+					QString("UPDATE `").append(tbl).append("` SET ").append(insertQuery.first.append(" WHERE `id` = ").append(documentID));
 
 			QObject::connect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
 			Controller::Get()->insertUpdateRow(insertQueryMerged);
@@ -535,7 +535,7 @@ void CreateEditUI::cancel()
 	this->clear();
 	this->data = QJsonObject();
 	this->fill(QJsonObject(),QJsonObject());
-	IndexUI::ShowUI(documentID,QVector<QJsonDocument>());
+	IndexUI::ShowUI(documentID);
 }
 
 void CreateEditUI::printAfterCheckBoxChanged(bool checked)
@@ -564,5 +564,5 @@ void CreateEditUI::saved()
 	this->clear();
 	this->data = QJsonObject();
 	this->fill(QJsonObject(),QJsonObject());
-	IndexUI::ShowUI(this->viewStructure.value("document_id").toString().toInt(),QVector<QJsonDocument>());
+	IndexUI::ShowUI(this->viewStructure.value("document_id").toString().toInt());
 }

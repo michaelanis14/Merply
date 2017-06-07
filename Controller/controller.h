@@ -142,8 +142,8 @@ public:
 	int getCachedViewStructureNames(QString name);
 	QStringList getCachedViewStructureNames();
 
-	QHash<int, QJsonObject> getCachedViewStructureSubFields(int id);
-	void insertCachedViewStructureSubFields(int id, QHash<int, QJsonObject> subFields);
+	QMap<int, QJsonObject> getCachedViewStructureSubFields(int id);
+	void insertCachedViewStructureSubFields(int id, QMap<int, QJsonObject> subFields);
 
 	void insertCachedViewStructureTabelFields(int key, QVector<QJsonObject> tabelFields);
 	QVector<QJsonObject> getCachedViewStructureTabelFields(int key);
@@ -151,7 +151,7 @@ public:
 
 
 	int getCachedSubFieldsClmnRef(int strctID);
-	QHash<int,int> subFieldsCounter;
+	QMap<int,int> subFieldsCounter;
 
 	//buildCachedUI s
 	void buildCachedCreateEditUI();

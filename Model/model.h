@@ -55,7 +55,7 @@ public:
 	QMap<int,QStringList> cachedViewStructureFieldsNames;
 	QMap<QString,int> cachedViewStructureNames;
 	QMap<int,QStringList> cachedViewStructureIndexFieldsNames;
-	QMap<int,QHash<int,QJsonObject> > cachedViewStructureSubFields;
+	QMap<int,QMap<int,QJsonObject> > cachedViewStructureSubFields;
 
 	QMap<int,QVector<QJsonObject>> cachedViewStructureTabelFields;
 	//Navigation

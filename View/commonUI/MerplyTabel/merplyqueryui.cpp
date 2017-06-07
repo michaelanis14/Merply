@@ -95,7 +95,8 @@ void MerplyQueryUI::fillEntityQuery(QJsonObject strct)
 
 void MerplyQueryUI::fillDocumentID(QString document_id)
 {
-	qDebug()<< __FILE__ << __LINE__ << document_id;
+	//qDebug()<< __FILE__ << __LINE__ << document_id;
+	this->document_id = document_id;
 	fill(Controller::Get()->getCachedViewStructure((document_id)));
 }
 
@@ -175,12 +176,7 @@ void MerplyQueryUI::clear()
 		}
 }
 
-void MerplyQueryUI::fillData(QJsonDocument strct)
-{
-	//qDebug() << "fillData" << strct;
-	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(fillData(QJsonDocument)));
-	this->fill(strct.object());
-}
+
 
 void MerplyQueryUI::generateQuery(int lmit)
 {

@@ -22,8 +22,8 @@ class IndexUI : public MainDisplay
 	Q_OBJECT
 public:
 	explicit IndexUI(QWidget *parent = 0);
-	static void ShowUI(const int document_id, const QVector<QJsonDocument> documents);
-	void fill(const int document_id, const QVector<QJsonDocument> items);
+	static void ShowUI(const int document_id);
+	void fill(const int document_id);
 
 private:
 	QVBoxLayout * layout;

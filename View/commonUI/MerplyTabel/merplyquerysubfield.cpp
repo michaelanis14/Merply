@@ -4,9 +4,10 @@
 
 MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : QWidget(parent)
 {
-	//qDebug() << __FILE__ << __LINE__  <<strct;
+//	qDebug() << __FILE__ << __LINE__  <<strct;
 	this->setContentsMargins(0,0,0,0);
 	this->strct = strct;
+	this->clmnNumber = strct.value("SubFields").toArray().first().toObject().value("clmnNumber").toString();
 
 	layout = new QFormLayout(this);
 	//this->layout->setSizeConstraint(QLayout::SetMaximumSize);
@@ -147,9 +148,9 @@ QString MerplyQuerySubField::getValue(QString entity)
 				}
 			else {
 				if(strct.value("clmn") != QJsonValue::Undefined)
-					save += QString("to_string(`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"'");
+					save += QString("`"+this->clmnNumber+"` ").append(QString("LIKE  ")).append("'"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"'");
 				else
-					save += QString("to_string(`"+((QLineEdit*)field)->objectName()+"`)").append(QString("LIKE  ")).append("'"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"'");
+					save += QString("`"+this->clmnNumber+"` ").append(QString("LIKE  ")).append("'"+((QLineEdit*)field)->text().trimmed().replace("٪","")+"'");
 				}
 			}
 		//	save =" ";

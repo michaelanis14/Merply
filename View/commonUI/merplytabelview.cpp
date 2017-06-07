@@ -6,6 +6,7 @@
 
 #include"merplytabelview.h"
 #include "merplytablecontrollers.h"
+#include "sqltabelmodel.h"
 #include "QPrinter"
 #include "QPrintDialog"
 #include "controller.h"
@@ -259,11 +260,46 @@ bool merplyTabelView::fillText(QJsonObject data)
 	return true;
 }
 
-void merplyTabelView::indexTable(const int document_id,const QVector<QJsonDocument> items)
+void merplyTabelView::indexTable(const int document_id)
 {
-	this->items = items;
+	//this->items = items;
 	this->indexDocument_id = QString::number(document_id);
 	controllers->setEnabled(false);
+
+
+	//Database* database  = new Database();
+	//QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getPageStructuresData(QVector<QSqlRecord>)));
+	//QString query = " SELECT id , pagestructure AS pagestructure FROM PageStructure ";
+
+	//database->query(query);
+	QString connectionName = QString("connection").append(QString::number(rand()));
+
+	QSqlDatabase localDb = QSqlDatabase::cloneDatabase(Model::Get()->getDb(), connectionName);
+	if( !localDb.open() )
+		{
+		qDebug() << __FILE__ << __LINE__ << localDb.lastError();
+		qFatal( "Failed to connect." );
+
+		}
+
+	SQLTabelModel* model = new SQLTabelModel(0,document_id,localDb);
+
+	tableView->setModel(model);
+	tableView->show();
+
+
+	//TODO:::
+	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+
+
+	//model->fillIndexTabel(items);
+
+	if(!indexDocument_id.isEmpty()){
+		QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
+		QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
+		queryUI->fillDocumentID(indexDocument_id);
+		}
+
 	//	if(model){
 	//		if(model->rowCount( )== items.count()
 	//			&& items.first().object().value("document_id").toString().compare(model->getRowKey(0)) == 0){
@@ -279,7 +315,7 @@ void merplyTabelView::indexTable(const int document_id,const QVector<QJsonDocume
 //	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT());
 //	getIndexHeader();
 
-	updateHeaderData(Controller::Get()->getCachedViewStructureIndexFieldsNames(document_id));
+	//updateHeaderData(Controller::Get()->getCachedViewStructureIndexFieldsNames(document_id));
 	//	initHController(QJsonObject());
 
 }
@@ -489,15 +525,15 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 {
 	//QObject::disconnect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT(updateHeaderData(QList<QString>)));
 
-	QJsonObject clmnObj = QJsonObject();
-	clmnObj.insert("clmnsHeader",QJsonValue::fromVariant(QVariant(headerItems)));
-	model = new MerplyReportTableModel(clmnObj);
+	//QJsonObject clmnObj = QJsonObject();
+	//clmnObj.insert("clmnsHeader",QJsonValue::fromVariant(QVariant(headerItems)));
+	//model = new MerplyReportTableModel(clmnObj);
 
 
 	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 
 
-	model->fillIndexTabel(items);
+	//model->fillIndexTabel(items);
 
 	if(!indexDocument_id.isEmpty()){
 		QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));

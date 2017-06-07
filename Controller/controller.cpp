@@ -159,7 +159,7 @@ void Controller::subNavPressed(QJsonObject view)
 				int card = view.value("Card").toInt();
 				qDebug() << __FILE__ << __LINE__  <<"Cards"<< card;
 				//queryIndexView(card);
-				IndexUI::ShowUI(card,QVector<QJsonDocument>());
+				IndexUI::ShowUI(card);
 
 				}
 			else{
@@ -178,7 +178,7 @@ void Controller::subNavPressed(QJsonObject view)
 				qDebug() << __FILE__ << __LINE__ << __func__ ; ///DATABASEER					database->getDoc(view.value("Card").toString());
 				}
 			}
-	else IndexUI::ShowUI(1,QVector<QJsonDocument>());
+	else IndexUI::ShowUI(1);
 }
 
 void Controller::queryIndexView(QString vStrctKey)
@@ -663,7 +663,7 @@ void Controller::buildCachedIndexUI()
 	foreach (QString structName, getCachedViewStructures().keys()) {
 		IndexUI* indexUI =  new IndexUI(0);
 		insertCachedCreateEditUI(structName,indexUI);
-		indexUI->fill(getCachedViewStructure(structName).value("document_id").toString().toInt(), QVector<QJsonDocument>());
+		indexUI->fill(getCachedViewStructure(structName).value("document_id").toString().toInt());
 		//qDebug() << structName;
 		}
 }
@@ -1261,12 +1261,12 @@ QStringList Controller::getCachedViewStructureNames()
 	return (Model::Get()->cachedViewStructureNames.keys());
 }
 
-QHash<int,QJsonObject> Controller::getCachedViewStructureSubFields(int id)
+QMap<int,QJsonObject> Controller::getCachedViewStructureSubFields(int id)
 {
 	return (Model::Get()->cachedViewStructureSubFields.value(id));
 }
 
-void Controller::insertCachedViewStructureSubFields(int id, QHash<int,QJsonObject> subFields)
+void Controller::insertCachedViewStructureSubFields(int id, QMap<int,QJsonObject> subFields)
 {
 	Model::Get()->cachedViewStructureSubFields.insert(id,subFields);
 }
@@ -1618,7 +1618,7 @@ void Controller::buildViewStructureIndexFieldsNamesList(QJsonObject viewstrct)
 
 	QStringList fieldsName;
 	QStringList indexFieldsName;
-	QHash<int,QJsonObject> subfields;
+	QMap<int,QJsonObject> subfields;
 	QVector<QJsonObject> tabelFields;
 	//	qDebug() << viewstrct;
 	int subFieldCounter = 0;
