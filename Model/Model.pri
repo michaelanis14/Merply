@@ -8,7 +8,9 @@ HEADERS += \
     $$PWD/couchbaselibmanager.h \
     $$PWD/database.h \
     $$PWD/inittabel.h \
-    $$PWD/sqltabelmodel.h
+    $$PWD/sqltabelmodel.h \
+    $$PWD/databaseworker.h \
+    $$PWD/db.h
 
 SOURCES += \
     Model/model.cpp \
@@ -18,5 +20,6 @@ SOURCES += \
     $$PWD/couchbaselibmanager.cpp \
     $$PWD/database.cpp \
     $$PWD/inittabel.cpp \
-    $$PWD/sqltabelmodel.cpp
+    $$PWD/sqltabelmodel.cpp \
+    $$PWD/databaseworker.cpp
 

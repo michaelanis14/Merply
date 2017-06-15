@@ -1,34 +1,20 @@
 #include "database.h"
 #include "model.h"
-#include <QSqlDriver>
 
-Database::Database(QObject *parent) : QObject(parent)
+#include <QDebug>
+#include <QStringList>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QVariant>
+
+Database::Database(QObject *parent) : QThread(parent)
 {
-	watcher  = new QFutureWatcher<QVector<QSqlRecord> >(this);
+	m_worker = new DatabaseWorker();
 
 }
 
-Database* Database::p_instance = 0;
-/**
- * @brief Database::Get
- * Checks if the instance is zero "not inti" then
- * starts a new thread, moving the instace to the new thread
- * finally starting the tread
- * Else if the instance already init, it returns this instance
- * @return p_instance "the static database refrence"
 
-Database* Database::Get()
-{
-	if ( p_instance == 0){
-
-	//	QThread* thread = new QThread;
-		p_instance = new Database();
-	//	p_instance->moveToThread(thread);
-	//	thread->start();
-		}
-	return p_instance;
-}
- */
 QVector<QSqlRecord> Database::threadedSql(const QSqlDatabase &db, const QString &query) {
 
 	connectionName = QString("connection").append(QString::number(rand()));
@@ -48,7 +34,7 @@ QVector<QSqlRecord> Database::threadedSql(const QSqlDatabase &db, const QString 
 			}
 		else
 			while(q.next()) {
-			//	qDebug()<< __FILE__ << __LINE__ << "QueryResultss" << q.record();
+				//	qDebug()<< __FILE__ << __LINE__ << "QueryResultss" << q.record();
 				results << q.record();
 				} //BETTER PERFORMANCE >?
 		}
@@ -110,26 +96,24 @@ bool Database::treadedInsert(const QSqlDatabase &db,const QString& query)
 
 void Database::query( const QString &query) {
 
-//	connect(watcher, SIGNAL(finished()),this, SLOT(gotQueryResutls()));
+	//	connect(watcher, SIGNAL(finished()),this, SLOT(gotQueryResutls()));
 	qDebug() << __FILE__ << __LINE__ << "Query:" << query;
-//	future = QtConcurrent::run(this,&Database::threadedSql, Model::Get()->getDb(), query);
-//	watcher->setFuture(future);
+	//	future = QtConcurrent::run(this,&Database::threadedSql, Model::Get()->getDb(), query);
+	//	watcher->setFuture(future);
 
-
-	threadedSql(Model::Get()->getDb(),query);
+	emit executefwd( query );
+	//threadedSql(Model::Get()->getDb(),query);
 }
 
-void Database::gotQueryResutls()
+void Database::gotQueryResutls(const QVector<QSqlRecord> results)
 {
-	disconnect(watcher, SIGNAL(finished()),this, SLOT(gotQueryResutls()));
-	qDebug() << "gotQueryResutls"<< future.result()  << QString(future.result().first().value("Value").toString());
-	if(this->future.result().count() == 1
-			&&(future.result().first().count() == 1)
-			&&(future.result().first().value("Value") != QVariant::Invalid)){
-		emit gotValue(QString(future.result().first().value("Value").toString()));
+	if(results.count() == 1
+			&&(results.first().count() == 1)
+			&&(results.first().value("Value") != QVariant::Invalid)){
+		emit gotValue(QString(results.first().value("Value").toString()));
 
 		}
-	emit queryResults(future.result());
+	emit queryResults(results);
 }
 
 void Database::getJson(const QString& select,const QString& tabel, const QString& key,const QString& id)
@@ -140,24 +124,30 @@ void Database::getJson(const QString& select,const QString& tabel, const QString
 	else if(!id.isEmpty())
 		query +="` WHERE `id` = '"+id+"'";
 	//watcher   = new QFutureWatcher<QVector<QSqlRecord> >(this);
-	connect(watcher, SIGNAL(finished()),this, SLOT(gotJson()));
+//	connect(watcher, SIGNAL(finished()),this, SLOT(gotJson()));
 	qDebug() << __FILE__ << __LINE__ << "Query:" << query;
-	future = QtConcurrent::run(this,&Database::threadedSql,  Model::Get()->getDb(), query);
-	watcher->setFuture(future);
+//	future = QtConcurrent::run(this,&Database::threadedSql,  Model::Get()->getDb(), query);
+//	watcher->setFuture(future);
+	connect( m_worker, SIGNAL( results( const QVector<QSqlRecord>& ) ),
+			 this, SLOT( gotJson( const QVector<QSqlRecord>& ) ) );
+
+	emit executefwd( query );
 }
 
-void Database::gotJson()
+void Database::gotJson(const QVector<QSqlRecord> results)
 {
-	disconnect(watcher, SIGNAL(finished()),this, SLOT(gotJson()));
-	if(future.result().count() > 0){
-		if(future.result().count() == 1){
-			QJsonObject documentObj = QJsonDocument::fromJson(future.result().first().value(1).toString().toUtf8()).object();
-			documentObj.insert("document_id",future.result().first().value("id").toString());
+	disconnect( m_worker, SIGNAL( results( const QVector<QSqlRecord>& ) ),
+			 this, SLOT( gotJson( const QVector<QSqlRecord>& ) ) );
+
+	if(results.count() > 0){
+		if(results.count() == 1){
+			QJsonObject documentObj = QJsonDocument::fromJson(results.first().value(1).toString().toUtf8()).object();
+			documentObj.insert("document_id",results.first().value("id").toString());
 			emit gotDocument(QJsonDocument(documentObj));
 			}
 		else {
 			QVector<QJsonDocument> documents;
-			foreach(QSqlRecord row,future.result()){
+			foreach(QSqlRecord row,results){
 				QJsonObject recordObject;
 				recordObject.insert("document_id",row.value("id").toString());
 				for(int x=0; x < row.count(); x++) {
@@ -169,6 +159,7 @@ void Database::gotJson()
 			emit gotDocuments(documents);
 			}
 		}
+
 }
 
 void Database::deletRow(const QString& tabel, const QString& id)
@@ -178,8 +169,8 @@ void Database::deletRow(const QString& tabel, const QString& id)
 	//watcher   = new QFutureWatcher<QVector<QSqlRecord> >(this);
 	//connect(watcher, SIGNAL(finished()),this, SLOT(gotJson()));
 	qDebug() << __FILE__ << __LINE__ << "Query:" << query;
-	future = QtConcurrent::run(this,&Database::threadedSql,  Model::Get()->getDb(), query);
-	watcher->setFuture(future);
+//	future = QtConcurrent::run(this,&Database::threadedSql,  Model::Get()->getDb(), query);
+//	watcher->setFuture(future);
 }
 
 void Database::insert(QString query)
@@ -187,17 +178,50 @@ void Database::insert(QString query)
 	//watcher  = new QFutureWatcher<QVector<QSqlRecord> >(this);
 	//connect(watcher, SIGNAL(finished()),this, SLOT(gotQueryResutls()));
 	qDebug() << __FILE__ << __LINE__ << "INSERT:" << query;
-	QtConcurrent::run(this,&Database::treadedInsert, Model::Get()->getDb(), query);
+//	QtConcurrent::run(this,&Database::treadedInsert, Model::Get()->getDb(), query);
 	//watcher->setFuture(future);
 }
 
+
+void Database::execute( const QString& query )
+{
+	emit executefwd( query ); // forwards to the worker
+}
+
+void Database::run()
+{
+	emit ready(false);
+	emit progress( "DataBaseThread starting, one moment please..." );
+
+	// Create worker object within the context of the new thread
+//	m_worker = new DatabaseWorker();
+
+	connect( this, SIGNAL( executefwd( const QString& ) ),
+			 m_worker, SLOT( slotExecute( const QString& ) ) );
+
+	// Critical: register new type so that this signal can be
+	// dispatched across thread boundaries by Qt using the event
+	// system
+	qRegisterMetaType< QList<QSqlRecord> >( "QList<QSqlRecord>" );
+
+	// forward final signal
+	connect( m_worker, SIGNAL( results( const QVector<QSqlRecord>& ) ),
+			 this, SLOT( gotQueryResutls( const QVector<QSqlRecord>& ) ) );
+
+
+	emit progress( "DatabaseThread is Ready" );
+	emit ready(true);
+	emit readyToQuery();
+	qDebug() << "Ready";
+	exec();  // our event loop
+}
 
 
 Database::~Database()
 {
 	qDebug() << "DELETE ~Database " ;
-	//	QSqlDatabase::removeDatabase("QMYSQL");
-	QSqlDatabase::removeDatabase(this->connectionName);
+	delete m_worker;
 }
 
+//#include "database.moc"
 

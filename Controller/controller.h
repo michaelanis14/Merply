@@ -29,8 +29,6 @@ class Controller : public QObject
 	Q_OBJECT
 public:
 	//    explicit Controller(QObject * parent = 0);
-	void showDisplay();
-
 
 
 	static Controller* Get();
@@ -196,7 +194,11 @@ private:
 	static Controller* p_instance;
 	QMap<QString,QStringList> layoutViewGroups;
 	QString indexDocument_id;
+	Database* database;
 public slots:
+	void showDisplay();
+
+
 	void subNavPressed(QJsonObject view);
 	void linkPressed(QJsonObject link);
 	void editControllerCancelDataPressed(QJsonDocument document);

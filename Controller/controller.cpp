@@ -41,6 +41,9 @@
 Controller::Controller(QObject *parent) :
 	QObject(parent)
 {
+	database  = new Database();
+	QObject::connect(database,SIGNAL(readyToQuery()),this,SLOT(showDisplay()));
+	database->start();
 	//	CouchbaseLibManager::Get();
 
 	///TimeLine
@@ -144,8 +147,8 @@ void Controller::showDisplayDataReturned(QJsonDocument document)
 
 void Controller::loadNavigationData(QJsonDocument document)
 {
-	//	QObject::disconnect(new Database(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
-	//qDebug() << "load";
+	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
+		//qDebug() << "load";
 	navigationUI::Get()->loadMainNavigation(document);
 }
 
@@ -163,7 +166,7 @@ void Controller::subNavPressed(QJsonObject view)
 
 				}
 			else{
-				//	Database* database  = new Database();
+				//
 				//	QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedData(QJsonDocument)));
 				//qDebug() << __FILE__ << __LINE__  <<"getDocument"<< view.value("Card").toString();
 				//	database->getDoc(view.value("Card").toString());
@@ -173,7 +176,7 @@ void Controller::subNavPressed(QJsonObject view)
 			}
 		else {if(view.value("Type").toString().contains("Page")){
 				//qDebug() << __FILE__ << __LINE__  <<"PAgee"<< view.value("Card").toString();
-				//				Database* database  = new Database();
+				//
 				//QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedPageData(QJsonDocument)));
 				qDebug() << __FILE__ << __LINE__ << __func__ ; ///DATABASEER					database->getDoc(view.value("Card").toString());
 				}
@@ -190,7 +193,7 @@ void Controller::queryIndexView(QString vStrctKey)
 	QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE meta("+QString(DATABASE)+").id LIKE '"+card+"' LIMIT 400");
 	//qDebug() << __FILE__ << __LINE__ <<"QINDEX : " << query;
 
-	Database* database  = new Database();
+
 	QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(subNavPressedIndexData(QVector<QSqlRecord>)));
 	database->query(query);
 }
@@ -199,9 +202,9 @@ void Controller::editControllerCancelPressed()
 {
 	navigationUI::Get()->setHidden(false);
 	navigationUI::Get()->setParent(MainForm::Get());
-	Database* database  = new Database();
-	QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(editControllerCancelDataPressed(QJsonDocument)));
 
+	QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(editControllerCancelDataPressed(QJsonDocument)));
+	database->start();
 	database->getJson("viewstructure","Navigation","","1");
 
 }
@@ -262,7 +265,7 @@ void Controller::createIndexes(QJsonObject viewStrct)
 						query = "CREATE INDEX `"+indexname+"` ON `AM`(`"+fv.toObject().value("Label").toString()+"`) WHERE META(`"+QString(DATABASE)+"`).id Like '"+key+"::%'  USING GSI";
 						}
 					}
-				//	Database* database  = new Database();
+				//
 				//database->query(query);
 				qDebug() << __FILE__ << __LINE__ <<"Creating Index :" << indexname;
 				//qDebug() << __FILE__ << __LINE__  << query;
@@ -298,15 +301,18 @@ void Controller::createEditSqlTabel(QJsonObject viewStrct)
 
 void Controller::initNavigation()
 {
-	Database* database  = new Database();
+
 	QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
 	qDebug() << __FILE__ << __LINE__ << __func__ ; ///DATABASEER
+	database->start();
 	database->getJson("viewstructure","Navigation","Default","1");
 
 }
 
 void Controller::editControllerCancelDataPressed(QJsonDocument document)
 {
+	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(editControllerCancelDataPressed(QJsonDocument)));
+
 	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(editControllerCancelDataPressed(QJsonDocument)));
 	navigationUI::Get()->loadMainNavigation(document);
 	NavigationEditUI::Get()->setHidden(true);
@@ -331,6 +337,8 @@ void Controller::subNavPressedData(QJsonDocument documents)
  */
 void Controller::subNavPressedIndexData(QVector<QSqlRecord> documents)
 {
+	QObject::disconnect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(subNavPressedIndexData(QVector<QSqlRecord>)));
+
 	//QObject::disconnect(new Database(),SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(subNavPressedIndexData(QVector<QSqlRecord>));
 	qDebug() << __FILE__ << __LINE__ << __func__  << documents; ///DATABASEER
 	//if(!indexDocument_id.isEmpty())
@@ -374,16 +382,17 @@ int Controller::countIndex(const QString index)
 
 void Controller::getDoc(const QString& select, const QString &tabel, const QString &key, const QString &id)
 {
-	Database* database  = new Database();
+
 	QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getDocData(QJsonDocument)));
 	qDebug() << __FILE__ << __LINE__ << __func__ ; ///DATABASEER
 	//database->getJson("viewstructure","ViewStructure",key);
+	database->start();
 	database->getJson(select,tabel,key,id);
 
 }
 void Controller::getDocData(QJsonDocument document)
 {
-	//QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getDocData(QJsonDocument)));
+	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(getDocData(QJsonDocument)));
 	emit gotDocument(document);
 }
 void Controller::getSelectList(QString table, QString select,QString condition)
@@ -410,7 +419,7 @@ void Controller::GetSelectListData(QVector<QSqlRecord> items)
 
 void Controller::getLastKey()
 {
-	//	Database* database  = new Database();
+	//
 	qDebug() <<  __FILE__ << __LINE__ <<"GOTTTTLASTTTTKEYYY CONTROLLER" ;
 	//QObject::connect(new Database(),SIGNAL(gotLastKey(QString)),Controller::Get(),SLOT(getLastKeyData(QString)));
 }
@@ -418,7 +427,7 @@ void Controller::getLastKey()
 /*
 void Controller::getValue(QString key)
 {
-	Database* database  = new Database();
+
 	QObject::connect(database,SIGNAL(gotValue(QString)),this,SLOT(getValueData(QString)));
 	database->getDoc(key);
 }
@@ -520,7 +529,7 @@ QVector<QJsonDocument> Controller::getEnities()
 void Controller::getFields(QString Title, int)
 {
 	if(!Title.isEmpty() && Title.compare("_") != 0){
-		Database* database  = new Database();
+
 		QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getFieldsData(QVector<QJsonDocument>)));
 		QString query = "SELECT array_star("+QString(DATABASE)+".Viewgroups[*].Viewgroup).Fields FROM  `"+QString(DATABASE)+"` WHERE META(`"+QString(DATABASE)+"`).id = '"+Title+"'";
 		//	qDebug() << __FILE__ << __LINE__  << "getFields"<<query;
@@ -562,7 +571,7 @@ void Controller::getFieldsData(QVector<QJsonDocument> documents)
 void Controller::getIndexHeader(QString title)
 {
 	if(!title.isEmpty() && title.compare("_") != 0){
-		Database* database  = new Database();
+
 		QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getIndexHeaderData(QVector<QJsonDocument>)));
 		QString query = "SELECT array_star("+QString(DATABASE)+".Viewgroups[*].Viewgroup).Fields FROM  `"+QString(DATABASE)+"` WHERE META(`"+QString(DATABASE)+"`).id = '"+title+"'";
 		//qDebug() << __FILE__ << __LINE__  << "getFields"<<query;
@@ -600,7 +609,7 @@ void Controller::getIndexHeaderData(QVector<QJsonDocument> documents){
 */
 void Controller::getViewStructures()
 {
-	Database* database  = new Database();
+
 	QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getViewStructuresData(QVector<QSqlRecord>)));
 	QString query = " SELECT `id` AS strctKey,`key` AS strctName, `viewstructure` AS viewstructure FROM ViewStructure ";
 	//qDebug() << __FILE__ << __LINE__ << __func__ ; ///DATABASEER
@@ -609,6 +618,8 @@ void Controller::getViewStructures()
 }
 
 void Controller::getViewStructuresData(QVector<QSqlRecord> documents){
+
+	QObject::disconnect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getViewStructuresData(QVector<QSqlRecord>)));
 
 	foreach(QSqlRecord stct,documents){
 		QVariant structKey = stct.value("strctKey");
@@ -632,7 +643,7 @@ void Controller::getViewStructuresData(QVector<QSqlRecord> documents){
 }
 void Controller::getPageStructures()
 {
-	Database* database  = new Database();
+
 	QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getPageStructuresData(QVector<QSqlRecord>)));
 	QString query = " SELECT id , pagestructure AS pagestructure FROM PageStructure ";
 
@@ -640,6 +651,8 @@ void Controller::getPageStructures()
 }
 
 void Controller::getPageStructuresData(QVector<QSqlRecord> documents){
+
+	QObject::disconnect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getPageStructuresData(QVector<QSqlRecord>)));
 
 	foreach(QSqlRecord stct,documents){
 		QVariant structKey = stct.value("id");
@@ -711,7 +724,8 @@ void Controller::storeJson(const QString& key, const QString& tabel, QJsonDocume
 	//	qDebug() << Prsistance::GenetrateCreateTabelQuery(document);
 	//	return;
 
-	Database* database  = new Database();
+	QObject::disconnect(database,SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
+
 	QObject::connect(database,SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
 
 	QString strJson(document.toJson(QJsonDocument::Compact));
@@ -730,7 +744,8 @@ void Controller::updateJson(const QString& id,const QString& tabel,QJsonDocument
 	//	qDebug() << Prsistance::GenetrateCreateTabelQuery(document);
 	//	return;
 
-	Database* database  = new Database();
+	QObject::disconnect(database,SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
+
 	QObject::connect(database,SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
 	QString strJson(document.toJson(QJsonDocument::Compact));
 	QString query;
@@ -743,8 +758,9 @@ void Controller::showCreateEditeStrUI(QString str,bool create)
 	//qDebug() << __FILE__ << __LINE__  << str.split("::")[1] <<"Check cached";
 	QString key = str.split("::").count() > 1?str.split("::")[1]:str;
 	if(create){
-		Database* database  = new Database();
+
 		QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUICreateTrueData(QJsonDocument)));
+		database->start();
 		database->getJson("viewstructure","ViewStructure",key,"");
 		//database->getDoc(str);
 		}
@@ -757,16 +773,17 @@ void Controller::showCreateEditeStrUI(QString str,bool create)
 		}
 	else{
 		qDebug() << __FILE__ << __LINE__  << key <<"NOT Cached";
-		Database* database  = new Database();
+
 		QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUIData(QJsonDocument)));
+		database->start();
 		database->getJson("viewstructure","ViewStructure","",key);
 		}
 
 }
 void Controller::showCreateEditeStrUIData(QJsonDocument str)
 {
-	//	QObject::disconnect(new Database(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUIData(QJsonDocument)));
-	//CreateEditUI::ShowUI(str.object(),QJsonObject(),true);
+	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUIData(QJsonDocument)));
+		//CreateEditUI::ShowUI(str.object(),QJsonObject(),true);
 	QString key = str.object().value("document_id").toString().split("::").count() > 1?str.object().value("document_id").toString().split("::")[1]:str.object().value("document_id").toString();
 
 	if(isCachedCreateEditUI(key)){
@@ -780,7 +797,7 @@ void Controller::showCreateEditeStrUIData(QJsonDocument str)
 }
 void Controller::showCreateEditeStrUICreateTrueData(QJsonDocument str)
 {
-	//	QObject::disconnect(new Database(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUICreateTrueData(QJsonDocument)));
+	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUICreateTrueData(QJsonDocument)));
 	QString key = str.object().value("document_id").toString().split("::")[1];
 	if(isCachedCreateEditUI(key)){
 		//((CreateEditUI*)getCachedCreateEditUI(key))->fill(QJsonObject(),);
@@ -790,15 +807,16 @@ void Controller::showCreateEditeStrUICreateTrueData(QJsonDocument str)
 void Controller::showCreateEditeValueUI(QString key)
 {
 	if(key.split("::").count() > 1){
-		Database* database  = new Database();
+
 		QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeValueUIData(QJsonDocument)));
+		database->start();
 		database->getJson("viewstructure","ViewStructure",key.split("::")[1],"");
 		}
 }
 
 void Controller::showCreateEditeValueUIData(QJsonDocument value)
 {
-	//	QObject::disconnect(new Database(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeValueUIData(QJsonDocument)));
+	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeValueUIData(QJsonDocument)));
 	QString key  = value.object().value("document_id").toString().split("::")[0];
 	if(!key.isEmpty()){
 		//qDebug() << __FILE__ << __LINE__  << key <<"is Cached Value";
@@ -823,7 +841,7 @@ void Controller::linkPressed(QJsonObject link)
 
 	if(link.value("Type").toString().contains("Link")){
 		//	new Database()->getDoc("ViewStructure::"+QString(view.value("EntityId").toString()));
-		Database* database  = new Database();
+
 		QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(linkPressedData(QJsonDocument)));
 		QString query = QString("SELECT `"+QString(DATABASE)+"`.*,meta("+QString(DATABASE)+").id AS `document_id` FROM `"+QString(DATABASE)+"` WHERE "+QString(DATABASE)+".Title = '"+link.value("Source").toString()+"'");
 		//qDebug() << __FILE__ << __LINE__ <<"Q : " << query;
@@ -834,7 +852,7 @@ void Controller::linkPressed(QJsonObject link)
 }
 void Controller::linkPressedData(QJsonDocument document)
 {
-	//QObject::disconnect(new Database(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(linkPressedData(QJsonDocument)));
+	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(linkPressedData(QJsonDocument)));
 	QString key = document.object().value("document_id").toString();
 	if(isCachedCreateEditUI(key))
 		MainForm::Get()->ShowDisplay(((CreateEditUI*)getCachedCreateEditUI(key)));
@@ -984,7 +1002,7 @@ void Controller::getReport(QJsonObject clmns,QString filter)
 
 	if(clmns.value("QueryUI") != QJsonValue::Undefined){
 		qRegisterMetaType<QVector<QJsonDocument> >("MyStruct");
-		Database* database  = new Database();
+
 		QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getReportData(QVector<QSqlRecord>)));
 		database->query(clmns.value("QueryUI").toObject().value("Query").toString().replace("#QUERYMERPLY","")); //TODO: CACHED FLAGG
 		//	qDebug() << __FILE__ << __LINE__<<"getReport Querii"  << clmns;
@@ -1305,7 +1323,7 @@ int Controller::getCachedSubFieldsClmnRef(int strctID)
 void Controller::getReportData(QVector<QSqlRecord> documents)
 {
 	//qDebug() << __FILE__ << __LINE__  << "GotReport Data" << documents;
-	//QObject::disconnect(new Database(),SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getReportData(QVector<QSqlRecord>));
+	QObject::disconnect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getReportData(QVector<QSqlRecord>)));
 	emit gotReportData(documents);
 
 }
@@ -1357,7 +1375,7 @@ int Controller::GetNavigationSubHeight()
 
 QString Controller::getLastKeyID()
 {
-	//	Database* database  = new Database();
+	//
 	qDebug() << __FILE__ << __LINE__ <<"getLastKeyID NO DATA";
 	return "new Database()->getLastKeyID()";
 }
@@ -1374,7 +1392,7 @@ bool Controller::runQRPTDesingerapp()
 
 void Controller::query(QString query)
 {
-	Database* database  = new Database();
+
 	QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(queryData(QVector<QSqlRecord>)));
 	database->query(query);
 }
@@ -1413,14 +1431,17 @@ bool Controller::createEditStore(QJsonObject document)
 	//qDebug() << __FILE__ << __LINE__ <<document.value("document_id").toString()<< document;
 
 	if(document.value("cas_value") != QJsonValue::Undefined){
-		Database* database  = new Database();
+
+		QObject::disconnect(database,SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
+
 		QObject::connect(database,SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
 		//QObject::connect(database,SIGNAL(savedQJson(QJsonDocument)),this,SIGNAL(savedQJson(QJsonDocument)));
 		qDebug() << __FILE__ << __LINE__ << __func__ ; ///DATABASEER
 		//	database->updateDoc(QJsonDocument(document));
 		}
 	else{
-		Database* database  = new Database();
+		QObject::disconnect(database,SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
+
 		QObject::connect(database,SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
 		//	QObject::connect(database,SIGNAL(savedQJson(QJsonDocument)),this,SIGNAL(savedQJson(QJsonDocument)));
 		qDebug() << __FILE__ << __LINE__ << __func__ ; ///DATABASEER
@@ -1453,7 +1474,7 @@ void Controller::deleteEntity(const QString& tabel, const QString& id)
 		{
 		QString strctKey = documentID.split("::")[0];
 		QString query = "SELECT (SELECT META(`"+QString(DATABASE)+"`).id AS DocumentID FROM `AM` WHERE META(`"+QString(DATABASE)+"`).id LIKE '"+strctKey+"%' AND  "+strctKey+" LIKE '"+documentID+"') AS ITEMSLIST";
-		Database* database  = new Database();
+
 		QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(deleteEntityData(QVector<QSqlRecord>)));
 		//	qDebug() << __FILE__ << __LINE__<< query;
 		database->query(query);
@@ -1559,7 +1580,7 @@ void Controller::saveRefrenceStructures(QJsonObject mainStrct, QJsonObject data)
 
 void Controller::insertUpdateRow(QString query)
 {
-	Database* database  = new Database();
+
 	QObject::disconnect(database,SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
 	QObject::connect(database,SIGNAL(saved(QString)),this,SIGNAL(saved(QString)));
 	database->insert(query);
@@ -1608,7 +1629,7 @@ void Controller::getTabelsData(QString entity, QStringList tbls)
 		i++;
 		}
 	//qDebug() << __FILE__ << __LINE__<< query;
-	Database* database  = new Database();
+
 	QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(queryData(QVector<QSqlRecord>)));
 	database->query(query);
 }
@@ -1692,8 +1713,8 @@ void Controller::deleteEntityData(QVector<QJsonDocument> items)
 
 void Controller::queryData(QVector<QSqlRecord> items)
 {
-	//qDebug() << items <<"FSFSF";
-	emit gotReportData(items);
+	QObject::disconnect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(queryData(QVector<QSqlRecord>)));
+		emit gotReportData(items);
 }
 
 void Controller::setShowWarning(bool value)
@@ -1778,7 +1799,7 @@ bool Controller::save(QList<Entity*> entityGroup,bool update){
 */
 void Controller::deleteDocument(const QString& tabel, const QString& id)
 {
-	Database* database  = new Database();
+
 	database->deletRow(tabel,id);
 	//DELETE FROM BankAccount WHERE BankAccountID
 }

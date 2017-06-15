@@ -78,7 +78,7 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 	connect(controllers, SIGNAL(btnClicked(const QString&)), this, SLOT(controller_Clicked(QString)));
 	tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	tableView->setSelectionMode(QAbstractItemView::SingleSelection);
-	tableView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+	tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 	layout->addWidget(tableView);
 
@@ -121,8 +121,9 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 			}
 		QItemSelectionModel *select = tableView->selectionModel();
 		if(select && select->hasSelection()){
-			QString id = 	model->getRowKey(select->currentIndex().row());
-			//qDebug() << __FILE__ << __LINE__  << id;
+		QString id = 	"1";
+				//tableView->getRowKey(select->currentIndex().row());
+			qDebug() << __FILE__ << __LINE__  << id;
 			if(nActon.count() > 1){
 				if(nActon.at(1).compare("Print") == 0){
 					PrintController::Get()->printEntity(id);
@@ -157,14 +158,14 @@ void merplyTabelView::resizeTabelToContets()
 	//this->tableView->resizeColumnsToContents(); //TODO : BAD PERFORMANCE
 
 	for (int c = 0; c < tableView->horizontalHeader()->count(); ++c)
-	{
+		{
 		tableView->horizontalHeader()->setSectionResizeMode(
-			c, QHeaderView::ResizeToContents);
-	}
+					c, QHeaderView::ResizeToContents);
+		}
 
 	//	}
 	//if(this->model->getRowsCount() < 40){
-		this->tableView->setMinimumHeight(tableView->rowHeight(1)*this->model->getRowsCount()+80);
+	this->tableView->setMinimumHeight(tableView->rowHeight(1)*this->model->getRowsCount()+80);
 	//	}
 }
 
@@ -289,14 +290,14 @@ void merplyTabelView::indexTable(const int document_id)
 
 
 	//TODO:::
-	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
+//	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 
 
 	//model->fillIndexTabel(items);
 
 	if(!indexDocument_id.isEmpty()){
-		QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
-		QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
+		//QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
+		//QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
 		queryUI->fillDocumentID(indexDocument_id);
 		}
 
@@ -312,17 +313,17 @@ void merplyTabelView::indexTable(const int document_id)
 
 	//QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QVector<QJsonDocument>)),this,SLOT(fill(QVector<QJsonDocument>)));
 	//qDebug() << __FILE__ << __LINE__  << "indexTable" << document_id ;
-//	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT());
-//	getIndexHeader();
+	//	QObject::connect(Controller::Get(),SIGNAL(gotFieldsData(QList<QString>)),this,SLOT());
+	//	getIndexHeader();
 
 	//updateHeaderData(Controller::Get()->getCachedViewStructureIndexFieldsNames(document_id));
 	//	initHController(QJsonObject());
-
+	modelFinished();
 }
 
 QJsonObject merplyTabelView::save()
 {
-//	tableView->setDisabled(true);
+	//	tableView->setDisabled(true);
 	QJsonObject table;
 	table.insert("merplyTabel",this->model->getJsonData());
 	if(this->model->getRemovedRows().count() > 0)
@@ -548,7 +549,7 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 
 void merplyTabelView::setValue(const int , const QString paramName, QVariant& paramValue, const int )
 {
-//	qDebug() << __FILE__ << __LINE__  <<"setValue TabelView"<< paramName;
+	//	qDebug() << __FILE__ << __LINE__  <<"setValue TabelView"<< paramName;
 	QJsonValue value;// = indexedTable.value(currenctPrintID).value(paramName);
 	if(value != QJsonValue::Undefined)
 		paramValue = value.toVariant();
@@ -560,7 +561,7 @@ void merplyTabelView::modelFinished()
 	//qDebug() << __FILE__ << __LINE__  << "ModelDone" <<model << model->getRowsCount();
 	QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 
-	tableView->setModel(model);
+	//tableView->setModel(model);
 	tableView->viewport()->installEventFilter(new QToolTipper(tableView));
 
 
@@ -577,8 +578,8 @@ void merplyTabelView::modelFinished()
 				SLOT(selectionChanged(const QItemSelection &, const QItemSelection &))
 				);
 
-	QObject::connect(model,SIGNAL(done()),this,SLOT(resizeTabelToContets()));
-	resizeTabelToContets();
+	//QObject::connect(model,SIGNAL(done()),this,SLOT(resizeTabelToContets()));
+	//resizeTabelToContets();
 	//this->repaint();
 }
 
