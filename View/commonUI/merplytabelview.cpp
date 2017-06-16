@@ -219,8 +219,8 @@ bool merplyTabelView::fill(QJsonObject columns,QString filter)
 		Controller::Get()->getReport(columns,filter);
 
 		}
-	if(initDelegate)
-		initDelegateClmns(columns); //TODO: Condition specific to init it.
+//	if(initDelegate)
+//		initDelegateClmns(columns); //TODO: Condition specific to init it.
 	initHController(columns);
 	return true;
 }

@@ -10,6 +10,7 @@
 
 Database::Database(QObject *parent) : QThread(parent)
 {
+	qDebug() << "new Worker";
 	m_worker = new DatabaseWorker();
 
 }
