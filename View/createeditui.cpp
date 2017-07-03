@@ -6,6 +6,7 @@
 #include "controller.h"
 #include "indexui.h"
 #include "printcontroller.h"
+#include <QMessageBox>
 
 
 
@@ -14,10 +15,9 @@ CreateEditUI::CreateEditUI(QWidget* parent ) : MainDisplay(parent)
 {
 	this->init = false;
 	this->fieldsgroups = QHash<QString,FeildUI*>();
-
 }
 
-CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObject data) : MainDisplay(parent)
+CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure,SQLTabelModel* model) : MainDisplay(parent)
 {
 
 	this->setContentsMargins(0,0,0,0);
@@ -25,9 +25,8 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 	this->layout->setSizeConstraint(QLayout::SetMaximumSize);
 	this->layout->setContentsMargins(0,0,0,0);
 	//this->layout->setSpacing(0);
-	this->data = data;
-	this->cas = "";
 	fieldsgroups = QHash<QString,FeildUI*>();
+	this->model = model;
 
 
 	QStringList btnsList;
@@ -63,13 +62,21 @@ CreateEditUI::CreateEditUI(QWidget* parent, QJsonObject viewStructure, QJsonObje
 
 
 
-	//fill(viewStructure,data);
+	fill(viewStructure);
 
 	cancelShortCut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_W), this, SLOT(cancel()));
 	cancelShortCut = new QShortcut(QKeySequence(Qt::Key_Escape), this, SLOT(cancel()));
 	saveShortCut =new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_S), this, SLOT(saveEntity()));
 	printShortCut = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_P), this, SLOT(printEntity()));
 	this->init = true;
+}
+
+void CreateEditUI::showUI( bool create)
+{
+	MainForm::Get()->ShowDisplay(this);
+	if(create)
+		mapper->toLast();
+	else mapper->toFirst();
 }
 
 //CreateEditUI* CreateEditUI::this = 0;
@@ -127,29 +134,34 @@ CreateEditUI* CreateEditUI::ShowUI(QJsonObject viewStructure, QJsonObject data,b
 }
 */
 
-
-void CreateEditUI::fill(QJsonObject viewStructure, QJsonObject data)
+//Dapricated
+void CreateEditUI::fill(QJsonObject viewStructure)
 {
+	QString documentid = viewStructure.value("document_id").toString();
+
+	//	model = new QSqlRelationalTableModel(0,Controller::Get()->getDatabase()->getDatabase());
+	//	model->setTable("`"+documentid+"`");
+	//	model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+
+
+	//	model->select();
+	mapper = new QDataWidgetMapper(this);
+	mapper->setModel(this->model);
+	mapper->setItemDelegate(new QSqlRelationalDelegate(this));
 
 	if(!viewStructure.isEmpty()){
 		this->viewStructure = viewStructure;
 		}
 
-	if(!data.isEmpty()){
-		this->data = data;
-		this->cas = data.value("cas_value").toString();
-		}
-	//qDebug() << __FILE__ << __LINE__  <<"Fill"<< this->cas;
-
-	viewGroups = new ViewGroups(0,this->viewStructure,data,&this->fieldsgroups) ;
+	viewGroups = new ViewGroups(0,this->viewStructure,&this->fieldsgroups,mapper) ;
 	createEditWidgetLayout->addWidget(viewGroups);
-
+	mapper->toFirst();
 	//this->layout->addWidget(createEditWidget);
 }
 
+//Dapricated
 void CreateEditUI::clear()
 {
-	this->cas = "";
 
 	QList<QWidget *> Widgets = this->createEditWidget->findChildren<QWidget *>();
 	foreach(QWidget * child, Widgets)
@@ -159,31 +171,6 @@ void CreateEditUI::clear()
 			child->setHidden(true);
 			//child->setParent(0);
 			child->deleteLater();
-			}
-		}
-}
-
-
-
-
-
-
-
-void CreateEditUI::fillData(QJsonObject data)
-{
-	if(!data.isEmpty()){
-		QStringList tbls =this->getTabelsFieldNames(this->viewStructure);
-		if(tbls.count() == 0){
-			this->clear();
-			this->fill(QJsonObject(), data);
-			}
-		else{
-
-			this->data = data;
-			//qDebug()<<"INITTT" << this->data;
-			QObject::connect(Controller::Get(),SIGNAL(gotReportData(QVector<QJsonDocument>)),this,SLOT(gotTabelsData(QVector<QJsonDocument>)));
-			Controller::Get()->getTabelsData(data.value("document_id").toString(),tbls);
-			//	return;
 			}
 		}
 }
@@ -269,6 +256,7 @@ void CreateEditUI::paintEvent(QPaintEvent *)
 	QPainter p(this);
 	style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
+
 void CreateEditUI::controller_Clicked(QString nameAction)
 {
 	QStringList nActon = nameAction.split("->");
@@ -280,7 +268,8 @@ void CreateEditUI::controller_Clicked(QString nameAction)
 			cancel();
 			}
 		else if(nActon.at(1).compare("Save") == 0){
-			saveEntity();
+			//saveEntity();
+			sqlSubmit();
 			}
 
 		}
@@ -301,11 +290,10 @@ void CreateEditUI::gotTabelsData(QVector<QJsonDocument> tblsData)
 	foreach(QString key,keys){
 		QJsonObject row;
 		row.insert("merplyTabel",tblsData.first().object().value(key).toArray());
-		this->data.insert(key,row);
 		}
 	this->clear();
 	//qDebug() << this->data;
-	this->fill(QJsonObject(), this->data);
+	//	this->fill(QJsonObject());
 	//MainForm::Get()->ShowDisplay(this);
 }
 
@@ -316,22 +304,19 @@ void CreateEditUI::printEntity()
 	if(errs.isEmpty()){
 		//	qDebug() << __FILE__ << __LINE__ <<"Controller Clicked to save" << this->cas;
 
-		if(this->cas.isEmpty()){
+		QJsonObject vgsSave;
+		qDebug() << __FILE__ << __LINE__ <<"TODO PRINTING";
+		//= viewGroups->save();
+		QString documentID ;
+		if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined){
+			documentID = this->viewStructure.value("SaveAs").toString();
 			}
 		else{
-			QJsonObject vgsSave;
-			qDebug() << __FILE__ << __LINE__ <<"TODO PRINTING";
-			//= viewGroups->save();
-			QString documentID ;
-			if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined){
-				documentID = this->viewStructure.value("SaveAs").toString();
-				}
-			else{
-				documentID = this->viewStructure.value("document_id").toString();
-				}
-			vgsSave.insert("document_id",documentID.split("::")[1]);
-			PrintController::Get()->gotPrintEntity(QJsonDocument(vgsSave));
+			documentID = this->viewStructure.value("document_id").toString();
 			}
+		vgsSave.insert("document_id",documentID.split("::")[1]);
+		PrintController::Get()->gotPrintEntity(QJsonDocument(vgsSave));
+
 
 
 		}
@@ -348,8 +333,9 @@ void CreateEditUI::saveEntity()
 		//	qDebug() << __FILE__ << __LINE__ <<"Controller Clicked to save" << this->cas;
 		QString documentID ;
 		QString tbl;
-		if(!this->data.isEmpty()){
-			documentID = this->data.value("document_id").toString();
+		if(false){
+			documentID ;
+			//= this->data.value("document_id").toString();
 			newDocument = false;
 			}
 		else if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined){
@@ -521,21 +507,31 @@ void CreateEditUI::saveEntity()
 		}
 
 }
+
+void CreateEditUI::sqlSubmit()
+{
+	model->database().transaction();
+	if (model->submitAll()) {
+		model->database().commit();
+		cancel();
+		} else {
+		model->database().rollback();
+		QMessageBox::warning(this, tr("Cached Table"),
+							 tr("The database reported an error: %1")
+							 .arg(model->lastError().text()));
+		}
+}
+
 void CreateEditUI::cancel()
 {
 	saveShortCut->setEnabled(false);
-	int documentID ;
-	if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined){
+	int documentID  = 0;
+	if(this->viewStructure.value("SaveAs") != QJsonValue::Undefined)
 		documentID = this->viewStructure.value("SaveAs").toString().toInt();
-		}
-	else{
+	else
 		documentID = this->viewStructure.value("document_id").toString().toInt();
-		}
 
-	this->clear();
-	this->data = QJsonObject();
-	this->fill(QJsonObject(),QJsonObject());
-	IndexUI::ShowUI(documentID);
+	((IndexUI*)Controller::Get()->getCachedIndexUI(documentID))->showUI();
 }
 
 void CreateEditUI::printAfterCheckBoxChanged(bool checked)
@@ -558,11 +554,11 @@ void CreateEditUI::printAfterSaved(QJsonDocument document)
 	PrintController::Get()->gotPrintEntity(document,this->showPrintDialog->isChecked());
 }
 
+//Dapricated
 void CreateEditUI::saved()
 {
 	QObject::disconnect(Controller::Get(),SIGNAL(saved(QString)),this,SLOT(saved()));
-	this->clear();
-	this->data = QJsonObject();
-	this->fill(QJsonObject(),QJsonObject());
-	IndexUI::ShowUI(this->viewStructure.value("document_id").toString().toInt());
+	//	this->clear();
+	//	this->fill(QJsonObject());
+	((IndexUI*)Controller::Get()->getCachedIndexUI(this->viewStructure.value("document_id").toString().toInt()))->showUI();
 }

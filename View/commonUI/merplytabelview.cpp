@@ -4,9 +4,9 @@
 **   Copyright: Bishara©.
 **************************************/
 
-#include"merplytabelview.h"
+#include "merplytabelview.h"
 #include "merplytablecontrollers.h"
-#include "sqltabelmodel.h"
+
 #include "QPrinter"
 #include "QPrintDialog"
 #include "controller.h"
@@ -91,6 +91,10 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 	this->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	//this->tableView->setSortingEnabled(true);
 
+
+
+	database = new Database();
+	database->start();
 }
 void merplyTabelView::controller_Clicked(QString nameAction)
 {
@@ -102,7 +106,8 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 
 				if(model->insertRow(model->rowCount(QModelIndex()))){
 					//qDebug() << (model->getRowsCount()-1)<< (model->getRowsCount());
-					QModelIndex index = tableView->model()->index((model->getRowsCount()-1),0, QModelIndex());
+					QModelIndex index ;
+					//= tableView->model()->index((model->getRowsCount()-1),0, QModelIndex());
 					tableView->setCurrentIndex(index);
 					tableView->edit(index);
 					//tableView->e
@@ -121,7 +126,14 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 			}
 		QItemSelectionModel *select = tableView->selectionModel();
 		if(select && select->hasSelection()){
-		QString id = 	"1";
+
+
+			QSqlRecord record= model->record(select->currentIndex().row());
+			QSqlField field = record.field(0);
+			int id = field.value().toInt();
+
+
+		//QString id = 	"1";
 				//tableView->getRowKey(select->currentIndex().row());
 			qDebug() << __FILE__ << __LINE__  << id;
 			if(nActon.count() > 1){
@@ -130,14 +142,16 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 					//////////////				Controller::Get()->queryIndexView(this->viewStructure.value("document_id").toString());
 					}
 				else if(nActon.at(1).compare("Edit") == 0){
-
-					Controller::Get()->showCreateEditeStrUI("ViewStructure::"+id.split("::")[0],false);
-					Controller::Get()->showCreateEditeValueUI(id);
+					emit editEntity(this->indexDocument_id.toInt(),id);
+					//Controller::Get()->showCreateEditeStrUI(this->indexDocument_id.toInt(),id);
+				//	Controller::Get()->showCreateEditeValueUI(id,this->indexDocument_id);
 					}
 				else if(nActon.at(1).compare("Delete") == 0){
 					if(Controller::Get()->ShowQuestion(tr("Are you sure you want to delete?").append(" "+id))){
-						Controller::Get()->deleteEntity(id.split("::")[0],id.split("::")[1]);
-						queryUI->generateQuery();
+
+						emit deleteEntity(this->indexDocument_id.toInt(),id);
+						//Controller::Get()->deleteEntity(QString::number(id),QString::number(id));
+						//queryUI->generateQuery();
 						//Controller::Get()->queryIndexView("ViewStructure::"+id.split("::")[0]);
 						}
 					}
@@ -145,13 +159,6 @@ void merplyTabelView::controller_Clicked(QString nameAction)
 			}
 		}
 }
-
-void merplyTabelView::selectionChanged(const QItemSelection& , const QItemSelection& )
-{
-	controllers->setEnabled(true);
-	//qDebug() << __FILE__ << __LINE__  << "SELECTIONN";
-}
-
 void merplyTabelView::resizeTabelToContets()
 {
 	//if(this->model->getRowsCount() < 100){
@@ -165,16 +172,17 @@ void merplyTabelView::resizeTabelToContets()
 
 	//	}
 	//if(this->model->getRowsCount() < 40){
-	this->tableView->setMinimumHeight(tableView->rowHeight(1)*this->model->getRowsCount()+80);
+	this->tableView->setMinimumHeight(tableView->rowHeight(1)*this->model->rowCount()+80);
 	//	}
 }
-
 
 bool merplyTabelView::fill(QJsonObject columns,QString filter)
 {
 	//TODO: Better connect to Signals
 	//	qDebug() << __FILE__ << __LINE__ << "fill";
-	model = new MerplyReportTableModel(columns);
+	qDebug() << __FILE__ << __LINE__ << "fill" << "EERR";
+	model = new SQLTabelModel(0,1,database->getDatabase());
+	//= new MerplyReportTableModel(columns);
 
 	bool initDelegate = true;
 	//	queryUI->fill(columns);
@@ -199,8 +207,8 @@ bool merplyTabelView::fill(QJsonObject columns,QString filter)
 				if(clmn.toObject().value("Source") != QJsonValue::Undefined){
 					initDelegate = false;
 					columns.remove("Add");
-					QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillAddtoTable(QVector<QJsonDocument>)));
-					QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillAddtoTable(QVector<QJsonDocument>)));
+				//	QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillAddtoTable(QVector<QJsonDocument>)));
+				//	QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillAddtoTable(QVector<QJsonDocument>)));
 					queryUI->fillAddtoTable(columns.value("Columns").toArray());
 
 					break; //TODO: SEVERAL INPUTS
@@ -229,8 +237,9 @@ bool merplyTabelView::fillLocalSource(QJsonObject columns, QString filter)
 {
 	//if(model)
 	//	model->deleteLater();
-	//qDebug() << __FILE__ << __LINE__ << "fillLocalSource";
-	model = new MerplyReportTableModel(columns);
+	qDebug() << __FILE__ << __LINE__ << "fillLocalSource" << "EERR";
+	model = new SQLTabelModel(0,1,database->getDatabase());
+	//= new MerplyReportTableModel(columns);
 	//QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 	//QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 	QObject::connect(this,SIGNAL(updateModel(QVector<QJsonDocument>)),model,SLOT(fillLocalSource(QVector<QJsonDocument>)));
@@ -253,7 +262,7 @@ bool merplyTabelView::fillText(QJsonObject data)
 	if(!dataArray.isEmpty()){
 		QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 		QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
-		model->fillText(dataArray);
+		//model->fillText(dataArray);
 		}
 	else modelFinished();
 
@@ -263,28 +272,9 @@ bool merplyTabelView::fillText(QJsonObject data)
 
 void merplyTabelView::indexTable(const int document_id)
 {
-	//this->items = items;
 	this->indexDocument_id = QString::number(document_id);
 	controllers->setEnabled(false);
-
-
-	//Database* database  = new Database();
-	//QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(getPageStructuresData(QVector<QSqlRecord>)));
-	//QString query = " SELECT id , pagestructure AS pagestructure FROM PageStructure ";
-
-	//database->query(query);
-	QString connectionName = QString("connection").append(QString::number(rand()));
-
-	QSqlDatabase localDb = QSqlDatabase::cloneDatabase(Model::Get()->getDb(), connectionName);
-	if( !localDb.open() )
-		{
-		qDebug() << __FILE__ << __LINE__ << localDb.lastError();
-		qFatal( "Failed to connect." );
-
-		}
-
-	SQLTabelModel* model = new SQLTabelModel(0,document_id,localDb);
-
+	model = new SQLTabelModel(0,document_id,database->getDatabase());
 	tableView->setModel(model);
 	tableView->show();
 
@@ -298,7 +288,7 @@ void merplyTabelView::indexTable(const int document_id)
 	if(!indexDocument_id.isEmpty()){
 		//QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
 		//QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
-		queryUI->fillDocumentID(indexDocument_id);
+		queryUI->fillDocumentID(document_id);
 		}
 
 	//	if(model){
@@ -324,18 +314,17 @@ void merplyTabelView::indexTable(const int document_id)
 QJsonObject merplyTabelView::save()
 {
 	//	tableView->setDisabled(true);
+	/*
 	QJsonObject table;
 	table.insert("merplyTabel",this->model->getJsonData());
 	if(this->model->getRemovedRows().count() > 0)
 		table.insert("RemovedRows",this->model->getRemovedRows());
 	//qDebug() << __FILE__ << __LINE__  << this->model->getJsonData();
 	return table;
+	*/
 }
 
-MerplyReportTableModel* merplyTabelView::getModel() const
-{
-	return model;
-}
+
 
 QModelIndex merplyTabelView::getIndexAt(QPoint position)
 {
@@ -352,6 +341,11 @@ void merplyTabelView::generateQuery(int limit)
 	if(this->queryUI){
 		this->queryUI->generateQuery(limit);
 		}
+}
+
+SQLTabelModel* merplyTabelView::getModel() const
+{
+	return model;
 }
 
 void merplyTabelView::initHController(QJsonObject columns)
@@ -539,7 +533,7 @@ void merplyTabelView::updateHeaderData(QList<QString> headerItems)
 	if(!indexDocument_id.isEmpty()){
 		QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
 		QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
-		queryUI->fillDocumentID(indexDocument_id);
+		queryUI->fillDocumentID(indexDocument_id.toInt());
 		}
 
 
@@ -556,12 +550,14 @@ void merplyTabelView::setValue(const int , const QString paramName, QVariant& pa
 	else return;
 }
 
+void merplyTabelView::selectionChanged(const QItemSelection& , const QItemSelection& )
+{
+	controllers->setEnabled(true);
+	//qDebug() << __FILE__ << __LINE__  << "SELECTIONN";
+}
+
 void merplyTabelView::modelFinished()
 {
-	//qDebug() << __FILE__ << __LINE__  << "ModelDone" <<model << model->getRowsCount();
-	QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
-
-	//tableView->setModel(model);
 	tableView->viewport()->installEventFilter(new QToolTipper(tableView));
 
 

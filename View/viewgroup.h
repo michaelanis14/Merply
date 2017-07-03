@@ -7,11 +7,12 @@
 #include <QObject>
 #include <QWidget>
 #include <QGroupBox>
+#include <QDataWidgetMapper>
 class ViewGroup  : public QGroupBox
 {
 public:
 	explicit ViewGroup(QWidget *parent = 0, QString strID = ""
-			, QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject(), QHash<QString, FeildUI*>* fieldsgroups =new  QHash<QString, FeildUI*>());
+			, QJsonObject structureView = QJsonObject(), QHash<QString, FeildUI*>* fieldsgroups =new  QHash<QString, FeildUI*>(),QDataWidgetMapper *mapper = new QDataWidgetMapper());
 	void save(QPair<QString, QString>* insertQuery, bool newDocument);
 
 	QList<FeildUI*> feilds;

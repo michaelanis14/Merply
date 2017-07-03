@@ -45,7 +45,6 @@ public:
 	static bool ShowQuestion(QString question);
 	void static Log(QStringList log);
 
-	void deleteDocument(const QString& tabel, const QString& id);
 	static bool Compare(QJsonObject first,QJsonObject second);
 
 	QStringList getModelDocumentsNameByType(const QString& modelType);
@@ -75,8 +74,8 @@ public:
 	void storeJson(const QString& key,const QString& tabel,QJsonDocument document);
 	void updateJson(const QString& id,const QString& tabel,QJsonDocument document);
 
-	void showCreateEditeStrUI(QString str, bool create);
-	void showCreateEditeValueUI(QString key);
+	//void showCreateEditeStrUI(int structure_id, int data_id);
+	//void showCreateEditeValueUI(int id, QString tabel);
 	void queryIndexView(QString vStrctKey);
 
 	void editControllerCancelPressed();
@@ -110,21 +109,21 @@ public:
 	void getReport(QJsonObject clmns, QString filter="");
 	QString getLocalSourceReport(QJsonObject clmn, int index, QString filter);
 
-	void insertCachedCreateEditUI(QString key, QWidget* instance);
-	QWidget* getCachedCreateEditUI(QString key);
-	bool isCachedCreateEditUI(QString key);
+	//void insertCachedCreateEditUI(int key, QWidget* instance);
+	//QWidget* getCachedCreateEditUI(int key);
+	//bool isCachedCreateEditUI(int key);
 
-	void insertCachedViewStructure(QString key, QJsonObject viewStrct);
-	QJsonObject getCachedViewStructure(QString key);
-	QMap<QString, QJsonObject> getCachedViewStructures() const;
+	void insertCachedViewStructure(int key, QJsonObject viewStrct);
+	QJsonObject getCachedViewStructure(int key);
+	QMap<int, QJsonObject> getCachedViewStructures() const;
 
 	void insertCachedPageStructure(int key, QJsonObject viewStrct);
 	QJsonObject getCachedPageStructure(int key);
 	QMap<int, QJsonObject> getCachedPageStructures() const;
 
-	void insertCachedIndexUI(QString key, QWidget* instance);
-	QWidget* getCachedIndexUI(QString key);
-	bool isCachedIndexUI(QString key);
+	void insertCachedIndexUI(int key, QWidget* instance);
+	QWidget* getCachedIndexUI(int key);
+	bool isCachedIndexUI(int key);
 
 	void insertCachedPageUI(int key, QWidget* instance);
 	QWidget* getCachedPageUI(int key);
@@ -189,6 +188,8 @@ public:
 	//QMap<QString,QWidget*> createEditUIWidget;
 	//bool accessed = false;
 
+	Database* getDatabase() const;
+
 private:
 	explicit Controller(QObject * parent = 0);
 	static Controller* p_instance;
@@ -205,7 +206,7 @@ public slots:
 
 	void showDisplayDataReturned(QJsonDocument document);
 	void loadNavigationData(QJsonDocument document);
-	void subNavPressedData(QJsonDocument documents);
+	//void subNavPressedData(QJsonDocument documents);
 	void subNavPressedIndexData(QVector<QSqlRecord> documents);
 	void subNavPressedPageData(QJsonDocument document);
 	//void getFieldsData(QVector<QJsonDocument> documents);
@@ -220,9 +221,12 @@ public slots:
 	void getReportData(QVector<QSqlRecord> documents);
 	void getLastKeyData(QString key);
 
-	void showCreateEditeStrUICreateTrueData(QJsonDocument str);
-	void showCreateEditeStrUIData(QJsonDocument str);
-	void showCreateEditeValueUIData(QJsonDocument value);
+	void deleteDocument(const QString& tabel, const QString& id);
+	void deleteEntity(const int& tabel, const int& id);
+
+	//void showCreateEditeStrUICreateTrueData(QJsonDocument str);
+	//void showCreateEditeStrUIData(QJsonDocument str);
+	//void showCreateEditeValueUIData(QVector<QSqlRecord> data);
 	void queryData(QVector<QSqlRecord> items);
 
 	void createEditStoreItems(QString key);

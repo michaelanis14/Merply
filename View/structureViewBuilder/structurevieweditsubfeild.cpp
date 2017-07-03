@@ -437,15 +437,16 @@ void StructureVieweditSubFeild::setSourceData()
 	QObject::connect(Select,SIGNAL(currentIndexChanged(QString)),this,SIGNAL(changed()));
 
 	if(fieldVS.toObject().value("Source") != QJsonValue::Undefined){
-		QString source;
+		int source;
 		if(fieldVS.toObject().value("Source").toString().split("::").count() > 1) {
 			QString strctureSoruce = (fieldVS.toObject().value("Source").toString().split("::")[1]);
 			strctureSoruce = strctureSoruce.simplified();
 			strctureSoruce.replace(" ","");
-			source = QString::number(Controller::Get()->getCachedViewStructureNames(strctureSoruce) );
+			source = Controller::Get()->getCachedViewStructureNames(strctureSoruce);
 			}
 		else {
-			source = fieldVS.toObject().value("Source").toString();
+			qDebug() << __FILE__ << __LINE__ << "ERR";
+			//source = fieldVS.toObject().value("Source").toString();
 			}
 
 		Source->setCurrentText(Controller::Get()->getCachedViewStructure(source).value("document_Name").toString());

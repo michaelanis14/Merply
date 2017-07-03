@@ -3,11 +3,11 @@
 #include "QPushButton"
 #include "QJsonValue"
 
-FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJsonObject data) : QWidget(parent)
+FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QDataWidgetMapper *mapper ) : QWidget(parent)
 {
 
 	//qDebug() << __FILE__ << __LINE__  << structureView;
-
+	this->mapper = mapper;
 	this->layout = new QHBoxLayout(this);
 	this->layout->setContentsMargins(0,0,0,0);
 	this->setContentsMargins(0,0,0,0);
@@ -42,7 +42,8 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 
 		if(structureView.value("ArrayList") != QJsonValue::Undefined   && structureView.value("ArrayList").toBool()){
 
-			QStringList arrDataSubFields = data.value(structureView.value("Label").toString()).toString().split(";");
+			QStringList arrDataSubFields;
+			//= data.value(structureView.value("Label").toString()).toString().split(";");
 			qDebug() << arrDataSubFields;
 			if(arrDataSubFields.isEmpty())
 				goto emptyData;
@@ -50,7 +51,8 @@ FeildUI::FeildUI(QWidget *parent, QString strID, QJsonObject structureView, QJso
 			if(structureView.value("SubFields").toArray().count() == arrDataSubFields.count()){
 				int counter = 0;
 				foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
-					SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),arrDataSubFields.at(counter));
+					SubFieldUI* subfeild ;
+					//new SubFieldUI(0,this->strID,fieldVS.toObject(),arrDataSubFields.at(counter),mapper);
 					subFieldsWidgetLayout->addWidget(subfeild);
 					subFields << subfeild;
 					counter++;
@@ -98,7 +100,7 @@ emptyData:
 
 			*/
 
-			SubFieldUI* subfeild = new SubFieldUI(0,this->strID,structureView.value("SubFields").toArray().first().toObject(),data.value(structureView.value("Label").toString()));
+			SubFieldUI* subfeild = new SubFieldUI(0,this->strID,structureView.value("SubFields").toArray().first().toObject(),mapper);
 			subFieldsWidgetLayout->addWidget(subfeild);
 			subFields << subfeild;
 			}
@@ -207,7 +209,8 @@ void FeildUI::addsubFields(QJsonArray arrDataSubFields)
 	subFieldsWidgetLayout->setMargin(0);
 	int d = 0;
 	foreach (QJsonValue fieldVS, structureView.value("SubFields").toArray()) {
-		SubFieldUI* subfeild = new SubFieldUI(0,this->strID,fieldVS.toObject(),arrDataSubFields.at(d));
+		SubFieldUI* subfeild ;
+		//= new SubFieldUI(0,this->strID,fieldVS.toObject(),arrDataSubFields.at(d),this->mapper);
 		subFieldsWidgetLayout->addWidget(subfeild);
 		d++;
 		}

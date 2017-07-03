@@ -27,7 +27,7 @@ void InitTabel::gotCounterT(int tblCount)
 {
 	if(tblCount == 0){
 		QString query;
-		query = genetrateCreateTabelQuery(QJsonDocument(Model::Get()->cachedViewStructures.value(this->tblName)));
+		query = genetrateCreateTabelQuery(QJsonDocument(Model::Get()->cachedViewStructures.value(this->tblName.toInt())));
 		qDebug()<< __FILE__ << __LINE__ << "NewTabel :::::::::" << query;
 
 		Database* database  = new Database();

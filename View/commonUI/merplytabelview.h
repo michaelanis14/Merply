@@ -14,6 +14,9 @@
 
 #include "hcontrollers.h"
 #include "merplyqueryui.h"
+#include "sqltabelmodel.h"
+
+#include "database.h"
 
 #include <QtGui>
 #include <QWidget>
@@ -44,18 +47,19 @@ public:
 	void indexTable(const int document_id);
 	QVector<QJsonDocument> items;
 	QJsonObject save();
-	MerplyReportTableModel* model;
-	MerplyReportTableModel* getModel() const;
+
 	QModelIndex getIndexAt(QPoint position);
 	QTableView* getTableView() const;
 	void generateQuery(int limit);
+	SQLTabelModel* getModel() const;
+
 private:
 	QVBoxLayout* layout;
 	QHBoxLayout* lblLayout;
 	QLabel* print;
 	QTableView* tableView;
 	MerplyQueryUI* queryUI;
-
+	SQLTabelModel* model;
 	HControllers* controllers ;
 	QString currenctPrintID;
 	QtRPT *report;
@@ -67,9 +71,17 @@ private:
 	QString indexDocument_id;
 	//QStandardItemModel *model;
 	//QStringList headerLabels;
+
+
+	Database* database;
 signals:
+
+
 	void updateModel(QVector<QJsonDocument> documents);
 
+	void editEntity(int document_id,int row_id);
+	void newEntity(int document_id);
+	void deleteEntity(int document_id,int row_id);
 
 public slots:
 	void printTabel();

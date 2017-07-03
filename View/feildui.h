@@ -2,7 +2,7 @@
 #define FEILDUI_H
 
 #include<subfeildui.h>
-
+#include <QDataWidgetMapper>
 
 
 
@@ -11,7 +11,7 @@ class FeildUI : public QWidget
 	Q_OBJECT
 public:
 	explicit FeildUI(QWidget *parent = 0,QString strID = ""
-			, QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject());
+			, QJsonObject structureView = QJsonObject(),QDataWidgetMapper *mapper = new QDataWidgetMapper());
 //	void clear();
 	void save(QPair<QString, QString>* insertQuery, bool newDocument);
 	QLabel * label;
@@ -24,6 +24,7 @@ private:
 	QString strID;
 	QJsonObject structureView;
 	QVBoxLayout* fieldsWidgetLayout;
+	QDataWidgetMapper *mapper;
 signals:
 
 protected:

@@ -4,6 +4,7 @@
 #include "maindisplay.h"
 #include "mainform.h"
 #include "merplytabelview.h"
+#include "createeditui.h"
 
 #include <QObject>
 #include <QWidget>
@@ -21,20 +22,19 @@ class IndexUI : public MainDisplay
 {
 	Q_OBJECT
 public:
-	explicit IndexUI(QWidget *parent = 0);
-	static void ShowUI(const int document_id);
-	void fill(const int document_id);
-
+	explicit IndexUI(QWidget *parent = 0, const int document_id = 0);
+	void showUI();
 private:
 	QVBoxLayout * layout;
-		static IndexUI* p_instance;
 	merplyTabelView * table ;
+	CreateEditUI* createEditUI;
 	QPushButton* btnCreatNew;
 	int document_id;
 signals:
 
 public slots:
 	void createNew();
+	void editEntity(int tbl,int id);
 };
 
 #endif // INDEXUI_H

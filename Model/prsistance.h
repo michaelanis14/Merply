@@ -36,6 +36,7 @@ public:
 
 private:
 	static Prsistance* p_instance;
+	bool ready;
 	Database* database;
 signals:
 	void GotSelectList(QVector<QSqlRecord> items);
@@ -43,6 +44,7 @@ signals:
 public slots:
 	void GetSelectListData(QVector<QSqlRecord> items);
 	void gotCount(QString value);
+	void readyToQuery(bool ready = true);
 };
 
 #endif // PRSISTANCE_H

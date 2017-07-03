@@ -1,9 +1,8 @@
 #include "sqltabelmodel.h"
 #include "controller.h"
 
-SQLTabelModel::SQLTabelModel(QObject *parent, const int document_id,QSqlDatabase db) :  QSqlTableModel(parent,db)
+SQLTabelModel::SQLTabelModel(QObject *parent, const int document_id,QSqlDatabase db) :  QSqlRelationalTableModel(parent,db)
 {
-	qDebug() << "TabelID" << QString::number(document_id);
 	this->document_id = document_id;
 	this->setTable("`"+QString::number(document_id)+"`");
 	this->setEditStrategy(QSqlTableModel::OnManualSubmit);

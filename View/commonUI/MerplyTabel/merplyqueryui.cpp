@@ -93,11 +93,11 @@ void MerplyQueryUI::fillEntityQuery(QJsonObject strct)
 		}
 }
 
-void MerplyQueryUI::fillDocumentID(QString document_id)
+void MerplyQueryUI::fillDocumentID(int id)
 {
-	//qDebug()<< __FILE__ << __LINE__ << document_id;
-	this->document_id = document_id;
-	fill(Controller::Get()->getCachedViewStructure((document_id)));
+	//qDebug()<< __FILE__ << __LINE__ << id;
+	this->id = id;
+	fill(Controller::Get()->getCachedViewStructure((id)));
 }
 
 void MerplyQueryUI::fillAddtoTable(QJsonArray clmns)
@@ -116,7 +116,7 @@ void MerplyQueryUI::fillAddtoTable(QJsonArray clmns)
 		clmnObj = clmn.toObject();
 		if(clmnObj.value("Type").toString().compare("Refrence") ==0){
 			this->clmnsFlag = true;
-			this->document_id = clmnObj.value("Source").toString();
+			this->id = clmnObj.value("Source").toInt();
 			clmnObj.insert("clmn","");
 			QString label = clmnObj.value("Header").toString();
 			MerplyQuerySubField* qSubField = new MerplyQuerySubField(clmnObj,0);
@@ -196,7 +196,7 @@ void MerplyQueryUI::generateQuery(int lmit)
 		}
 	else if(!save.isEmpty()){
 
-			query += "SELECT *,id AS `SN` "+selectClmnsQuery+" FROM  `"+document_id+"`  WHERE "+save;
+			query += "SELECT *,id AS `SN` "+selectClmnsQuery+" FROM  `"+id+"`  WHERE "+save;
 
 		if(clmnsFlag)
 			query += " LIMIT 1 ";
@@ -213,7 +213,7 @@ void MerplyQueryUI::generateQuery(int lmit)
 		if(this->btnFilter)
 			this->btnFilter->setDisabled(false);
 		}
-	//qDebug() << "SELECT *  FROM "<<QString(DATABASE) << "WHERE META('"<<QString(DATABASE)<<"').id LIKE"<<document_id<<" AND "<<save;
+	//qDebug() << "SELECT *  FROM "<<QString(DATABASE) << "WHERE META('"<<QString(DATABASE)<<"').id LIKE"<<id<<" AND "<<save;
 	//return save;
 }
 

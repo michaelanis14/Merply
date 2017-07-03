@@ -45,7 +45,7 @@ void PageUI::fill(QJsonObject viewStructure)
 	this->document_id = viewStructure.value("document_id").toString();
 	headerlbl->setTitle(viewStructure.value("Title").toString());
 
-	viewGroups = new ViewGroups(0,viewStructure,QJsonObject()) ;
+	viewGroups = new ViewGroups(0,viewStructure) ;
 	viewGroups->setHidden(false);
 	layout->addWidget(viewGroups);
 	//this->layout->addWidget(createEditWidget);

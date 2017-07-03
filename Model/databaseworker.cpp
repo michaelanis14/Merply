@@ -14,6 +14,7 @@ DatabaseWorker::DatabaseWorker(QObject *parent) : QObject(parent)
 	if ( !m_database.open() )
 		{
 		qWarning() << "Unable to connect to database, giving up:" << m_database.lastError().text();
+		qFatal( "Failed to connect." );
 		return;
 		}
 
@@ -47,7 +48,12 @@ void DatabaseWorker::slotExecute( const QString& query )
 		}
 	emit results( recs );
 }
+
+QSqlDatabase DatabaseWorker::database() const
+{
+	return m_database;
+}
 DatabaseWorker::~DatabaseWorker()
 {
-
+	m_database.close();
 }

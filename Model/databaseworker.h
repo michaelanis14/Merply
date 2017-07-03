@@ -17,6 +17,8 @@ public:
 	explicit DatabaseWorker(QObject *parent = 0);
 	~DatabaseWorker();
 
+	QSqlDatabase database() const;
+
 public slots:
 	void slotExecute( const QString& query );
 

@@ -198,7 +198,7 @@ void NavigationPageEditUI:: fill(QJsonObject structureView)
 				qDebug() << __FILE__ << __LINE__<< __func__ <<structureView.value("Card");
 			//	cards->setCurrentIndex(cards->keys.indexOf(structureView.value("Card").toString()));
 			if(structureView.value("Card").isDouble())
-			cards->setCurrentText((Controller::Get()->getCachedViewStructure(QString::number(structureView.value("Card").toInt()))).value("document_Name").toString());
+			cards->setCurrentText((Controller::Get()->getCachedViewStructure(structureView.value("Card").toInt())).value("document_Name").toString());
 			else{
 				QString card = structureView.value("Card").toString().split("::")[1];
 				cards->setCurrentText(card);
@@ -451,7 +451,7 @@ void NavigationPageEditUI::updateNewCardPreview()
 	if(newCard->isChecked()){
 		clearPreview();
 
-		ViewGroups* vg = new ViewGroups(0,newCardStructure->save() ,QJsonObject());
+		ViewGroups* vg = new ViewGroups(0,newCardStructure->save() );
 		previewLayout->addWidget(vg);
 		}
 }
@@ -489,7 +489,7 @@ void NavigationPageEditUI::loadCard(QJsonDocument document)
 {
 	//	qDebug() << __FILE__ << __LINE__  << "Reploaded" << preview->isHidden() << document.object();
 	QObject::disconnect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadCard(QJsonDocument)));
-	previewLayout->addWidget(new ViewGroups(0,document.object(),QJsonObject()));
+	previewLayout->addWidget(new ViewGroups(0,document.object()));
 }
 
 

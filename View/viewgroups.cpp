@@ -4,7 +4,7 @@
 #include "structureviewgroupsui.h"
 
 
-ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject data, QHash<QString, FeildUI*>* fieldsgroups) : QWidget(parent)
+ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QHash<QString, FeildUI*>* fieldsgroups, QDataWidgetMapper* mapper) : QWidget(parent)
 {
 	this->setObjectName("ViewGroups");
 	this->structureView = structureView;
@@ -29,7 +29,7 @@ ViewGroups::ViewGroups(QWidget *parent, QJsonObject structureView, QJsonObject d
 		//	QJsonArray dataVGs =data.value("Fields").toArray();
 
 		foreach (QJsonValue item, structureView.value("Viewgroups").toArray()) {
-			ViewGroup* viewgroup = new ViewGroup(0,structureView.value("document_id").toString(),item.toObject(),data,fieldsgroups);
+			ViewGroup* viewgroup = new ViewGroup(0,structureView.value("document_id").toString(),item.toObject(),fieldsgroups,mapper);
 			QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
 			spRight.setHorizontalStretch(1);
 			viewgroup->setSizePolicy(spRight);

@@ -9,7 +9,9 @@
 
 Prsistance::Prsistance(QObject *parent) : QObject(parent)
 {
+	this->ready = false;
 	database = new Database();
+	QObject::connect(database,SIGNAL(readyToQuery()),this,SLOT(readyToQuery()));
 	database->start();
 
 	//	Database::Get();
@@ -2102,6 +2104,11 @@ void Prsistance::gotCount(QString value)
 	emit count(value.toInt());
 }
 
+void Prsistance::readyToQuery(bool ready)
+{
+	this->ready = ready;
+}
+
 
 
 int Prsistance::CountIndexes(const QString index)
@@ -2159,23 +2166,23 @@ bool Prsistance::CreateViewStructureTabels()
 	QMap<int,QJsonObject>* builtTabels  = new QMap<int,QJsonObject>();
 	InitTabel* initT = new InitTabel(0,"");
 	while (builtTabels->count() < Model::Get()->cachedViewStructures.count()) {
-		QMapIterator<QString, QJsonObject> i(Model::Get()->cachedViewStructures);
+		QMapIterator<int, QJsonObject> i(Model::Get()->cachedViewStructures);
 		while (i.hasNext()) {
 			outerloop:
 			i.next();
-			if(builtTabels->contains(i.key().toInt())){
+			if(builtTabels->contains(i.key())){
 				continue;
 				}
 			else{
-				foreach(QJsonObject subField,Model::Get()->cachedViewStructureSubFields.value(i.key().toInt())){
+				foreach(QJsonObject subField,Model::Get()->cachedViewStructureSubFields.value(i.key())){
 					if(subField.value("Type").toString().compare("Refrence") == 0){
 						if(!builtTabels->contains(subField.value("Source").toString().toInt())){
 							goto outerloop;
 							}
 						}
 					}
-					initT->count(QString::number(i.key().toInt()));
-					builtTabels->insert(i.key().toInt(),i.value());
+					initT->count(QString::number(i.key()));
+					builtTabels->insert(i.key(),i.value());
 
 				}
 

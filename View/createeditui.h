@@ -4,24 +4,34 @@
 
 #include "maindisplay.h"
 #include "viewgroups.h"
+#include "sqltabelmodel.h"
+
 #include <QObject>
 #include <QWidget>
 #include <QJsonObject>
 #include <QVBoxLayout>
 #include <QShortcut>
 #include <QCheckBox>
+
+class QSqlRelationalTableModel;
+class QStandardItemModel;
+class QStringListModel;
+class QTextEdit;
+class QComboBox;
+class QDataWidgetMapper;
+class QItemSelectionModel;
+
 class CreateEditUI : public MainDisplay
 {
 	Q_OBJECT
 public:
 	CreateEditUI(QWidget *parent = 0);
-	explicit CreateEditUI(QWidget *parent = 0,QJsonObject viewStructure = QJsonObject(),QJsonObject data = QJsonObject());
+	explicit CreateEditUI(QWidget *parent = 0,QJsonObject viewStructure = QJsonObject(),SQLTabelModel* model = new SQLTabelModel());
 	//static CreateEditUI* ShowUI(QJsonObject viewStructure, QJsonObject data, bool create);
-
+	void showUI(bool create = false);
 
 	QJsonObject getViewStructure() const;
-	void fillData(QJsonObject data);
-	void fill(QJsonObject viewStructure,QJsonObject data);
+	void fill(QJsonObject viewStructure);
 	QHash<QString, FeildUI*> getFieldsgroups() const;
 
 private:
@@ -35,8 +45,6 @@ private:
 	QVBoxLayout *layout;
 	ViewGroups * viewGroups;
 	QJsonObject viewStructure;
-	QString cas;
-	QJsonObject data;
 	void clearErrorsWidget();
 	QStringList getTabelsFieldNames(QJsonObject viewStructure);
 	QShortcut* saveShortCut;
@@ -51,8 +59,13 @@ private:
 	QCheckBox* showPrintDialog;
 	QCheckBox* toInvoice;
 	bool toInvoiceFlag;
-
+	Database* database;
 	QHash<QString,FeildUI*> fieldsgroups;
+
+	SQLTabelModel* model;
+	QItemSelectionModel *selectionModel;
+	QDataWidgetMapper *mapper;
+	int typeIndex;
 signals:
 protected:
 	//void showEvent(QShowEvent *);
@@ -63,6 +76,7 @@ public slots:
 	void saved();
 	void printEntity();
 	void saveEntity();
+	void sqlSubmit();
 	void cancel();
 	void printAfterCheckBoxChanged(bool checked);
 	void printAfterSaved(QJsonDocument document);

@@ -16,14 +16,14 @@
 #include <QDebug>
 #include <QJsonArray>
 
-
+#include <QDataWidgetMapper>
 
 
 class SubFieldUI : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit SubFieldUI(QWidget *parent = 0,QString strID = "", QJsonObject structureView = QJsonObject(), QJsonValue data = QJsonValue());
+	explicit SubFieldUI(QWidget *parent = 0, QString strID = "", QJsonObject structureView = QJsonObject(), QDataWidgetMapper *mapper = new QDataWidgetMapper());
 	void clear();
 	QString save();
 	bool checkMandatory();

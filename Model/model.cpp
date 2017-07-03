@@ -58,7 +58,7 @@ QMap<int, QJsonObject> Model::getCachedPageStructures() const
 	return cachedPageStructures;
 }
 
-QMap<QString, QJsonObject> Model::getCachedViewStructures() const
+QMap<int, QJsonObject> Model::getCachedViewStructures() const
 {
 	return cachedViewStructures;
 }

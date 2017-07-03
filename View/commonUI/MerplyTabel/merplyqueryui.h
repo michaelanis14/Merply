@@ -17,7 +17,7 @@ public:
 	explicit MerplyQueryUI(QWidget *parent = 0, bool btnFilter = false);
 	void fill(QJsonObject strct);
 	void fillEntityQuery(QJsonObject strct);
-	void fillDocumentID(QString document_id);
+	void fillDocumentID(int id);
 	void fillAddtoTable(QJsonArray clmns);
 	QString getFields(QString entity);
 private:
@@ -25,7 +25,7 @@ private:
 	QPushButton* btnFilter;
 	QHBoxLayout *layout;
 	QVector<MerplyQuerySubField*> fields;
-	QString document_id;
+	int id;
 	QString document_Name;
 	QJsonObject strct;
 	bool clmnsFlag;

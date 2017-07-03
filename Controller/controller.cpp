@@ -61,6 +61,11 @@ Controller::Controller(QObject *parent) :
 
 }
 
+Database* Controller::getDatabase() const
+{
+	return database;
+}
+
 
 
 
@@ -123,7 +128,7 @@ void Controller::successLogin()
 
 void Controller::reBuildViewStructures()
 {
-	QMapIterator<QString, QJsonObject> i(Model::Get()->cachedViewStructures);
+	QMapIterator<int, QJsonObject> i(Model::Get()->cachedViewStructures);
 	while (i.hasNext()) {
 		i.next();
 
@@ -132,7 +137,7 @@ void Controller::reBuildViewStructures()
 		QJsonObject savedObj = strct->save();
 		//	qDebug()<< __FILE__ << __LINE__ << savedObj;
 		//qDebug() << __FILE__ << __LINE__  <<"SAVE: editControllerSavePressed"<< savedObj;
-	//	Controller::Get()->updateJson(savedObj.value("document_id").toString(),"ViewStructure",QJsonDocument(savedObj));
+		//	Controller::Get()->updateJson(savedObj.value("document_id").toString(),"ViewStructure",QJsonDocument(savedObj));
 
 		}
 
@@ -148,7 +153,7 @@ void Controller::showDisplayDataReturned(QJsonDocument document)
 void Controller::loadNavigationData(QJsonDocument document)
 {
 	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(loadNavigationData(QJsonDocument)));
-		//qDebug() << "load";
+	//qDebug() << "load";
 	navigationUI::Get()->loadMainNavigation(document);
 }
 
@@ -162,7 +167,11 @@ void Controller::subNavPressed(QJsonObject view)
 				int card = view.value("Card").toInt();
 				qDebug() << __FILE__ << __LINE__  <<"Cards"<< card;
 				//queryIndexView(card);
-				IndexUI::ShowUI(card);
+				if(Controller::Get()->isCachedIndexUI(card))
+					((IndexUI*)Controller::Get()->getCachedIndexUI(card))->showUI();
+				//	MainForm::Get()->ShowDisplay((IndexUI*)Controller::Get()->getCachedIndexUI(card));
+
+				//	IndexUI::ShowUI(card);
 
 				}
 			else{
@@ -170,7 +179,8 @@ void Controller::subNavPressed(QJsonObject view)
 				//	QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(subNavPressedData(QJsonDocument)));
 				//qDebug() << __FILE__ << __LINE__  <<"getDocument"<< view.value("Card").toString();
 				//	database->getDoc(view.value("Card").toString());
-				Controller::Get()->showCreateEditeStrUI(QString::number(view.value("Card").toInt()),false);
+
+//				Controller::Get()->showCreateEditeStrUI(view.value("Card").toInt(),false);
 
 				}
 			}
@@ -181,7 +191,7 @@ void Controller::subNavPressed(QJsonObject view)
 				qDebug() << __FILE__ << __LINE__ << __func__ ; ///DATABASEER					database->getDoc(view.value("Card").toString());
 				}
 			}
-	else IndexUI::ShowUI(1);
+	//	else IndexUI::ShowUI(1);
 }
 
 void Controller::queryIndexView(QString vStrctKey)
@@ -216,18 +226,20 @@ SubFieldUI*Controller::getFirstSubField(QString strID,QString feildName)
 	//	QString key = strID.split("::")[1];
 	//	if(getCachedViewStructure(key).value())
 
+	/* TODOOOOO
 	if(isCachedCreateEditUI(key)){
 		if(((CreateEditUI*)getCachedCreateEditUI(key))->getFieldsgroups().find(feildName.trimmed()) != ((CreateEditUI*)getCachedCreateEditUI(key))->getFieldsgroups().end()
 				&&((CreateEditUI*)getCachedCreateEditUI(key))->getFieldsgroups().value(feildName.trimmed()))
 			return ((CreateEditUI*)getCachedCreateEditUI(key))->getFieldsgroups().value(feildName.trimmed())->subFields.first();
 
-		/*	else if(((PageUI*)getCachedPageUI(key))->getFieldsgroups().find(feildName.trimmed()) != ((PageUI*)getCachedPageUI(key))->getFieldsgroups().end()
+			*/
+	/*	else if(((PageUI*)getCachedPageUI(key))->getFieldsgroups().find(feildName.trimmed()) != ((PageUI*)getCachedPageUI(key))->getFieldsgroups().end()
 			&&((PageUI*)getCachedPageUI(key))->getFieldsgroups().value(feildName.trimmed())){
 		qDebug() << "PAGEEEEEEEEEEEEEEEEEEEEEEEEEE";
 		return ((PageUI*)getCachedPageUI(key))->getFieldsgroups().value(feildName.trimmed())->subFields.first();
 		}
 */
-		}
+	//	}
 	return new SubFieldUI();
 }
 
@@ -318,6 +330,7 @@ void Controller::editControllerCancelDataPressed(QJsonDocument document)
 	NavigationEditUI::Get()->setHidden(true);
 }
 
+/*
 void Controller::subNavPressedData(QJsonDocument documents)
 {
 	//	qDebug() << __FILE__ << __LINE__  << "SubPreseed" << documents;
@@ -330,6 +343,8 @@ void Controller::subNavPressedData(QJsonDocument documents)
 	//CreateEditUI::ShowUI(documents.object(),QJsonObject(),false);
 	//if()
 }
+
+*/
 /**
  * @brief Controller::subNavPressedIndexData
  * @param documents
@@ -630,12 +645,12 @@ void Controller::getViewStructuresData(QVector<QSqlRecord> documents){
 		strctObj.insert("document_Name",structName.toString());
 
 		//	qDebug() << __FILE__ << __LINE__ << "document_id" <<strctObj.value("document_id").toString();
-		insertCachedViewStructure(QString::number(structKey.toInt()),strctObj);
+		insertCachedViewStructure(structKey.toInt(),strctObj);
 		buildViewStructureIndexFieldsNamesList(strctObj);
 
 		}
-	buildCachedCreateEditUI();
-	//buildCachedIndexUI();
+	//buildCachedCreateEditUI();
+	buildCachedIndexUI();
 
 	//reBuildViewStructures(); // OneTime Run for the migration to MySQL
 
@@ -663,21 +678,19 @@ void Controller::getPageStructuresData(QVector<QSqlRecord> documents){
 }
 void Controller::buildCachedCreateEditUI()
 {
-	foreach (QString structName, getCachedViewStructures().keys()) {
-		CreateEditUI* createEditUI =  new CreateEditUI(0,getCachedViewStructure(structName), QJsonObject());
-		insertCachedCreateEditUI(structName,createEditUI);
-		createEditUI->fill(getCachedViewStructure(structName), QJsonObject());
+	foreach (int structID, getCachedViewStructures().keys()) {
+		CreateEditUI* createEditUI =  new CreateEditUI(0,getCachedViewStructure(structID));
+	//	insertCachedCreateEditUI(structID,createEditUI);
+	//	createEditUI->fill(getCachedViewStructure(structID));
 		//qDebug() << structName;
 		}
 }
 
 void Controller::buildCachedIndexUI()
 {
-	foreach (QString structName, getCachedViewStructures().keys()) {
-		IndexUI* indexUI =  new IndexUI(0);
-		insertCachedCreateEditUI(structName,indexUI);
-		indexUI->fill(getCachedViewStructure(structName).value("document_id").toString().toInt());
-		//qDebug() << structName;
+	foreach (int structID, getCachedViewStructures().keys()) {
+		IndexUI* indexUI =  new IndexUI(0,structID);
+		insertCachedIndexUI(structID,indexUI);
 		}
 }
 
@@ -753,72 +766,65 @@ void Controller::updateJson(const QString& id,const QString& tabel,QJsonDocument
 	database->insert(query);
 }
 
-void Controller::showCreateEditeStrUI(QString str,bool create)
+
+////Daprecated
+///
+/*
+void Controller::showCreateEditeStrUI(int structure_id,int data_id)
 {
-	//qDebug() << __FILE__ << __LINE__  << str.split("::")[1] <<"Check cached";
-	QString key = str.split("::").count() > 1?str.split("::")[1]:str;
-	if(create){
-
-		QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUICreateTrueData(QJsonDocument)));
-		database->start();
-		database->getJson("viewstructure","ViewStructure",key,"");
-		//database->getDoc(str);
-		}
-	else if(!key.isEmpty() && isCachedCreateEditUI(key)){
-		qDebug() << __FILE__ << __LINE__  << key <<"Cached" ;
-		//MainForm::Get()->ShowDisplay(->getP_instance());
-		//qDebug() << ((CreateEditUI*)(Controller::Get()->getStructure(key)))->getViewStructure();
-		//((CreateEditUI*)(Controller::Get()->getStructure(key)))->ShowUI(structNames.value(key),QJsonObject(),false);
-		MainForm::Get()->ShowDisplay(((CreateEditUI*)(getCachedCreateEditUI(key))));
-		}
-	else{
-		qDebug() << __FILE__ << __LINE__  << key <<"NOT Cached";
-
-		QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUIData(QJsonDocument)));
-		database->start();
-		database->getJson("viewstructure","ViewStructure","",key);
+	if(structure_id && isCachedCreateEditUI(structure_id)){
+		qDebug() << __FILE__ << __LINE__  << structure_id <<"Cached" ;
+		////	MainForm::Get()->ShowDisplay(((CreateEditUI*)(getCachedCreateEditUI(structure_id))));
 		}
 
 }
+
+////Daprecated
 void Controller::showCreateEditeStrUIData(QJsonDocument str)
 {
 	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUIData(QJsonDocument)));
-		//CreateEditUI::ShowUI(str.object(),QJsonObject(),true);
-	QString key = str.object().value("document_id").toString().split("::").count() > 1?str.object().value("document_id").toString().split("::")[1]:str.object().value("document_id").toString();
+	//CreateEditUI::ShowUI(str.object(),QJsonObject(),true);
+	int key = str.object().value("document_id").toString().split("::").count() > 1?str.object().value("document_id").toString().split("::")[1].toInt():str.object().value("document_id").toInt();
 
 	if(isCachedCreateEditUI(key)){
 		//((CreateEditUI*)getCachedCreateEditUI(key))->fill(QJsonObject(),);
-		MainForm::Get()->ShowDisplay(((CreateEditUI*)getCachedCreateEditUI(key)));
+		///////		MainForm::Get()->ShowDisplay(((CreateEditUI*)getCachedCreateEditUI(key)));
 		}
 	else {
 		qDebug() << __FILE__ << __LINE__  << key <<"NOT Cached" << key;
 		//new CreateEditUI
 		}
 }
+////Daprecated
 void Controller::showCreateEditeStrUICreateTrueData(QJsonDocument str)
 {
 	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeStrUICreateTrueData(QJsonDocument)));
-	QString key = str.object().value("document_id").toString().split("::")[1];
+	int key = str.object().value("document_id").toString().split("::")[1].toInt();
 	if(isCachedCreateEditUI(key)){
 		//((CreateEditUI*)getCachedCreateEditUI(key))->fill(QJsonObject(),);
-		MainForm::Get()->ShowDisplay(((CreateEditUI*)getCachedCreateEditUI(key)));
+		///////	MainForm::Get()->ShowDisplay(((CreateEditUI*)getCachedCreateEditUI(key)));
 		}
 }
-void Controller::showCreateEditeValueUI(QString key)
+////Daprecated
+void Controller::showCreateEditeValueUI(int id,QString tabel)
 {
-	if(key.split("::").count() > 1){
-
-		QObject::connect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeValueUIData(QJsonDocument)));
-		database->start();
-		database->getJson("viewstructure","ViewStructure",key.split("::")[1],"");
+	if(id > 0){
+		QString query = "SELECT * FROM `"+tabel+"` WHERE `id` = '"+QString::number(id)+"' LIMIT 1;";
+		qDebug() << __FILE__ << __LINE__  <<"show" << query;
+		QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(showCreateEditeValueUIData(QVector<QSqlRecord>)));
+		database->query(query);
 		}
 }
-
-void Controller::showCreateEditeValueUIData(QJsonDocument value)
+////Daprecated
+void Controller::showCreateEditeValueUIData(QVector<QSqlRecord> data)
 {
-	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(showCreateEditeValueUIData(QJsonDocument)));
-	QString key  = value.object().value("document_id").toString().split("::")[0];
-	if(!key.isEmpty()){
+	QObject::disconnect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(showCreateEditeValueUIData(QVector<QSqlRecord>)));
+	qDebug() << data.first();
+
+	qDebug() << data;
+	int key  = 0;
+	//value.object().value("document_id").toString().split("::")[0].toInt();
+	if(key){
 		//qDebug() << __FILE__ << __LINE__  << key <<"is Cached Value";
 		//((CreateEditUI*)Model::Get()->cachedCreateEditUI.value(key))->ShowUI(QJsonObject(),value.object(),false);
 		//((CreateEditUI*)MainForm::Get()->GetCurrentDisplay())->ShowUI(QJsonObject(),value.object());
@@ -827,14 +833,14 @@ void Controller::showCreateEditeValueUIData(QJsonDocument value)
 
 
 		if(isCachedCreateEditUI(key)){
-			((CreateEditUI*)getCachedCreateEditUI(key))->fillData(value.object());
-			MainForm::Get()->ShowDisplay(((CreateEditUI*)getCachedCreateEditUI(key)));
+			//((CreateEditUI*)getCachedCreateEditUI(key))->fillData(value.object());
+			//		MainForm::Get()->ShowDisplay(((CreateEditUI*)getCachedCreateEditUI(key)));
 			}
 		}
 
 
 }
-
+*/
 void Controller::linkPressed(QJsonObject link)
 {
 	qDebug() << __FILE__ << __LINE__  << link;
@@ -853,9 +859,9 @@ void Controller::linkPressed(QJsonObject link)
 void Controller::linkPressedData(QJsonDocument document)
 {
 	QObject::disconnect(database,SIGNAL(gotDocument(QJsonDocument)),this,SLOT(linkPressedData(QJsonDocument)));
-	QString key = document.object().value("document_id").toString();
-	if(isCachedCreateEditUI(key))
-		MainForm::Get()->ShowDisplay(((CreateEditUI*)getCachedCreateEditUI(key)));
+	int key = document.object().value("document_id").toInt();
+	//	if(isCachedCreateEditUI(key))
+	//		MainForm::Get()->ShowDisplay(((CreateEditUI*)getCachedCreateEditUI(key)));
 	//CreateEditUI::ShowUI(document.object(),QJsonObject(),false);
 }
 
@@ -1163,37 +1169,39 @@ QString Controller::getLocalSourceReport(QJsonObject clmn,int index,QString filt
 	return query;
 }
 
-void Controller::insertCachedCreateEditUI(QString key, QWidget* instance)
+/* To Check Importance and need
+void Controller::insertCachedCreateEditUI(int key, QWidget* instance)
 {
 	//qDebug() << __FILE__ << __LINE__  << "insert"<<key<< instance;
 	Model::Get()->cachedCreateEditUI.insert(key,instance);
 }
 
-QWidget* Controller::getCachedCreateEditUI(QString key)
+QWidget* Controller::getCachedCreateEditUI(int key)
 {
 	//qDebug() << __FILE__ << __LINE__ <<"getCachedCreateEditUI"<< key;
 	return (Model::Get()->cachedCreateEditUI.value(key));
 
 }
 
-bool Controller::isCachedCreateEditUI(QString key)
+bool Controller::isCachedCreateEditUI(int key)
 {
 	//qDebug() << __FILE__ << __LINE__  << "insert"<<key<< instance;
 	return Model::Get()->cachedCreateEditUI.contains(key);
 
 }
-
-void Controller::insertCachedViewStructure(QString key, QJsonObject viewStrct)
+*/
+void Controller::insertCachedViewStructure(int key, QJsonObject viewStrct)
 {
 	Model::Get()->cachedViewStructures.insert(key,viewStrct);
 }
 
-QJsonObject Controller::getCachedViewStructure(QString key)
+
+QJsonObject Controller::getCachedViewStructure(int key)
 {
 	return Model::Get()->cachedViewStructures.value(key);
 }
 
-QMap<QString, QJsonObject> Controller::getCachedViewStructures() const
+QMap<int, QJsonObject> Controller::getCachedViewStructures() const
 {
 	return Model::Get()->getCachedViewStructures();
 }
@@ -1213,17 +1221,17 @@ QMap<int, QJsonObject> Controller::getCachedPageStructures() const
 	return Model::Get()->getCachedPageStructures();
 }
 
-void Controller::insertCachedIndexUI(QString key, QWidget* instance)
+void Controller::insertCachedIndexUI(int key, QWidget* instance)
 {
 	Model::Get()->cachedIndexUI.insert(key,instance);
 }
 
-QWidget*Controller::getCachedIndexUI(QString key)
+QWidget*Controller::getCachedIndexUI(int key)
 {
 	return (Model::Get()->cachedIndexUI.value(key));
 }
 
-bool Controller::isCachedIndexUI(QString key)
+bool Controller::isCachedIndexUI(int key)
 {
 	return Model::Get()->cachedIndexUI.contains(key);
 }
@@ -1714,7 +1722,7 @@ void Controller::deleteEntityData(QVector<QJsonDocument> items)
 void Controller::queryData(QVector<QSqlRecord> items)
 {
 	QObject::disconnect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(queryData(QVector<QSqlRecord>)));
-		emit gotReportData(items);
+	emit gotReportData(items);
 }
 
 void Controller::setShowWarning(bool value)
@@ -1799,9 +1807,12 @@ bool Controller::save(QList<Entity*> entityGroup,bool update){
 */
 void Controller::deleteDocument(const QString& tabel, const QString& id)
 {
-
 	database->deletRow(tabel,id);
-	//DELETE FROM BankAccount WHERE BankAccountID
+}
+
+void Controller::deleteEntity(const int& tabel, const int& id)
+{
+	database->deletRow(QString::number(tabel),QString::number(id));
 }
 
 bool Controller::Compare(QJsonObject first, QJsonObject second)

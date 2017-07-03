@@ -12,7 +12,7 @@ class PrintController : public QObject
 public:
 	explicit PrintController(QObject *parent = 0);
 	static PrintController* Get();
-	void printEntity(QString id);
+	void printEntity(int id);
 private:
 	static PrintController* p_instance;
 	QtRPT *report;

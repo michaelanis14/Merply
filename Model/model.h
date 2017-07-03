@@ -47,10 +47,10 @@ public:
 
 
 	//preloading
-	QMap< QString,QWidget* > cachedCreateEditUI;
-	QMap< QString,QWidget* > cachedIndexUI;
+	QMap< int,QWidget* > cachedCreateEditUI;
+	QMap< int,QWidget* > cachedIndexUI;
 	QMap< int,QWidget* > cachedPageUI;
-	QMap<QString,QJsonObject> cachedViewStructures;
+	QMap<int,QJsonObject> cachedViewStructures;
 	QMap<int,QJsonObject> cachedPageStructures;
 	QMap<int,QStringList> cachedViewStructureFieldsNames;
 	QMap<QString,int> cachedViewStructureNames;
@@ -95,7 +95,7 @@ public:
 	QString getDefaulConnStrg() const;
 	void setDefaulConnStrg(const QString& value);
 
-	QMap<QString, QJsonObject> getCachedViewStructures() const;
+	QMap<int, QJsonObject> getCachedViewStructures() const;
 
 	QMap<int, QJsonObject> getCachedPageStructures() const;
 

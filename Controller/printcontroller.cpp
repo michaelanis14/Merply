@@ -15,14 +15,13 @@ PrintController* PrintController::Get()
 
 	return p_instance;
 }
-void PrintController::printEntity(QString id)
+void PrintController::printEntity(int id)
 {
-	//qDebug() << __FILE__ << __LINE__  <<"printEntity"<< id;
-	QStringList idSplit = id.split("::");
-	if(idSplit.count() > 1){
-		QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintEntity(QJsonDocument)));
-		Controller::Get()->getDoc(" * ",idSplit[0],idSplit[1],"");
-		}
+	qDebug() << __FILE__ << __LINE__  <<"DATABASE ERR"<< id;
+		//QObject::connect(Controller::Get(),SIGNAL(gotDocument(QJsonDocument)),this,SLOT(gotPrintEntity(QJsonDocument)));
+
+		//Controller::Get()->getDoc(" * ",idSplit[0],idSplit[1],"");
+
 }
 
 /**

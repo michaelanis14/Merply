@@ -9,14 +9,15 @@
 #include <QObject>
 #include <QWidget>
 #include <QPainter>
+#include <QDataWidgetMapper>
 
 class ViewGroup;
 class ViewGroups : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ViewGroups(QWidget *parent = 0,QJsonObject structureView = QJsonObject(), QJsonObject data = QJsonObject()
-			,QHash<QString,FeildUI*> *fieldsgroups = new QHash<QString,FeildUI*>());
+	explicit ViewGroups(QWidget *parent = 0,QJsonObject structureView = QJsonObject()
+			,QHash<QString,FeildUI*> *fieldsgroups = new QHash<QString,FeildUI*>(),QDataWidgetMapper *mapper = new QDataWidgetMapper());
 		QPair<QString, QString> save(bool newDocument);
 	//	static  ViewGroups* Create(QJsonObject structureView, QJsonObject data);
 	//	static ViewGroups* Get();

@@ -33,7 +33,7 @@ MerplyQuerySubField::MerplyQuerySubField(QJsonObject strct, QWidget *parent) : Q
 	else if(!strct.value("Source").toString().isEmpty() && strct.value("Source").toString().compare("_") != 0){
 		if(!strct.value("Select").toString().isEmpty() && strct.value("Select").toString().compare("ALL") == 0){
 			MerplyQueryUI* q= new MerplyQueryUI(this);
-			q->fillDocumentID(strct.value("Source").toString());
+			q->fillDocumentID(strct.value("Source").toInt());
 			layout->addRow((strct.value("Label").toString()),q);
 			field = q;
 			}

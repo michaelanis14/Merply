@@ -2,7 +2,7 @@
 #include "structureviewedit.h"
 
 
-ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, QJsonObject data,QHash<QString,FeildUI*>* fieldsgroups) : QGroupBox (parent)
+ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, QHash<QString,FeildUI*>* fieldsgroups,QDataWidgetMapper *mapper ) : QGroupBox (parent)
 {
 
 	this->structureView = structureView;
@@ -27,7 +27,7 @@ ViewGroup::ViewGroup(QWidget *parent, QString strID, QJsonObject structureView, 
 			//qDebug() << __FILE__ << __LINE__  << data.at(d);
 			foreach (QJsonValue fieldVS, viewgroup.value("Fields").toArray()) {
 				//qDebug() << __FILE__ << __LINE__  << fieldVS.toObject();
-				FeildUI* feild = new FeildUI(0,strID,fieldVS.toObject(),data);
+				FeildUI* feild = new FeildUI(0,strID,fieldVS.toObject(),mapper);
 				feilds << feild;
 				fieldsgroups->insert(fieldVS.toObject().value("Label").toString().trimmed(),feild);
 				layout->addWidget(feild);

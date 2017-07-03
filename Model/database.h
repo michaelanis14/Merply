@@ -15,7 +15,7 @@
 #include <QJsonObject>
 
 //#define DATABASE "default"
-class DatabaseWorker; // forw decl
+class DatabaseWorker; // forward declaration
 
 class Database : public QThread
 {
@@ -23,20 +23,14 @@ class Database : public QThread
 public:
 	 Database(QObject *parent = 0);
 	 ~Database();
-	//static Database* Get();
-//	QList<QSqlRecord> query(const QString &query, const QVariantMap &arguments);
 	void query(const QString &query);
 	void getJson(const QString& select, const QString &tabel, const QString& key, const QString &id);
 	void deletRow(const QString &tabel, const QString &id);
 	void insert(QString query);
 	void execute( const QString& query );
-
+	QSqlDatabase getDatabase() const;
 private :
 	DatabaseWorker* m_worker;
-
-	QString connectionName;
-	QString connectionNameMain;
-	QVector<QSqlRecord> threadedSql(const QSqlDatabase &db, const QString &query) ;
 	bool treadedInsert(const QSqlDatabase &db,const QString &query);
 
 

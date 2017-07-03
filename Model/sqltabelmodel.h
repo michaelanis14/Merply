@@ -7,7 +7,7 @@
 
 
 
-class SQLTabelModel : public  QSqlTableModel
+class SQLTabelModel : public  QSqlRelationalTableModel
 {
 	Q_OBJECT
 public:
