@@ -46,6 +46,7 @@ Controller::Controller(QObject *parent) :
 	database->start();
 	//	CouchbaseLibManager::Get();
 
+
 	///TimeLine
 	//	connect(timelineUI::Get(), SIGNAL(btnLoadPressed()), this, SLOT(onBtnLoadClicked()));
 	//	connect(timelineUI::Get(), SIGNAL(btnRunPressed()), this, SLOT(onBtnRunClicked()));
@@ -124,6 +125,7 @@ void Controller::successLogin()
 	qDebug() << "SucessLogin";
 	QObject::connect(navigationUI::Get(),SIGNAL(subNavPressed(QJsonObject)),this,SLOT(subNavPressed(QJsonObject)));
 	initNavigation();
+	Prsistance::Get()->init();
 }
 
 void Controller::reBuildViewStructures()
@@ -654,6 +656,7 @@ void Controller::getViewStructuresData(QVector<QSqlRecord> documents){
 
 	//reBuildViewStructures(); // OneTime Run for the migration to MySQL
 
+	//I COMMENTED THIS
 	//Prsistance::Get()->CreateViewStructureTabels(); //OneTime Run for the migration to MySQL
 }
 void Controller::getPageStructures()
@@ -1686,9 +1689,10 @@ void Controller::buildViewStructureIndexFieldsNamesList(QJsonObject viewstrct)
 					if(fv.toObject().value("ShowInIndex") != QJsonValue::Undefined)
 						indexFieldsName.removeLast();
 					foreach(QJsonValue clmn,subFld.toObject().value("Columns").toArray()){
-						fieldsName <<clmn.toObject().value("Header").toString().append("$").append(tableName);
-						if(fv.toObject().value("ShowInIndex") != QJsonValue::Undefined)
-							indexFieldsName <<clmn.toObject().value("Header").toString();
+					//We commented this for cachedFieldsIndex
+						//	fieldsName <<clmn.toObject().value("Header").toString().append("$").append(tableName);
+						//if(fv.toObject().value("ShowInIndex") != QJsonValue::Undefined)
+							//indexFieldsName <<clmn.toObject().value("Header").toString();
 						}
 					}
 				}
@@ -1831,5 +1835,6 @@ bool Controller::Compare(QJsonObject first, QJsonObject second)
 
 	return true;
 }
+
 
 

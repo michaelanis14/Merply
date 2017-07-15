@@ -4,7 +4,7 @@
 # Copyright (C) 2015 Merply - Michael Bishara e.U.
 #-------------------------------------------------
 
-QT       += core gui printsupport sql
+QT       += core gui printsupport sql axcontainer
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets concurrent
 
@@ -39,7 +39,7 @@ debug:MOC_DIR = debug/.moc
 debug:RCC_DIR = debug/.rcc
 debug:UI_DIR = debug/.ui
 
-CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+#CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 #CONFIG += static
 #CONFIG   -= x86_64
@@ -80,5 +80,13 @@ macx: LIBS += -L$$PWD/../../../../../Users/michaelbishara/Qt5.8.0/5.8/clang_64/p
 
 INCLUDEPATH += $$PWD/../../../../../Users/michaelbishara/Qt5.8.0/5.8/clang_64/plugins/sqldrivers
 DEPENDPATH += $$PWD/../../../../../Users/michaelbishara/Qt5.8.0/5.8/clang_64/plugins/sqldrivers
+
+
+win32: LIBS += -L'C:/Program Files (x86)/MySQL/MySQLConnector.C6.1/lib/' -llibmysql
+
+INCLUDEPATH += 'C:/Program Files (x86)/MySQL/MySQLConnector.C6.1/include'
+DEPENDPATH += 'C:/Program Files (x86)/MySQL/MySQLConnector.C6.1/include'
+
+DISTFILES +=
 
 

@@ -34,6 +34,11 @@ public:
 	static QString GetDatabaseName();
 	static bool CreateViewStructureTabels();
 
+	QString getTableNumber(QString table);
+
+	int countRecords(QString table);
+	QStringList getColumnsNumber(const QString table);
+	void insertIntoTable(QString tableName, QString fileName, int startingRow, QStringList dataIndex);
 private:
 	static Prsistance* p_instance;
 	bool ready;

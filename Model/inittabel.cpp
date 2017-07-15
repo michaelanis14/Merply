@@ -33,6 +33,7 @@ void InitTabel::gotCounterT(int tblCount)
 		Database* database  = new Database();
 		QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(gotResults(QVector<QSqlRecord>)));
 		database->query(query);
+
 		}
 }
 
@@ -121,7 +122,8 @@ QString InitTabel::genetrateCreateTabelQuery(QJsonDocument document)
 			 "`CreatedByID` VARCHAR(40) NOT NULL, "
 			 "`EditedByID` VARCHAR(40) NOT NULL, "
 			 "`EditedOn` DATE NOT NULL, KEY(`EditedOn`) )ENGINE=INNODB DEFAULT CHARSET=utf8mb4; ";
-	query += oneToManyQueries;
+	//query += oneToManyQueries //I COMMENTED THIS;
+	query = oneToManyQueries;
 
 	return query;
 }
@@ -129,32 +131,31 @@ QString InitTabel::genetrateCreateTabelQuery(QJsonDocument document)
 QString InitTabel::genetrateCreateTabelQueryForTabel(QString parentEntity,QString field,QJsonValue tabel)
 {
 	QString query;
-
-
-
-
 	if(tabel.toObject().value("Type").toString().compare("Table") == 0){
 		query += "CREATE TABLE `"+parentEntity+"_"+field+"` (";
-		query +="`id` INT NOT NULL AUTO_INCREMENT, "
-				"PRIMARY KEY (`id`), ";
-		query += "FOREIGN KEY (`"+parentEntity+"ID`) REFERENCES `"+parentEntity+"`(`id`)  ON DELETE CASCADE, ";
-
+		query +="`id` INT NOT NULL,";
+		//query += "FOREIGN KEY (`"+parentEntity+"ID`) REFERENCES `"+parentEntity+"`(`id`)  ON DELETE CASCADE, ";
+		query += "FOREIGN KEY (`id`) REFERENCES `"+parentEntity+"`(`id`)  ON DELETE CASCADE, ";
 
 		int i = 0;
 		foreach(QJsonValue clmn,tabel.toObject().value("Columns").toArray()){
 
 			QString type = clmn.toObject().value("Type").toString();
 			if(type.compare("Refrence") == 0){
+				if(!clmn.toObject().value("Source").toString().isEmpty()){
+					query +="`"+QString::number(i)+"` INT,";
+					query += "FOREIGN KEY (`"+QString::number(i)+"`) REFERENCES `"+clmn.toObject().value("Source").toString()+"`(`id`)  ON DELETE CASCADE, ";
+					}
 
-				query += "FOREIGN KEY (`"+QString::number(i)+"`) REFERENCES `"+clmn.toObject().value("Source").toString()+"`(`"+clmn.toObject().value("Select").toString()+"`)  ON DELETE CASCADE ";
+
 
 				}
 			else if(type.compare("Equation") == 0){
-				query += "`"+QString::number(i)+"` DECIMAL(6,2) ";
+				query += "`"+QString::number(i)+"` DECIMAL(6,2), ";
 
 				}
 			else {
-				query += "`"+QString::number(i)+"` VARCHAR(40) ";
+				query += "`"+QString::number(i)+"` VARCHAR(40), ";
 				}
 
 			clmn.toObject().value("Header").toString();
@@ -166,8 +167,15 @@ QString InitTabel::genetrateCreateTabelQueryForTabel(QString parentEntity,QStrin
 
 	query += "`Enabled` VARCHAR(1) NOT NULL, "
 			 "`Active` VARCHAR(1) NOT NULL, "
-			 "`CreatedOn` VARCHAR(40) NOT NULL, "
-			 "`EditedOn` VARCHAR(40) NOT NULL, KEY(`EditedOn`) ); ";
+			 "`ShowOnWebSite` VARCHAR(1) NOT NULL, "
+			 "`CreatedOn` DATE NOT NULL, "
+			 "`CreatedByName` VARCHAR(40) NOT NULL, "
+			 "`EditedByName` VARCHAR(40) NOT NULL, "
+			 "`CreatedByID` VARCHAR(40) NOT NULL, "
+			 "`EditedByID` VARCHAR(40) NOT NULL, "
+			 "`EditedOn` DATE NOT NULL, KEY(`EditedOn`) )ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ;";
+
+	qDebug()<<__FILE__<<__LINE__<<"query in table is" <<query;
 	return query;
 
 }
