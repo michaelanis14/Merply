@@ -100,7 +100,7 @@ emptyData:
 
 			*/
 
-			SubFieldUI* subfeild = new SubFieldUI(0,this->strID,structureView.value("SubFields").toArray().first().toObject(),mapper);
+			SubFieldUI* subfeild = new SubFieldUI(0,this->strID,structureView.value("SubFields").toArray().first().toObject(),mapper,structureView.value("Label").toString());
 			subFieldsWidgetLayout->addWidget(subfeild);
 			subFields << subfeild;
 			}

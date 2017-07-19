@@ -3,7 +3,7 @@
 #include "controller.h"
 #include "createeditui.h"
 
-IndexUI::IndexUI(QWidget *parent,const int document_id) : MainDisplay(parent)
+IndexUI::IndexUI(QWidget *parent,const QString document_id) : MainDisplay(parent)
 {
 
 	layout = new QVBoxLayout(formPanel);
@@ -30,7 +30,7 @@ IndexUI::IndexUI(QWidget *parent,const int document_id) : MainDisplay(parent)
 	table->indexTable(document_id);
 	layout->addWidget(table);
 
-	createEditUI = new CreateEditUI(0,Controller::Get()->getCachedViewStructure(this->document_id),this->table->getModel());
+	createEditUI = new CreateEditUI(0,Controller::Get()->getCachedViewStructure(this->document_id.toInt()),this->table->getModel());
 
 
 	new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_N), this, SLOT(createNew()));

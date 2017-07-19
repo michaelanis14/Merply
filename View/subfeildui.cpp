@@ -3,7 +3,7 @@
 
 #include<QDateTimeEdit>
 
-SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,QDataWidgetMapper *mapper ) : QWidget(parent)
+SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,QDataWidgetMapper *mapper, QString referenceLabel ) : QWidget(parent)
 {
 
 	//qDebug() << __FILE__ << __LINE__  << "wassup" << structureView;
@@ -23,10 +23,9 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 	QString type = structureView.value("Type").toString();
 
 
-
 	if(type.compare("Refrence") == 0){
 		combox = new ERPComboBox(this,false);
-		//qDebug() << __FILE__ << __LINE__ <<"SELECT" << structureView.value("Select");
+		qDebug() << __FILE__ << __LINE__ <<"SELECT" << structureView.value("Select");
 		if(structureView.value("Editable").toString().compare("false") == 0)
 			combox->setEditable(false);
 		layout->addWidget(combox);
@@ -66,7 +65,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		//qDebug() << __FILE__ << __LINE__  << structureView.value("Source").toString() << structureView.value("Select").toString();
 		}
 	else if(type.compare("Text") == 0){
-
+		qDebug() << __FILE__ << __LINE__  << "in text";
 		QLineEdit* lineEdit = new QLineEdit();
 		lineEdit->setContentsMargins(0,0,0,0);
 		if(structureView.value("Default") != QJsonValue::Undefined){
@@ -82,12 +81,12 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		layout->addWidget(lineEdit);
 		field = lineEdit;
 		//qDebug() << __FILE__ << __LINE__ <<strID<<mapper << structureView.value("clmnNumber") << structureView.value("clmnNumber").toString().toInt();
-		mapper->addMapping(lineEdit, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
+		//mapper->addMapping(lineEdit, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
 
 
 		}
 	else if(type.compare("TextArea") == 0){
-
+		qDebug() << __FILE__ << __LINE__  << "in text area";
 		QTextEdit* lineEdit = new QTextEdit();
 		lineEdit->setContentsMargins(0,0,0,0);
 		if(structureView.value("Default") != QJsonValue::Undefined){
@@ -96,10 +95,11 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		//lineEdit->setText(data.toString());
 		layout->addWidget(lineEdit);
 		field = lineEdit;
-		mapper->addMapping(lineEdit, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
+		//mapper->addMapping(lineEdit, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
 
 		}
 	else if(type.compare("Fixed") == 0){
+		qDebug() << __FILE__ << __LINE__  << "in fixed";
 		QLineEdit* lineEdit = new QLineEdit();
 		lineEdit->setContentsMargins(0,0,0,0);
 		if(structureView.value("Default") != QJsonValue::Undefined){
@@ -110,7 +110,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 
 		layout->addWidget(lineEdit);
 		field = lineEdit;
-		mapper->addMapping(lineEdit, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
+		//mapper->addMapping(lineEdit, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
 
 		}
 	else if(type.compare("Index") == 0){
@@ -125,8 +125,8 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		Controller::Get()->getSelectList(structureView.value("Source").toString(),structureView.value("Select").toString());
 		}
 	else if(type.compare("Table") == 0){
-		table = new merplyTabelView(this,true,false);
-		//	qDebug() << __FILE__ << __LINE__ <<"Table" << data.toObject() << structureView;
+		qDebug() << __FILE__ << __LINE__ <<"Table";
+		table = new merplyTabelView(this,true,false);		
 		//Controller::Get()->getReportTableData(structureView);
 		QJsonObject firstclmn = structureView.value("Columns").toArray().first().toObject();
 		if(firstclmn.value("SourceLocalFilter") != QJsonValue::Undefined &&firstclmn.value("LocalSource").toBool()){
@@ -145,9 +145,12 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 				}
 			}
 		else {
-			table->fill(structureView);
+			if(!referenceLabel.isEmpty()){
+				referenceLabel.replace(0,1,referenceLabel[0].toUpper()); // Change first letter to capital letter to match cached QMap
+				}
+			table->indexTable(strID+"_"+ QString::number(Controller::Get()->getCachedViewStructureNames(referenceLabel)));
+			qDebug() << __FILE__ << __LINE__  <<"table in subfield is"<<strID+"_"+ QString::number(Controller::Get()->getCachedViewStructureNames(referenceLabel));
 			}
-
 
 		QJsonObject dataObj;
 		//= data.toObject();
@@ -166,36 +169,39 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		field = table;
 		}
 	else if(type.compare("Link") == 0){
+		qDebug() << __FILE__ << __LINE__ <<"link";
 		QPushButton* btn  = new QPushButton(structureView.value("Title").toString(),this);
 		QObject::connect(btn,SIGNAL(pressed()),this,SLOT(linkPressed()));
 		layout->addWidget(btn);
 		field = btn;
 		}
 	else if(type.compare("Serial") == 0){
+		qDebug() << __FILE__ << __LINE__ <<"serial";
 		QLineEdit* lineEdit = new QLineEdit();
 		field = lineEdit;
 		lineEdit->setContentsMargins(0,0,0,0);
 		//lineEdit->setEnabled(false);
 
-			if(structureView.value("startNum") != QJsonValue::Undefined){
-				lineEdit->setText(QString::number(structureView.value("startNum").toInt()));
-				}
+//			if(structureView.value("startNum") != QJsonValue::Undefined){
+//				lineEdit->setText(QString::number(structureView.value("startNum").toInt()));
+//				}
 			//this split gives the name of the card
-			QStringList id = this->strID.split("ViewStructure::");
-			if(id.count() > 1){
-				QObject::connect(Controller::Get(),SIGNAL(CountData(int)),this,SLOT(serialData(int)));
-				Controller::Get()->Count(id[1]);
-				}
+//			QStringList id = this->strID.split("ViewStructure::");
+//			if(id.count() > 1){
+//				QObject::connect(Controller::Get(),SIGNAL(CountData(int)),this,SLOT(serialData(int)));
+//				Controller::Get()->Count(id[1]);
+//				}
 
 		//lineEdit->setText(data.toString());
-		layout->addWidget(lineEdit);
+		//layout->addWidget(lineEdit);
 	//	qDebug() << __FILE__ << __LINE__ <<strID<<mapper <<((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()) << structureView.value("clmnNumber") << structureView.value("clmnNumber").toString().toInt();
 
-		mapper->addMapping(lineEdit, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
+		//mapper->addMapping(lineEdit, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
 
 
 		}
 	else if(type.compare("Date") == 0){
+		qDebug() << __FILE__ << __LINE__ <<"date";
 		QDateEdit *date = new QDateEdit(this);
 
 		//qDebug() << data.toString();
@@ -212,12 +218,13 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 	//	qDebug() << __FILE__ << __LINE__ <<strID<<mapper << structureView.value("clmnNumber") << structureView.value("clmnNumber").toString().toInt();
 
 //		mapper->addMapping(date, mapper->model()->fieldIndex(structureView.value("clmnNumber").toString().toInt()));
-		qDebug() << __FILE__ << __LINE__ <<strID<<mapper <<((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()) << structureView.value("clmnNumber") << structureView.value("clmnNumber").toString().toInt();
+		//qDebug() << __FILE__ << __LINE__ <<strID<<mapper <<((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()) << structureView.value("clmnNumber") << structureView.value("clmnNumber").toString().toInt();
 
-		mapper->addMapping(date, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
+		//mapper->addMapping(date, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
 
 		}
 	else if(type.compare("Equation") == 0){
+		qDebug() << __FILE__ << __LINE__ <<"equation";
 		QLineEdit* lineEdit = new QLineEdit();
 		field = lineEdit;
 		lineEdit->setContentsMargins(0,0,0,0);
@@ -229,7 +236,7 @@ SubFieldUI::SubFieldUI(QWidget *parent,QString strID, QJsonObject structureView,
 		//if(!dataString.isEmpty()){
 		//	lineEdit->setText(dataString);
 		//	}
-		mapper->addMapping(lineEdit, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
+		//mapper->addMapping(lineEdit, ((QSqlRelationalTableModel*)mapper->model())->fieldIndex(structureView.value("clmnNumber").toString()));
 
 		}
 	else field  = new QWidget();
@@ -342,6 +349,7 @@ bool SubFieldUI::checkMandatory()
 
 QString SubFieldUI::getSqlClmnNumber() const
 {
+	qDebug() << __FILE__ << __LINE__  << "in get sql number";
 	return sqlClmnNumber;
 }
 
@@ -353,11 +361,13 @@ void SubFieldUI::indexedFillEvent(QString completion)
 
 void SubFieldUI::linkPressed()
 {
+	qDebug() << __FILE__ << __LINE__  << "in link pressed";
 	Controller::Get()->linkPressed(this->structureView);
 }
 
 void SubFieldUI::refrenceData(QVector<QSqlRecord> items)
 {
+	qDebug() << __FILE__ << __LINE__  << "in refrence data";
 	QObject::disconnect(Controller::Get(),SIGNAL(gotSelectListData(QVector<QSqlRecord>)),this,SLOT(refrenceData(QVector<QSqlRecord>)));
 
 	if(combox){
@@ -376,6 +386,7 @@ void SubFieldUI::refrenceData(QVector<QSqlRecord> items)
 
 void SubFieldUI::serialData(int serial)
 {
+	qDebug() << __FILE__ << __LINE__  << "in serial data";
 	QObject::disconnect(Controller::Get(),SIGNAL(gotValue(QString)),this,SLOT(serialData(QString)));
 	//No. of clients in db are 251
 	QString Clients = "clients::%";
@@ -396,7 +407,7 @@ void SubFieldUI::serialData(int serial)
 
 void SubFieldUI::updateFilter(QString filter)
 {
-
+	qDebug() << __FILE__ << __LINE__  << "in update filter";
 	QString source = structureView.value("Source").toString().trimmed();
 	QString select = structureView.value("Select").toString().trimmed();
 	QString entity = structureView.value("Entity").toString().trimmed();
@@ -417,6 +428,7 @@ void SubFieldUI::updateFilter(QString filter)
 
 void SubFieldUI::updateTable(QString)
 {
+	qDebug() << __FILE__ << __LINE__  << "in update table";
 	if(localFilterCombobox)
 		table->fillLocalSource(structureView,QString::number(localFilterCombobox->getKey()));
 }
@@ -598,7 +610,7 @@ void SubFieldUI::updateEquationField()
 
 double SubFieldUI::getClmnDataCount(QString strct)
 {
-
+	qDebug() << __FILE__ << __LINE__  << "in getClmnDataCount";
 	QString fieldName = strct.split("$").count() == 2? strct.split("$")[1]:"";
 	QString columnName = strct.split("$").count() == 2?strct.split("$")[0]:"";
 
@@ -623,7 +635,7 @@ double SubFieldUI::getClmnDataCount(QString strct)
 
 double SubFieldUI::evalEquationCondition(int condition, double col1, double col2)
 {
-	//qDebug() << __FILE__ << __LINE__  << condition << col1 << col2;
+	qDebug() << __FILE__ << __LINE__  << "evalEquation";
 	if(condition == 1){
 		if(col1 > col2)
 			return col1;

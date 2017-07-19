@@ -28,11 +28,17 @@ void InitTabel::gotCounterT(int tblCount)
 	if(tblCount == 0){
 		QString query;
 		query = genetrateCreateTabelQuery(QJsonDocument(Model::Get()->cachedViewStructures.value(this->tblName.toInt())));
-		qDebug()<< __FILE__ << __LINE__ << "NewTabel :::::::::" << query;
 
-		Database* database  = new Database();
-		QObject::connect(database,SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(gotResults(QVector<QSqlRecord>)));
-		database->query(query);
+
+		//Database* database  = new Database();
+		QObject::connect(Controller::Get()->getDatabase(),SIGNAL(queryResults(QVector<QSqlRecord>)),this,SLOT(gotResults(QVector<QSqlRecord>)));
+		foreach (QString q, query.split(";")) {
+			if(!q.isEmpty()){
+				Controller::Get()->getDatabase()->query(q);
+				qDebug()<< __FILE__ << __LINE__ << "NewTabel :::::::::" << q;
+				}
+			}
+
 
 		}
 }
@@ -56,7 +62,11 @@ QString InitTabel::genetrateCreateTabelQuery(QJsonDocument document)
 	foreach(QJsonValue vg,document.object().value("Viewgroups").toArray()){
 		//	qDebug() << vg.toObject() << vg.toObject().value("Viewgroup");
 		foreach(QJsonValue fv,vg.toObject().value("Viewgroup").toObject().value("Fields").toArray()){
-			QString fieldName = fv.toObject().value("Label").toString();
+			QString fieldName = fv.toObject().value("Label").toString(); //category not categorey
+			fieldName.replace(0,1,fieldName[0].toUpper()); // Change first letter to capital letter to match cached QMap
+			int tableNumber = Controller::Get()->getCachedViewStructureNames(fieldName);
+			qDebug()<<__FILE__<<__LINE__<<"Field name" <<fieldName <<tableNumber ;
+
 			//	if(fv.toObject().value("ShowInIndex") != QJsonValue::Undefined)
 			//		indexFieldsName << fv.toObject().value("Label").toString();
 			//	fieldsName << fv.toObject().value("Label").toString();
@@ -102,7 +112,7 @@ QString InitTabel::genetrateCreateTabelQuery(QJsonDocument document)
 					query +=", ";
 					}
 				else if(type.compare("Table") == 0){
-					oneToManyQueries +=  genetrateCreateTabelQueryForTabel(document.object().value("document_id").toString(),fieldName,subFld);
+					oneToManyQueries +=  genetrateCreateTabelQueryForTabel(document.object().value("document_id").toString(),tableNumber,subFld);
 					}
 				//	subfields.append(subFld.toObject());
 
@@ -121,18 +131,18 @@ QString InitTabel::genetrateCreateTabelQuery(QJsonDocument document)
 			 "`EditedByName` VARCHAR(40) NOT NULL, "
 			 "`CreatedByID` VARCHAR(40) NOT NULL, "
 			 "`EditedByID` VARCHAR(40) NOT NULL, "
-			 "`EditedOn` DATE NOT NULL, KEY(`EditedOn`) )ENGINE=INNODB DEFAULT CHARSET=utf8mb4; ";
+			 "`EditedOn` DATE NOT NULL, KEY(`EditedOn`) )ENGINE=INNODB DEFAULT CHARSET=`utf8mb4`; ";
 	//query += oneToManyQueries //I COMMENTED THIS;
-	query = oneToManyQueries;
+	//query = oneToManyQueries;
 
 	return query;
 }
 
-QString InitTabel::genetrateCreateTabelQueryForTabel(QString parentEntity,QString field,QJsonValue tabel)
+QString InitTabel::genetrateCreateTabelQueryForTabel(QString parentEntity,int tableNumber,QJsonValue tabel)
 {
 	QString query;
 	if(tabel.toObject().value("Type").toString().compare("Table") == 0){
-		query += "CREATE TABLE `"+parentEntity+"_"+field+"` (";
+		query += "CREATE TABLE `"+parentEntity+"_"+QString::number(tableNumber)+"` (";
 		query +="`id` INT NOT NULL,";
 		//query += "FOREIGN KEY (`"+parentEntity+"ID`) REFERENCES `"+parentEntity+"`(`id`)  ON DELETE CASCADE, ";
 		query += "FOREIGN KEY (`id`) REFERENCES `"+parentEntity+"`(`id`)  ON DELETE CASCADE, ";
@@ -173,9 +183,9 @@ QString InitTabel::genetrateCreateTabelQueryForTabel(QString parentEntity,QStrin
 			 "`EditedByName` VARCHAR(40) NOT NULL, "
 			 "`CreatedByID` VARCHAR(40) NOT NULL, "
 			 "`EditedByID` VARCHAR(40) NOT NULL, "
-			 "`EditedOn` DATE NOT NULL, KEY(`EditedOn`) )ENGINE=INNODB DEFAULT CHARSET=utf8mb4 ;";
+			 "`EditedOn` DATE NOT NULL, KEY(`EditedOn`) )ENGINE=INNODB DEFAULT CHARSET=`utf8mb4` ;";
 
-	qDebug()<<__FILE__<<__LINE__<<"query in table is" <<query;
+	//qDebug()<<__FILE__<<__LINE__<<"query in table is" <<query;
 	return query;
 
 }

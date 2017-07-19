@@ -11,10 +11,10 @@ class SQLTabelModel : public  QSqlRelationalTableModel
 {
 	Q_OBJECT
 public:
-	explicit SQLTabelModel(QObject *parent = 0, const int document_id = -1, QSqlDatabase db = QSqlDatabase());
+	explicit SQLTabelModel(QObject *parent = 0, const QString document_id = "", QSqlDatabase db = QSqlDatabase());
 	QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 private:
-	int document_id;
+	QString document_id;
 
 signals:
 

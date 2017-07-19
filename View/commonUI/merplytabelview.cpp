@@ -179,9 +179,9 @@ void merplyTabelView::resizeTabelToContets()
 bool merplyTabelView::fill(QJsonObject columns,QString filter)
 {
 	//TODO: Better connect to Signals
-	//	qDebug() << __FILE__ << __LINE__ << "fill";
+	//qDebug() << __FILE__ << __LINE__ << "fill" <<columns;
 	qDebug() << __FILE__ << __LINE__ << "fill" << "EERR";
-	model = new SQLTabelModel(0,1,database->getDatabase());
+	model = new SQLTabelModel(0,"1",database->getDatabase());
 	//= new MerplyReportTableModel(columns);
 
 	bool initDelegate = true;
@@ -201,7 +201,7 @@ bool merplyTabelView::fill(QJsonObject columns,QString filter)
 
 		}
 	else if(columns.value("Add") != QJsonValue::Undefined){
-		//qDebug() << "ADD" << columns;
+		qDebug() << "ADD" << columns;
 		if(columns.value("Add").toBool()){
 			foreach(QJsonValue clmn,columns.value("Columns").toArray()){
 				if(clmn.toObject().value("Source") != QJsonValue::Undefined){
@@ -238,7 +238,7 @@ bool merplyTabelView::fillLocalSource(QJsonObject columns, QString filter)
 	//if(model)
 	//	model->deleteLater();
 	qDebug() << __FILE__ << __LINE__ << "fillLocalSource" << "EERR";
-	model = new SQLTabelModel(0,1,database->getDatabase());
+	model = new SQLTabelModel(0,"1",database->getDatabase());
 	//= new MerplyReportTableModel(columns);
 	//QObject::disconnect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 	//QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
@@ -270,9 +270,11 @@ bool merplyTabelView::fillText(QJsonObject data)
 	return true;
 }
 
-void merplyTabelView::indexTable(const int document_id)
+
+void merplyTabelView::indexTable(const QString document_id)
 {
-	this->indexDocument_id = QString::number(document_id);
+	//this->indexDocument_id = QString::number(document_id);
+	this->indexDocument_id = document_id;
 	controllers->setEnabled(false);
 	model = new SQLTabelModel(0,document_id,database->getDatabase());
 	tableView->setModel(model);
@@ -288,7 +290,7 @@ void merplyTabelView::indexTable(const int document_id)
 	if(!indexDocument_id.isEmpty()){
 		//QObject::disconnect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
 		//QObject::connect(queryUI,SIGNAL(queryResults(QVector<QJsonDocument>)),model,SLOT(fillIndexTabel(QVector<QJsonDocument>)));
-		queryUI->fillDocumentID(document_id);
+		queryUI->fillDocumentID(document_id.toInt());
 		}
 
 	//	if(model){

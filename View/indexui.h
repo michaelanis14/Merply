@@ -22,14 +22,14 @@ class IndexUI : public MainDisplay
 {
 	Q_OBJECT
 public:
-	explicit IndexUI(QWidget *parent = 0, const int document_id = 0);
+	explicit IndexUI(QWidget *parent = 0, const QString document_id = 0);
 	void showUI();
 private:
 	QVBoxLayout * layout;
 	merplyTabelView * table ;
 	CreateEditUI* createEditUI;
 	QPushButton* btnCreatNew;
-	int document_id;
+	QString document_id;
 signals:
 
 public slots:

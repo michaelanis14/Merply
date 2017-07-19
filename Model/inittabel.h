@@ -14,7 +14,7 @@ public:
 	QString tblName;
 	Prsistance *persistance;
 	QString genetrateCreateTabelQuery(QJsonDocument document);
-	QString genetrateCreateTabelQueryForTabel(QString parentEntity, QString field, QJsonValue tabel);
+	QString genetrateCreateTabelQueryForTabel(QString parentEntity, int tableNumber, QJsonValue tabel);
 
 public slots:
 	void gotCounterT(int tblCount);

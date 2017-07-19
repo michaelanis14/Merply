@@ -692,7 +692,7 @@ void Controller::buildCachedCreateEditUI()
 void Controller::buildCachedIndexUI()
 {
 	foreach (int structID, getCachedViewStructures().keys()) {
-		IndexUI* indexUI =  new IndexUI(0,structID);
+		IndexUI* indexUI =  new IndexUI(0,QString::number(structID));
 		insertCachedIndexUI(structID,indexUI);
 		}
 }

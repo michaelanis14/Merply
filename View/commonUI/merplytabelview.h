@@ -44,7 +44,7 @@ public:
 	bool fill(QJsonObject columns,QString filter = "");
 	bool fillLocalSource(QJsonObject columns,QString filter = "");
 	bool fillText(QJsonObject data);
-	void indexTable(const int document_id);
+	void indexTable(const QString document_id);
 	QVector<QJsonDocument> items;
 	QJsonObject save();
 

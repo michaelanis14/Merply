@@ -4,7 +4,7 @@
 # Copyright (C) 2015 Merply - Michael Bishara e.U.
 #-------------------------------------------------
 
-QT       += core gui printsupport sql axcontainer
+QT       += core gui printsupport sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets concurrent
 
@@ -86,7 +86,5 @@ win32: LIBS += -L'C:/Program Files (x86)/MySQL/MySQLConnector.C6.1/lib/' -llibmy
 
 INCLUDEPATH += 'C:/Program Files (x86)/MySQL/MySQLConnector.C6.1/include'
 DEPENDPATH += 'C:/Program Files (x86)/MySQL/MySQLConnector.C6.1/include'
-
-DISTFILES +=
 
 
