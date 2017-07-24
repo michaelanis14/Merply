@@ -39,7 +39,6 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 
 
 	//tabel->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	//tabel->hideColumn(0); // don't show the ID
 
 	//tabel->resizeColumnsToContents();
 	//tabel->resizeRowsToContents();
@@ -67,6 +66,7 @@ merplyTabelView::merplyTabelView(QWidget *parent, bool add, bool edit) :
 	tableView->setContentsMargins(0,0,0,0);
 	//tableView->horizontalHeader()->setStretchLastSection(true);
 	tableView->horizontalHeader()->setStretchLastSection(true);
+	tableView->verticalHeader()->setVisible(false);
 	//tableView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
 	//tableView->sortByColumn(0,Qt::DescendingOrder);
 	//tableView->setSortingEnabled(true);
@@ -281,6 +281,7 @@ void merplyTabelView::indexTable(const QString document_id)
 	tableView->show();
 
 
+
 	//TODO:::
 //	QObject::connect(model,SIGNAL(done()),this,SLOT(modelFinished()));
 
@@ -311,6 +312,22 @@ void merplyTabelView::indexTable(const QString document_id)
 	//updateHeaderData(Controller::Get()->getCachedViewStructureIndexFieldsNames(document_id));
 	//	initHController(QJsonObject());
 	modelFinished();
+}
+
+void merplyTabelView::hideColumns(QJsonObject viewStructure)
+{
+	int index = 0;
+	qDebug()<<__FILE__<<__LINE__<<"column count"<<model->columnCount();
+	foreach (QJsonValue vg, viewStructure.value("Viewgroups").toArray()) {
+		foreach (QJsonValue fields, vg.toObject().value("Viewgroup").toObject().value("Fields").toArray()) {
+			if(fields.toObject().value("ShowInIndex") == QJsonValue::Undefined)
+				tableView->hideColumn(index);
+			index++;
+			}
+		}
+
+	for(int i = index ; i<=model->columnCount(); i++ )
+		tableView->hideColumn(i);
 }
 
 QJsonObject merplyTabelView::save()
@@ -561,6 +578,7 @@ void merplyTabelView::selectionChanged(const QItemSelection& , const QItemSelect
 void merplyTabelView::modelFinished()
 {
 	tableView->viewport()->installEventFilter(new QToolTipper(tableView));
+
 
 
 
