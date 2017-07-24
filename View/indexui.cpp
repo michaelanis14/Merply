@@ -28,6 +28,7 @@ IndexUI::IndexUI(QWidget *parent,const QString document_id) : MainDisplay(parent
 
 	this->document_id = document_id;
 	table->indexTable(document_id);
+	table->hideColumns(Controller::Get()->getCachedViewStructure(this->document_id.toInt()));
 	layout->addWidget(table);
 
 	createEditUI = new CreateEditUI(0,Controller::Get()->getCachedViewStructure(this->document_id.toInt()),this->table->getModel());
